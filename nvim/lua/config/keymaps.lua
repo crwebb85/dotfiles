@@ -11,3 +11,8 @@ vim.keymap.set('n', '<leader>c', '"+y')
 vim.keymap.set('n', '<leader>cc', '"+yy')
 vim.keymap.set('v', '<leader>c', '"+y')
 
+-- Select the last changed text or the text that was just pasted (does not work for multilined spaces)
+vim.keymap.set('n', 'gp', '`[v`]') 
+
+-- Remap key to enter visual block mode so it doesn't interfere with pasting shortcut
+vim.keymap.set('n', '<A-v>', '<C-V>')
