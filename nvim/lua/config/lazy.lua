@@ -74,4 +74,7 @@ require("lazy").setup({
         end
     },
 
+    -- harpoon (fast file navigation between pinned files)
+    'theprimeagen/harpoon',
+
 })
