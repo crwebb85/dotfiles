@@ -49,7 +49,22 @@ require("lazy").setup({
         config = function()
             require'nvim-treesitter.configs'.setup {
                 -- A list of parser names, or "all"
-                ensure_installed = { "javascript", "typescript", "c", "lua", "rust", "vim", "vimdoc", "query" },
+                ensure_installed = { 
+                    "javascript", 
+                    "typescript", 
+                    "tsx",
+                    "css",
+                    "json",
+                    "html",
+                    "xml",
+                    "yaml",
+                    "c", 
+                    "lua", 
+                    "rust", 
+                    "vim", 
+                    "vimdoc", 
+                    "query",
+                },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
                 sync_install = false,
@@ -76,5 +91,92 @@ require("lazy").setup({
 
     -- harpoon (fast file navigation between pinned files)
     'theprimeagen/harpoon',
+    
+    -- Undotree the solution to screwups
+    'mbbill/undotree',
+ 
+    -- LSP Package Manager
+    {'williamboman/mason.nvim'},
+    {'williamboman/mason-lspconfig.nvim'},
 
+    -- LSP Support
+    {
+        'VonHeikemen/lsp-zero.nvim',
+        branch = 'v3.x',
+        lazy = true,
+        config = false,
+    },
+    {
+        'neovim/nvim-lspconfig',
+        dependencies = {
+            {'hrsh7th/cmp-nvim-lsp'},
+        }
+    },
+    -- Autocompletion
+    {
+        'hrsh7th/nvim-cmp',
+        dependencies = {
+            {'L3MON4D3/LuaSnip'}
+        },
+    },
+    {'hrsh7th/cmp-buffer'},
+    {'hrsh7th/cmp-path'},
+    {'saadparwaiz1/cmp_luasnip'},
+    {'hrsh7th/cmp-nvim-lsp'},
+
+    -- Snippets
+    {'L3MON4D3/LuaSnip'},
+    {'rafamadriz/friendly-snippets'},
+})
+
+
+local lsp_zero = require('lsp-zero')
+
+lsp_zero.preset("recommended")
+
+local cmp = require('cmp')
+local cmp_action = require('lsp-zero').cmp_action()
+local cmp_select = {behavior = cmp.SelectBehavior.Select}
+
+cmp.setup({
+  mapping = cmp.mapping.preset.insert({
+    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+    
+    -- `Enter` key to confirm completion
+    ['<CR>'] = cmp.mapping.confirm({select = false}),
+
+    -- Ctrl+Space to trigger completion menu
+    ['<C-Space>'] = cmp.mapping.complete(),
+
+    -- Navigate between snippet placeholder
+    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+
+    -- Scroll up and down in the completion documentation
+    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+  })
+})
+
+
+lsp_zero.on_attach(function(client, bufnr)
+  -- see :help lsp-zero-keybindings
+  -- to learn the available actions
+  lsp_zero.default_keymaps({buffer = bufnr})
+  
+  local opts = {buffer = bufnr, remap = false}
+
+  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+  vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
+  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
+end)
+
+lsp_zero.setup() 
+
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  handlers = {
+    lsp_zero.default_setup,
+  },
 })
