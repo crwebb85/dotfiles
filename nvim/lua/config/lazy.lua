@@ -15,31 +15,31 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     -- git integration
     "tpope/vim-fugitive",
-    
+
     "sindrets/diffview.nvim",
 
     -- fuzzy finder (for many things not just file finder)
     {
-        'nvim-telescope/telescope.nvim', 
+        'nvim-telescope/telescope.nvim',
         tag = '0.1.2',
-        dependencies = { 
+        dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
-        } 
+        }
     },
 
     -- clipboard support (copy from vim to the outside world)
     "ojroques/nvim-osc52",
 
     -- color theme
-    { 
-        'rose-pine/neovim', 
+    {
+        'rose-pine/neovim',
         name = 'rose-pine',
         lazy = false,
         config = function()
             require("rose-pine").setup({
                 disable_background = true
             })
-        end     
+        end
     },
 
     -- LSP (Language Server Protocol
@@ -47,22 +47,22 @@ require("lazy").setup({
         'nvim-treesitter/nvim-treesitter',
         lazy = false,
         config = function()
-            require'nvim-treesitter.configs'.setup {
+            require 'nvim-treesitter.configs'.setup {
                 -- A list of parser names, or "all"
-                ensure_installed = { 
-                    "javascript", 
-                    "typescript", 
+                ensure_installed = {
+                    "javascript",
+                    "typescript",
                     "tsx",
                     "css",
                     "json",
                     "html",
                     "xml",
                     "yaml",
-                    "c", 
-                    "lua", 
-                    "rust", 
-                    "vim", 
-                    "vimdoc", 
+                    "c",
+                    "lua",
+                    "rust",
+                    "vim",
+                    "vimdoc",
                     "query",
                 },
 
@@ -85,19 +85,19 @@ require("lazy").setup({
                     -- Instead of true it can also be a list of languages
                     additional_vim_regex_highlighting = false,
                 },
-            }        
+            }
         end
     },
 
     -- harpoon (fast file navigation between pinned files)
     'theprimeagen/harpoon',
-    
+
     -- Undotree the solution to screwups
     'mbbill/undotree',
- 
+
     -- LSP Package Manager
-    {'williamboman/mason.nvim'},
-    {'williamboman/mason-lspconfig.nvim'},
+    { 'williamboman/mason.nvim' },
+    { 'williamboman/mason-lspconfig.nvim' },
 
     -- LSP Support
     {
@@ -109,24 +109,24 @@ require("lazy").setup({
     {
         'neovim/nvim-lspconfig',
         dependencies = {
-            {'hrsh7th/cmp-nvim-lsp'},
+            { 'hrsh7th/cmp-nvim-lsp' },
         }
     },
     -- Autocompletion
     {
         'hrsh7th/nvim-cmp',
         dependencies = {
-            {'L3MON4D3/LuaSnip'}
+            { 'L3MON4D3/LuaSnip' }
         },
     },
-    {'hrsh7th/cmp-buffer'},
-    {'hrsh7th/cmp-path'},
-    {'saadparwaiz1/cmp_luasnip'},
-    {'hrsh7th/cmp-nvim-lsp'},
+    { 'hrsh7th/cmp-buffer' },
+    { 'hrsh7th/cmp-path' },
+    { 'saadparwaiz1/cmp_luasnip' },
+    { 'hrsh7th/cmp-nvim-lsp' },
 
     -- Snippets
-    {'L3MON4D3/LuaSnip'},
-    {'rafamadriz/friendly-snippets'},
+    { 'L3MON4D3/LuaSnip' },
+    { 'rafamadriz/friendly-snippets' },
 })
 
 
@@ -136,47 +136,47 @@ lsp_zero.preset("recommended")
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
-local cmp_select = {behavior = cmp.SelectBehavior.Select}
+local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
 cmp.setup({
-  mapping = cmp.mapping.preset.insert({
-    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-    
-    -- `Enter` key to confirm completion
-    ['<CR>'] = cmp.mapping.confirm({select = false}),
+    mapping = cmp.mapping.preset.insert({
+        ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+        ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
 
-    -- Ctrl+Space to trigger completion menu
-    ['<C-Space>'] = cmp.mapping.complete(),
+        -- `Enter` key to confirm completion
+        ['<CR>'] = cmp.mapping.confirm({ select = false }),
 
-    -- Navigate between snippet placeholder
-    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+        -- Ctrl+Space to trigger completion menu
+        ['<C-Space>'] = cmp.mapping.complete(),
 
-    -- Scroll up and down in the completion documentation
-    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-d>'] = cmp.mapping.scroll_docs(4),
-  })
+        -- Navigate between snippet placeholder
+        ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+        ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+
+        -- Scroll up and down in the completion documentation
+        ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    })
 })
 
 
 lsp_zero.on_attach(function(client, bufnr)
-  -- see :help lsp-zero-keybindings
-  -- to learn the available actions
-  lsp_zero.default_keymaps({buffer = bufnr})
-  
-  local opts = {buffer = bufnr, remap = false}
+    -- see :help lsp-zero-keybindings
+    -- to learn the available actions
+    lsp_zero.default_keymaps({ buffer = bufnr })
 
-  vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-  vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
-  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
+    local opts = { buffer = bufnr, remap = false }
+
+    vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
+    vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
+    vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
 end)
 
-lsp_zero.setup() 
+lsp_zero.setup()
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  handlers = {
-    lsp_zero.default_setup,
-  },
+    handlers = {
+        lsp_zero.default_setup,
+    },
 })

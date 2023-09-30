@@ -26,9 +26,9 @@ vim.keymap.set('n', '<leader>c', '"+y')
 vim.keymap.set('n', '<leader>cc', '"+yy')
 vim.keymap.set('v', '<leader>c', '"+y')
 
--- Nearly the same keymaps 
+-- Nearly the same keymaps
 -- TODO determine which I like better
-vim.keymap.set({"n", "v"}, "<leader>y", [["+y]])
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 -- don't override paste buffer with the replaced text
@@ -36,7 +36,7 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
 -- Delete to the void register
-vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
+vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
 
 -- Undo Mistakes --
@@ -45,7 +45,7 @@ vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
 
 -- Other --
 -- Select the last changed text or the text that was just pasted (does not work for multilined spaces)
-vim.keymap.set('n', 'gp', '`[v`]') 
+vim.keymap.set('n', 'gp', '`[v`]')
 
 -- Remap key to enter visual block mode so it doesn't interfere with pasting shortcut
 vim.keymap.set('n', '<A-v>', '<C-V>')
@@ -57,7 +57,7 @@ vim.keymap.set("n", "<leader>fv", vim.cmd.Ex)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
--- Move next line to the end of the current line 
+-- Move next line to the end of the current line
 -- but without moving the cursor to the end of the line
 vim.keymap.set("n", "J", "mzJ`z")
 
@@ -65,7 +65,7 @@ vim.keymap.set("n", "J", "mzJ`z")
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
--- Go to next/previous search term 
+-- Go to next/previous search term
 -- but keep cursor in the middle of page
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
@@ -88,4 +88,3 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 
 -- Make file executeable
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-
