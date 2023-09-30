@@ -13,12 +13,16 @@ vim.opt.rtp:prepend(lazypath)
 
 
 require("lazy").setup({
-    -- git integration
+    ------------------------------
+    --- git integration
     "tpope/vim-fugitive",
 
     "sindrets/diffview.nvim",
 
-    -- fuzzy finder (for many things not just file finder)
+    ------------------------------
+    --- Navigation
+
+    -- Fuzzy finder (for many things not just file finder)
     {
         'nvim-telescope/telescope.nvim',
         tag = '0.1.2',
@@ -27,7 +31,11 @@ require("lazy").setup({
         }
     },
 
-    -- clipboard support (copy from vim to the outside world)
+    -- Harpoon (fast file navigation between pinned files)
+    'theprimeagen/harpoon',
+
+    ------------------------------
+    -- Clipboard support (copy from vim to the outside world)
     "ojroques/nvim-osc52",
 
     -- color theme
@@ -42,7 +50,12 @@ require("lazy").setup({
         end
     },
 
-    -- LSP (Language Server Protocol
+    ------------------------------
+    --- Undotree the solution to screwups
+    'mbbill/undotree',
+
+    ------------------------------
+    -- Parser for syntax highlighting
     {
         'nvim-treesitter/nvim-treesitter',
         lazy = false,
@@ -64,6 +77,10 @@ require("lazy").setup({
                     "vim",
                     "vimdoc",
                     "query",
+                    "markdown",
+                    "markdown_inline",
+                    "python",
+                    "toml",
                 },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
@@ -89,11 +106,8 @@ require("lazy").setup({
         end
     },
 
-    -- harpoon (fast file navigation between pinned files)
-    'theprimeagen/harpoon',
-
-    -- Undotree the solution to screwups
-    'mbbill/undotree',
+    ------------------------------
+    --- LSP's and more
 
     -- LSP Package Manager
     { 'williamboman/mason.nvim' },

@@ -5,3 +5,5 @@
 - `:EditQuery` to open the Live Query Editor
 
 - `:DiffviewOpen` to open the git diff for current changes
+
+- `:Mason` to open the package manager for LSPs, linters, formatters, and debugers.
