@@ -13,14 +13,14 @@ vim.opt.rtp:prepend(lazypath)
 
 
 require("lazy").setup({
-    ------------------------------
-    --- git integration
+    ---------------------------------------------------------------------------
+    -- Git integration
     "tpope/vim-fugitive",
 
     "sindrets/diffview.nvim",
 
-    ------------------------------
-    --- Navigation
+    ---------------------------------------------------------------------------
+    -- Navigation
 
     -- Fuzzy finder (for many things not just file finder)
     {
@@ -34,11 +34,11 @@ require("lazy").setup({
     -- Harpoon (fast file navigation between pinned files)
     'theprimeagen/harpoon',
 
-    ------------------------------
+    ---------------------------------------------------------------------------
     -- Clipboard support (copy from vim to the outside world)
     "ojroques/nvim-osc52",
 
-    -- color theme
+    -- Color theme
     {
         'rose-pine/neovim',
         name = 'rose-pine',
@@ -50,11 +50,11 @@ require("lazy").setup({
         end
     },
 
-    ------------------------------
-    --- Undotree the solution to screwups
+    ---------------------------------------------------------------------------
+    -- Undotree the solution to screwups
     'mbbill/undotree',
 
-    ------------------------------
+    ---------------------------------------------------------------------------
     -- Parser for syntax highlighting
     {
         'nvim-treesitter/nvim-treesitter',
@@ -106,7 +106,126 @@ require("lazy").setup({
         end
     },
 
-    ------------------------------
+    -----------------------------------------------------------------------------
+    -- PYTHON REPL
+    -- A basic REPL that opens up as a horizontal split
+    -- - use `<leader>i` to toggle the REPL
+    -- - use `<leader>I` to restart the REPL
+    -- - `+` serves as the "send to REPL" operator. That means we can use `++`
+    -- to send the current line to the REPL, and `+j` to send the current and the
+    -- following line to the REPL, like we would do with other vim operators.
+    {
+        "Vigemus/iron.nvim",
+        keys = {
+            { "<leader>i", vim.cmd.IronRepl, desc = "󱠤 Toggle REPL" },
+            { "<leader>I", vim.cmd.IronRestart, desc = "󱠤 Restart REPL" },
+
+            -- these keymaps need no right-hand-side, since that is defined by the
+            -- plugin config further below
+            { "+", mode = { "n", "x" }, desc = "󱠤 Send-to-REPL Operator" },
+            { "++", desc = "󱠤 Send Line to REPL" },
+        },
+
+        -- since irons's setup call is `require("iron.core").setup`, instead of
+        -- `require("iron").setup` like other plugins would do, we need to tell
+        -- lazy.nvim which module to via the `main` key
+        main = "iron.core",
+
+        opts = {
+            keymaps = {
+                send_line = "++",
+                visual_send = "+",
+                send_motion = "+",
+            },
+            config = {
+                -- this defined how the repl is opened. Here we set the REPL window
+                -- to open in a horizontal split to a bottom, with a height of 10
+                -- cells.
+                repl_open_cmd = "horizontal bot 10 split",
+
+                -- This defines which binary to use for the REPL. If `ipython` is
+                -- available, it will use `ipython`, otherwise it will use `python3`.
+                -- since the python repl does not play well with indents, it's
+                -- preferable to use `ipython` or `bypython` here.
+                -- (see: https://github.com/Vigemus/iron.nvim/issues/348)
+                repl_definition = {
+                    python = {
+                        command = function()
+                            local ipythonAvailable = vim.fn.executable("ipython") == 1
+                            local binary = ipythonAvailable and "ipython" or "python3"
+                            return { binary }
+                        end,
+                    },
+                },
+            },
+        },
+    },
+
+    ---------------------------------------------------------------------------
+    -- DEBUGGING
+
+    -- DAP Client for nvim
+    -- - start the debugger with `<leader>dc`
+    -- - add breakpoints with `<leader>db`
+    -- - terminate the debugger `<leader>dt`
+    {
+        "mfussenegger/nvim-dap",
+        keys = {
+            {
+                "<leader>dc",
+                function() require("dap").continue() end,
+                desc = "Start/Continue Debugger",
+            },
+            {
+                "<leader>db",
+                function() require("dap").toggle_breakpoint() end,
+                desc = "Add Breakpoint",
+            },
+            {
+                "<leader>dt",
+                function() require("dap").terminate() end,
+                desc = "Terminate Debugger",
+            },
+        },
+    },
+
+    -- UI for the debugger
+    -- - the debugger UI is also automatically opened when starting/stopping the debugger
+    -- - toggle debugger UI manually with `<leader>du`
+    {
+        "rcarriga/nvim-dap-ui",
+        dependencies = "mfussenegger/nvim-dap",
+        keys = {
+            {
+                "<leader>du",
+                function() require("dapui").toggle() end,
+                desc = "Toggle Debugger UI",
+            },
+        },
+        -- automatically open/close the DAP UI when starting/stopping the debugger
+        config = function()
+            local listener = require("dap").listeners
+            listener.after.event_initialized["dapui_config"] = function() require("dapui").open() end
+            listener.before.event_terminated["dapui_config"] = function() require("dapui").close() end
+            listener.before.event_exited["dapui_config"] = function() require("dapui").close() end
+        end,
+    },
+
+    -- Configuration for the python debugger
+    -- - configures debugpy for us
+    -- - uses the debugpy installation from mason
+    {
+        "mfussenegger/nvim-dap-python",
+        dependencies = "mfussenegger/nvim-dap",
+        config = function()
+            -- uses the debugypy installation by mason
+            local debugpyPythonPath = require("mason-registry").get_package("debugpy"):get_install_path()
+                .. "/.venv/bin/python3" -- TODO figure out if I need dynamically determine path
+            require("dap-python").setup(debugpyPythonPath, {})
+        end,
+    },
+
+    ---------------------------------------------------------------------------
     --- LSP's and more
 
     -- LSP Package Manager
@@ -141,6 +260,48 @@ require("lazy").setup({
     -- Snippets
     { 'L3MON4D3/LuaSnip' },
     { 'rafamadriz/friendly-snippets' },
+
+    -- Virtual Environments
+    -- select virtual environments
+    -- - makes pyright and debugpy aware of the selected virtual environment
+    -- - Select a virtual environment with `:VenvSelect`
+    {
+        "linux-cultist/venv-selector.nvim",
+        dependencies = {
+            "neovim/nvim-lspconfig",
+            "nvim-telescope/telescope.nvim",
+            "mfussenegger/nvim-dap-python",
+        },
+        opts = {
+            dap_enabled = true, -- makes the debugger work with venv
+        },
+    },
+
+    -- Formatting client: conform.nvim
+    -- - configured to use black & isort in python
+    -- - use the taplo-LSP for formatting in toml
+    -- - Formatting is triggered via `<leader>f`, but also automatically on save
+    {
+        "stevearc/conform.nvim",
+        event = "BufWritePre", -- load the plugin before saving
+        opts = {
+            formatters_by_ft = {
+                -- first use isort and then black
+                python = { "isort", "black" },
+                -- "inject" is a "special" formatter from conform.nvim, which
+                -- formats treesitter-injected code. In effect, hits will make
+                -- conform.nvim format any python codeblocks inside a markdown file.
+                markdown = { "inject" },
+            },
+            -- enable format-on-save
+            format_on_save = {
+                -- when no formatter is setup for a filetype, fallback to formatting
+                -- via the LSP. This is relevant e.g. for taplo (toml LSP), where the
+                -- LSP can handle the formatting for us
+                lsp_fallback = true,
+            },
+        },
+    },
 })
 
 

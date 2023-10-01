@@ -75,7 +75,7 @@ vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("n", "Q", "<nop>")
 
 -- Format buffer
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+vim.keymap.set("n", "<leader>f", function() require("conform").format({ lsp_fallback = true }) end)
 
 -- Quick fix navigation
 vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
