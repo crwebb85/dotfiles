@@ -212,25 +212,35 @@ require("lazy").setup({
     },
 
     -- Configuration for the python debugger
-    -- - configures debugpy for us
-    -- - uses the debugpy installation from mason
     {
         "mfussenegger/nvim-dap-python",
         dependencies = "mfussenegger/nvim-dap",
-        config = function()
-            -- uses the debugypy installation by mason
-            local debugpyPythonPath = require("mason-registry").get_package("debugpy"):get_install_path()
-                .. "/.venv/bin/python3" -- TODO figure out if I need dynamically determine path
-            require("dap-python").setup(debugpyPythonPath, {})
-        end,
     },
 
     ---------------------------------------------------------------------------
     --- LSP's and more
 
-    -- LSP Package Manager
-    { 'williamboman/mason.nvim' },
-    { 'williamboman/mason-lspconfig.nvim' },
+    -- Manager for external tools (LSPs, linters, debuggers, formatters)
+    -- auto-install of those external tools
+    {
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        dependencies = {
+            { "williamboman/mason.nvim",           opts = true },
+            { "williamboman/mason-lspconfig.nvim", opts = true },
+        },
+        opts = {
+            ensure_installed = {
+                "pyright",             -- LSP for python
+                "ruff-lsp",            -- linter for python (includes flake8, pep8, etc.)
+                "debugpy",             -- python debugger
+                "black",               -- python formatter
+                "isort",               -- python organize imports
+                "taplo",               -- LSP for toml (for pyproject.toml files)
+                "lua-language-server", -- LSP for lua files
+                "stylua",              -- Formatter for lua files
+            },
+        },
+    },
 
     -- LSP Support
     {
@@ -274,6 +284,7 @@ require("lazy").setup({
         },
         opts = {
             dap_enabled = true, -- makes the debugger work with venv
+            name = { "venv", ".venv" },
         },
     },
 
@@ -355,3 +366,11 @@ require('mason-lspconfig').setup({
         lsp_zero.default_setup,
     },
 })
+
+-- configures debugpy
+-- uses the debugypy installation by mason
+local debugpyPythonPath = require("mason-registry").get_package("debugpy"):get_install_path()
+    .. "/.venv/bin/python3" -- TODO figure out if I need dynamically determine path
+require("dap-python").setup(debugpyPythonPath, {})
+
+--TODO add statusline functionality https://github.com/linux-cultist/venv-selector.nvim#tips-and-tricks
