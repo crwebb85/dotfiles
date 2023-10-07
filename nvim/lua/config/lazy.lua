@@ -34,6 +34,27 @@ require("lazy").setup({
     -- Harpoon (fast file navigation between pinned files)
     'theprimeagen/harpoon',
 
+
+    ---------------------------------------------------------------------------
+    -- Utils
+
+    -- Autopair brackets and quotes
+    {
+        'echasnovski/mini.pairs',
+        version = '*',
+        config = function()
+            require('mini.pairs').setup()
+        end
+    },
+    -- Comment toggling
+    {
+        'echasnovski/mini.comment',
+        version = '*',
+        config = function()
+            require('mini.comment').setup()
+        end
+    },
+
     ---------------------------------------------------------------------------
     -- Clipboard support (copy from vim to the outside world)
     "ojroques/nvim-osc52",
@@ -331,6 +352,7 @@ cmp.setup({
 
         -- `Enter` key to confirm completion
         ['<CR>'] = cmp.mapping.confirm({ select = false }),
+        ['<TAB>'] = cmp.mapping.confirm({ select = false }),
 
         -- Ctrl+Space to trigger completion menu
         ['<C-Space>'] = cmp.mapping.complete(),
