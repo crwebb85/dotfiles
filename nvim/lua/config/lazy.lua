@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({
         "git",
         "clone",
@@ -10,7 +10,6 @@ if not vim.loop.fs_stat(lazypath) then
     })
 end
 vim.opt.rtp:prepend(lazypath)
-
 
 require("lazy").setup({
     ---------------------------------------------------------------------------
@@ -80,8 +79,10 @@ require("lazy").setup({
     {
         'nvim-treesitter/nvim-treesitter',
         lazy = false,
+        build = ":TSUpdate",
         config = function()
-            require 'nvim-treesitter.configs'.setup {
+            require('nvim-treesitter.configs').setup({
+                modules = {},
                 -- A list of parser names, or "all"
                 ensure_installed = {
                     "javascript",
@@ -111,6 +112,10 @@ require("lazy").setup({
                 -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
                 auto_install = true,
 
+                -- List of parsers to ignore installing (or "all")
+                ignore_install = {},
+
+
                 ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
                 -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
 
@@ -123,7 +128,7 @@ require("lazy").setup({
                     -- Instead of true it can also be a list of languages
                     additional_vim_regex_highlighting = false,
                 },
-            }
+            })
         end
     },
 
@@ -241,6 +246,28 @@ require("lazy").setup({
     ---------------------------------------------------------------------------
     --- LSP's and more
 
+    -- Adds workspace configuration file support
+    {
+        "folke/neoconf.nvim",
+        config = function()
+            require("neoconf").setup({})
+        end
+    },
+
+    -- Configure Lua LSP to know about neovim plugins when in neovim config
+    {
+        "folke/neodev.nvim",
+        config = function()
+            require("neodev").setup({
+                -- Workaround to get correctly configure lua_ls for neovim config
+                -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
+                override = function(root_dir, library)
+                    library.enabled = true
+                    library.plugins = true
+                end,
+            })
+        end
+    },
     -- Manager for external tools (LSPs, linters, debuggers, formatters)
     -- auto-install of those external tools
     {
@@ -382,6 +409,7 @@ end)
 
 lsp_zero.setup()
 
+
 require('mason').setup({})
 require('mason-lspconfig').setup({
     handlers = {
@@ -389,10 +417,20 @@ require('mason-lspconfig').setup({
     },
 })
 
+local lspconfig = require('lspconfig')
+
+lspconfig.lua_ls.setup({
+    settings = {
+        Lua = {
+            completion = {
+                callSnippet = "Replace"
+            }
+        }
+    }
+})
+
 -- configures debugpy
 -- uses the debugypy installation by mason
 local debugpyPythonPath = require("mason-registry").get_package("debugpy"):get_install_path()
     .. "/.venv/bin/python3" -- TODO figure out if I need dynamically determine path
 require("dap-python").setup(debugpyPythonPath, {})
-
---TODO add statusline functionality https://github.com/linux-cultist/venv-selector.nvim#tips-and-tricks
