@@ -1,3 +1,5 @@
+vim.g.mapleader = " "
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({
@@ -18,6 +20,12 @@ require("lazy").setup({
 
     "sindrets/diffview.nvim",
 
+    {
+        "lewis6991/gitsigns.nvim",
+        config = function()
+            require('gitsigns').setup()
+        end
+    },
     ---------------------------------------------------------------------------
     -- Navigation
 
@@ -58,18 +66,17 @@ require("lazy").setup({
     -- Clipboard support (copy from vim to the outside world)
     "ojroques/nvim-osc52",
 
-    -- Color theme
     {
-        'rose-pine/neovim',
-        name = 'rose-pine',
+        "folke/tokyonight.nvim",
         lazy = false,
+        priority = 1000,
+        opts = {},
         config = function()
-            require("rose-pine").setup({
-                disable_background = true
-            })
+            require("tokyonight.colors").setup()
+            local color = "tokyonight"
+            vim.cmd.colorscheme(color)
         end
     },
-
     ---------------------------------------------------------------------------
     -- Undotree the solution to screwups
     'mbbill/undotree',
@@ -200,7 +207,8 @@ require("lazy").setup({
             {
                 "<leader>dc",
                 function() require("dap").continue() end,
-                desc = "Start/Continue Debugger",
+                desc = "Start/Continue Debugger"
+                ,
             },
             {
                 "<leader>db",
@@ -273,8 +281,8 @@ require("lazy").setup({
     {
         "WhoIsSethDaniel/mason-tool-installer.nvim",
         dependencies = {
-            { "williamboman/mason.nvim",           opts = true },
-            { "williamboman/mason-lspconfig.nvim", opts = true },
+            { "williamboman/mason.nvim" },
+            { "williamboman/mason-lspconfig.nvim" },
         },
         opts = {
             ensure_installed = {
@@ -295,7 +303,6 @@ require("lazy").setup({
         'VonHeikemen/lsp-zero.nvim',
         branch = 'v3.x',
         lazy = true,
-        config = false,
     },
     {
         'neovim/nvim-lspconfig',
@@ -361,8 +368,9 @@ require("lazy").setup({
             },
         },
     },
+    -- Import plugins defined in the plugins folder
+    { import = "plugins" },
 })
-
 
 local lsp_zero = require('lsp-zero')
 
@@ -393,7 +401,6 @@ cmp.setup({
         ['<C-d>'] = cmp.mapping.scroll_docs(4),
     })
 })
-
 
 lsp_zero.on_attach(function(client, bufnr)
     -- see :help lsp-zero-keybindings
@@ -428,6 +435,7 @@ lspconfig.lua_ls.setup({
         }
     }
 })
+
 
 -- configures debugpy
 -- uses the debugypy installation by mason

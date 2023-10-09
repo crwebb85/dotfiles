@@ -32,5 +32,8 @@
         "/home/chris/.local/share/nvim/lazy/nvim-dap-ui/lua",
         "/home/chris/.config/nvim/lua",
         "${3rd}/luv/library"
+    ],
+    "diagnostics.disable": [
+        "missing-fields"
     ]
 }

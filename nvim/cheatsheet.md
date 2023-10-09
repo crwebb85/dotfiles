@@ -7,3 +7,7 @@
 - `:DiffviewOpen` to open the git diff for current changes
 
 - `:Mason` to open the package manager for LSPs, linters, formatters, and debugers.
+
+
+- `:lua= vim.lsp.get_active_clients({ name = "lua_ls" })[1].config.settings.Lua` to print info about the lua lsp config
+- `:Gitsigns toggle_current_line_blame` to toggle git blame
