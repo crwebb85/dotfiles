@@ -17,15 +17,19 @@ require("lazy").setup({
     ---------------------------------------------------------------------------
     -- Git integration
     "tpope/vim-fugitive",
-
-    "sindrets/diffview.nvim",
-
+    -- Adds git diffview
+    {
+        "sindrets/diffview.nvim",
+        keys = { { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open Git DiffView" } },
+    },
+    -- Adds an api wrapper arround git which I use in my heirline setup
     {
         "lewis6991/gitsigns.nvim",
         config = function()
             require('gitsigns').setup()
         end
     },
+
     ---------------------------------------------------------------------------
     -- Navigation
 
@@ -61,6 +65,16 @@ require("lazy").setup({
             require('mini.comment').setup()
         end
     },
+    -- Keymap suggestions
+    {
+        "folke/which-key.nvim",
+        event = "VeryLazy",
+        init = function()
+            vim.o.timeout = true
+            vim.o.timeoutlen = 300
+        end,
+        opts = {}
+    },
 
     ---------------------------------------------------------------------------
     -- Clipboard support (copy from vim to the outside world)
@@ -77,6 +91,7 @@ require("lazy").setup({
             vim.cmd.colorscheme(color)
         end
     },
+
     ---------------------------------------------------------------------------
     -- Undotree the solution to screwups
     'mbbill/undotree',
@@ -368,6 +383,8 @@ require("lazy").setup({
             },
         },
     },
+
+    ---------------------------------------------------------------------------
     -- Import plugins defined in the plugins folder
     { import = "plugins" },
 })
