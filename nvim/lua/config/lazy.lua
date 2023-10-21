@@ -20,11 +20,15 @@ require("lazy").setup({
     -- Adds git diffview
     {
         "sindrets/diffview.nvim",
+        lazy = false,
         keys = { { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open Git DiffView" } },
     },
     -- Adds an api wrapper arround git which I use in my heirline setup
+    -- Adds Gitblame
+    -- Adds sidbar showing lines changed
     {
         "lewis6991/gitsigns.nvim",
+        lazy = false,
         config = function()
             require('gitsigns').setup()
         end

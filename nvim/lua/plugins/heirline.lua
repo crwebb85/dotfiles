@@ -60,7 +60,6 @@ local config = function()
         end,
     }
 
-
     local ActiveBlock = {
         hl = function()
             if conditions.is_active() then
@@ -79,60 +78,6 @@ local config = function()
                 return { fg = inactive_background_color }
             end
         end,
-    }
-
-    local FileIcon = {
-        init = function(self)
-            local filename = self.filename
-            local extension = vim.fn.fnamemodify(filename, ":e")
-            self.icon, self.icon_color =
-                require("nvim-web-devicons").get_icon_color(filename, extension, { default = true })
-        end,
-        provider = function(self)
-            if self.filename == "" then
-                return ""
-            else
-                return self.icon and (self.icon .. " ")
-            end
-        end,
-        hl = function(self)
-            return { fg = self.icon_color }
-        end,
-    }
-
-    local FileName = {
-        provider = function(self)
-            local filename = vim.fn.fnamemodify(self.filename, ":t")
-            if filename == "" then
-                return ""
-            end
-            if not conditions.width_percent_below(#filename, 0.1) then
-                filename = vim.fn.pathshorten(filename)
-            end
-            return filename
-        end,
-        hl = { fg = colors.magenta2, bold = true },
-    }
-
-    local FileFlags = {
-        {
-            -- shows if buffer is unsaved
-            provider = function()
-                if vim.bo.modified then
-                    return "[+] "
-                end
-            end,
-            hl = { fg = colors.green, bold = true, italic = true },
-        },
-        {
-            -- shows a lock if the file is readonly
-            provider = function()
-                if not vim.bo.modifiable or vim.bo.readonly then
-                    return " "
-                end
-            end,
-            hl = { fg = colors.green2, bold = true, italic = true },
-        },
     }
 
     -- Italicizes the buffer file name if it has been modified
@@ -305,6 +250,7 @@ local config = function()
             end),
         },
     }
+
     local Git = {
         condition = conditions.is_git_repo,
         init = function(self)
@@ -363,7 +309,6 @@ local config = function()
             hl = { bg = active_foreground_color },
         },
     }
-
 
     local LSPActive = {
         condition = conditions.lsp_attached,
@@ -428,16 +373,6 @@ local config = function()
         update = { "RecordingEnter", "RecordingLeave" },
     }
 
-    local FileType = {
-        condition = function()
-            return conditions.buffer_matches({ filetype = { "coderunner" } })
-        end,
-        provider = function()
-            return vim.bo.filetype
-        end,
-        hl = { fg = colors.magenta, bold = true },
-    }
-
     local Ruler = {
         condition = function()
             return scrollbar_enabled()
@@ -463,6 +398,70 @@ local config = function()
             return string.rep(self.sbar[i], 2)
         end,
         hl = { fg = scrollbar_foreground_color, bg = scrollbar_background_color },
+    }
+
+    local FileIcon = {
+        init = function(self)
+            local filename = self.filename
+            local extension = vim.fn.fnamemodify(filename, ":e")
+            self.icon, self.icon_color =
+                require("nvim-web-devicons").get_icon_color(filename, extension, { default = true })
+        end,
+        provider = function(self)
+            if self.filename == "" then
+                return ""
+            else
+                return self.icon and (self.icon .. " ")
+            end
+        end,
+        hl = function(self)
+            return { fg = self.icon_color }
+        end,
+    }
+
+    local FileName = {
+        provider = function(self)
+            local filename = vim.fn.fnamemodify(self.filename, ":t")
+            if filename == "" then
+                return ""
+            end
+            if not conditions.width_percent_below(#filename, 0.1) then
+                filename = vim.fn.pathshorten(filename)
+            end
+            return filename
+        end,
+        hl = { fg = colors.magenta2, bold = true },
+    }
+
+    local FileFlags = {
+        {
+            -- shows if buffer is unsaved
+            provider = function()
+                if vim.bo.modified then
+                    return "[+] "
+                end
+            end,
+            hl = { fg = colors.green, bold = true, italic = true },
+        },
+        {
+            -- shows a lock if the file is readonly
+            provider = function()
+                if not vim.bo.modifiable or vim.bo.readonly then
+                    return " "
+                end
+            end,
+            hl = { fg = colors.green2, bold = true, italic = true },
+        },
+    }
+
+    local FileType = {
+        condition = function()
+            return conditions.buffer_matches({ filetype = { "coderunner" } })
+        end,
+        provider = function()
+            return vim.bo.filetype
+        end,
+        hl = { fg = colors.magenta, bold = true },
     }
 
     local FileNameBlock = {

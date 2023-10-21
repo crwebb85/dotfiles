@@ -7,4 +7,7 @@
 
 Cool plugins:
 - https://github.com/folke/trouble.nvim
-
+- https://github.com/rmagatti/auto-session
+- https://github.com/kevinhwang91/nvim-bqf
+- https://github.com/CKolkey/ts-node-action Toggle formatting of code snippets (this is not about typescript) 
+- https://github.com/ThePrimeagen/refactoring.nvim 
