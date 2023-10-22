@@ -27,3 +27,32 @@ augroup remember_folds
   autocmd BufWinEnter ?* silent! loadview
 augroup END
 ]])
+
+-- If my folds get screwed up the following function can be used to delete
+-- the view file. I think this should fix my folds but need to test it
+function MyDeleteView()
+    local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
+    -- vim's odd =~ escaping for /
+    path = vim.fn.substitute(path, '=', '==', 'g')
+    if vim.fn.has_key(vim.fn.environ(), "HOME") then
+        path = vim.fn.substitute(path, '^' .. os.getenv("HOME"), '\\~', '')
+    end
+    path = vim.fn.substitute(path, '/', '=+', 'g') .. '='
+    -- view directory
+    path = vim.opt.viewdir:get() .. path
+    vim.fn.delete(path)
+    print("Deleted: " .. path)
+end
+
+function FixFolds()
+    vim.cmd([[
+        augroup remember_folds
+          autocmd!
+        augroup END
+    ]])
+    MyDeleteView()
+    print("Close and reopen nvim for folds to work on this file again")
+end
+
+vim.api.nvim_create_user_command('FixFolds', FixFolds, {})
+vim.api.nvim_create_user_command('Delview', MyDeleteView, {})

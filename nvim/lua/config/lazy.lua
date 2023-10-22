@@ -305,14 +305,19 @@ require("lazy").setup({
         },
         opts = {
             ensure_installed = {
-                "pyright",             -- LSP for python
-                "ruff-lsp",            -- linter for python (includes flake8, pep8, etc.)
-                "debugpy",             -- python debugger
-                "black",               -- python formatter
-                "isort",               -- python organize imports
-                "taplo",               -- LSP for toml (for pyproject.toml files)
-                "lua-language-server", -- LSP for lua files
-                "stylua",              -- Formatter for lua files
+                "pyright",                    -- LSP for python
+                "ruff-lsp",                   -- linter for python (includes flake8, pep8, etc.)
+                "debugpy",                    -- python debugger
+                "black",                      -- python formatter
+                "isort",                      -- python organize imports
+                "taplo",                      -- LSP for toml (for pyproject.toml files)
+
+                "lua-language-server",        -- LSP for lua files
+                "stylua",                     -- Formatter for lua files
+
+                "prettier",                   -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
+                "typescript-language-server", -- tsserver LSP (keywords: typescript, javascript)
+                "eslint-lsp",                 -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
             },
         },
     },
@@ -456,7 +461,6 @@ lspconfig.lua_ls.setup({
         }
     }
 })
-
 
 -- configures debugpy
 -- uses the debugypy installation by mason
