@@ -28,9 +28,8 @@ augroup remember_folds
 augroup END
 ]])
 
--- If my folds get screwed up the following function can be used to delete
--- the view file. I think this should fix my folds but need to test it
-function MyDeleteView()
+
+function GetBufferViewPath()
     local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
     -- vim's odd =~ escaping for /
     path = vim.fn.substitute(path, '=', '==', 'g')
@@ -40,19 +39,38 @@ function MyDeleteView()
     path = vim.fn.substitute(path, '/', '=+', 'g') .. '='
     -- view directory
     path = vim.opt.viewdir:get() .. path
+    return path
+end
+
+-- If my folds get screwed up the following function can be used to delete
+-- the view file. I think this should fix my folds but need to test it
+function DeleteView()
+    local path = GetBufferViewPath()
     vim.fn.delete(path)
     print("Deleted: " .. path)
 end
 
-function FixFolds()
+function OpenView()
+    local path = GetBufferViewPath()
+    vim.cmd('e ' .. path)
+end
+
+function PrintViewPath()
+    local path = GetBufferViewPath()
+    print(path)
+end
+
+function ResetView()
     vim.cmd([[
         augroup remember_folds
           autocmd!
         augroup END
     ]])
-    MyDeleteView()
-    print("Close and reopen nvim for folds to work on this file again")
+    DeleteView()
+    print("Close and reopen nvim for to finish reseting the view file")
 end
 
-vim.api.nvim_create_user_command('FixFolds', FixFolds, {})
-vim.api.nvim_create_user_command('Delview', MyDeleteView, {})
+vim.api.nvim_create_user_command('OpenView', OpenView, {})
+vim.api.nvim_create_user_command('PrintViewPath', PrintViewPath, {})
+vim.api.nvim_create_user_command('ResetView', ResetView, {})
+vim.api.nvim_create_user_command('DeleteView', DeleteView, {})
