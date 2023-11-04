@@ -1,4 +1,5 @@
 require("config.lazy")
+require("config.utils")
 require("config.keymaps")
 require("config.clipboard")
 require("config.set")

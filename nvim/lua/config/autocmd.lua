@@ -16,61 +16,47 @@ vim.api.nvim_create_autocmd("VimEnter", {
     once = true,
 })
 
-vim.cmd([[
-augroup remember_folds
-  autocmd!
-  " view files are about 500 bytes
-  " bufleave but not bufwinleave captures closing 2nd tab
-  " nested is needed by bufwrite* (if triggered via other autocmd)
-  " BufHidden for compatibility with `set hidden`
-  autocmd BufWinLeave,BufLeave,BufWritePost,BufHidden,QuitPre ?* nested silent! mkview!
-  autocmd BufWinEnter ?* silent! loadview
-augroup END
-]])
+local remember_folds_group = 'remember_folds'
+
+vim.api.nvim_create_augroup(remember_folds_group, { clear = true })
+-- bufleave but not bufwinleave captures closing 2nd tab
+-- BufHidden for compatibility with `set hidden`
+vim.api.nvim_create_autocmd({ 'BufWinLeave', 'BufLeave', 'BufWritePost', 'BufHidden', 'QuitPre' },
+    {
+        desc = "Saves view file (saves information like open/closed folds)",
+        group = remember_folds_group,
+        pattern = "?*",
+        -- nested is needed by bufwrite* (if triggered via other autocmd)
+        nested = true,
+        callback = SaveView,
+    }
+)
 
 
-function GetBufferViewPath()
-    local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
-    -- vim's odd =~ escaping for /
-    path = vim.fn.substitute(path, '=', '==', 'g')
-    if vim.fn.has_key(vim.fn.environ(), "HOME") then
-        path = vim.fn.substitute(path, '^' .. os.getenv("HOME"), '\\~', '')
-    end
-    path = vim.fn.substitute(path, '/', '=+', 'g') .. '='
-    -- view directory
-    path = vim.opt.viewdir:get() .. path
-    return path
-end
+--TODO debug loading betwen format and writing
+vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' },
+    {
+        desc = "Loads the view file for the buffer (reloads open/closed folds)",
+        group = remember_folds_group,
+        pattern = "?*",
+        callback = function()
+            if vim.api.nvim_get_option_value("diff", {}) and vim.api.nvim_get_option_value('foldexpr', {}) == "v:lua.vim.treesitter.foldexpr()" then
+                -- Reset Folding back to using tresitter after no longer using diff mode
+                vim.api.nvim_set_option_value("foldmethod", "expr", {})
+                vim.api.nvim_set_option_value("foldexpr ", "v:lua.vim.treesitter.foldexpr()", {})
+            end
+            LoadView()
+        end,
+    }
+)
 
--- If my folds get screwed up the following function can be used to delete
--- the view file. I think this should fix my folds but need to test it
-function DeleteView()
-    local path = GetBufferViewPath()
-    vim.fn.delete(path)
-    print("Deleted: " .. path)
-end
 
-function OpenView()
-    local path = GetBufferViewPath()
-    vim.cmd('e ' .. path)
-end
-
-function PrintViewPath()
-    local path = GetBufferViewPath()
-    print(path)
-end
-
-function ResetView()
-    vim.cmd([[
-        augroup remember_folds
-          autocmd!
-        augroup END
-    ]])
-    DeleteView()
-    print("Close and reopen nvim for to finish reseting the view file")
-end
-
-vim.api.nvim_create_user_command('OpenView', OpenView, {})
-vim.api.nvim_create_user_command('PrintViewPath', PrintViewPath, {})
-vim.api.nvim_create_user_command('ResetView', ResetView, {})
-vim.api.nvim_create_user_command('DeleteView', DeleteView, {})
+local format_on_save_group = 'format_on_save_group'
+vim.api.nvim_create_augroup(format_on_save_group, { clear = true })
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*",
+    group = format_on_save_group,
+    callback = function(args)
+        require("conform").format({ bufnr = args.buf, lsp_fallback = true })
+    end,
+})

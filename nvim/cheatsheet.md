@@ -1,4 +1,7 @@
 # Useful command
+- `:help <a neovim api function/object>` opens help for the function
+- `:help motions.txt` opens help page for learning vim motions
+
 
 - `:Inspect` to show the highlight groups under the cursor
 - `:InspectTree` to show the parsed syntax tree

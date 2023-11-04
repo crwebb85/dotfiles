@@ -79,6 +79,18 @@ require("lazy").setup({
         end,
         opts = {}
     },
+    -- Adds motions to wrap text in qoutes/brackets/tags/etc
+    -- using the same motions I use to yank text
+    {
+        "kylechui/nvim-surround",
+        version = "*", -- Use for stability; omit to use `main` branch for the latest features
+        event = "VeryLazy",
+        config = function()
+            require("nvim-surround").setup({
+                -- Configuration here, or leave empty to use defaults
+            })
+        end
+    },
 
     ---------------------------------------------------------------------------
     -- Clipboard support (copy from vim to the outside world)
@@ -376,6 +388,7 @@ require("lazy").setup({
         event = "BufWritePre", -- load the plugin before saving
         opts = {
             formatters_by_ft = {
+                lua = { "stylua " },
                 -- first use isort and then black
                 python = { "isort", "black" },
                 -- "inject" is a "special" formatter from conform.nvim, which
@@ -384,12 +397,12 @@ require("lazy").setup({
                 markdown = { "inject" },
             },
             -- enable format-on-save
-            format_on_save = {
-                -- when no formatter is setup for a filetype, fallback to formatting
-                -- via the LSP. This is relevant e.g. for taplo (toml LSP), where the
-                -- LSP can handle the formatting for us
-                lsp_fallback = true,
-            },
+            -- format_on_save = {
+            --     -- when no formatter is setup for a filetype, fallback to formatting
+            --     -- via the LSP. This is relevant e.g. for taplo (toml LSP), where the
+            --     -- LSP can handle the formatting for us
+            --     lsp_fallback = true,
+            -- },
         },
     },
 

@@ -1,3 +1,4 @@
+TODO:
 - Setup Heirline
 - create telescope finder for keymaps searching by discription rather than key
 - the plugin mini-pairs is decent but I might want something more similar to what I am used to
