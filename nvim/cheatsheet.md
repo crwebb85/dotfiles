@@ -16,4 +16,6 @@
 - `:Gitsigns toggle_current_line_blame` to toggle git blame
 
 - `shift-K` shows hover diagnostics
- 
+
+- `:redir @a | silent scriptnames | redir END` redirect output of script to register https://vi.stackexchange.com/a/18833
+- `:put =execute(':scriptnames')` directly paste output of script into the current buffer https://vi.stackexchange.com/a/18834

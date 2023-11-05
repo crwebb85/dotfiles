@@ -3,6 +3,8 @@ local config = function()
     local conditions = require("heirline.conditions")
     local utils = require("heirline.utils")
     local colors = require("tokyonight.colors").setup()
+    local luasnip = require('luasnip')
+
     heirline.load_colors(colors)
 
     local status_inactive = {
@@ -35,6 +37,7 @@ local config = function()
     }
 
     local recording_background_color = colors.bg_highlight
+    local recording_foreground_color = colors.red
     local active_background_color = colors.bg_popup
     local active_foreground_color = colors.fg_popup
     local inactive_background_color = colors.bg_dark
@@ -50,45 +53,6 @@ local config = function()
     local Seperator = { provider = "|" }
     local LeftSep = { provider = "" }
     local RightSep = { provider = "" }
-
-    local ActiveWindow = {
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_background_color }
-            else
-                return { bg = inactive_background_color }
-            end
-        end,
-    }
-
-    local ActiveBlock = {
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_foreground_color }
-            else
-                return { bg = active_foreground_color }
-            end
-        end,
-    }
-
-    local ActiveSep = {
-        hl = function()
-            if conditions.is_active() then
-                return { fg = active_background_color }
-            else
-                return { fg = inactive_background_color }
-            end
-        end,
-    }
-
-    -- Italicizes the buffer file name if it has been modified
-    local FileNameModifer = {
-        hl = function()
-            if vim.bo.modified then
-                return { italic = true, force = true }
-            end
-        end,
-    }
 
     local diagnostics_spacer = " "
     local Diagnostics = {
@@ -320,6 +284,36 @@ local config = function()
         Seperator,
     }
 
+    local FormatterActive = {
+        condition = function(self)
+            local ok, conform = pcall(require, 'conform')
+            self.conform = conform
+            return ok
+        end,
+        update    = { 'BufEnter' },
+        Space,
+        {
+            provider = function()
+                local names = {}
+                local formatters = require('conform').formatters_by_ft[vim.bo.filetype]
+                if formatters == nil then
+                    formatters = {}
+                end
+                for i, formatterName in pairs(formatters) do
+                    table.insert(names, Trim(formatterName))
+                    if i > 4 then
+                        table.insert(names, "...") -- I don't want the list of LSP's to get too long
+                        break
+                    end
+                end
+                return " [" .. table.concat(names, " ") .. "]"
+            end,
+            hl       = { fg = "green", bold = true },
+        },
+        Space,
+        Seperator,
+    }
+
     local MacroRecording = {
         condition = conditions.is_active,
         init = function(self)
@@ -338,6 +332,7 @@ local config = function()
                     return self.has_changes
                 end,
                 LeftSep,
+                hl = { bg = recording_background_color, fg = active_background_color },
             },
             {
                 provider = "   ",
@@ -356,9 +351,27 @@ local config = function()
                 LeftSep,
                 hl = { bg = active_background_color, fg = recording_background_color },
             },
-            hl = { bg = recording_background_color, fg = active_background_color },
+            hl = { bg = recording_background_color, fg = recording_foreground_color },
         },
         update = { "RecordingEnter", "RecordingLeave" },
+    }
+
+    local Snippets = {
+        -- check that we are in insert or select mode
+        condition = function()
+            return vim.tbl_contains({ 's', 'i' }, vim.fn.mode()) and luasnip.in_snippet()
+        end,
+        Space,
+        {
+            provider = function()
+                local backward = luasnip.jumpable(1) and " <C-b> " or ""
+                local forward = luasnip.jumpable(-1) and " <C-f> " or ""
+                return backward .. "" .. forward
+            end,
+            hl = { fg = "red", bold = true },
+        },
+        Space,
+        Seperator
     }
 
     local Ruler = {
@@ -386,6 +399,101 @@ local config = function()
             return string.rep(self.sbar[i], 2)
         end,
         hl = { fg = scrollbar_foreground_color, bg = scrollbar_background_color },
+    }
+
+    local InactiveStatusline = {
+        condition = function()
+            conditions.buffer_matches(status_inactive)
+        end,
+        provider = function()
+            return "%="
+        end,
+        hl = function()
+            if conditions.is_active() then
+                return { bg = active_background_color }
+            else
+                return { bg = inactive_background_color }
+            end
+        end,
+    }
+
+    local ComponentDelimiter = { "", " |" }
+
+    local ActiveStatusline = {
+        condition = function()
+            return not conditions.buffer_matches(status_inactive)
+        end,
+        MacroRecording,
+        utils.surround(ComponentDelimiter, nil, ViMode),
+        Git,
+        LSPActive,
+        FormatterActive,
+        Snippets,
+        Align,
+        Diagnostics,
+        Ruler,
+        ScrollBar,
+        hl = function()
+            if conditions.is_active() then
+                return { bg = active_background_color }
+            else
+                return { bg = inactive_background_color }
+            end
+        end,
+    }
+
+    local StatusLines = {
+        condition = function()
+            for _, c in ipairs(cmdtype_inactive) do
+                if vim.fn.getcmdtype() == c then
+                    return false
+                end
+            end
+            return true
+        end,
+        InactiveStatusline,
+        ActiveStatusline,
+    }
+
+    ---------------------------------------------------------------------------
+    -- Winbar
+    local ActiveWindow = {
+        hl = function()
+            if conditions.is_active() then
+                return { bg = active_background_color }
+            else
+                return { bg = inactive_background_color }
+            end
+        end,
+    }
+
+    local ActiveBlock = {
+        hl = function()
+            if conditions.is_active() then
+                return { bg = active_foreground_color }
+            else
+                return { bg = active_foreground_color }
+            end
+        end,
+    }
+
+    local ActiveSep = {
+        hl = function()
+            if conditions.is_active() then
+                return { fg = active_background_color }
+            else
+                return { fg = inactive_background_color }
+            end
+        end,
+    }
+
+    -- Italicizes the buffer file name if it has been modified
+    local FileNameModifer = {
+        hl = function()
+            if vim.bo.modified then
+                return { italic = true, force = true }
+            end
+        end,
     }
 
     local FileIcon = {
@@ -456,83 +564,15 @@ local config = function()
         init = function(self)
             self.filename = vim.api.nvim_buf_get_name(0)
         end,
-    }
-    local DiagnosticsBlock = {}
-    local ViModeBlock = {}
-    local GitBlock = {}
-    local LSPActiveBlock = {}
-    local MacroRecordingBlock = {}
-    local RulerBlock = {}
-    local ScrollBarBlock = {}
-
-    FileNameBlock = utils.insert(
-        FileNameBlock,
         FileType,
         utils.insert(ActiveSep, LeftSep),
         Space,
         unpack(FileFlags),
         utils.insert(FileNameModifer, FileName, Space, FileIcon),
         { provider = "%<" }
-    )
-    DiagnosticsBlock = utils.insert(DiagnosticsBlock, Diagnostics)
-    ViModeBlock = utils.insert(ViModeBlock, ViMode)
-    GitBlock = utils.insert(GitBlock, Git)
-    LSPActiveBlock = utils.insert(LSPActiveBlock, LSPActive)
-    MacroRecordingBlock = utils.insert(MacroRecordingBlock, MacroRecording)
-    RulerBlock = utils.insert(RulerBlock, Ruler)
-    ScrollBarBlock = utils.insert(ScrollBarBlock, ScrollBar)
-
-    InactiveStatusline = {
-        condition = function()
-            conditions.buffer_matches(status_inactive)
-        end,
-        provider = function()
-            return "%="
-        end,
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_background_color }
-            else
-                return { bg = inactive_background_color }
-            end
-        end,
-    }
-    local ComponentDelimiter = { "", " |" }
-    ActiveStatusline = {
-        condition = function()
-            return not conditions.buffer_matches(status_inactive)
-        end,
-        utils.surround(ComponentDelimiter, nil, ViModeBlock),
-        GitBlock,
-        LSPActiveBlock,
-        MacroRecording,
-        Align,
-        DiagnosticsBlock,
-        RulerBlock,
-        ScrollBarBlock,
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_background_color }
-            else
-                return { bg = inactive_background_color }
-            end
-        end,
     }
 
-    local StatusLines = {
-        condition = function()
-            for _, c in ipairs(cmdtype_inactive) do
-                if vim.fn.getcmdtype() == c then
-                    return false
-                end
-            end
-            return true
-        end,
-        InactiveStatusline,
-        ActiveStatusline,
-    }
-
-    ActiveWinbar = {
+    local ActiveWinbar = {
         condition = function()
             local empty_buffer = function()
                 return vim.bo.ft == "" and vim.bo.buftype == ""
@@ -547,6 +587,8 @@ local config = function()
         utils.insert(ActiveWindow, ActiveWinbar),
     }
 
+    ---------------------------------------------------------------------------
+    -- Heirline Setup
     heirline.setup({
         statusline = StatusLines,
         winbar = WinBars,

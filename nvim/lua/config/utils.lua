@@ -1,3 +1,8 @@
+function Trim(s)
+    --Trim leading and ending whitespace from string
+    return s:match '^()%s*$' and '' or s:match '^%s*(.*%S)'
+end
+
 function GetBufferViewPath(viewNumber)
     local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
     -- vim's odd =~ escaping for /
