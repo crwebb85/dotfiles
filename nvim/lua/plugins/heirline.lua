@@ -47,6 +47,7 @@ local config = function()
 
     local Align = { provider = "%=" }
     local Space = { provider = " " }
+    local Seperator = { provider = "|" }
     local LeftSep = { provider = "" }
     local RightSep = { provider = "" }
 
@@ -263,9 +264,10 @@ local config = function()
             condition = function(self)
                 return self.has_changes
             end,
+            Space,
             {
                 provider = function(self)
-                    return "  " .. self.status_dict.head .. " "
+                    return " " .. self.status_dict.head .. " "
                 end,
                 hl = { fg = colors.green2, bold = true, italic = true },
             },
@@ -290,22 +292,7 @@ local config = function()
                 end,
                 hl = { fg = colors.gitSigns.change, bold = true },
             },
-            {
-                LeftSep,
-                hl = function()
-                    if conditions.is_active() then
-                        return {
-                            bg = active_background_color,
-                            fg = active_foreground_color,
-                        }
-                    else
-                        return {
-                            fg = active_foreground_color,
-                            bg = inactive_background_color,
-                        }
-                    end
-                end,
-            },
+            Seperator,
             hl = { bg = active_foreground_color },
         },
     }
@@ -314,22 +301,23 @@ local config = function()
         condition = conditions.lsp_attached,
         update    = { 'LspAttach', 'LspDetach' },
 
-        -- You can keep it simple,
-        -- provider = " [LSP]",
-
-        -- Or complicate things a bit and get the servers names
-        provider  = function()
-            local names = {}
-            for i, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-                table.insert(names, server.name)
-                if i > 4 then
-                    table.insert(names, "...") -- I don't want the list of LSP's to get too long
-                    break
+        Space,
+        {
+            provider = function()
+                local names = {}
+                for i, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+                    table.insert(names, server.name)
+                    if i > 4 then
+                        table.insert(names, "...") -- I don't want the list of LSP's to get too long
+                        break
+                    end
                 end
-            end
-            return " [" .. table.concat(names, " ") .. "]"
-        end,
-        hl        = { fg = "green", bold = true },
+                return " [" .. table.concat(names, " ") .. "]"
+            end,
+            hl       = { fg = "green", bold = true },
+        },
+        Space,
+        Seperator,
     }
 
     local MacroRecording = {
@@ -509,12 +497,12 @@ local config = function()
             end
         end,
     }
-
+    local ComponentDelimiter = { "", " |" }
     ActiveStatusline = {
         condition = function()
             return not conditions.buffer_matches(status_inactive)
         end,
-        ViModeBlock,
+        utils.surround(ComponentDelimiter, nil, ViModeBlock),
         GitBlock,
         LSPActiveBlock,
         MacroRecording,
@@ -552,7 +540,6 @@ local config = function()
             -- return not conditions.buffer_matches(winbar_inactive) and not empty_buffer()
             return not empty_buffer()
         end,
-        Align,
         utils.insert(ActiveBlock, FileNameBlock),
     }
 

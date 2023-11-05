@@ -1,4 +1,4 @@
-function GetBufferViewPath()
+function GetBufferViewPath(viewNumber)
     local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
     -- vim's odd =~ escaping for /
     path = vim.fn.substitute(path, '=', '==', 'g')
@@ -8,6 +8,9 @@ function GetBufferViewPath()
     path = vim.fn.substitute(path, '/', '=+', 'g') .. '='
     -- view directory
     path = vim.opt.viewdir:get() .. path
+    if type(viewNumber) == 'number' and 0 < viewNumber and viewNumber <= 9 then
+        path = path .. viewNumber .. '.vim'
+    end
     return path
 end
 
@@ -29,55 +32,52 @@ end
 
 -- If my folds get screwed up the following function can be used to delete
 -- the view file. I think this should fix my folds but need to test it
-function DeleteView()
-    local path = GetBufferViewPath()
+function DeleteView(viewNumber)
+    local path = GetBufferViewPath(viewNumber)
     vim.fn.delete(path)
     print("Deleted: " .. path)
 end
 
-function OpenView()
-    local path = GetBufferViewPath()
+function OpenView(viewNumber)
+    local path = GetBufferViewPath(viewNumber)
     vim.cmd('e ' .. path)
 end
 
-function PrintViewPath()
-    local path = GetBufferViewPath()
+function PrintViewPath(viewNumber)
+    local path = GetBufferViewPath(viewNumber)
     print(path)
 end
 
-function ResetView()
+function ResetView(viewNumber)
     vim.cmd([[
         augroup remember_folds
            autocmd!
         augroup END
     ]])
-    DeleteView()
+    DeleteView(viewNumber)
     print("Close and reopen nvim for to finish reseting the view file")
 end
 
 function SaveView()
     -- view files are about 500 bytes
-
-    -- print("--")
-    -- print("buffer number " .. vim.api.nvim_get_current_buf())
-    -- print("buffer modified " .. tostring(vim.bo.modified))
-    -- print("save view for buffer " .. vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()))
-    -- print("save view for buffer " .. vim.api.nvim_buf_get_name(0))
-    -- print("--")
     local viewFileNumber = GetBufferViewFileNumber()
     vim.cmd('silent! mkview!' .. viewFileNumber)
 end
 
 function LoadView()
-    -- print("--")
-    -- print("load view for buffer " .. vim.api.nvim_buf_get_name(0))
-    -- print("load view for buffer " .. vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()))
-    -- print("--")
     local viewFileNumber = GetBufferViewFileNumber()
     vim.cmd('silent! loadview ' .. viewFileNumber)
 end
 
-vim.api.nvim_create_user_command('OpenView', OpenView, {})
-vim.api.nvim_create_user_command('PrintViewPath', PrintViewPath, {})
-vim.api.nvim_create_user_command('ResetView', ResetView, {})
-vim.api.nvim_create_user_command('DeleteView', DeleteView, {})
+vim.api.nvim_create_user_command('OpenView', function(opts)
+    OpenView(tonumber(opts.args))
+end, { nargs = '?' })
+vim.api.nvim_create_user_command('PrintViewPath', function(opts)
+    PrintViewPath(tonumber(opts.args))
+end, { nargs = '?' })
+vim.api.nvim_create_user_command('ResetView', function(opts)
+    ResetView(tonumber(opts.args))
+end, { nargs = '?' })
+vim.api.nvim_create_user_command('DeleteView', function(opts)
+    DeleteView(tonumber(opts.args))
+end, { nargs = '?' })
