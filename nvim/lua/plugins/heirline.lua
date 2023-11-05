@@ -224,17 +224,17 @@ local config = function()
                 or self.status_dict.removed ~= 0
                 or self.status_dict.changed ~= 0
         end,
+        Space,
+        {
+            provider = function(self)
+                return " " .. self.status_dict.head .. " "
+            end,
+            hl = { fg = colors.green2, bold = true, italic = true },
+        },
         {
             condition = function(self)
                 return self.has_changes
             end,
-            Space,
-            {
-                provider = function(self)
-                    return " " .. self.status_dict.head .. " "
-                end,
-                hl = { fg = colors.green2, bold = true, italic = true },
-            },
             {
                 provider = function(self)
                     local count = self.status_dict.added or 0
@@ -256,9 +256,9 @@ local config = function()
                 end,
                 hl = { fg = colors.gitSigns.change, bold = true },
             },
-            Seperator,
             hl = { bg = active_foreground_color },
         },
+        Seperator,
     }
 
     local LSPActive = {
