@@ -2,6 +2,7 @@
 - `:help <a neovim api function/object>` opens help for the function
 - `:help motions.txt` opens help page for learning vim motions
 - `:help vim-diff.txt` list differences between vim
+- `:help nvim-surround.txt` readme for nvim-surround plugin
 
 - `:Inspect` to show the highlight groups under the cursor
 - `:InspectTree` to show the parsed syntax tree
