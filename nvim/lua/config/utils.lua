@@ -5,12 +5,16 @@ end
 
 function GetBufferViewPath(viewNumber)
     local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
-    -- vim's odd =~ escaping for /
-    path = vim.fn.substitute(path, '=', '==', 'g')
-    if vim.fn.has_key(vim.fn.environ(), "HOME") then
-        path = vim.fn.substitute(path, '^' .. os.getenv("HOME"), '\\~', '')
+    if path == nil then
+        error("path to buffer is unexpectedly nil")
     end
-    path = vim.fn.substitute(path, '/', '=+', 'g') .. '='
+    -- vim's odd =~ escaping for /
+    path = vim.fn.substitute(path, '=', '==', 'g') or ''
+    if vim.fn.has_key(vim.fn.environ(), "HOME") then
+        path = vim.fn.substitute(path, '^' .. os.getenv("HOME"), '\\~', '') or ''
+    end
+    path = vim.fn.substitute(path, '/', '=+', 'g') or ''
+    path = path .. '='
     -- view directory
     path = vim.opt.viewdir:get() .. path
     if type(viewNumber) == 'number' and 0 < viewNumber and viewNumber <= 9 then
@@ -74,15 +78,15 @@ function LoadView()
     vim.cmd('silent! loadview ' .. viewFileNumber)
 end
 
-vim.api.nvim_create_user_command('OpenView', function(opts)
+vim.api.nvim_create_user_command('ViewOpen', function(opts)
     OpenView(tonumber(opts.args))
 end, { nargs = '?' })
-vim.api.nvim_create_user_command('PrintViewPath', function(opts)
+vim.api.nvim_create_user_command('ViewPrintPath', function(opts)
     PrintViewPath(tonumber(opts.args))
 end, { nargs = '?' })
-vim.api.nvim_create_user_command('ResetView', function(opts)
+vim.api.nvim_create_user_command('ViewReset', function(opts)
     ResetView(tonumber(opts.args))
 end, { nargs = '?' })
-vim.api.nvim_create_user_command('DeleteView', function(opts)
+vim.api.nvim_create_user_command('ViewDelete', function(opts)
     DeleteView(tonumber(opts.args))
 end, { nargs = '?' })
