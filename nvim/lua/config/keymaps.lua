@@ -98,3 +98,20 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 
 -- Make file executeable
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true, desc = 'Make file executeable' })
+
+-- Diffing https://www.naseraleisa.com/posts/diff#file-1
+-- Compare buffer to clipboard
+vim.keymap.set(
+    "n",
+    "<leader>vc",
+    "<cmd>CompareClipboard<cr>",
+    { desc = "Compare Clipboard", silent = true }
+)
+
+-- Compare Clipboard to selected text
+vim.keymap.set(
+    "v",
+    "<leader>vc",
+    "<esc><cmd>CompareClipboardSelection<cr>",
+    { desc = "Compare Clipboard Selection" }
+)

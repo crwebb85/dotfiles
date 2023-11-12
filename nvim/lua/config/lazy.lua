@@ -13,6 +13,14 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local function get_default_branch_name()
+    local res = vim.system(
+        { "git", "rev-parse", "--verify", "main" },
+        { capture_output = true }
+    ):wait()
+    return res.code == 0 and "main" or "master"
+end
+
 require("lazy").setup({
     ---------------------------------------------------------------------------
     -- Git integration
@@ -21,17 +29,60 @@ require("lazy").setup({
     {
         "sindrets/diffview.nvim",
         lazy = false,
-        keys = { {
-            "<leader>gd",
-            function()
-                if next(require('diffview.lib').views) == nil then
-                    require('diffview').open({})
-                else
-                    require('diffview').close()
-                end
-            end,
-            desc = "Toggle Git DiffView"
-        } },
+        keys = {
+            {
+                "<leader>gd",
+                function()
+                    if next(require('diffview.lib').views) == nil then
+                        require('diffview').open({})
+                    else
+                        require('diffview').close()
+                    end
+                end,
+                desc = "Toggle Git DiffView"
+            },
+            { "<leader>gh",
+                "<cmd>DiffviewFileHistory<cr>",
+                { desc = "Open Git Repo history" }
+            },
+
+            { "<leader>ghf",
+                "<cmd>DiffviewFileHistory --follow %<cr>",
+                { desc = "Open Git File history" }
+            },
+
+            {
+                "<leader>ghl",
+                "<Esc><Cmd>'<,'>DiffviewFileHistory --follow<CR>",
+                mode = "v",
+                { desc = "Open Git File history over selected text" }
+            },
+
+            {
+                "<leader>ghl",
+                "<Cmd>.DiffviewFileHistory --follow<CR>",
+                { desc = "Open Git history for the line" }
+            },
+
+            -- Diff against local master branch
+            {
+                "<leader>ghm",
+                function()
+                    vim.cmd("DiffviewOpen " .. get_default_branch_name())
+                end,
+                { desc = "Diff against master" }
+            },
+
+            -- Diff against remote master branch
+            {
+                "<leader>ghM",
+                function()
+                    vim.cmd("DiffviewOpen HEAD..origin/" .. get_default_branch_name())
+                end,
+                { desc = "Diff against origin/master" }
+            },
+
+        },
     },
     -- Adds an api wrapper arround git which I use in my heirline setup
     -- Adds Gitblame
@@ -41,7 +92,43 @@ require("lazy").setup({
         lazy = false,
         config = function()
             require('gitsigns').setup()
-        end
+        end,
+        keys = {
+
+            -- Highlight changed words.
+            {
+                "<leader>gvw",
+                function()
+                    require("gitsigns").toggle_word_diff()
+                end,
+                { desc = "Toggle word diff" }
+            },
+
+            -- Highlight added lines.
+            {
+                "<leader>gvl",
+                function()
+                    require("gitsigns").toggle_linehl()
+                end,
+                { desc = "Toggle line highlight" }
+            },
+
+            -- Highlight removed lines.
+            {
+                "<leader>gvd",
+                function()
+                    require("gitsigns").toggle_deleted()
+                end,
+                { desc = "Toggle deleted (all)" }
+            },
+            {
+                "<leader>gvh",
+                function()
+                    require("gitsigns").preview_hunk()
+                end,
+                { desc = "Preview hunk" }
+            },
+        },
     },
 
     ---------------------------------------------------------------------------
@@ -133,6 +220,7 @@ require("lazy").setup({
                 modules = {},
                 -- A list of parser names, or "all"
                 ensure_installed = {
+                    "diff",
                     "javascript",
                     "typescript",
                     "tsx",
