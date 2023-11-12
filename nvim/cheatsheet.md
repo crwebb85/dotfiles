@@ -16,7 +16,10 @@
 - `:lua= vim.lsp.get_active_clients({ name = "lua_ls" })[1].config.settings.Lua` to print info about the lua lsp config
 - `:Gitsigns toggle_current_line_blame` to toggle git blame
 
-- `shift-K` shows hover diagnostics
-
 - `:redir @a | silent scriptnames | redir END` redirect output of script to register https://vi.stackexchange.com/a/18833
 - `:put =execute(':scriptnames')` directly paste output of script into the current buffer https://vi.stackexchange.com/a/18834
+
+- `:Telescope lsp_document_symbols` find symbols in buffer
+
+- `<C-k>` opens information in popup about the symbol using the lsp (press again to move cursor into the popup and q to leave the popup)
+- `shift-K` opens hover diagnostics in popup about the symbol (press again to move cursor into the popup and q to leave the popup)

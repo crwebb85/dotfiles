@@ -89,6 +89,9 @@ vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz", { desc = 'cprev quick fix navig
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz", { desc = 'lnext quick fix navigation' })
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz", { desc = 'lprev quick fix navigation' })
 
+-- LSP signature info
+vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help)
+
 -- Find and replace word cursor is on
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
     { desc = 'Find and replace the word the cursor is on' })

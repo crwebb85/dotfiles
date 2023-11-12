@@ -442,6 +442,14 @@ cmp.setup({
         -- Ctrl+Space to trigger completion menu
         ['<C-Space>'] = cmp.mapping.complete(),
 
+        -- Complete common string
+        ['<C-l>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+                return cmp.complete_common_string()
+            end
+            fallback()
+        end, { 'i', 'c' }),
+
         -- Navigate between snippet placeholder
         ['<C-f>'] = cmp_action.luasnip_jump_forward(),
         ['<C-b>'] = cmp_action.luasnip_jump_backward(),

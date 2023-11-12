@@ -15,6 +15,7 @@ TODO:
 - Add debuger buttons to heirline
 - Add linter list element to heirline
 - setup inlay hints (may require upgrading neovim version and configuring plugins) It shows parameter names when functions are used
+- figure out how to create custom keymaps that use motions for example a custom yank function that lets me also use the motion commands to select what to yank
 
 Cool plugins:
 - https://github.com/folke/trouble.nvim
