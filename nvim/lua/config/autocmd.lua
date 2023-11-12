@@ -40,10 +40,10 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' },
         group = remember_folds_group,
         pattern = "?*",
         callback = function()
-            if vim.api.nvim_get_option_value("diff", {}) and vim.api.nvim_get_option_value('foldexpr', {}) == "v:lua.vim.treesitter.foldexpr()" then
+            if not vim.api.nvim_get_option_value("diff", {}) and vim.api.nvim_get_option_value("foldmethod", {}) == 'diff' and vim.api.nvim_get_option_value('foldexpr', {}) == "v:lua.vim.treesitter.foldexpr()" then
                 -- Reset Folding back to using tresitter after no longer using diff mode
                 vim.api.nvim_set_option_value("foldmethod", "expr", {})
-                vim.api.nvim_set_option_value("foldexpr ", "v:lua.vim.treesitter.foldexpr()", {})
+                vim.api.nvim_set_option_value("foldexpr", "v:lua.vim.treesitter.foldexpr()", {})
             end
             LoadView()
         end,
