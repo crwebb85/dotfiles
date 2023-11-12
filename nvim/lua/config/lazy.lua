@@ -21,7 +21,17 @@ require("lazy").setup({
     {
         "sindrets/diffview.nvim",
         lazy = false,
-        keys = { { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Open Git DiffView" } },
+        keys = { {
+            "<leader>gd",
+            function()
+                if next(require('diffview.lib').views) == nil then
+                    require('diffview').open({})
+                else
+                    require('diffview').close()
+                end
+            end,
+            desc = "Toggle Git DiffView"
+        } },
     },
     -- Adds an api wrapper arround git which I use in my heirline setup
     -- Adds Gitblame
