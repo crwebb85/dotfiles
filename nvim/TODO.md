@@ -14,7 +14,7 @@ TODO:
 ```
 - Add debuger buttons to heirline
 - Add linter list element to heirline
-
+- setup inlay hints (may require upgrading neovim version and configuring plugins) It shows parameter names when functions are used
 
 Cool plugins:
 - https://github.com/folke/trouble.nvim
@@ -24,3 +24,5 @@ Cool plugins:
 - https://github.com/ThePrimeagen/refactoring.nvim
 - https://github.com/sudormrfbin/cheatsheet.nvim
 - https://github.com/soulis-1256/hoverhints.nvim 
+- https://github.com/rgroli/other.nvim
+- https://github.com/jmederosalvarado/roslyn.nvim
