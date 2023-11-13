@@ -176,6 +176,11 @@ require("lazy").setup({
         end,
         opts = {}
     },
+    {
+        'akinsho/toggleterm.nvim',
+        version = "*",
+        config = true
+    },
     -- Adds motions to wrap text in qoutes/brackets/tags/etc
     -- using the same motions I use to yank text
     {
