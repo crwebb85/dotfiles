@@ -576,16 +576,49 @@ require('mason-lspconfig').setup({
 })
 
 local lspconfig = require('lspconfig')
-
+--https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 lspconfig.lua_ls.setup({
     settings = {
         Lua = {
             completion = {
                 callSnippet = "Replace"
-            }
+            },
+            hint = { enable = true }
         }
     }
 })
+lspconfig.tsserver.setup({
+    settings = {
+        typescript = {
+            inlayHints = {
+                -- taken from https://github.com/typescript-language-server/typescript-language-server#workspacedidchangeconfiguration
+                includeInlayEnumMemberValueHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true, -- false
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true -- false
+            }
+        },
+        javascript = {
+            inlayHints = {
+                includeInlayEnumMemberValueHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true
+            }
+        },
+    }
+
+})
+
+
 
 -- configures debugpy
 -- uses the debugypy installation by mason

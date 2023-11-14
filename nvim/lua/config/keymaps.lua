@@ -115,3 +115,6 @@ vim.keymap.set(
     "<esc><cmd>CompareClipboardSelection<cr>",
     { desc = "Compare Clipboard Selection" }
 )
+
+-- Toggle Inlay Hints
+vim.keymap.set('n', '<leader>uh', function () ToggleInlayHintsAutocmd() end, { desc = 'Toggle Inlay Hints' })

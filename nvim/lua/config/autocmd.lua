@@ -60,3 +60,25 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         require("conform").format({ bufnr = args.buf, lsp_fallback = true })
     end,
 })
+
+local isInlayHintsEnabled = false
+function ToggleInlayHintsAutocmd()
+    if not vim.lsp.inlay_hint then
+        print("This version of neovim doesn't support inlay hints")
+    end
+
+    vim.api.nvim_create_augroup('inlay_hints', { clear = true })
+    isInlayHintsEnabled = not isInlayHintsEnabled
+
+    vim.lsp.inlay_hint(0, isInlayHintsEnabled)
+
+    vim.api.nvim_create_autocmd(
+        { 'BufWinEnter' },
+        {
+            pattern = "?*",
+            callback = function()
+                vim.lsp.inlay_hint(0, isInlayHintsEnabled)
+            end
+        }
+    )
+end
