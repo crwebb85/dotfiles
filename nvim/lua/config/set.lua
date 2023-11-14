@@ -1,3 +1,6 @@
+vim.opt.title = true
+vim.opt.titlestring = [[%t – %{fnamemodify(getcwd(), ':t')}]]
+
 vim.opt.relativenumber = true
 
 vim.opt.tabstop = 4
