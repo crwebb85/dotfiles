@@ -90,7 +90,7 @@ vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz", { desc = 'lnext quick fix n
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz", { desc = 'lprev quick fix navigation' })
 
 -- LSP signature info
-vim.keymap.set({ 'n', 'i' }, '<C-k>', vim.lsp.buf.signature_help)
+vim.keymap.set({ 'n', 'i' }, '<C-m>', vim.lsp.buf.signature_help)
 
 -- Find and replace word cursor is on
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
@@ -117,4 +117,4 @@ vim.keymap.set(
 )
 
 -- Toggle Inlay Hints
-vim.keymap.set('n', '<leader>uh', function () ToggleInlayHintsAutocmd() end, { desc = 'Toggle Inlay Hints' })
+vim.keymap.set('n', '<leader>uh', function() ToggleInlayHintsAutocmd() end, { desc = 'Toggle Inlay Hints' })
