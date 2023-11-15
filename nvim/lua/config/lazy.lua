@@ -1,13 +1,13 @@
-vim.g.mapleader = " "
+vim.g.mapleader = ' '
 
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
     vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable", -- latest stable release
+        'git',
+        'clone',
+        '--filter=blob:none',
+        'https://github.com/folke/lazy.nvim.git',
+        '--branch=stable', -- latest stable release
         lazypath,
     })
 end
@@ -15,23 +15,23 @@ vim.opt.rtp:prepend(lazypath)
 
 local function get_default_branch_name()
     local res = vim.system(
-        { "git", "rev-parse", "--verify", "main" },
+        { 'git', 'rev-parse', '--verify', 'main' },
         { capture_output = true }
     ):wait()
-    return res.code == 0 and "main" or "master"
+    return res.code == 0 and 'main' or 'master'
 end
 
-require("lazy").setup({
+require('lazy').setup({
     ---------------------------------------------------------------------------
     -- Git integration
-    "tpope/vim-fugitive",
+    'tpope/vim-fugitive',
     -- Adds git diffview
     {
-        "sindrets/diffview.nvim",
+        'sindrets/diffview.nvim',
         lazy = false,
         keys = {
             {
-                "<leader>gd",
+                '<leader>gd',
                 function()
                     if next(require('diffview.lib').views) == nil then
                         require('diffview').open({})
@@ -39,94 +39,88 @@ require("lazy").setup({
                         require('diffview').close()
                     end
                 end,
-                desc = "Toggle Git DiffView"
+                desc = 'Toggle Git DiffView',
             },
-            { "<leader>gh",
-                "<cmd>DiffviewFileHistory<cr>",
-                { desc = "Open Git Repo history" }
-            },
-
-            { "<leader>ghf",
-                "<cmd>DiffviewFileHistory --follow %<cr>",
-                { desc = "Open Git File history" }
+            {
+                '<leader>gh',
+                '<cmd>DiffviewFileHistory<cr>',
+                { desc = 'Open Git Repo history' },
             },
 
             {
-                "<leader>ghl",
+                '<leader>ghf',
+                '<cmd>DiffviewFileHistory --follow %<cr>',
+                { desc = 'Open Git File history' },
+            },
+
+            {
+                '<leader>ghl',
                 "<Esc><Cmd>'<,'>DiffviewFileHistory --follow<CR>",
-                mode = "v",
-                { desc = "Open Git File history over selected text" }
+                mode = 'v',
+                { desc = 'Open Git File history over selected text' },
             },
 
             {
-                "<leader>ghl",
-                "<Cmd>.DiffviewFileHistory --follow<CR>",
-                { desc = "Open Git history for the line" }
+                '<leader>ghl',
+                '<Cmd>.DiffviewFileHistory --follow<CR>',
+                { desc = 'Open Git history for the line' },
             },
 
             -- Diff against local master branch
             {
-                "<leader>ghm",
+                '<leader>ghm',
                 function()
-                    vim.cmd("DiffviewOpen " .. get_default_branch_name())
+                    vim.cmd('DiffviewOpen ' .. get_default_branch_name())
                 end,
-                { desc = "Diff against master" }
+                { desc = 'Diff against master' },
             },
 
             -- Diff against remote master branch
             {
-                "<leader>ghM",
+                '<leader>ghM',
                 function()
-                    vim.cmd("DiffviewOpen HEAD..origin/" .. get_default_branch_name())
+                    vim.cmd(
+                        'DiffviewOpen HEAD..origin/'
+                            .. get_default_branch_name()
+                    )
                 end,
-                { desc = "Diff against origin/master" }
+                { desc = 'Diff against origin/master' },
             },
-
         },
     },
     -- Adds an api wrapper arround git which I use in my heirline setup
     -- Adds Gitblame
     -- Adds sidbar showing lines changed
     {
-        "lewis6991/gitsigns.nvim",
+        'lewis6991/gitsigns.nvim',
         lazy = false,
-        config = function()
-            require('gitsigns').setup()
-        end,
+        config = function() require('gitsigns').setup() end,
         keys = {
 
             -- Highlight changed words.
             {
-                "<leader>gvw",
-                function()
-                    require("gitsigns").toggle_word_diff()
-                end,
-                { desc = "Toggle word diff" }
+                '<leader>gvw',
+                function() require('gitsigns').toggle_word_diff() end,
+                { desc = 'Toggle word diff' },
             },
 
             -- Highlight added lines.
             {
-                "<leader>gvl",
-                function()
-                    require("gitsigns").toggle_linehl()
-                end,
-                { desc = "Toggle line highlight" }
+                '<leader>gvl',
+                function() require('gitsigns').toggle_linehl() end,
+                { desc = 'Toggle line highlight' },
             },
 
             -- Highlight removed lines.
             {
-                "<leader>gvd",
-                function()
-                    require("gitsigns").toggle_deleted()
-                end,
-                { desc = "Toggle deleted (all)" }
+                '<leader>gvd',
+                function() require('gitsigns').toggle_deleted() end,
+                { desc = 'Toggle deleted (all)' },
             },
             {
-                "<leader>gvh",
-                function()
-                    require("gitsigns").preview_hunk()
-                end,
-                { desc = "Preview hunk" }
+                '<leader>gvh',
+                function() require('gitsigns').preview_hunk() end,
+                { desc = 'Preview hunk' },
             },
         },
     },
@@ -140,12 +134,11 @@ require("lazy").setup({
         tag = '0.1.2',
         dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
-        }
+        },
     },
 
     -- Harpoon (fast file navigation between pinned files)
     'theprimeagen/harpoon',
-
 
     ---------------------------------------------------------------------------
     -- Utils
@@ -154,60 +147,56 @@ require("lazy").setup({
     {
         'echasnovski/mini.pairs',
         version = '*',
-        config = function()
-            require('mini.pairs').setup()
-        end
+        config = function() require('mini.pairs').setup() end,
     },
     -- Comment toggling
     {
         'echasnovski/mini.comment',
         version = '*',
-        config = function()
-            require('mini.comment').setup()
-        end
+        config = function() require('mini.comment').setup() end,
     },
     -- Keymap suggestions
     {
-        "folke/which-key.nvim",
-        event = "VeryLazy",
+        'folke/which-key.nvim',
+        event = 'VeryLazy',
         init = function()
             vim.o.timeout = true
             vim.o.timeoutlen = 300
         end,
-        opts = {}
+        opts = {},
     },
     {
         'akinsho/toggleterm.nvim',
-        version = "*",
-        config = true
+        version = '*',
+        config = true,
     },
     -- Adds motions to wrap text in qoutes/brackets/tags/etc
     -- using the same motions I use to yank text
     {
-        "kylechui/nvim-surround",
-        version = "*", -- Use for stability; omit to use `main` branch for the latest features
-        event = "VeryLazy",
+        'kylechui/nvim-surround',
+        version = '*', -- Use for stability; omit to use `main` branch for the latest features
+        event = 'VeryLazy',
         config = function()
-            require("nvim-surround").setup({
+            require('nvim-surround').setup({
                 -- Configuration here, or leave empty to use defaults
             })
-        end
+        end,
     },
 
     ---------------------------------------------------------------------------
     -- Clipboard support (copy from vim to the outside world)
-    "ojroques/nvim-osc52",
+    'ojroques/nvim-osc52',
 
     {
-        "folke/tokyonight.nvim",
+        'folke/tokyonight.nvim',
         lazy = false,
         priority = 1000,
         opts = {},
         config = function()
-            require("tokyonight.colors").setup()
-            local color = "tokyonight"
+            require('tokyonight.colors').setup()
+            local color = 'tokyonight'
             vim.cmd.colorscheme(color)
-        end
+        end,
     },
 
     ---------------------------------------------------------------------------
@@ -219,31 +208,31 @@ require("lazy").setup({
     {
         'nvim-treesitter/nvim-treesitter',
         lazy = false,
-        build = ":TSUpdate",
+        build = ':TSUpdate',
         config = function()
             require('nvim-treesitter.configs').setup({
                 modules = {},
                 -- A list of parser names, or "all"
                 ensure_installed = {
-                    "diff",
-                    "javascript",
-                    "typescript",
-                    "tsx",
-                    "css",
-                    "json",
-                    "html",
-                    "xml",
-                    "yaml",
-                    "c",
-                    "lua",
-                    "rust",
-                    "vim",
-                    "vimdoc",
-                    "query",
-                    "markdown",
-                    "markdown_inline",
-                    "python",
-                    "toml",
+                    'diff',
+                    'javascript',
+                    'typescript',
+                    'tsx',
+                    'css',
+                    'json',
+                    'html',
+                    'xml',
+                    'yaml',
+                    'c',
+                    'lua',
+                    'rust',
+                    'vim',
+                    'vimdoc',
+                    'query',
+                    'markdown',
+                    'markdown_inline',
+                    'python',
+                    'toml',
                 },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
@@ -255,7 +244,6 @@ require("lazy").setup({
 
                 -- List of parsers to ignore installing (or "all")
                 ignore_install = {},
-
 
                 ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
                 -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
@@ -270,7 +258,7 @@ require("lazy").setup({
                     additional_vim_regex_highlighting = false,
                 },
             })
-        end
+        end,
     },
 
     -----------------------------------------------------------------------------
@@ -282,33 +270,33 @@ require("lazy").setup({
     -- to send the current line to the REPL, and `+j` to send the current and the
     -- following line to the REPL, like we would do with other vim operators.
     {
-        "Vigemus/iron.nvim",
+        'Vigemus/iron.nvim',
         keys = {
-            { "<leader>i", vim.cmd.IronRepl, desc = "󱠤 Toggle REPL" },
-            { "<leader>I", vim.cmd.IronRestart, desc = "󱠤 Restart REPL" },
+            { '<leader>i', vim.cmd.IronRepl, desc = '󱠤 Toggle REPL' },
+            { '<leader>I', vim.cmd.IronRestart, desc = '󱠤 Restart REPL' },
 
             -- these keymaps need no right-hand-side, since that is defined by the
             -- plugin config further below
-            { "+", mode = { "n", "x" }, desc = "󱠤 Send-to-REPL Operator" },
-            { "++", desc = "󱠤 Send Line to REPL" },
+            { '+', mode = { 'n', 'x' }, desc = '󱠤 Send-to-REPL Operator' },
+            { '++', desc = '󱠤 Send Line to REPL' },
         },
 
         -- since irons's setup call is `require("iron.core").setup`, instead of
         -- `require("iron").setup` like other plugins would do, we need to tell
         -- lazy.nvim which module to via the `main` key
-        main = "iron.core",
+        main = 'iron.core',
 
         opts = {
             keymaps = {
-                send_line = "++",
-                visual_send = "+",
-                send_motion = "+",
+                send_line = '++',
+                visual_send = '+',
+                send_motion = '+',
             },
             config = {
                 -- this defined how the repl is opened. Here we set the REPL window
                 -- to open in a horizontal split to a bottom, with a height of 10
                 -- cells.
-                repl_open_cmd = "horizontal bot 10 split",
+                repl_open_cmd = 'horizontal bot 10 split',
 
                 -- This defines which binary to use for the REPL. If `ipython` is
                 -- available, it will use `ipython`, otherwise it will use `python3`.
@@ -318,8 +306,11 @@ require("lazy").setup({
                 repl_definition = {
                     python = {
                         command = function()
-                            local ipythonAvailable = vim.fn.executable("ipython") == 1
-                            local binary = ipythonAvailable and "ipython" or "python3"
+                            local ipythonAvailable = vim.fn.executable(
+                                'ipython'
+                            ) == 1
+                            local binary = ipythonAvailable and 'ipython'
+                                or 'python3'
                             return { binary }
                         end,
                     },
@@ -336,23 +327,22 @@ require("lazy").setup({
     -- - add breakpoints with `<leader>db`
     -- - terminate the debugger `<leader>dt`
     {
-        "mfussenegger/nvim-dap",
+        'mfussenegger/nvim-dap',
         keys = {
             {
-                "<leader>dc",
-                function() require("dap").continue() end,
-                desc = "Start/Continue Debugger"
-                ,
+                '<leader>dc',
+                function() require('dap').continue() end,
+                desc = 'Start/Continue Debugger',
             },
             {
-                "<leader>db",
-                function() require("dap").toggle_breakpoint() end,
-                desc = "Add Breakpoint",
+                '<leader>db',
+                function() require('dap').toggle_breakpoint() end,
+                desc = 'Add Breakpoint',
             },
             {
-                "<leader>dt",
-                function() require("dap").terminate() end,
-                desc = "Terminate Debugger",
+                '<leader>dt',
+                function() require('dap').terminate() end,
+                desc = 'Terminate Debugger',
             },
         },
     },
@@ -361,28 +351,34 @@ require("lazy").setup({
     -- - the debugger UI is also automatically opened when starting/stopping the debugger
     -- - toggle debugger UI manually with `<leader>du`
     {
-        "rcarriga/nvim-dap-ui",
-        dependencies = "mfussenegger/nvim-dap",
+        'rcarriga/nvim-dap-ui',
+        dependencies = 'mfussenegger/nvim-dap',
         keys = {
             {
-                "<leader>du",
-                function() require("dapui").toggle() end,
-                desc = "Toggle Debugger UI",
+                '<leader>du',
+                function() require('dapui').toggle() end,
+                desc = 'Toggle Debugger UI',
             },
         },
         -- automatically open/close the DAP UI when starting/stopping the debugger
         config = function()
-            local listener = require("dap").listeners
-            listener.after.event_initialized["dapui_config"] = function() require("dapui").open() end
-            listener.before.event_terminated["dapui_config"] = function() require("dapui").close() end
-            listener.before.event_exited["dapui_config"] = function() require("dapui").close() end
+            local listener = require('dap').listeners
+            listener.after.event_initialized['dapui_config'] = function()
+                require('dapui').open()
+            end
+            listener.before.event_terminated['dapui_config'] = function()
+                require('dapui').close()
+            end
+            listener.before.event_exited['dapui_config'] = function()
+                require('dapui').close()
+            end
         end,
     },
 
     -- Configuration for the python debugger
     {
-        "mfussenegger/nvim-dap-python",
-        dependencies = "mfussenegger/nvim-dap",
+        'mfussenegger/nvim-dap-python',
+        dependencies = 'mfussenegger/nvim-dap',
     },
 
     ---------------------------------------------------------------------------
@@ -390,17 +386,15 @@ require("lazy").setup({
 
     -- Adds workspace configuration file support
     {
-        "folke/neoconf.nvim",
-        config = function()
-            require("neoconf").setup({})
-        end
+        'folke/neoconf.nvim',
+        config = function() require('neoconf').setup({}) end,
     },
 
     -- Configure Lua LSP to know about neovim plugins when in neovim config
     {
-        "folke/neodev.nvim",
+        'folke/neodev.nvim',
         config = function()
-            require("neodev").setup({
+            require('neodev').setup({
                 -- Workaround to get correctly configure lua_ls for neovim config
                 -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
                 override = function(root_dir, library)
@@ -408,31 +402,31 @@ require("lazy").setup({
                     library.plugins = true
                 end,
             })
-        end
+        end,
     },
     -- Manager for external tools (LSPs, linters, debuggers, formatters)
     -- auto-install of those external tools
     {
-        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        'WhoIsSethDaniel/mason-tool-installer.nvim',
         dependencies = {
-            { "williamboman/mason.nvim" },
-            { "williamboman/mason-lspconfig.nvim" },
+            { 'williamboman/mason.nvim' },
+            { 'williamboman/mason-lspconfig.nvim' },
         },
         opts = {
             ensure_installed = {
-                "pyright",                    -- LSP for python
-                "ruff-lsp",                   -- linter for python (includes flake8, pep8, etc.)
-                "debugpy",                    -- python debugger
-                "black",                      -- python formatter
-                "isort",                      -- python organize imports
-                "taplo",                      -- LSP for toml (for pyproject.toml files)
+                'pyright', -- LSP for python
+                'ruff-lsp', -- linter for python (includes flake8, pep8, etc.)
+                'debugpy', -- python debugger
+                'black', -- python formatter
+                'isort', -- python organize imports
+                'taplo', -- LSP for toml (for pyproject.toml files)
 
-                "lua-language-server",        -- LSP for lua files
-                "stylua",                     -- Formatter for lua files
+                'lua-language-server', -- LSP for lua files
+                'stylua', -- Formatter for lua files
 
-                "prettier",                   -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                "typescript-language-server", -- tsserver LSP (keywords: typescript, javascript)
-                "eslint-lsp",                 -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
+                'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
+                'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
+                'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
             },
         },
     },
@@ -447,13 +441,13 @@ require("lazy").setup({
         'neovim/nvim-lspconfig',
         dependencies = {
             { 'hrsh7th/cmp-nvim-lsp' },
-        }
+        },
     },
     -- Autocompletion
     {
         'hrsh7th/nvim-cmp',
         dependencies = {
-            { 'L3MON4D3/LuaSnip' }
+            { 'L3MON4D3/LuaSnip' },
         },
     },
     { 'hrsh7th/cmp-buffer' },
@@ -470,15 +464,15 @@ require("lazy").setup({
     -- - makes pyright and debugpy aware of the selected virtual environment
     -- - Select a virtual environment with `:VenvSelect`
     {
-        "linux-cultist/venv-selector.nvim",
+        'linux-cultist/venv-selector.nvim',
         dependencies = {
-            "neovim/nvim-lspconfig",
-            "nvim-telescope/telescope.nvim",
-            "mfussenegger/nvim-dap-python",
+            'neovim/nvim-lspconfig',
+            'nvim-telescope/telescope.nvim',
+            'mfussenegger/nvim-dap-python',
         },
         opts = {
             dap_enabled = true, -- makes the debugger work with venv
-            name = { "venv", ".venv" },
+            name = { 'venv', '.venv' },
         },
     },
 
@@ -487,17 +481,17 @@ require("lazy").setup({
     -- - use the taplo-LSP for formatting in toml
     -- - Formatting is triggered via `<leader>f`, but also automatically on save
     {
-        "stevearc/conform.nvim",
-        event = "BufWritePre", -- load the plugin before saving
+        'stevearc/conform.nvim',
+        event = 'BufWritePre', -- load the plugin before saving
         opts = {
             formatters_by_ft = {
-                lua = { "stylua " },
+                lua = { 'stylua' },
                 -- first use isort and then black
-                python = { "isort", "black" },
+                python = { 'isort', 'black' },
                 -- "inject" is a "special" formatter from conform.nvim, which
                 -- formats treesitter-injected code. In effect, hits will make
                 -- conform.nvim format any python codeblocks inside a markdown file.
-                markdown = { "inject" },
+                markdown = { 'inject' },
             },
             -- enable format-on-save
             -- format_on_save = {
@@ -511,13 +505,12 @@ require("lazy").setup({
 
     ---------------------------------------------------------------------------
     -- Import plugins defined in the plugins folder
-    { import = "plugins" },
+    { import = 'plugins' },
 })
-
 
 local lsp_zero = require('lsp-zero')
 
-lsp_zero.preset("recommended")
+lsp_zero.preset('recommended')
 
 local cmp = require('cmp')
 local cmp_action = require('lsp-zero').cmp_action()
@@ -537,9 +530,7 @@ cmp.setup({
 
         -- Complete common string
         ['<C-l>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                return cmp.complete_common_string()
-            end
+            if cmp.visible() then return cmp.complete_common_string() end
             fallback()
         end, { 'i', 'c' }),
 
@@ -550,7 +541,7 @@ cmp.setup({
         -- Scroll up and down in the completion documentation
         ['<C-u>'] = cmp.mapping.scroll_docs(-4),
         ['<C-d>'] = cmp.mapping.scroll_docs(4),
-    })
+    }),
 })
 
 lsp_zero.on_attach(function(client, bufnr)
@@ -560,13 +551,27 @@ lsp_zero.on_attach(function(client, bufnr)
 
     local opts = { buffer = bufnr, remap = false }
 
-    vim.keymap.set("n", "<leader>vca", function() vim.lsp.buf.code_action() end, opts)
-    vim.keymap.set("n", "<leader>vrr", function() vim.lsp.buf.references() end, opts)
-    vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
+    vim.keymap.set(
+        'n',
+        '<leader>vca',
+        function() vim.lsp.buf.code_action() end,
+        opts
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>vrr',
+        function() vim.lsp.buf.references() end,
+        opts
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>vrn',
+        function() vim.lsp.buf.rename() end,
+        opts
+    )
 end)
 
 lsp_zero.setup()
-
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
@@ -581,11 +586,11 @@ lspconfig.lua_ls.setup({
     settings = {
         Lua = {
             completion = {
-                callSnippet = "Replace"
+                callSnippet = 'Replace',
             },
-            hint = { enable = true }
-        }
-    }
+            hint = { enable = true },
+        },
+    },
 })
 lspconfig.tsserver.setup({
     settings = {
@@ -599,8 +604,8 @@ lspconfig.tsserver.setup({
                 includeInlayParameterNameHintsWhenArgumentMatchesName = true, -- false
                 includeInlayPropertyDeclarationTypeHints = true,
                 includeInlayVariableTypeHints = true,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = true -- false
-            }
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true, -- false
+            },
         },
         javascript = {
             inlayHints = {
@@ -611,17 +616,15 @@ lspconfig.tsserver.setup({
                 includeInlayParameterNameHintsWhenArgumentMatchesName = true,
                 includeInlayPropertyDeclarationTypeHints = true,
                 includeInlayVariableTypeHints = true,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = true
-            }
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+            },
         },
-    }
-
+    },
 })
-
-
 
 -- configures debugpy
 -- uses the debugypy installation by mason
-local debugpyPythonPath = require("mason-registry").get_package("debugpy"):get_install_path()
-    .. "/.venv/bin/python3" -- TODO figure out if I need dynamically determine path
-require("dap-python").setup(debugpyPythonPath, {})
+local debugpyPythonPath = require('mason-registry')
+    .get_package('debugpy')
+    :get_install_path() .. '/.venv/bin/python3' -- TODO figure out if I need dynamically determine path
+require('dap-python').setup(debugpyPythonPath, {})
