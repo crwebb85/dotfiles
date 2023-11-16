@@ -381,8 +381,8 @@ local config = function()
         Space,
         {
             provider = function()
-                local backward = luasnip.jumpable(1) and ' <C-b> ' or ''
-                local forward = luasnip.jumpable(-1) and ' <C-f> ' or ''
+                local backward = luasnip.jumpable(-1) and ' ' or ''
+                local forward = luasnip.jumpable(1) and ' ' or ''
                 return backward .. '' .. forward
             end,
             hl = { fg = 'red', bold = true },
