@@ -13,12 +13,13 @@ TODO:
 :lua= vim.api.nvim_get_option_value('fileencodings', {})
 ```
 - Add debuger buttons to heirline
-- Add linter list element to heirline
-- setup inlay hints (may require upgrading neovim version and configuring plugins) It shows parameter names when functions are used
 - figure out how to create custom keymaps that use motions for example a custom yank function that lets me also use the motion commands to select what to yank
+- setup code lens to show number of variable/function references https://www.reddit.com/r/neovim/comments/12hf3k3/comment/jfom79l/?utm_medium=android_app&utm_source=share&context=3
+- https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3
 
 Cool plugins:
-- https://github.com/folke/trouble.nvim
+- https://github.com/rockerBOO/awesome-neovim
+- https://github.com/carbon-steel/detour.nvim/tree/main
 - https://github.com/rmagatti/auto-session
 - https://github.com/kevinhwang91/nvim-bqf
 - https://github.com/CKolkey/ts-node-action Toggle formatting of code snippets (this is not about typescript) 
@@ -27,3 +28,5 @@ Cool plugins:
 - https://github.com/soulis-1256/hoverhints.nvim 
 - https://github.com/rgroli/other.nvim
 - https://github.com/jmederosalvarado/roslyn.nvim
+- emmet lsp - https://www.reddit.com/r/neovim/comments/17v1678/comment/k97ggs2/?utm_source=share&utm_medium=web2x&context=3
+- https://github.com/iamcco/markdown-preview.nvim
