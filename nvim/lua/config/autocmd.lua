@@ -97,3 +97,18 @@ end
 
 -- if you only want these mappings for toggle term use term://*toggleterm#* instead
 vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
+
+--Add lightbulb above code that has code actions
+local lightbulb = require('config.lightbulb')
+-- Show a lightbulb when code actions are available at the cursor position
+vim.api.nvim_create_augroup('code_action', { clear = true })
+vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI', 'WinScrolled' }, {
+    group = 'code_action',
+    pattern = '*',
+    callback = lightbulb.show_lightbulb,
+})
+vim.api.nvim_create_autocmd({ 'TermEnter' }, {
+    group = 'code_action',
+    pattern = '*',
+    callback = lightbulb.remove_bulb,
+})
