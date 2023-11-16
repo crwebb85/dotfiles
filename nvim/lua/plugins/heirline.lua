@@ -302,6 +302,8 @@ local config = function()
             local ok, conform = pcall(require, 'conform')
             self.conform = conform
             return ok
+                and require('conform').formatters_by_ft[vim.bo.filetype]
+                    ~= nil
         end,
         update = { 'BufEnter' },
         Space,
