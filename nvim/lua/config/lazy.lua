@@ -131,7 +131,6 @@ require('lazy').setup({
     -- Fuzzy finder (for many things not just file finder)
     {
         'nvim-telescope/telescope.nvim',
-        tag = '0.1.2',
         dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
         },
