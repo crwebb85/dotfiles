@@ -218,14 +218,9 @@ vim.keymap.set(
     'nzzzv',
     { desc = 'Go to next search term and move cursor to middle of the page' }
 )
-vim.keymap.set(
-    'n',
-    'N',
-    'Nzzzv',
-    {
-        desc = 'Go to previous search term and move cursor to middle of the page',
-    }
-)
+vim.keymap.set('n', 'N', 'Nzzzv', {
+    desc = 'Go to previous search term and move cursor to middle of the page',
+})
 
 -- Disable the "execute last macro" shortcut
 --TODO detemine if I want this
@@ -312,4 +307,19 @@ vim.keymap.set(
     '<leader>uh',
     function() ToggleInlayHintsAutocmd() end,
     { desc = 'Toggle Inlay Hints' }
+)
+
+-- ToggleTerm
+vim.keymap.set(
+    'n',
+    '<leader>tt',
+    '<cmd>exe v:count1 . "ToggleTerm"<CR>',
+    { desc = 'Toggle ToggleTerm' }
+)
+
+vim.keymap.set(
+    { 'n', 'i' },
+    [[<C-\>]],
+    '<cmd>exe v:count1 . "ToggleTerm"<CR>',
+    { desc = 'Toggle ToggleTerm' }
 )

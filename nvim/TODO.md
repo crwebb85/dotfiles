@@ -16,6 +16,7 @@ TODO:
 - figure out how to create custom keymaps that use motions for example a custom yank function that lets me also use the motion commands to select what to yank
 - setup code lens to show number of variable/function references https://www.reddit.com/r/neovim/comments/12hf3k3/comment/jfom79l/?utm_medium=android_app&utm_source=share&context=3
 - https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3
+- interesting cmp and luasnip config https://www.reddit.com/r/neovim/comments/wmkf9o/comment/ik0mcwk/?utm_source=share&utm_medium=web2x&context=3
 
 Cool plugins:
 - https://github.com/rockerBOO/awesome-neovim
