@@ -558,6 +558,8 @@ require('lazy').setup({
                 lua = { 'stylua' },
                 -- first use isort and then black
                 python = { 'isort', 'black' },
+                typescript = { 'prettier' },
+                javascript = { 'prettier' },
                 -- "inject" is a "special" formatter from conform.nvim, which
                 -- formats treesitter-injected code. In effect, hits will make
                 -- conform.nvim format any python codeblocks inside a markdown file.
@@ -690,10 +692,10 @@ lspconfig.tsserver.setup({
                 includeInlayFunctionLikeReturnTypeHints = true,
                 includeInlayFunctionParameterTypeHints = true,
                 includeInlayParameterNameHints = 'all',
-                includeInlayParameterNameHintsWhenArgumentMatchesName = true, -- false
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
                 includeInlayPropertyDeclarationTypeHints = true,
                 includeInlayVariableTypeHints = true,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = true, -- false
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true,
             },
         },
         javascript = {
