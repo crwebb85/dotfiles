@@ -305,7 +305,11 @@ local config = function()
                 and require('conform').formatters_by_ft[vim.bo.filetype]
                     ~= nil
         end,
-        update = { 'BufEnter' },
+        update = {
+            'BufEnter',
+            'User',
+            pattern = { '*.*', 'DisabledFormatter', 'EnabledFormatter' },
+        },
         Space,
         {
             provider = function()
@@ -322,7 +326,13 @@ local config = function()
                 end
                 return ' [' .. table.concat(names, ' ') .. ']'
             end,
-            hl = { fg = 'green', bold = true },
+            hl = function()
+                if vim.g.disable_autoformat or vim.b[0].disable_autoformat then
+                    return { fg = 'red', bold = true }
+                else
+                    return { fg = 'green', bold = true }
+                end
+            end,
         },
         Space,
         Seperator,

@@ -150,3 +150,26 @@ vim.api.nvim_create_user_command(
         range = true,
     }
 )
+
+-- update = { 'BufEnter', 'DisabledFormatter', 'EnabledFormatter' },
+vim.api.nvim_create_user_command('FormatDisable', function(args)
+    -- FormatDisable! will disable formatting just for this buffer
+    vim.b.disable_autoformat = true
+    if not args.bang then vim.g.disable_autoformat = true end
+
+    vim.api.nvim_exec_autocmds('User', { pattern = 'DisabledFormatter' })
+end, {
+    desc = 'Disable autoformat-on-save',
+    bang = true,
+})
+
+vim.api.nvim_create_user_command('FormatEnable', function(args)
+    -- FormatDisable! will enable formatting just for this buffer
+    vim.b.disable_autoformat = false
+    if not args.bang then vim.g.disable_autoformat = false end
+
+    vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
+end, {
+    desc = 'Re-enable autoformat-on-save',
+    bang = true,
+})

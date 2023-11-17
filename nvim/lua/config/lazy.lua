@@ -566,12 +566,15 @@ require('lazy').setup({
                 markdown = { 'inject' },
             },
             -- enable format-on-save
-            -- format_on_save = {
-            --     -- when no formatter is setup for a filetype, fallback to formatting
-            --     -- via the LSP. This is relevant e.g. for taplo (toml LSP), where the
-            --     -- LSP can handle the formatting for us
-            --     lsp_fallback = true,
-            -- },
+            format_on_save = function(bufnr)
+                -- Disable with a global or buffer-local variable
+                if
+                    vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat
+                then
+                    return
+                end
+                return { timeout_ms = 500, lsp_fallback = true }
+            end,
         },
     },
 

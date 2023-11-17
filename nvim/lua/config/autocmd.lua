@@ -58,16 +58,6 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
     end,
 })
 
-local format_on_save_group = 'format_on_save_group'
-vim.api.nvim_create_augroup(format_on_save_group, { clear = true })
-vim.api.nvim_create_autocmd('BufWritePre', {
-    pattern = '*',
-    group = format_on_save_group,
-    callback = function(args)
-        require('conform').format({ bufnr = args.buf, lsp_fallback = true })
-    end,
-})
-
 local isInlayHintsEnabled = false
 function ToggleInlayHintsAutocmd()
     if not vim.lsp.inlay_hint then
