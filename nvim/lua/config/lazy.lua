@@ -24,11 +24,18 @@ end
 require('lazy').setup({
     ---------------------------------------------------------------------------
     -- Git integration
-    'tpope/vim-fugitive',
+    {
+        'tpope/vim-fugitive',
+        version = '*',
+        lazy = true,
+        event = 'VeryLazy',
+    },
     -- Adds git diffview
     {
         'sindrets/diffview.nvim',
-        lazy = false,
+        version = '*',
+        lazy = true,
+        config = true,
         keys = {
             {
                 '<leader>gd',
@@ -93,8 +100,10 @@ require('lazy').setup({
     -- Adds sidbar showing lines changed
     {
         'lewis6991/gitsigns.nvim',
-        lazy = false,
-        config = function() require('gitsigns').setup() end,
+        version = '*',
+        lazy = true,
+        event = 'VeryLazy',
+        config = true,
         keys = {
 
             -- Highlight changed words.
@@ -134,10 +143,117 @@ require('lazy').setup({
         dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
         },
+        version = '*',
+        lazy = true,
+        cmd = { 'Telescope' },
+        keys = {
+
+            {
+                '<leader>ff',
+                function() require('telescope.builtin').find_files() end,
+                desc = 'Telescope find files',
+            },
+            {
+                '<leader>fg',
+                function() require('telescope.builtin').live_grep() end,
+                desc = 'Telescope live_grep',
+            },
+            {
+                '<leader>fb',
+                function() require('telescope.builtin').buffers() end,
+                desc = 'Telescope open buffers',
+            },
+            {
+                '<leader>fh',
+                function() require('telescope.builtin').help_tags() end,
+                desc = 'Telescope help tags',
+            },
+            {
+                '<leader>fk',
+                function() require('telescope.builtin').keymaps() end,
+                desc = 'Telescope keymaps',
+            },
+            {
+                '<leader>fd',
+                function() require('telescope.builtin').spell_suggest() end,
+                desc = 'Telescope suggest spelling (search dictionary)',
+            },
+        },
+        config = true,
     },
 
     -- Harpoon (fast file navigation between pinned files)
-    'theprimeagen/harpoon',
+    {
+        'theprimeagen/harpoon',
+        version = '*',
+        lazy = true,
+        config = true,
+        keys = {
+            {
+                '<leader>a',
+                function() require('harpoon.mark').add_file() end,
+                desc = 'Add file to harpoon',
+            },
+            {
+                '<C-e>',
+                function() require('harpoon.ui').toggle_quick_menu() end,
+                desc = 'Toggle harpoon quick menu',
+            },
+            -- Protip: To reorder the entries in harpoon quick menu use `Vd` to cut the line and `P` to paste where you want it
+
+            -- Harpoon quick navigation
+            {
+                '<leader>1',
+                function() require('harpoon.ui').nav_file(1) end,
+                desc = 'Go to harpoon file 1',
+            },
+            {
+                '<leader>2',
+                function() require('harpoon.ui').nav_file(2) end,
+                desc = 'Go to harpoon file 2',
+            },
+            {
+                '<leader>3',
+                function() require('harpoon.ui').nav_file(3) end,
+                desc = 'Go to harpoon file 3',
+            },
+            {
+                '<leader>4',
+                function() require('harpoon.ui').nav_file(4) end,
+                desc = 'Go to harpoon file 4',
+            },
+            {
+                '<leader>5',
+                function() require('harpoon.ui').nav_file(5) end,
+                desc = 'Go to harpoon file 5',
+            },
+            {
+                '<leader>6',
+                function() require('harpoon.ui').nav_file(6) end,
+                desc = 'Go to harpoon file 6',
+            },
+            {
+                '<leader>7',
+                function() require('harpoon.ui').nav_file(7) end,
+                desc = 'Go to harpoon file 7',
+            },
+            {
+                '<leader>8',
+                function() require('harpoon.ui').nav_file(8) end,
+                desc = 'Go to harpoon file 8',
+            },
+            {
+                '<leader>9',
+                function() require('harpoon.ui').nav_file(9) end,
+                desc = 'Go to harpoon file 9',
+            },
+            {
+                '<leader>0',
+                function() require('harpoon.ui').nav_file(0) end,
+                desc = 'Go to harpoon file 10',
+            },
+        },
+    },
 
     ---------------------------------------------------------------------------
     -- Utils
@@ -146,51 +262,68 @@ require('lazy').setup({
     {
         'echasnovski/mini.pairs',
         version = '*',
-        config = function() require('mini.pairs').setup() end,
+        lazy = true,
+        event = 'VeryLazy',
+        config = true,
     },
     -- Comment toggling
     {
         'echasnovski/mini.comment',
         version = '*',
-        config = function() require('mini.comment').setup() end,
+        lazy = true,
+        event = 'VeryLazy',
+        config = true,
     },
     -- Keymap suggestions
     {
         'folke/which-key.nvim',
+        lazy = true,
         event = 'VeryLazy',
         init = function()
             vim.o.timeout = true
             vim.o.timeoutlen = 300
         end,
-        opts = {},
+        config = true,
     },
     -- Adds motions to wrap text in qoutes/brackets/tags/etc
     -- using the same motions I use to yank text
     {
         'kylechui/nvim-surround',
-        version = '*', -- Use for stability; omit to use `main` branch for the latest features
+        version = '*',
+        lazy = true,
         event = 'VeryLazy',
-        config = function()
-            require('nvim-surround').setup({
-                -- Configuration here, or leave empty to use defaults
-            })
-        end,
+        config = true,
     },
     -- Open terminal within neovi
     {
         'akinsho/toggleterm.nvim',
         version = '*',
+        lazy = true,
         config = true,
+        cmd = { 'ToggleTerm' },
+        keys = {
+            {
+                '<leader>tt',
+                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
+                desc = 'Toggle ToggleTerm',
+            },
+            {
+
+                [[<C-\>]],
+                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
+                desc = 'Toggle ToggleTerm',
+                mode = { 'n', 'i' },
+            },
+        },
     },
     -- Diagnostic info
     {
         'folke/trouble.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        opts = {
-            -- your configuration comes here
-            -- or leave it empty to use the default settings
-            -- refer to the configuration section below
-        },
+        version = '*',
+        lazy = true,
+        config = true,
+        cmd = { 'Trouble', 'TroubleToggle' },
         keys = {
             {
                 '<leader>xx',
@@ -230,7 +363,9 @@ require('lazy').setup({
         dependencies = {
             'nvim-lua/plenary.nvim',
         },
-
+        version = '*',
+        lazy = true,
+        config = true,
         -- All the user commands added by the plugin
         cmd = { 'Ollama', 'OllamaModel', 'OllamaServe', 'OllamaServeStop' },
 
@@ -243,22 +378,18 @@ require('lazy').setup({
                 mode = { 'n', 'v' },
             },
         },
-
-        ---@type Ollama.Config
-        opts = {
-            -- your configuration overrides
-        },
     },
 
     ---------------------------------------------------------------------------
     -- Clipboard support (copy from vim to the outside world)
-    'ojroques/nvim-osc52',
+    {
+        'ojroques/nvim-osc52',
+    },
 
     {
         'folke/tokyonight.nvim',
         lazy = false,
         priority = 1000,
-        opts = {},
         config = function()
             require('tokyonight.colors').setup()
             local color = 'tokyonight'
@@ -268,13 +399,28 @@ require('lazy').setup({
 
     ---------------------------------------------------------------------------
     -- Undotree the solution to screwups
-    'mbbill/undotree',
+    {
+        'mbbill/undotree',
+        version = '*',
+        lazy = true,
+        config = true,
+        cmd = { 'UndotreeToggle', 'UndotreeShow' },
+        keys = {
+            {
+                '<leader>u',
+                vim.cmd.UndotreeToggle,
+                desc = 'Toggle Undotree pluggin',
+            },
+        },
+    },
 
     ---------------------------------------------------------------------------
     -- Parser for syntax highlighting
     {
         'nvim-treesitter/nvim-treesitter',
-        lazy = false,
+        version = '*',
+        lazy = true,
+        event = 'VeryLazy',
         build = ':TSUpdate',
         config = function()
             require('nvim-treesitter.configs').setup({
@@ -395,6 +541,8 @@ require('lazy').setup({
     -- - terminate the debugger `<leader>dt`
     {
         'mfussenegger/nvim-dap',
+        version = '*',
+        lazy = true,
         keys = {
             {
                 '<leader>dc',
@@ -419,6 +567,8 @@ require('lazy').setup({
     -- - toggle debugger UI manually with `<leader>du`
     {
         'rcarriga/nvim-dap-ui',
+        version = '*',
+        lazy = true,
         dependencies = 'mfussenegger/nvim-dap',
         keys = {
             {
@@ -445,7 +595,18 @@ require('lazy').setup({
     -- Configuration for the python debugger
     {
         'mfussenegger/nvim-dap-python',
+        version = '*',
+        lazy = true,
+        ft = 'python',
         dependencies = 'mfussenegger/nvim-dap',
+        config = function()
+            -- configures debugpy
+            -- uses the debugypy installation by mason
+            local debugpyPythonPath = require('mason-registry')
+                .get_package('debugpy')
+                :get_install_path() .. '/.venv/bin/python3' -- TODO figure out if I need dynamically determine path
+            require('dap-python').setup(debugpyPythonPath, {})
+        end,
     },
 
     ---------------------------------------------------------------------------
@@ -454,17 +615,22 @@ require('lazy').setup({
     -- Adds workspace configuration file support
     {
         'folke/neoconf.nvim',
-        config = function() require('neoconf').setup({}) end,
+        version = '*',
+        lazy = false,
+        config = true,
     },
 
     -- Configure Lua LSP to know about neovim plugins when in neovim config
     {
         'folke/neodev.nvim',
+        version = '*',
+        lazy = true,
+        ft = 'lua',
         config = function()
             require('neodev').setup({
                 -- Workaround to get correctly configure lua_ls for neovim config
                 -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
-                override = function(root_dir, library)
+                override = function(_, library)
                     library.enabled = true
                     library.plugins = true
                 end,
@@ -475,6 +641,9 @@ require('lazy').setup({
     -- auto-install of those external tools
     {
         'WhoIsSethDaniel/mason-tool-installer.nvim',
+        version = '*',
+        lazy = true,
+        event = 'VeryLazy',
         dependencies = {
             { 'williamboman/mason.nvim' },
             { 'williamboman/mason-lspconfig.nvim' },
@@ -500,34 +669,203 @@ require('lazy').setup({
             },
         },
     },
+    {
+        'williamboman/mason.nvim',
+        version = '*',
+        lazy = true,
+        config = true,
+    },
+    {
+        'williamboman/mason-lspconfig.nvim',
+        version = '*',
+        lazy = true,
+        config = function()
+            local lsp_zero = require('lsp-zero')
+
+            require('mason-lspconfig').setup({
+                handlers = {
+                    lsp_zero.default_setup,
+                },
+            })
+        end,
+    },
 
     -- LSP Support
     {
         'VonHeikemen/lsp-zero.nvim',
         branch = 'v3.x',
         lazy = true,
+        config = function()
+            local lsp_zero = require('lsp-zero')
+
+            lsp_zero.preset('recommended')
+
+            lsp_zero.on_attach(function(_, bufnr)
+                -- see :help lsp-zero-keybindings
+                -- to learn the available actions
+                lsp_zero.default_keymaps({ buffer = bufnr })
+
+                vim.keymap.set(
+                    'n',
+                    '<leader>vca',
+                    function() vim.lsp.buf.code_action() end,
+                    {
+                        buffer = bufnr,
+                        remap = false,
+                        desc = 'LSP: Open Code Action menu',
+                    }
+                )
+                vim.keymap.set(
+                    'n',
+                    '<leader>vrr',
+                    function() vim.lsp.buf.references() end,
+                    {
+                        buffer = bufnr,
+                        remap = false,
+                        desc = 'LSP: Find references',
+                    }
+                )
+                vim.keymap.set(
+                    'n',
+                    '<leader>vrn',
+                    function() vim.lsp.buf.rename() end,
+                    {
+                        buffer = bufnr,
+                        remap = false,
+                        desc = 'LSP: Rename symbol',
+                    }
+                )
+            end)
+
+            lsp_zero.setup()
+        end,
     },
     {
         'neovim/nvim-lspconfig',
+        version = '*',
+        lazy = true,
         dependencies = {
+            { 'VonHeikemen/lsp-zero.nvim' }, --need lsp zero configured before nvim-lspconfig
             { 'hrsh7th/cmp-nvim-lsp' },
         },
+        config = function()
+            local lspconfig = require('lspconfig')
+            --https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+            lspconfig.lua_ls.setup({
+                settings = {
+                    Lua = {
+                        completion = {
+                            callSnippet = 'Replace',
+                        },
+                        hint = { enable = true },
+                    },
+                },
+            })
+            lspconfig.tsserver.setup({
+                settings = {
+                    typescript = {
+                        inlayHints = {
+                            -- taken from https://github.com/typescript-language-server/typescript-language-server#workspacedidchangeconfiguration
+                            includeInlayEnumMemberValueHints = true,
+                            includeInlayFunctionLikeReturnTypeHints = true,
+                            includeInlayFunctionParameterTypeHints = true,
+                            includeInlayParameterNameHints = 'all',
+                            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                            includeInlayPropertyDeclarationTypeHints = true,
+                            includeInlayVariableTypeHints = true,
+                            includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                        },
+                    },
+                    javascript = {
+                        inlayHints = {
+                            includeInlayEnumMemberValueHints = true,
+                            includeInlayFunctionLikeReturnTypeHints = true,
+                            includeInlayFunctionParameterTypeHints = true,
+                            includeInlayParameterNameHints = 'all',
+                            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                            includeInlayPropertyDeclarationTypeHints = true,
+                            includeInlayVariableTypeHints = true,
+                            includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                        },
+                    },
+                },
+            })
+        end,
     },
     -- Autocompletion
     {
         'hrsh7th/nvim-cmp',
+        version = '*',
+        lazy = true,
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
+            { 'hrsh7th/cmp-buffer' },
+            { 'hrsh7th/cmp-path' },
+            { 'saadparwaiz1/cmp_luasnip' },
+            { 'hrsh7th/cmp-nvim-lsp' },
         },
+
+        config = function()
+            local cmp = require('cmp')
+            local cmp_action = require('lsp-zero').cmp_action()
+            local cmp_select = { behavior = cmp.SelectBehavior.Select }
+
+            cmp.setup({
+                mapping = cmp.mapping.preset.insert({
+                    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+                    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+
+                    -- `Enter` key to confirm completion
+                    ['<CR>'] = cmp.mapping.confirm({ select = false }),
+
+                    -- Ctrl+Space to trigger completion menu
+                    ['<C-Space>'] = cmp.mapping.complete(),
+
+                    -- Complete common string
+                    ['<C-l>'] = cmp.mapping(function(fallback)
+                        if cmp.visible() then
+                            return cmp.complete_common_string()
+                        end
+                        fallback()
+                    end, { 'i', 'c' }),
+
+                    -- Navigate between snippet placeholder
+                    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
+                    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+                    ['<Tab>'] = cmp.mapping(function(fallback)
+                        local luasnip = require('luasnip')
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        elseif luasnip.expand_or_jumpable() then
+                            luasnip.expand_or_jump()
+                        else
+                            fallback()
+                        end
+                    end, { 'i', 's' }),
+
+                    ['<S-Tab>'] = cmp.mapping(function(fallback)
+                        local luasnip = require('luasnip')
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        elseif luasnip.jumpable(-1) then
+                            luasnip.jump(-1)
+                        else
+                            fallback()
+                        end
+                    end, { 'i', 's' }),
+                    -- Scroll up and down in the completion documentation
+                    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+                    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+                }),
+            })
+        end,
     },
-    { 'hrsh7th/cmp-buffer' },
-    { 'hrsh7th/cmp-path' },
-    { 'saadparwaiz1/cmp_luasnip' },
-    { 'hrsh7th/cmp-nvim-lsp' },
 
     -- Snippets
     {
         'L3MON4D3/LuaSnip',
+        version = '*',
+        lazy = true,
         dependencies = {
             'rafamadriz/friendly-snippets',
             {
@@ -564,7 +902,6 @@ require('lazy').setup({
             require('luasnip').filetype_extend('sh', { 'shelldoc' })
         end,
     },
-    { 'rafamadriz/friendly-snippets' },
 
     -- Virtual Environments
     -- select virtual environments
@@ -572,6 +909,9 @@ require('lazy').setup({
     -- - Select a virtual environment with `:VenvSelect`
     {
         'linux-cultist/venv-selector.nvim',
+        version = '*',
+        lazy = true,
+        ft = 'python',
         dependencies = {
             'neovim/nvim-lspconfig',
             'nvim-telescope/telescope.nvim',
@@ -620,143 +960,3 @@ require('lazy').setup({
     -- Import plugins defined in the plugins folder
     { import = 'plugins' },
 })
-
-local lsp_zero = require('lsp-zero')
-
-lsp_zero.preset('recommended')
-
-local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
-local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
-cmp.setup({
-    mapping = cmp.mapping.preset.insert({
-        ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-        ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-
-        -- `Enter` key to confirm completion
-        ['<CR>'] = cmp.mapping.confirm({ select = false }),
-
-        -- Ctrl+Space to trigger completion menu
-        ['<C-Space>'] = cmp.mapping.complete(),
-
-        -- Complete common string
-        ['<C-l>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then return cmp.complete_common_string() end
-            fallback()
-        end, { 'i', 'c' }),
-
-        -- Navigate between snippet placeholder
-        ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-        ['<C-b>'] = cmp_action.luasnip_jump_backward(),
-        ['<Tab>'] = cmp.mapping(function(fallback)
-            local luasnip = require('luasnip')
-            if cmp.visible() then
-                cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then
-                luasnip.expand_or_jump()
-            else
-                fallback()
-            end
-        end, { 'i', 's' }),
-
-        ['<S-Tab>'] = cmp.mapping(function(fallback)
-            local luasnip = require('luasnip')
-            if cmp.visible() then
-                cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-                luasnip.jump(-1)
-            else
-                fallback()
-            end
-        end, { 'i', 's' }),
-        -- Scroll up and down in the completion documentation
-        ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-        ['<C-d>'] = cmp.mapping.scroll_docs(4),
-    }),
-})
-
-lsp_zero.on_attach(function(client, bufnr)
-    -- see :help lsp-zero-keybindings
-    -- to learn the available actions
-    lsp_zero.default_keymaps({ buffer = bufnr })
-
-    local opts = { buffer = bufnr, remap = false }
-
-    vim.keymap.set(
-        'n',
-        '<leader>vca',
-        function() vim.lsp.buf.code_action() end,
-        opts
-    )
-    vim.keymap.set(
-        'n',
-        '<leader>vrr',
-        function() vim.lsp.buf.references() end,
-        opts
-    )
-    vim.keymap.set(
-        'n',
-        '<leader>vrn',
-        function() vim.lsp.buf.rename() end,
-        opts
-    )
-end)
-
-lsp_zero.setup()
-
-require('mason').setup({})
-require('mason-lspconfig').setup({
-    handlers = {
-        lsp_zero.default_setup,
-    },
-})
-
-local lspconfig = require('lspconfig')
---https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-lspconfig.lua_ls.setup({
-    settings = {
-        Lua = {
-            completion = {
-                callSnippet = 'Replace',
-            },
-            hint = { enable = true },
-        },
-    },
-})
-lspconfig.tsserver.setup({
-    settings = {
-        typescript = {
-            inlayHints = {
-                -- taken from https://github.com/typescript-language-server/typescript-language-server#workspacedidchangeconfiguration
-                includeInlayEnumMemberValueHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayParameterNameHints = 'all',
-                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayVariableTypeHints = true,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-            },
-        },
-        javascript = {
-            inlayHints = {
-                includeInlayEnumMemberValueHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayParameterNameHints = 'all',
-                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayVariableTypeHints = true,
-                includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-            },
-        },
-    },
-})
-
--- configures debugpy
--- uses the debugypy installation by mason
-local debugpyPythonPath = require('mason-registry')
-    .get_package('debugpy')
-    :get_install_path() .. '/.venv/bin/python3' -- TODO figure out if I need dynamically determine path
-require('dap-python').setup(debugpyPythonPath, {})

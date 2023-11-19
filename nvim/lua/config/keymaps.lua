@@ -1,41 +1,4 @@
 -- Navigation --
-local builtin = require('telescope.builtin')
-vim.keymap.set(
-    'n',
-    '<leader>ff',
-    builtin.find_files,
-    { desc = 'Telescope find files' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>fg',
-    builtin.live_grep,
-    { desc = 'Telescope live_grep' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>fb',
-    builtin.buffers,
-    { desc = 'Telescope open buffers' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>fh',
-    builtin.help_tags,
-    { desc = 'Telescope help tags' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>fk',
-    builtin.keymaps,
-    { desc = 'Telescope keymaps' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>fd',
-    builtin.spell_suggest,
-    { desc = 'Telescope suggest spelling (search dictionary)' }
-)
 
 -- Pull up netrw file explorer
 vim.keymap.set(
@@ -43,84 +6,6 @@ vim.keymap.set(
     '<leader>fv',
     vim.cmd.Ex,
     { desc = 'Pull up netrw file explorer (view file explorer)' }
-)
-
-local mark = require('harpoon.mark')
-local ui = require('harpoon.ui')
-vim.keymap.set(
-    'n',
-    '<leader>a',
-    mark.add_file,
-    { desc = 'Add file to harpoon' }
-)
-vim.keymap.set(
-    'n',
-    '<C-e>',
-    ui.toggle_quick_menu,
-    { desc = 'Toggle harpoon quick menu' }
-)
--- Protip: To reorder the entries in harpoon quick menu use `Vd` to cut the line and `P` to paste where you want it
-
--- Harpoon quick navigation
-vim.keymap.set(
-    'n',
-    '<leader>1',
-    function() ui.nav_file(1) end,
-    { desc = 'Go to harpoon file 1' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>2',
-    function() ui.nav_file(2) end,
-    { desc = 'Go to harpoon file 2' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>3',
-    function() ui.nav_file(3) end,
-    { desc = 'Go to harpoon file 3' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>4',
-    function() ui.nav_file(4) end,
-    { desc = 'Go to harpoon file 4' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>5',
-    function() ui.nav_file(5) end,
-    { desc = 'Go to harpoon file 5' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>6',
-    function() ui.nav_file(6) end,
-    { desc = 'Go to harpoon file 6' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>7',
-    function() ui.nav_file(7) end,
-    { desc = 'Go to harpoon file 7' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>8',
-    function() ui.nav_file(8) end,
-    { desc = 'Go to harpoon file 8' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>9',
-    function() ui.nav_file(9) end,
-    { desc = 'Go to harpoon file 9' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>0',
-    function() ui.nav_file(0) end,
-    { desc = 'Go to harpoon file 10' }
 )
 
 -- Clipboard --
@@ -154,14 +39,6 @@ vim.keymap.set(
     '<leader>d',
     [["_d]],
     { desc = 'Delete to the void register' }
-)
-
--- Undo Mistakes --
-vim.keymap.set(
-    'n',
-    '<leader>u',
-    vim.cmd.UndotreeToggle,
-    { desc = 'Toggle Undotree pluggin' }
 )
 
 -- Other --
@@ -307,19 +184,4 @@ vim.keymap.set(
     '<leader>uh',
     function() ToggleInlayHintsAutocmd() end,
     { desc = 'Toggle Inlay Hints' }
-)
-
--- ToggleTerm
-vim.keymap.set(
-    'n',
-    '<leader>tt',
-    '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-    { desc = 'Toggle ToggleTerm' }
-)
-
-vim.keymap.set(
-    { 'n', 'i' },
-    [[<C-\>]],
-    '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-    { desc = 'Toggle ToggleTerm' }
 )

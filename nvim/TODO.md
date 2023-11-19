@@ -18,7 +18,7 @@ TODO:
 - https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3
 - interesting cmp and luasnip config https://www.reddit.com/r/neovim/comments/wmkf9o/comment/ik0mcwk/?utm_source=share&utm_medium=web2x&context=3
 - add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
-
+- add add keymap to navigate to next/previous item int trouble diagnostics menu
 Cool plugins:
 - https://github.com/rockerBOO/awesome-neovim
 - https://github.com/carbon-steel/detour.nvim/tree/main
