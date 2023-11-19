@@ -17,6 +17,7 @@ TODO:
 - setup code lens to show number of variable/function references https://www.reddit.com/r/neovim/comments/12hf3k3/comment/jfom79l/?utm_medium=android_app&utm_source=share&context=3
 - https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3
 - interesting cmp and luasnip config https://www.reddit.com/r/neovim/comments/wmkf9o/comment/ik0mcwk/?utm_source=share&utm_medium=web2x&context=3
+- add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
 
 Cool plugins:
 - https://github.com/rockerBOO/awesome-neovim

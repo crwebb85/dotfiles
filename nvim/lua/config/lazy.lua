@@ -164,7 +164,19 @@ require('lazy').setup({
         end,
         opts = {},
     },
-    -- Open terminal within neovim
+    -- Adds motions to wrap text in qoutes/brackets/tags/etc
+    -- using the same motions I use to yank text
+    {
+        'kylechui/nvim-surround',
+        version = '*', -- Use for stability; omit to use `main` branch for the latest features
+        event = 'VeryLazy',
+        config = function()
+            require('nvim-surround').setup({
+                -- Configuration here, or leave empty to use defaults
+            })
+        end,
+    },
+    -- Open terminal within neovi
     {
         'akinsho/toggleterm.nvim',
         version = '*',
@@ -180,40 +192,62 @@ require('lazy').setup({
             -- refer to the configuration section below
         },
         keys = {
-            { '<leader>xx', function() require('trouble').toggle() end },
+            {
+                '<leader>xx',
+                function() require('trouble').toggle() end,
+                desc = 'Trouble: Toggle UI',
+            },
             {
                 '<leader>xw',
                 function() require('trouble').toggle('workspace_diagnostics') end,
+                desc = 'Trouble: Toggle workspace diagnostics',
             },
             {
                 '<leader>xd',
                 function() require('trouble').toggle('document_diagnostics') end,
+                desc = 'Trouble: Toggle document diagnostics',
             },
             {
                 '<leader>xq',
                 function() require('trouble').toggle('quickfix') end,
+                desc = 'Trouble: Toggle quickfix list (Using Troubles UI)',
             },
             {
                 '<leader>xl',
                 function() require('trouble').toggle('loclist') end,
+                desc = 'Trouble: Toggle loclist',
             },
             {
-                'gR',
+                '<leader>xr',
                 function() require('trouble').toggle('lsp_references') end,
+                desc = 'Trouble: Toggle lsp references',
             },
         },
     },
-    -- Adds motions to wrap text in qoutes/brackets/tags/etc
-    -- using the same motions I use to yank text
+    -- Query ollama
     {
-        'kylechui/nvim-surround',
-        version = '*', -- Use for stability; omit to use `main` branch for the latest features
-        event = 'VeryLazy',
-        config = function()
-            require('nvim-surround').setup({
-                -- Configuration here, or leave empty to use defaults
-            })
-        end,
+        'nomnivore/ollama.nvim',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+        },
+
+        -- All the user commands added by the plugin
+        cmd = { 'Ollama', 'OllamaModel', 'OllamaServe', 'OllamaServeStop' },
+
+        -- Sample keybind for prompting. Note that the <c-u> is important for selections to work properly.
+        keys = {
+            {
+                '<leader>oo',
+                ":<c-u>lua require('ollama').prompt()<cr>",
+                desc = 'ollama prompt',
+                mode = { 'n', 'v' },
+            },
+        },
+
+        ---@type Ollama.Config
+        opts = {
+            -- your configuration overrides
+        },
     },
 
     ---------------------------------------------------------------------------
@@ -460,6 +494,9 @@ require('lazy').setup({
                 'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
                 'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
                 'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
+
+                'ansible-language-server',
+                'ansible-lint',
             },
         },
     },
@@ -560,6 +597,7 @@ require('lazy').setup({
                 python = { 'isort', 'black' },
                 typescript = { 'prettier' },
                 javascript = { 'prettier' },
+                yaml = { 'prettier' },
                 -- "inject" is a "special" formatter from conform.nvim, which
                 -- formats treesitter-injected code. In effect, hits will make
                 -- conform.nvim format any python codeblocks inside a markdown file.

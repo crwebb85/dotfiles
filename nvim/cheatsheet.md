@@ -28,3 +28,21 @@
 - `shift-K` opens hover diagnostics in popup about the symbol (press again to move cursor into the popup and q to leave the popup)
 
 - `:vimgrep "\%^" **/*.md` add all files with md extension to quick fix list (`\%^` is the regex for the first line of a file)
+- `:Git Difftool` adds all git changes to the quick fix list
+
+You can pass arbitrary data to a User autocmd callback by doing
+```lua
+vim.api.nvim_exec_autocmds('User', {
+  pattern = '<event-name>',
+  data = <some-data>
+})
+```
+then receive it using
+```
+vim.api.nvim_create_autocmd('User', {
+  pattern = '<event-name>',
+  callback = function(event)
+    -- event.data == <some-data>
+  end
+})
+```
