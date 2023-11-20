@@ -693,7 +693,6 @@ require('lazy').setup({
     -- LSP Support
     {
         'VonHeikemen/lsp-zero.nvim',
-        branch = 'v3.x',
         lazy = true,
         config = function()
             local lsp_zero = require('lsp-zero')
