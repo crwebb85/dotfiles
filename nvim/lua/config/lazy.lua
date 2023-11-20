@@ -179,7 +179,23 @@ require('lazy').setup({
                 desc = 'Telescope suggest spelling (search dictionary)',
             },
         },
-        config = true,
+        config = function()
+            require('telescope').setup({
+                pickers = {
+                    find_files = {
+                        find_command = {
+                            'rg',
+                            '--files',
+                            '--hidden',
+                            '--glob',
+                            '!.git',
+                            '--glob',
+                            '!node_modules',
+                        },
+                    },
+                },
+            })
+        end,
     },
 
     -- Harpoon (fast file navigation between pinned files)
@@ -610,6 +626,7 @@ require('lazy').setup({
         },
         -- automatically open/close the DAP UI when starting/stopping the debugger
         config = function()
+            require('dapui').setup()
             local listener = require('dap').listeners
             listener.after.event_initialized['dapui_config'] = function()
                 require('dapui').open()
@@ -635,7 +652,7 @@ require('lazy').setup({
             -- uses the debugypy installation by mason
             local debugpyPythonPath = require('mason-registry')
                 .get_package('debugpy')
-                :get_install_path() .. '/.venv/bin/python3' -- TODO figure out if I need dynamically determine path
+                :get_install_path() .. '/venv/bin/python3'
             require('dap-python').setup(debugpyPythonPath, {})
         end,
     },
@@ -828,6 +845,7 @@ require('lazy').setup({
         'hrsh7th/nvim-cmp',
         version = '*',
         lazy = true,
+        event = 'VeryLazy',
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
             { 'hrsh7th/cmp-buffer' },
@@ -835,7 +853,6 @@ require('lazy').setup({
             { 'saadparwaiz1/cmp_luasnip' },
             { 'hrsh7th/cmp-nvim-lsp' },
         },
-
         config = function()
             local cmp = require('cmp')
             local cmp_action = require('lsp-zero').cmp_action()
