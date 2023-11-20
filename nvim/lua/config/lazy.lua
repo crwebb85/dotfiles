@@ -676,12 +676,12 @@ require('lazy').setup({
         ft = 'lua',
         config = function()
             require('neodev').setup({
-                -- Workaround to get correctly configure lua_ls for neovim config
-                -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
-                override = function(_, library)
-                    library.enabled = true
-                    library.plugins = true
-                end,
+                -- -- Workaround to get correctly configure lua_ls for neovim config
+                -- -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
+                -- override = function(_, library)
+                --     library.enabled = true
+                --     library.plugins = true
+                -- end,
             })
         end,
     },
