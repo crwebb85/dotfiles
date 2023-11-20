@@ -355,6 +355,37 @@ require('lazy').setup({
                 function() require('trouble').toggle('lsp_references') end,
                 desc = 'Trouble: Toggle lsp references',
             },
+            {
+                '<leader>xn',
+                function()
+                    require('trouble').next({ skip_groups = true, jump = true })
+                end,
+                desc = 'Trouble: jump to the next item, skipping the groups',
+            },
+            {
+                '<leader>xp',
+                function()
+                    require('trouble').previous({
+                        skip_groups = true,
+                        jump = true,
+                    })
+                end,
+                desc = 'Trouble: jump to the previous item, skipping the groups',
+            },
+            {
+                '<leader>xf',
+                function()
+                    require('trouble').first({ skip_groups = true, jump = true })
+                end,
+                desc = 'Trouble: jump to the first item, skipping the groups',
+            },
+            {
+                '<leader>xl',
+                function()
+                    require('trouble').last({ skip_groups = true, jump = true })
+                end,
+                desc = 'Trouble: jump to the last item, skipping the groups',
+            },
         },
     },
     -- Query ollama
@@ -753,6 +784,7 @@ require('lazy').setup({
             lspconfig.lua_ls.setup({
                 settings = {
                     Lua = {
+                        runtime = { version = 'LuaJIT' },
                         completion = {
                             callSnippet = 'Replace',
                         },
