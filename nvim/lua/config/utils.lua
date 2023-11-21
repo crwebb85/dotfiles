@@ -1,9 +1,10 @@
-function Trim(s)
+local M = {}
+function M.trim(s)
     --Trim leading and ending whitespace from string
     return s:match('^()%s*$') and '' or s:match('^%s*(.*%S)')
 end
 
-function GetBufferViewPath(viewNumber)
+function M.getBufferViewPath(viewNumber)
     local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
     if path == nil then error('path to buffer is unexpectedly nil') end
     -- vim's odd =~ escaping for /
@@ -26,7 +27,7 @@ local TREESITTER_FOLDING_VIEW_FILE_NUMBER = 1
 local DIFF_FOLDING_VIEW_FILE_NUMBER = 2
 local OTHER_FOLDING_VIEW_FILE_NUMBER = 3
 
-function GetBufferViewFileNumber()
+function M.getBufferViewFileNumber()
     if
         vim.api.nvim_get_option_value('foldmethod', {}) == 'expr'
         and vim.api.nvim_get_option_value('foldexpr', {})
@@ -44,82 +45,53 @@ end
 
 -- If my folds get screwed up the following function can be used to delete
 -- the view file. I think this should fix my folds but need to test it
-function DeleteView(viewNumber)
-    local path = GetBufferViewPath(viewNumber)
+function M.deleteView(viewNumber)
+    local path = M.getBufferViewPath(viewNumber)
     vim.fn.delete(path)
     print('Deleted: ' .. path)
 end
 
-function OpenView(viewNumber)
-    local path = GetBufferViewPath(viewNumber)
+function M.openView(viewNumber)
+    local path = M.getBufferViewPath(viewNumber)
     vim.cmd('e ' .. path)
 end
 
-function PrintViewPath(viewNumber)
-    local path = GetBufferViewPath(viewNumber)
+function M.printViewPath(viewNumber)
+    local path = M.getBufferViewPath(viewNumber)
     print(path)
 end
 
-function ResetView(viewNumber)
+function M.resetView(viewNumber)
     vim.cmd([[
         augroup remember_folds
            autocmd!
         augroup END
     ]])
-    DeleteView(viewNumber)
+    M.deleteView(viewNumber)
     print('Close and reopen nvim for to finish reseting the view file')
 end
 
-function SaveView()
+function M.saveView()
     -- view files are about 500 bytes
-    local viewFileNumber = GetBufferViewFileNumber()
+    local viewFileNumber = M.getBufferViewFileNumber()
     vim.cmd('silent! mkview!' .. viewFileNumber)
 end
 
-function LoadView()
-    local viewFileNumber = GetBufferViewFileNumber()
+function M.loadView()
+    local viewFileNumber = M.getBufferViewFileNumber()
     vim.cmd('silent! loadview ' .. viewFileNumber)
 end
 
-vim.api.nvim_create_user_command(
-    'ViewOpen',
-    function(opts) OpenView(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-vim.api.nvim_create_user_command(
-    'ViewPrintPath',
-    function(opts) PrintViewPath(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-vim.api.nvim_create_user_command(
-    'ViewReset',
-    function(opts) ResetView(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-vim.api.nvim_create_user_command(
-    'ViewDelete',
-    function(opts) DeleteView(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-
--- Diff Clipboard https://www.naseraleisa.com/posts/diff#file-1
--- TODO cleanup these user commands to not us vim.cmd
--- Create a new scratch buffer
-vim.api.nvim_create_user_command(
-    'Ns',
-    function()
-        vim.cmd([[
+function M.openNewScratchBuffer()
+    vim.cmd([[
 		execute 'vsplit | enew'
 		setlocal buftype=nofile
 		setlocal bufhidden=hide
 		setlocal noswapfile
 	]])
-    end,
-    { nargs = 0 }
-)
+end
 
--- Compare clipboard to current buffer
-vim.api.nvim_create_user_command('CompareClipboard', function()
+function M.compareClipboardToBuffer()
     local ftype = vim.api.nvim_eval('&filetype') -- original filetype
     vim.cmd([[
 		tabnew %
@@ -128,12 +100,10 @@ vim.api.nvim_create_user_command('CompareClipboard', function()
 		windo diffthis
 	]])
     vim.cmd('set filetype=' .. ftype)
-end, { nargs = 0 })
+end
 
-vim.api.nvim_create_user_command(
-    'CompareClipboardSelection',
-    function()
-        vim.cmd([[
+function M.compareClipboardToSelection()
+    vim.cmd([[
 		" yank visual selection to z register
 		normal! gv"zy
 		" open new tab, set options to prevent save prompt when closing
@@ -144,32 +114,6 @@ vim.api.nvim_create_user_command(
 		normal! Vp
 		windo diffthis
 	]])
-    end,
-    {
-        nargs = 0,
-        range = true,
-    }
-)
+end
 
--- update = { 'BufEnter', 'DisabledFormatter', 'EnabledFormatter' },
-vim.api.nvim_create_user_command('FormatDisable', function(args)
-    -- FormatDisable! will disable formatting just for this buffer
-    vim.b.disable_autoformat = true
-    if not args.bang then vim.g.disable_autoformat = true end
-
-    vim.api.nvim_exec_autocmds('User', { pattern = 'DisabledFormatter' })
-end, {
-    desc = 'Disable autoformat-on-save',
-    bang = true,
-})
-
-vim.api.nvim_create_user_command('FormatEnable', function(args)
-    -- FormatDisable! will enable formatting just for this buffer
-    vim.b.disable_autoformat = false
-    if not args.bang then vim.g.disable_autoformat = false end
-
-    vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
-end, {
-    desc = 'Re-enable autoformat-on-save',
-    bang = true,
-})
+return M

@@ -1,9 +1,8 @@
 local config = function()
     local heirline = require('heirline')
     local conditions = require('heirline.conditions')
-    local utils = require('heirline.utils')
+    local heirlineUtils = require('heirline.utils')
     local colors = require('tokyonight.colors').setup()
-    local luasnip = require('luasnip')
 
     heirline.load_colors(colors)
 
@@ -318,7 +317,10 @@ local config = function()
                     require('conform').formatters_by_ft[vim.bo.filetype]
                 if formatters == nil then formatters = {} end
                 for i, formatterName in pairs(formatters) do
-                    table.insert(names, Trim(formatterName))
+                    table.insert(
+                        names,
+                        require('config.utils').trim(formatterName)
+                    )
                     if i > 4 then
                         table.insert(names, '...') -- I don't want the list of LSP's to get too long
                         break
@@ -388,13 +390,14 @@ local config = function()
         -- check that we are in insert or select mode
         condition = function()
             return vim.tbl_contains({ 's', 'i' }, vim.fn.mode())
-                and luasnip.in_snippet()
+                and require('luasnip').in_snippet()
         end,
         Space,
         {
             provider = function()
-                local backward = luasnip.jumpable(-1) and ' ' or ''
-                local forward = luasnip.jumpable(1) and ' ' or ''
+                local backward = require('luasnip').jumpable(-1) and ' '
+                    or ''
+                local forward = require('luasnip').jumpable(1) and ' ' or ''
                 return backward .. '' .. forward
             end,
             hl = { fg = 'red', bold = true },
@@ -448,7 +451,7 @@ local config = function()
             return not conditions.buffer_matches(status_inactive)
         end,
         MacroRecording,
-        utils.surround(ComponentDelimiter, nil, ViMode),
+        heirlineUtils.surround(ComponentDelimiter, nil, ViMode),
         Git,
         LSPActive,
         FormatterActive,
@@ -579,10 +582,10 @@ local config = function()
     local FileNameBlock = {
         init = function(self) self.filename = vim.api.nvim_buf_get_name(0) end,
         FileType,
-        utils.insert(ActiveSep, LeftSep),
+        heirlineUtils.insert(ActiveSep, LeftSep),
         Space,
         unpack(FileFlags),
-        utils.insert(FileNameModifer, FileName, Space, FileIcon),
+        heirlineUtils.insert(FileNameModifer, FileName, Space, FileIcon),
         { provider = '%<' },
     }
 
@@ -594,11 +597,11 @@ local config = function()
             -- return not conditions.buffer_matches(winbar_inactive) and not empty_buffer()
             return not empty_buffer()
         end,
-        utils.insert(ActiveBlock, FileNameBlock),
+        heirlineUtils.insert(ActiveBlock, FileNameBlock),
     }
 
     local WinBars = {
-        utils.insert(ActiveWindow, ActiveWinbar),
+        heirlineUtils.insert(ActiveWindow, ActiveWinbar),
     }
 
     ---------------------------------------------------------------------------

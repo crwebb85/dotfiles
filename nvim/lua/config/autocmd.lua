@@ -1,9 +1,9 @@
-local init_group = 'init'
+local yank_group = 'init'
 
-vim.api.nvim_create_augroup(init_group, { clear = true })
+vim.api.nvim_create_augroup(yank_group, { clear = true })
 vim.api.nvim_create_autocmd(
     'TextYankPost',
-    { group = init_group, callback = function() vim.highlight.on_yank() end }
+    { group = yank_group, callback = function() vim.highlight.on_yank() end }
 )
 
 vim.api.nvim_create_autocmd('VimEnter', {
@@ -30,7 +30,7 @@ vim.api.nvim_create_autocmd(
         pattern = '?*',
         -- nested is needed by bufwrite* (if triggered via other autocmd)
         nested = true,
-        callback = SaveView,
+        callback = require('config.utils').saveView,
     }
 )
 
@@ -54,7 +54,7 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
                 {}
             )
         end
-        LoadView()
+        require('config.utils').loadView()
     end,
 })
 
