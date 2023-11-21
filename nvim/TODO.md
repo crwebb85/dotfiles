@@ -18,6 +18,24 @@ TODO:
 - interesting cmp and luasnip config https://www.reddit.com/r/neovim/comments/wmkf9o/comment/ik0mcwk/?utm_source=share&utm_medium=web2x&context=3
 - add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
 - add add keymap to navigate to next/previous item int trouble diagnostics menu
+- had an error when saving changes made within diffview
+```log
+Error detected while processing BufWriteCmd Autocommands for "<buffer=31>":
+Error executing lua callback: ...azy/diffview.nvim/lua/diffview/vcs/adapters/git/init.lua:1629: vim/_editor.lua:0: BufWriteCmd Autocommands for "<buffer=31>"..script nvim_exec2() called at BufWriteCmd Autocommands for "<buffer=31>":0: Vim(write):E19:
+ Mark has invalid line number: silent noautocmd keepalt '[,']write /tmp/nvim.chris/0QWTdw/0
+stack traceback:
+        [C]: in function 'error'
+        ...azy/diffview.nvim/lua/diffview/vcs/adapters/git/init.lua:1629: in function 'stage_index_file'
+        .../share/nvim/lazy/diffview.nvim/lua/diffview/vcs/file.lua:275: in function <.../share/nvim/lazy/diffview.nvim/lua/diffview/vcs/file.lua:274>
+Error detected while processing BufWriteCmd Autocommands for "<buffer=37>":
+Error executing lua callback: ...azy/diffview.nvim/lua/diffview/vcs/adapters/git/init.lua:1629: vim/_editor.lua:0: BufWriteCmd Autocommands for "<buffer=37>"..script nvim_exec2() called at BufWriteCmd Autocommands for "<buffer=37>":0: Vim(write):E19:
+ Mark has invalid line number: silent noautocmd keepalt '[,']write /tmp/nvim.chris/0QWTdw/1
+stack traceback:
+        [C]: in function 'error'
+        ...azy/diffview.nvim/lua/diffview/vcs/adapters/git/init.lua:1629: in function 'stage_index_file'
+        .../share/nvim/lazy/diffview.nvim/lua/diffview/vcs/file.lua:275: in function <.../share/nvim/lazy/diffview.nvim/lua/diffview/vcs/file.lua:274>
+```
+
 Cool plugins:
 - https://github.com/rockerBOO/awesome-neovim
 - https://github.com/carbon-steel/detour.nvim/tree/main
