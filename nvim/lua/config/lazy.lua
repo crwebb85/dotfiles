@@ -154,6 +154,12 @@ require('lazy').setup({
                 desc = 'Telescope find files',
             },
             {
+                '<leader>fs',
+                function() require('telescope.builtin').grep_string() end,
+                desc = 'Telescope grep at cursor/selection',
+                mode = { 'n', 'v' },
+            },
+            {
                 '<leader>fg',
                 function() require('telescope.builtin').live_grep() end,
                 desc = 'Telescope live_grep',
