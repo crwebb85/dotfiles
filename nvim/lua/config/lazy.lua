@@ -13,14 +13,6 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-local function get_default_branch_name()
-    local res = vim.system(
-        { 'git', 'rev-parse', '--verify', 'main' },
-        { capture_output = true }
-    ):wait()
-    return res.code == 0 and 'main' or 'master'
-end
-
 require('lazy').setup({
     ---------------------------------------------------------------------------
     -- Git integration
@@ -77,7 +69,10 @@ require('lazy').setup({
             {
                 '<leader>ghm',
                 function()
-                    vim.cmd('DiffviewOpen ' .. get_default_branch_name())
+                    vim.cmd(
+                        'DiffviewOpen '
+                            .. require('config.utils').get_default_branch_name()
+                    )
                 end,
                 { desc = 'Diff against master' },
             },
@@ -88,7 +83,7 @@ require('lazy').setup({
                 function()
                     vim.cmd(
                         'DiffviewOpen HEAD..origin/'
-                            .. get_default_branch_name()
+                            .. require('config.utils').get_default_branch_name()
                     )
                 end,
                 { desc = 'Diff against origin/master' },
