@@ -46,3 +46,6 @@ vim.api.nvim_create_autocmd('User', {
   end
 })
 ```
+- `o` create new line below current line and go to it
+- `O` create new line above current line and go to it
+

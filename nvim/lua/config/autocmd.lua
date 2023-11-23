@@ -1,11 +1,14 @@
-local yank_group = 'init'
-
+-------------------------------------------------------------------------------
+--- Temporarily highlight text selection that was yanked
+local yank_group = 'yank_group'
 vim.api.nvim_create_augroup(yank_group, { clear = true })
 vim.api.nvim_create_autocmd(
     'TextYankPost',
     { group = yank_group, callback = function() vim.highlight.on_yank() end }
 )
 
+-------------------------------------------------------------------------------
+--- Select python virtual environment
 vim.api.nvim_create_autocmd('VimEnter', {
     desc = 'Auto select virtualenv Nvim open',
     pattern = '*',
@@ -17,12 +20,16 @@ vim.api.nvim_create_autocmd('VimEnter', {
     once = true,
 })
 
-local remember_folds_group = 'remember_folds'
+-------------------------------------------------------------------------------
+--- Code Folding
 
+local remember_folds_group = 'remember_folds'
 vim.api.nvim_create_augroup(remember_folds_group, { clear = true })
--- bufleave but not bufwinleave captures closing 2nd tab
--- BufHidden for compatibility with `set hidden`
+
+-- Save fold informatin in view file
 vim.api.nvim_create_autocmd(
+    -- bufleave but not bufwinleave captures closing 2nd tab
+    -- BufHidden for compatibility with `set hidden`
     { 'BufWinLeave', 'BufLeave', 'BufWritePost', 'BufHidden', 'QuitPre' },
     {
         desc = 'Saves view file (saves information like open/closed folds)',
@@ -34,7 +41,7 @@ vim.api.nvim_create_autocmd(
     }
 )
 
---TODO debug loading betwen format and writing
+-- Apply folds to folder based on view file
 vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
     desc = 'Loads the view file for the buffer (reloads open/closed folds)',
     group = remember_folds_group,
@@ -58,6 +65,8 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
     end,
 })
 
+-------------------------------------------------------------------------------
+--- Toggle Inlay hints
 local isInlayHintsEnabled = false
 function ToggleInlayHintsAutocmd()
     if not vim.lsp.inlay_hint then
@@ -75,6 +84,10 @@ function ToggleInlayHintsAutocmd()
     })
 end
 
+-------------------------------------------------------------------------------
+--- Add keybindings to specific buffer types
+
+-- Add keybindings to terminal buffers
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
     -- if you only want these mappings for toggle term use term://*toggleterm#* instead
     pattern = 'term://*',
@@ -88,22 +101,8 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
         vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
     end,
 })
---Add lightbulb above code that has code actions
-local lightbulb = require('config.lightbulb')
--- Show a lightbulb when code actions are available at the cursor position
-vim.api.nvim_create_augroup('code_action', { clear = true })
-vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI', 'WinScrolled' }, {
-    group = 'code_action',
-    pattern = '*',
-    callback = lightbulb.show_lightbulb,
-})
-vim.api.nvim_create_autocmd({ 'TermEnter' }, {
-    group = 'code_action',
-    pattern = '*',
-    callback = lightbulb.remove_bulb,
-})
 
--- close some filetypes with <q>
+-- Close some filetypes with <q>
 vim.api.nvim_create_autocmd('FileType', {
     group = vim.api.nvim_create_augroup('close_with_q', { clear = true }),
     pattern = {
@@ -138,7 +137,49 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
+-- Close man pages with <q>
 vim.api.nvim_create_autocmd('FileType', {
     pattern = 'man',
     command = [[nnoremap <buffer><silent> q :quit<CR>]],
+})
+
+-- Pressing enter on item in quickfix list will take me to that file and line
+-- TODO determine why I need this since I believe this should be a default
+-- keymapping but something is overridding it
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'qf',
+    callback = function(event)
+        vim.keymap.set(
+            'n',
+            '<CR>',
+            '<CR>',
+            { buffer = event.buf, silent = true }
+        )
+    end,
+})
+
+-------------------------------------------------------------------------------
+--- Lightbulb code action virtual text
+
+local lightbulb = require('config.lightbulb')
+
+-- Show a lightbulb when code actions are available at the cursor position
+vim.api.nvim_create_augroup('code_action', { clear = true })
+vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI', 'WinScrolled' }, {
+    group = 'code_action',
+    pattern = '*',
+    callback = lightbulb.show_lightbulb,
+})
+-- Remove lightbulb from terminal buffers
+vim.api.nvim_create_autocmd({ 'TermEnter' }, {
+    group = 'code_action',
+    pattern = '*',
+    callback = lightbulb.remove_bulb,
+})
+
+-------------------------------------------------------------------------------
+-- Resize splits if window got resized
+vim.api.nvim_create_autocmd({ 'VimResized' }, {
+    group = vim.api.nvim_create_augroup('resize_splits', { clear = true }),
+    callback = function() vim.cmd('tabdo wincmd =') end,
 })
