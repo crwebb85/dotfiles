@@ -44,8 +44,7 @@ require('lazy').setup({
                             '<cmd>DiffviewClose<CR>',
                             { silent = true },
                         },
-                        { 'n', '<leader>gp', ':Git push<CR>' },
-                        { 'n', '<leader>gl', ':Git pull<CR>' },
+                        { 'n', '<leader>gc', ':tab Git commit<CR>' },
                     },
                     file_panel = {
                         {
@@ -60,8 +59,7 @@ require('lazy').setup({
                             '<cmd>DiffviewClose<CR>',
                             { silent = true },
                         },
-                        { 'n', '<leader>gp', ':Git push<CR>' },
-                        { 'n', '<leader>gl', ':Git pull<CR>' },
+                        { 'n', '<leader>gc', ':tab Git commit<CR>' },
                     },
                     file_history_panel = {
                         {
@@ -76,8 +74,7 @@ require('lazy').setup({
                             '<cmd>DiffviewClose<CR>',
                             { silent = true },
                         },
-                        { 'n', '<leader>gp', ':Git push<CR>' },
-                        { 'n', '<leader>gl', ':Git pull<CR>' },
+                        { 'n', '<leader>gc', ':tab Git commit<CR>' },
                     },
                 },
             })
