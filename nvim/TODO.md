@@ -49,3 +49,4 @@ Cool plugins:
 - https://github.com/jmederosalvarado/roslyn.nvim
 - emmet lsp - https://www.reddit.com/r/neovim/comments/17v1678/comment/k97ggs2/?utm_source=share&utm_medium=web2x&context=3
 - https://github.com/iamcco/markdown-preview.nvim
+- https://github.com/ryanmsnyder/toggleterm-manager.nvim

@@ -27,7 +27,61 @@ require('lazy').setup({
         'sindrets/diffview.nvim',
         version = '*',
         lazy = true,
-        config = true,
+        config = function()
+            local actions = require('diffview.actions')
+            require('diffview').setup({
+                keymaps = {
+                    view = {
+                        {
+                            'n',
+                            '<leader>ggo',
+                            actions.goto_file_tab,
+                            { desc = 'Open the file in a new tabpage' },
+                        },
+                        {
+                            'n',
+                            'q',
+                            '<cmd>DiffviewClose<CR>',
+                            { silent = true },
+                        },
+                        { 'n', '<leader>gp', ':Git push<CR>' },
+                        { 'n', '<leader>gl', ':Git pull<CR>' },
+                    },
+                    file_panel = {
+                        {
+                            'n',
+                            '<leader>ggo',
+                            actions.goto_file_tab,
+                            { desc = 'Open the file in a new tabpage' },
+                        },
+                        {
+                            'n',
+                            'q',
+                            '<cmd>DiffviewClose<CR>',
+                            { silent = true },
+                        },
+                        { 'n', '<leader>gp', ':Git push<CR>' },
+                        { 'n', '<leader>gl', ':Git pull<CR>' },
+                    },
+                    file_history_panel = {
+                        {
+                            'n',
+                            '<leader>ggo',
+                            actions.goto_file_tab,
+                            { desc = 'Open the file in a new tabpage' },
+                        },
+                        {
+                            'n',
+                            'q',
+                            '<cmd>DiffviewClose<CR>',
+                            { silent = true },
+                        },
+                        { 'n', '<leader>gp', ':Git push<CR>' },
+                        { 'n', '<leader>gl', ':Git pull<CR>' },
+                    },
+                },
+            })
+        end,
         keys = {
             {
                 '<leader>gd',
