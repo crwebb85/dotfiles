@@ -102,3 +102,43 @@ vim.api.nvim_create_autocmd({ 'TermEnter' }, {
     pattern = '*',
     callback = lightbulb.remove_bulb,
 })
+
+-- close some filetypes with <q>
+vim.api.nvim_create_autocmd('FileType', {
+    group = vim.api.nvim_create_augroup('close_with_q', { clear = true }),
+    pattern = {
+        'PlenaryTestPopup',
+        'help',
+        'lspinfo',
+        'man',
+        'notify',
+        'qf',
+        'git',
+        'spectre_panel',
+        'startuptime',
+        'tsplayground',
+        'checkhealth',
+        'neotest-output',
+        'neotest-summary',
+        'neotest-output-panel',
+        'guihua',
+    },
+    callback = function(event)
+        vim.bo[event.buf].buflisted = false
+        vim.keymap.set(
+            'n',
+            'q',
+            '<cmd>close<CR>',
+            { buffer = event.buf, silent = true }
+        )
+        vim.cmd([[
+      setlocal colorcolumn=0
+      stopinsert
+    ]])
+    end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'man',
+    command = [[nnoremap <buffer><silent> q :quit<CR>]],
+})
