@@ -35,6 +35,10 @@ stack traceback:
         ...azy/diffview.nvim/lua/diffview/vcs/adapters/git/init.lua:1629: in function 'stage_index_file'
         .../share/nvim/lazy/diffview.nvim/lua/diffview/vcs/file.lua:275: in function <.../share/nvim/lazy/diffview.nvim/lua/diffview/vcs/file.lua:274>
 ```
+- to diff navigation with [c and ]c dot-repeatable
+- fix my Git commit remap to start cursor at top of the buffer
+- fix lsp progress info from getting visually stuck (seems to happen either when using diffview or Git commit)
+- cleanup cmp keymaps by utilizing cmp modes and fallbacks
 
 Cool plugins:
 - https://github.com/rockerBOO/awesome-neovim
