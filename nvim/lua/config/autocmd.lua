@@ -85,7 +85,7 @@ function ToggleInlayHintsAutocmd()
 end
 
 -------------------------------------------------------------------------------
---- Add keybindings to specific buffer types
+--- Add keybindings/settings to specific buffer types
 
 -- Add keybindings to terminal buffers
 vim.api.nvim_create_autocmd({ 'TermOpen' }, {
@@ -100,6 +100,34 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
         vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
         vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
     end,
+})
+
+-- If opening a terminal start in insert mode and set local parameters
+-- Works for both the :terminal command and toggleterm plugin
+vim.api.nvim_create_autocmd('TermOpen', {
+    group = vim.api.nvim_create_augroup('term_open_insert', { clear = true }),
+    pattern = { 'term://*' },
+    command = [[
+    startinsert
+    setlocal nonumber norelativenumber nospell signcolumn=no noruler
+  ]],
+})
+
+-- When entering terminal start in insert mode. This is useful if I had toggled
+-- the terminal closed in normal mode but then try to toggle it back up.
+vim.api.nvim_create_autocmd({ 'BufWinEnter', 'WinEnter' }, {
+    group = vim.api.nvim_create_augroup('term_insert', { clear = true }),
+    pattern = { 'term://*' },
+    command = [[
+    startinsert
+  ]],
+})
+
+-- Dockerfile filetype
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+    desc = 'Set file type for Dockerfile*',
+    pattern = { 'Dockerfile*', '*.Dockerfile', '*.dockerfile' },
+    command = [[set ft=dockerfile]],
 })
 
 -- Close some filetypes with <q>
@@ -175,6 +203,13 @@ vim.api.nvim_create_autocmd({ 'TermEnter' }, {
     group = 'code_action',
     pattern = '*',
     callback = lightbulb.remove_bulb,
+})
+
+-------------------------------------------------------------------------------
+--- Check if we need to reload the file when it changed
+vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
+    group = vim.api.nvim_create_augroup('checktime', { clear = true }),
+    command = 'checktime',
 })
 
 -------------------------------------------------------------------------------
