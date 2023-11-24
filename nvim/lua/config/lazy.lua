@@ -156,26 +156,46 @@ require('lazy').setup({
             {
                 '<leader>gvw',
                 function() require('gitsigns').toggle_word_diff() end,
-                { desc = 'Toggle word diff' },
+                { desc = 'Gitsigns: Toggle word diff' },
             },
 
             -- Highlight added lines.
             {
                 '<leader>gvl',
                 function() require('gitsigns').toggle_linehl() end,
-                { desc = 'Toggle line highlight' },
+                { desc = 'Gitsigns: Toggle line highlight' },
             },
 
             -- Highlight removed lines.
             {
                 '<leader>gvd',
                 function() require('gitsigns').toggle_deleted() end,
-                { desc = 'Toggle deleted (all)' },
+                { desc = 'Gitsigns: Toggle deleted (all)' },
             },
             {
                 '<leader>gvh',
                 function() require('gitsigns').preview_hunk() end,
-                { desc = 'Preview hunk' },
+                { desc = 'Gitsigns: Preview hunk' },
+            },
+            {
+                ']h',
+                require('config.utils').dot_repeat(function()
+                    if vim.wo.diff then return ']h' end
+                    vim.schedule(function() require('gitsigns').next_hunk() end)
+                    return '<Ignore>'
+                end),
+                desc = 'Gitsigns: Go to next hunk (dot repeatable)',
+                expr = true,
+            },
+            {
+                '[h',
+                require('config.utils').dot_repeat(function()
+                    if vim.wo.diff then return '[h' end
+                    vim.schedule(function() require('gitsigns').prev_hunk() end)
+                    return '<Ignore>'
+                end),
+                desc = 'Gitsigns: Go to previous hunk (dot repeatable)',
+                expr = true,
             },
         },
     },
@@ -197,38 +217,38 @@ require('lazy').setup({
             {
                 '<leader>ff',
                 function() require('telescope.builtin').find_files() end,
-                desc = 'Telescope find files',
+                desc = 'Telescope: find files',
             },
             {
                 '<leader>fs',
                 function() require('telescope.builtin').grep_string() end,
-                desc = 'Telescope grep at cursor/selection',
+                desc = 'Telescope: grep at cursor/selection',
                 mode = { 'n', 'v' },
             },
             {
                 '<leader>fg',
                 function() require('telescope.builtin').live_grep() end,
-                desc = 'Telescope live_grep',
+                desc = 'Telescope: live_grep',
             },
             {
                 '<leader>fb',
                 function() require('telescope.builtin').buffers() end,
-                desc = 'Telescope open buffers',
+                desc = 'Telescope: open buffers',
             },
             {
                 '<leader>fh',
                 function() require('telescope.builtin').help_tags() end,
-                desc = 'Telescope help tags',
+                desc = 'Telescope: help tags',
             },
             {
                 '<leader>fk',
                 function() require('telescope.builtin').keymaps() end,
-                desc = 'Telescope keymaps',
+                desc = 'Telescope: keymaps',
             },
             {
                 '<leader>fd',
                 function() require('telescope.builtin').spell_suggest() end,
-                desc = 'Telescope suggest spelling (search dictionary)',
+                desc = 'Telescope: suggest spelling (search dictionary)',
             },
         },
         config = function()
