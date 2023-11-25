@@ -522,7 +522,6 @@ require('lazy').setup({
         'mbbill/undotree',
         version = '*',
         lazy = true,
-        config = true,
         cmd = { 'UndotreeToggle', 'UndotreeShow' },
         keys = {
             {
@@ -860,29 +859,26 @@ require('lazy').setup({
         version = '*',
         lazy = true,
         config = function()
-            local lsp_zero = require('lsp-zero')
-
             require('mason-lspconfig').setup({
                 handlers = {
-                    lsp_zero.default_setup,
+                    require('config.lsp.lsp').default_setup,
                 },
             })
         end,
     },
 
-    -- LSP Support
     {
-        'VonHeikemen/lsp-zero.nvim',
+        'neovim/nvim-lspconfig',
+        version = '*',
         lazy = true,
+        dependencies = {
+            { 'hrsh7th/cmp-nvim-lsp' },
+        },
         config = function()
-            local lsp_zero = require('lsp-zero')
+            local lsp = require('config.lsp.lsp')
 
-            lsp_zero.preset('recommended')
-
-            lsp_zero.on_attach(function(_, bufnr)
-                -- see :help lsp-zero-keybindings
-                -- to learn the available actions
-                lsp_zero.default_keymaps({ buffer = bufnr })
+            lsp.on_attach(function(_, bufnr)
+                lsp.default_keymaps({ buffer = bufnr })
 
                 vim.keymap.set(
                     'n',
@@ -916,18 +912,6 @@ require('lazy').setup({
                 )
             end)
 
-            lsp_zero.setup()
-        end,
-    },
-    {
-        'neovim/nvim-lspconfig',
-        version = '*',
-        lazy = true,
-        dependencies = {
-            { 'VonHeikemen/lsp-zero.nvim' }, --need lsp zero configured before nvim-lspconfig
-            { 'hrsh7th/cmp-nvim-lsp' },
-        },
-        config = function()
             local lspconfig = require('lspconfig')
             --https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
             lspconfig.lua_ls.setup({
@@ -980,39 +964,70 @@ require('lazy').setup({
         event = 'InsertEnter',
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
-            { 'hrsh7th/cmp-buffer' },
-            { 'hrsh7th/cmp-path' },
-            { 'saadparwaiz1/cmp_luasnip' },
-            { 'hrsh7th/cmp-nvim-lsp' },
+            { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
+            { 'hrsh7th/cmp-path' }, -- Completion for file paths
+            {
+                'hrsh7th/cmp-nvim-lua', -- Completion for lua api
+                lazy = true,
+                ft = 'lua',
+            },
+            { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
+            { 'hrsh7th/cmp-nvim-lsp' }, -- Completion for lsp
         },
         config = function()
             local cmp = require('cmp')
-            local cmp_action = require('lsp-zero').cmp_action()
-            local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
             cmp.setup({
                 mapping = cmp.mapping.preset.insert({
-                    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-                    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
 
                     -- `Enter` key to confirm completion
-                    ['<CR>'] = cmp.mapping.confirm({ select = false }),
+                    ['<CR>'] = cmp.mapping.confirm({
+                        select = false,
+                        behavior = cmp.ConfirmBehavior.Insert,
+                    }),
+                    ['<S-CR>'] = cmp.mapping.confirm({
+                        select = false,
+                        behavior = cmp.ConfirmBehavior.Replace,
+                    }),
 
                     -- Ctrl+Space to trigger completion menu
                     ['<C-Space>'] = cmp.mapping.complete(),
-
                     -- Complete common string
-                    ['<C-l>'] = cmp.mapping(function(fallback)
+                    ['<S-Space>'] = cmp.mapping(function(fallback)
+                        print('hi from <S-Space>')
                         if cmp.visible() then
                             return cmp.complete_common_string()
+                        else
+                            fallback()
                         end
-                        fallback()
-                    end, { 'i', 'c' }),
-
+                    end, { 'i', 's' }),
+                    ['<C-t>'] = cmp.mapping(function()
+                        print('hi from <C-t>')
+                        if cmp.visible_docs() then
+                            cmp.close_docs()
+                        else
+                            cmp.open_docs()
+                        end
+                    end, { 'i', 's' }),
+                    -- Scroll up and down in the completion documentation
+                    ['<C-u>'] = cmp.mapping(function(falback)
+                        print('hi from <C-u>')
+                        if cmp.visible() then
+                            cmp.mapping.scroll_docs(-4)
+                        else
+                            falback()
+                        end
+                    end, { 'i', 's' }),
+                    ['<C-d>'] = cmp.mapping(function(falback)
+                        print('hi from <C-d>')
+                        if cmp.visible() then
+                            cmp.mapping.scroll_docs(4)
+                        else
+                            falback()
+                        end
+                    end, { 'i', 's' }),
                     -- Navigate between snippet placeholder
-                    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-                    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
                     ['<Tab>'] = cmp.mapping(function(fallback)
+                        print('hi from <Tab>')
                         local luasnip = require('luasnip')
                         if cmp.visible() then
                             cmp.select_next_item()
@@ -1024,6 +1039,7 @@ require('lazy').setup({
                     end, { 'i', 's' }),
 
                     ['<S-Tab>'] = cmp.mapping(function(fallback)
+                        print('hi from <S-Tab>')
                         local luasnip = require('luasnip')
                         if cmp.visible() then
                             cmp.select_prev_item()
@@ -1033,9 +1049,6 @@ require('lazy').setup({
                             fallback()
                         end
                     end, { 'i', 's' }),
-                    -- Scroll up and down in the completion documentation
-                    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-                    ['<C-d>'] = cmp.mapping.scroll_docs(4),
                 }),
             })
         end,
