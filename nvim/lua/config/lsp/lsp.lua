@@ -1,12 +1,3 @@
---Begin setup.lua
-if vim.g.loaded_lsp_zero == 1 then return { ok = false } end
-
-vim.g.loaded_lsp_zero = 1
-
-local Setup = {}
-Setup.ok = true
-Setup.done = false
-
 ---
 -- Commands
 ---
@@ -69,20 +60,14 @@ local function config_source_complete(user_input)
     return res
 end
 
-vim.api.nvim_create_user_command(
-    'LspZeroViewConfigSource',
-    inspect_config_source,
-    {
-        nargs = 1,
-        complete = config_source_complete,
-    }
-)
+vim.api.nvim_create_user_command('LspViewConfigSource', inspect_config_source, {
+    nargs = 1,
+    complete = config_source_complete,
+})
 
 ---
 -- Autocommands
 ---
-local lsp_cmds =
-    vim.api.nvim_create_augroup('lsp_zero_attach', { clear = true })
 
 local function default_keymaps(bufnr)
     vim.keymap.set(
@@ -229,85 +214,10 @@ local function lsp_attach(event)
 end
 
 vim.api.nvim_create_autocmd('LspAttach', {
-    group = lsp_cmds,
-    desc = 'lsp-zero on_attach',
+    group = vim.api.nvim_create_augroup('lsp_attach', { clear = true }),
+    desc = 'lsp on_attach',
     callback = lsp_attach,
 })
-
-local function setup_lspconfig()
-    local extend = vim.g.lsp_zero_extend_lspconfig
-
-    if extend == false or extend == 0 then return end
-
-    local ok = (
-        vim.g.lspconfig == 1
-        or #vim.api.nvim_get_runtime_file('doc/lspconfig.txt', 0) > 0
-    )
-
-    if not ok then
-        local show_msg = function()
-            if vim.g.lspconfig ~= 1 then return end
-
-            local Server = require('config.lsp.server')
-            if Server.setup_done then return end
-
-            local err_msg = '[lsp] Could not configure lspconfig\n'
-                .. 'during initial setup. Some features may fail.'
-                .. '\n\nDetails on how to solve this problem are in the help page.\n'
-
-            vim.notify(err_msg, vim.log.levels.WARN)
-        end
-
-        vim.api.nvim_create_autocmd(
-            'LspAttach',
-            { once = true, callback = show_msg }
-        )
-        return
-    end
-
-    local Server = require('config.lsp.server')
-
-    if Server.has_configs() then
-        local err_msg = '[lsp] Some language servers have been configured before\n'
-            .. 'lsp could finish its initial setup. Some features may fail.'
-            .. '\n\nDetails on how to solve this problem are in the help page.\n'
-
-        vim.notify(err_msg, vim.log.levels.WARN)
-        return
-    end
-
-    Server.has_lspconfig = true
-    Server.extend_lspconfig()
-end
-
-local function setup_cmp()
-    local extend_cmp = vim.g.lsp_zero_extend_cmp
-    if extend_cmp == 0 or extend_cmp == false then return end
-
-    local loaded_cmp = vim.g.loaded_cmp
-    if loaded_cmp == true then
-        require('config.lsp.cmp').apply_base()
-        return
-    end
-
-    if loaded_cmp == 0 or loaded_cmp == false then return end
-
-    vim.api.nvim_create_autocmd('User', {
-        pattern = 'CmpReady',
-        once = true,
-        callback = function() require('config.lsp.cmp').apply_base() end,
-    })
-end
-
-function Setup.extend_plugins()
-    if Setup.done then return false end
-
-    Setup.done = true
-    setup_lspconfig()
-    setup_cmp()
-
-    return true
-end
 
 ---
 -- UI settings
@@ -327,20 +237,6 @@ vim.diagnostic.config({
 if vim.o.signcolumn == 'auto' then vim.o.signcolumn = 'yes' end
 
 local M = {}
-local s = {
-    lsp_project_configs = {},
-}
-
-local function store_config(name, opts)
-    if type(opts) == 'table' then s.lsp_project_configs[name] = opts end
-end
-
-function M.configure(name, opts)
-    local Server = require('config.lsp.server')
-
-    store_config(name, opts)
-    Server.setup(name, opts)
-end
 
 function M.default_setup(name) require('config.lsp.server').setup(name, {}) end
 
