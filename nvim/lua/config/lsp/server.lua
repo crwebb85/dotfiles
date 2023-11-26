@@ -49,7 +49,7 @@ function M.setup(name, opts)
     local ok = pcall(lsp.setup, opts)
 
     if not ok then
-        local msg = '[lsp-zero] Failed to setup %s.\n'
+        local msg = '[lsp] Failed to setup %s.\n'
             .. 'Configure this server using lspconfig to get the full error message.'
 
         vim.notify(msg:format(name), vim.log.levels.WARN)
@@ -93,53 +93,6 @@ function M.nvim_workspace(opts)
     }
 
     return vim.tbl_deep_extend('force', config, opts or {})
-end
-
-function M.set_buf_commands(bufnr)
-    local bufcmd = vim.api.nvim_buf_create_user_command
-    local format = function(input)
-        if #input.fargs > 2 then
-            vim.notify(
-                'Too many arguments for LspZeroFormat',
-                vim.log.levels.ERROR
-            )
-            return
-        end
-
-        local server = input.fargs[1]
-        local timeout = input.fargs[2]
-
-        if timeout and timeout:find('timeout=') then
-            timeout = timeout:gsub('timeout=', '')
-            timeout = tonumber(timeout)
-        end
-
-        if server and server:find('timeout=') then
-            timeout = server:gsub('timeout=', '')
-            timeout = tonumber(timeout)
-            server = input.fargs[2]
-        end
-
-        vim.lsp.buf.format({
-            async = input.bang,
-            timeout_ms = timeout,
-            name = server,
-        })
-    end
-
-    bufcmd(
-        bufnr,
-        'LspFormat',
-        format,
-        { range = true, bang = true, nargs = '*' }
-    )
-
-    bufcmd(
-        bufnr,
-        'LspWorkspaceRemove',
-        'lua vim.lsp.buf.remove_workspace_folder()',
-        {}
-    )
 end
 
 function M.skip_setup(name)

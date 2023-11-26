@@ -218,12 +218,14 @@ local function default_keymaps(bufnr)
 end
 
 local function lsp_attach(event)
-    local Server = require('config.lsp.server')
-    local bufnr = event.buf
+    vim.api.nvim_buf_create_user_command(
+        event.buf,
+        'LspWorkspaceRemove',
+        'lua vim.lsp.buf.remove_workspace_folder()',
+        {}
+    )
 
-    Server.set_buf_commands(bufnr)
-
-    default_keymaps(bufnr)
+    default_keymaps(event.buf)
 end
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -249,10 +251,9 @@ local function setup_lspconfig()
             local Server = require('config.lsp.server')
             if Server.setup_done then return end
 
-            local err_msg = '[lsp-zero] Could not configure lspconfig\n'
+            local err_msg = '[lsp] Could not configure lspconfig\n'
                 .. 'during initial setup. Some features may fail.'
                 .. '\n\nDetails on how to solve this problem are in the help page.\n'
-                .. 'Execute the following command\n\n:help lsp-zero-guide:fix-extend-lspconfig'
 
             vim.notify(err_msg, vim.log.levels.WARN)
         end
@@ -267,10 +268,9 @@ local function setup_lspconfig()
     local Server = require('config.lsp.server')
 
     if Server.has_configs() then
-        local err_msg = '[lsp-zero] Some language servers have been configured before\n'
-            .. 'lsp-zero could finish its initial setup. Some features may fail.'
+        local err_msg = '[lsp] Some language servers have been configured before\n'
+            .. 'lsp could finish its initial setup. Some features may fail.'
             .. '\n\nDetails on how to solve this problem are in the help page.\n'
-            .. 'Execute the following command\n\n:help lsp-zero-guide:fix-extend-lspconfig'
 
         vim.notify(err_msg, vim.log.levels.WARN)
         return
