@@ -963,8 +963,111 @@ require('lazy').setup({
             local lsp = require('config.lsp.lsp')
 
             lsp.on_attach(function(_, bufnr)
-                lsp.default_keymaps({ buffer = bufnr })
+                vim.keymap.set(
+                    'n',
+                    'K',
+                    function() vim.lsp.buf.hover() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    'gd',
+                    function() vim.lsp.buf.definition() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    'gD',
+                    function() vim.lsp.buf.declaration() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    'gi',
+                    function() vim.lsp.buf.implementation() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    'go',
+                    function() vim.lsp.buf.type_definition() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    'gr',
+                    function() vim.lsp.buf.references() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    'gs',
+                    function() vim.lsp.buf.signature_help() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    '<F2>',
+                    function() vim.lsp.buf.rename() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    '<F3>',
+                    function() vim.lsp.buf.format({ async = true }) end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'x',
+                    '<F3>',
+                    function() vim.lsp.buf.format({ async = true }) end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    '<F4>',
+                    function() vim.lsp.buf.code_action() end,
+                    { buffer = bufnr }
+                )
 
+                if vim.lsp.buf.range_code_action then
+                    vim.keymap.set(
+                        'x',
+                        '<F4>',
+                        function() vim.lsp.buf.range_code_action() end,
+                        { buffer = bufnr }
+                    )
+                else
+                    vim.keymap.set(
+                        'x',
+                        '<F4>',
+                        function() vim.lsp.buf.code_action() end,
+                        { buffer = bufnr }
+                    )
+                end
+
+                vim.keymap.set(
+                    'n',
+                    'gl',
+                    function() vim.diagnostic.open_float() end,
+                    { buffer = bufnr }
+                )
+                vim.keymap.set(
+                    'n',
+                    '[d',
+                    require('config.utils').dot_repeat(
+                        function() vim.diagnostic.goto_prev() end
+                    ),
+                    { buffer = bufnr, expr = true }
+                )
+                vim.keymap.set(
+                    'n',
+                    ']d',
+                    require('config.utils').dot_repeat(
+                        function() vim.diagnostic.goto_next() end
+                    ),
+                    { buffer = bufnr, expr = true }
+                )
                 vim.keymap.set(
                     'n',
                     '<leader>vca',
