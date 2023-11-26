@@ -226,7 +226,57 @@ end
 
 function M.default_keymaps(opts)
     opts = opts or { buffer = 0 }
-    require('config.lsp.server').default_keymaps(opts)
+
+    local fmt = function(cmd)
+        return function(str) return cmd:format(str) end
+    end
+
+    local buffer = opts.buffer or vim.api.nvim_get_current_buf()
+
+    local lsp = fmt('<cmd>lua vim.lsp.%s<cr>')
+    local diagnostic = fmt('<cmd>lua vim.diagnostic.%s<cr>')
+
+    vim.keymap.set('n', 'K', lsp('buf.hover()'), { buffer = buffer })
+    vim.keymap.set('n', 'gd', lsp('buf.definition()'), { buffer = buffer })
+    vim.keymap.set('n', 'gD', lsp('buf.declaration()'), { buffer = buffer })
+    vim.keymap.set('n', 'gi', lsp('buf.implementation()'), { buffer = buffer })
+    vim.keymap.set('n', 'go', lsp('buf.type_definition()'), { buffer = buffer })
+    vim.keymap.set('n', 'gr', lsp('buf.references()'), { buffer = buffer })
+    vim.keymap.set('n', 'gs', lsp('buf.signature_help()'), { buffer = buffer })
+    vim.keymap.set('n', '<F2>', lsp('buf.rename()'), { buffer = buffer })
+    vim.keymap.set(
+        'n',
+        '<F3>',
+        lsp('buf.format({async = true})'),
+        { buffer = buffer }
+    )
+    vim.keymap.set(
+        'x',
+        '<F3>',
+        lsp('buf.format({async = true})'),
+        { buffer = buffer }
+    )
+    vim.keymap.set('n', '<F4>', lsp('buf.code_action()'), { buffer = buffer })
+
+    if vim.lsp.buf.range_code_action then
+        vim.keymap.set(
+            'x',
+            '<F4>',
+            lsp('buf.range_code_action()'),
+            { buffer = buffer }
+        )
+    else
+        vim.keymap.set(
+            'x',
+            '<F4>',
+            lsp('buf.code_action()'),
+            { buffer = buffer }
+        )
+    end
+
+    vim.keymap.set('n', 'gl', diagnostic('open_float()'), { buffer = buffer })
+    vim.keymap.set('n', '[d', diagnostic('goto_prev()'), { buffer = buffer })
+    vim.keymap.set('n', ']d', diagnostic('goto_next()'), { buffer = buffer })
 end
 
 if Setup.ok then Setup.extend_plugins() end

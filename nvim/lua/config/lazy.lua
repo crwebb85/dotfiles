@@ -382,6 +382,91 @@ require('lazy').setup({
         event = 'VeryLazy',
         config = true,
     },
+    {
+        'ThePrimeagen/refactoring.nvim',
+        version = '*',
+        lazy = true,
+        config = true,
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'nvim-treesitter/nvim-treesitter',
+        },
+        cmd = { 'Refactor' },
+        keys = {
+            {
+                '<leader>re',
+                function() require('refactoring').refactor('Extract Function') end,
+                mode = { 'x' },
+                desc = 'Refactor: Extract Function',
+            },
+            {
+                '<leader>rf',
+                function()
+                    require('refactoring').refactor('Extract Function To File')
+                end,
+                mode = { 'x' },
+                desc = 'Refactor: Extract Function To File',
+            }, -- Extract variable supports only visual mode
+            {
+                '<leader>rv',
+                function() require('refactoring').refactor('Extract Variable') end,
+                mode = { 'x' },
+                desc = 'Refactor: Extract Variable',
+            }, -- Inline func supports only normal
+            {
+                '<leader>rI',
+                function() require('refactoring').refactor('Inline Function') end,
+                mode = { 'n' },
+                desc = 'Refactor: Inline Function',
+            }, -- Inline var supports both normal and visual mode
+            {
+                '<leader>ri',
+                function() require('refactoring').refactor('Inline Variable') end,
+                mode = { 'n', 'x' },
+                desc = 'Refactor: Inline Variable',
+            }, -- Extract block supports only normal mode
+            {
+                '<leader>rb',
+                function() require('refactoring').refactor('Extract Block') end,
+                mode = { 'n' },
+                desc = 'Refactor: Extract Block',
+            }, -- Extract block supports only normal mode
+            {
+                '<leader>rbf',
+                function()
+                    require('refactoring').refactor('Extract Block To File')
+                end,
+                mode = { 'n' },
+                desc = 'Refactor: Extract Block To File',
+            },
+            {
+                '<leader>rr',
+                function() require('refactoring').select_refactor() end,
+                mode = { 'n', 'x' },
+                desc = 'Refactor: Prompt for a refactor',
+            },
+            {
+                '<leader>rp',
+                function()
+                    require('refactoring').debug.printf({ below = false })
+                end,
+                mode = { 'n' },
+                desc = 'Refactor: Printf',
+            },
+            {
+                '<leader>rv',
+                function() require('refactoring').debug.print_var() end,
+                mode = { 'n', 'x' },
+                desc = 'Refactor: Print var',
+            },
+            {
+                '<leader>rc',
+                function() require('refactoring').debug.cleanup({}) end,
+                mode = { 'n' },
+                desc = 'Refactor: Cleanup debugging print statements',
+            },
+        },
+    },
     -- Open terminal within neovi
     {
         'akinsho/toggleterm.nvim',

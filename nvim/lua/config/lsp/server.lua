@@ -11,9 +11,7 @@ local s = {}
 local state = {
     exclude = {},
     capabilities = nil,
-    omit_keys = { n = {}, i = {}, x = {} },
 }
-
 function M.extend_lspconfig()
     if M.setup_done then return end
 
@@ -60,56 +58,6 @@ function M.setup(name, opts)
     end
 
     return true
-end
-
-function M.default_keymaps(opts)
-    local fmt = function(cmd)
-        return function(str) return cmd:format(str) end
-    end
-
-    local buffer = opts.buffer or vim.api.nvim_get_current_buf()
-    local keep_defaults = true
-    local exclude = {}
-
-    if type(opts.preserve_mappings) == 'boolean' then
-        keep_defaults = opts.preserve_mappings
-    end
-
-    if type(opts.exclude) == 'table' then exclude = opts.exclude end
-
-    local lsp = fmt('<cmd>lua vim.lsp.%s<cr>')
-    local diagnostic = fmt('<cmd>lua vim.diagnostic.%s<cr>')
-
-    local map = function(m, lhs, rhs)
-        if vim.tbl_contains(exclude, lhs) then return end
-
-        if keep_defaults and s.map_check(m, lhs) then return end
-
-        local key_opts = { buffer = buffer }
-        vim.keymap.set(m, lhs, rhs, key_opts)
-    end
-
-    map('n', 'K', lsp('buf.hover()'))
-    map('n', 'gd', lsp('buf.definition()'))
-    map('n', 'gD', lsp('buf.declaration()'))
-    map('n', 'gi', lsp('buf.implementation()'))
-    map('n', 'go', lsp('buf.type_definition()'))
-    map('n', 'gr', lsp('buf.references()'))
-    map('n', 'gs', lsp('buf.signature_help()'))
-    map('n', '<F2>', lsp('buf.rename()'))
-    map('n', '<F3>', lsp('buf.format({async = true})'))
-    map('x', '<F3>', lsp('buf.format({async = true})'))
-    map('n', '<F4>', lsp('buf.code_action()'))
-
-    if vim.lsp.buf.range_code_action then
-        map('x', '<F4>', lsp('buf.range_code_action()'))
-    else
-        map('x', '<F4>', lsp('buf.code_action()'))
-    end
-
-    map('n', 'gl', diagnostic('open_float()'))
-    map('n', '[d', diagnostic('goto_prev()'))
-    map('n', ']d', diagnostic('goto_next()'))
 end
 
 --TODO use this to configure lua_ls
@@ -263,18 +211,6 @@ function s.ensure_capabilities(server_config, user_config)
         vim.tbl_deep_extend('force', default_opts, plugin_opts, user_opts)
 
     server_config.capabilities.textDocument.completion = completion_opts
-end
-
-function s.map_check(mode, lhs)
-    local cache = state.omit_keys[mode][lhs]
-    if cache == nil then
-        local available = vim.fn.mapcheck(lhs, mode) == ''
-        state.omit_keys[mode][lhs] = not available
-
-        return not available
-    end
-
-    return cache
 end
 
 function s.apply_global_config(config, user_config, defaults)
