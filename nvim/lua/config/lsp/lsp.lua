@@ -84,20 +84,146 @@ vim.api.nvim_create_user_command(
 local lsp_cmds =
     vim.api.nvim_create_augroup('lsp_zero_attach', { clear = true })
 
+local function default_keymaps(bufnr)
+    vim.keymap.set(
+        'n',
+        'K',
+        function() vim.lsp.buf.hover() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gd',
+        function() vim.lsp.buf.definition() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gD',
+        function() vim.lsp.buf.declaration() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gi',
+        function() vim.lsp.buf.implementation() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'go',
+        function() vim.lsp.buf.type_definition() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gr',
+        function() vim.lsp.buf.references() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gs',
+        function() vim.lsp.buf.signature_help() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '<F2>',
+        function() vim.lsp.buf.rename() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '<F3>',
+        function() vim.lsp.buf.format({ async = true }) end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'x',
+        '<F3>',
+        function() vim.lsp.buf.format({ async = true }) end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '<F4>',
+        function() vim.lsp.buf.code_action() end,
+        { buffer = bufnr }
+    )
+
+    if vim.lsp.buf.range_code_action then
+        vim.keymap.set(
+            'x',
+            '<F4>',
+            function() vim.lsp.buf.range_code_action() end,
+            { buffer = bufnr }
+        )
+    else
+        vim.keymap.set(
+            'x',
+            '<F4>',
+            function() vim.lsp.buf.code_action() end,
+            { buffer = bufnr }
+        )
+    end
+
+    vim.keymap.set(
+        'n',
+        'gl',
+        function() vim.diagnostic.open_float() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '[d',
+        require('config.utils').dot_repeat(
+            function() vim.diagnostic.goto_prev() end
+        ),
+        { buffer = bufnr, expr = true }
+    )
+    vim.keymap.set(
+        'n',
+        ']d',
+        require('config.utils').dot_repeat(
+            function() vim.diagnostic.goto_next() end
+        ),
+        { buffer = bufnr, expr = true }
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>vca',
+        function() vim.lsp.buf.code_action() end,
+        {
+            buffer = bufnr,
+            remap = false,
+            desc = 'LSP: Open Code Action menu',
+        }
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>vrr',
+        function() vim.lsp.buf.references() end,
+        {
+            buffer = bufnr,
+            remap = false,
+            desc = 'LSP: Find references',
+        }
+    )
+    vim.keymap.set('n', '<leader>vrn', function() vim.lsp.buf.rename() end, {
+        buffer = bufnr,
+        remap = false,
+        desc = 'LSP: Rename symbol',
+    })
+end
+
 local function lsp_attach(event)
     local Server = require('config.lsp.server')
     local bufnr = event.buf
 
     Server.set_buf_commands(bufnr)
 
-    if Server.common_attach then
-        local id = vim.tbl_get(event, 'data', 'client_id')
-        local client = {}
-
-        if id then client = vim.lsp.get_client_by_id(id) end
-
-        Server.common_attach(client, bufnr)
-    end
+    default_keymaps(bufnr)
 end
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -217,11 +343,5 @@ function M.configure(name, opts)
 end
 
 function M.default_setup(name) require('config.lsp.server').setup(name, {}) end
-
-function M.on_attach(fn)
-    local Server = require('config.lsp.server')
-
-    if type(fn) == 'function' then Server.common_attach = fn end
-end
 
 return M

@@ -1,6 +1,5 @@
 local M = {
     default_config = false,
-    common_attach = nil,
     has_lspconfig = false,
     cmp_capabilities = false,
     setup_done = false,
