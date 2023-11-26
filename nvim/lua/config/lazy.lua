@@ -1021,12 +1021,59 @@ require('lazy').setup({
             },
             { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
             { 'hrsh7th/cmp-nvim-lsp' }, -- Completion for lsp
+            { 'onsails/lspkind.nvim' },
         },
         config = function()
             local cmp = require('cmp')
             cmp.setup({
+                sources = cmp.config.sources({
+                    { name = 'nvim_lua' },
+                    { name = 'nvim_lsp' },
+                    { name = 'luasnip' },
+                }, {
+                    { name = 'path' },
+                    { name = 'buffer', keyword_length = 5 },
+                }),
+                snippet = {
+                    expand = function(args)
+                        require('luasnip').lsp_expand(args.body)
+                    end,
+                },
+                formatting = {
+                    format = require('lspkind').cmp_format({
+                        with_text = true,
+                        menu = {
+                            buffer = '[buf]',
+                            nvim_lsp = '[LSP]',
+                            nvim_lua = '[api]',
+                            path = '[path]',
+                            luasnip = '[snip]',
+                        },
+                    }),
+                },
                 mapping = cmp.mapping.preset.insert({
-
+                    ['<C-y>'] = cmp.mapping.confirm({ select = false }),
+                    ['<C-e>'] = cmp.mapping.abort(),
+                    ['<Up>'] = cmp.mapping.select_prev_item({
+                        behavior = 'select',
+                    }),
+                    ['<Down>'] = cmp.mapping.select_next_item({
+                        behavior = 'select',
+                    }),
+                    ['<C-p>'] = cmp.mapping(function()
+                        if cmp.visible() then
+                            cmp.select_prev_item({ behavior = 'insert' })
+                        else
+                            cmp.complete()
+                        end
+                    end),
+                    ['<C-n>'] = cmp.mapping(function()
+                        if cmp.visible() then
+                            cmp.select_next_item({ behavior = 'insert' })
+                        else
+                            cmp.complete()
+                        end
+                    end),
                     -- `Enter` key to confirm completion
                     ['<CR>'] = cmp.mapping.confirm({
                         select = false,
