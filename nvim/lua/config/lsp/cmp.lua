@@ -1,33 +1,6 @@
 local M = {}
 
 local base_setup = false
-local setup_complete = false
-
-function M.extend(opts)
-    if setup_complete then return end
-
-    local defaults = {
-        set_lsp_source = true,
-        set_mappings = true,
-        use_luasnip = true,
-    }
-
-    opts = vim.tbl_deep_extend('force', defaults, opts or {})
-
-    local base = M.base_config()
-    local config = {}
-
-    if opts.set_lsp_source then config.sources = base.sources end
-
-    if opts.set_mappings then config.mapping = base.mapping end
-
-    if opts.use_luasnip then config.snippet = base.snippet end
-
-    require('cmp').setup(config)
-
-    base_setup = true
-    setup_complete = true
-end
 
 function M.apply_base()
     if base_setup then return end
@@ -102,26 +75,5 @@ function M.basic_mappings()
         end),
     }
 end
-
---TODO inline if used
--- function M.format()
---     return {
---         fields = { 'abbr', 'menu', 'kind' },
---         format = function(entry, item)
---             local n = entry.source.name
---             if n == 'nvim_lsp' then
---                 item.menu = '[LSP]'
---             elseif n == 'nvim_lua' then
---                 item.menu = '[nvim]'
---             else
---                 item.menu = string.format('[%s]', n)
---             end
---             return item
---         end,
---     }
--- end
-
---TODO inline if used
--- function M.action() return require('lsp-zero.cmp-mapping') end
 
 return M

@@ -112,25 +112,7 @@ function M.default_keymaps(opts)
     map('n', ']d', diagnostic('goto_next()'))
 end
 
-function M.set_sign_icons(opts)
-    opts = opts or {}
-
-    local sign = function(args)
-        if opts[args.name] == nil then return end
-
-        vim.fn.sign_define(args.hl, {
-            texthl = args.hl,
-            text = opts[args.name],
-            numhl = '',
-        })
-    end
-
-    sign({ name = 'error', hl = 'DiagnosticSignError' })
-    sign({ name = 'warn', hl = 'DiagnosticSignWarn' })
-    sign({ name = 'hint', hl = 'DiagnosticSignHint' })
-    sign({ name = 'info', hl = 'DiagnosticSignInfo' })
-end
-
+--TODO use this to configure lua_ls
 function M.nvim_workspace(opts)
     local runtime_path = vim.split(package.path, ';')
     table.insert(runtime_path, 'lua/?.lua')
@@ -164,18 +146,6 @@ function M.nvim_workspace(opts)
     }
 
     return vim.tbl_deep_extend('force', config, opts or {})
-end
-
-function M.client_capabilities()
-    if state.capabilities == nil then
-        if M.has_lspconfig == false then
-            local ok = pcall(require, 'lspconfig')
-            M.has_lspconfig = ok
-        end
-        return s.set_capabilities()
-    end
-
-    return state.capabilities
 end
 
 function M.set_buf_commands(bufnr)
@@ -212,14 +182,14 @@ function M.set_buf_commands(bufnr)
 
     bufcmd(
         bufnr,
-        'LspZeroFormat',
+        'LspFormat',
         format,
         { range = true, bang = true, nargs = '*' }
     )
 
     bufcmd(
         bufnr,
-        'LspZeroWorkspaceRemove',
+        'LspWorkspaceRemove',
         'lua vim.lsp.buf.remove_workspace_folder()',
         {}
     )

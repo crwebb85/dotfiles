@@ -19,19 +19,19 @@ local function setup_server(input)
     M.use(input.fargs, opts)
 end
 
-vim.api.nvim_create_user_command('LspZeroSetupServers', setup_server, {
+vim.api.nvim_create_user_command('LspSetupServers', setup_server, {
     bang = true,
     nargs = '*',
 })
 
 vim.api.nvim_create_user_command(
-    'LspZeroWorkspaceAdd',
+    'LspWorkspaceAdd',
     'lua vim.lsp.buf.add_workspace_folder()',
     {}
 )
 
 vim.api.nvim_create_user_command(
-    'LspZeroWorkspaceList',
+    'LspWorkspaceList',
     'lua vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders()))',
     {}
 )
@@ -186,90 +186,33 @@ end
 ---
 -- UI settings
 ---
-local border_style = vim.g.lsp_zero_ui_float_border
-if border_style == nil then border_style = 'rounded' end
+local border_style = 'rounded'
 
-if type(border_style) == 'string' then
-    vim.lsp.handlers['textDocument/hover'] =
-        vim.lsp.with(vim.lsp.handlers.hover, { border = border_style })
+vim.lsp.handlers['textDocument/hover'] =
+    vim.lsp.with(vim.lsp.handlers.hover, { border = border_style })
 
-    vim.lsp.handlers['textDocument/signatureHelp'] =
-        vim.lsp.with(vim.lsp.handlers.signature_help, { border = border_style })
+vim.lsp.handlers['textDocument/signatureHelp'] =
+    vim.lsp.with(vim.lsp.handlers.signature_help, { border = border_style })
 
-    vim.diagnostic.config({
-        float = { border = border_style },
-    })
-end
+vim.diagnostic.config({
+    float = { border = border_style },
+})
 
-local signs = vim.g.lsp_zero_ui_signcolumn
-if
-    (signs == nil and vim.o.signcolumn == 'auto')
-    or signs == 1
-    or signs == true
-then
-    vim.o.signcolumn = 'yes'
-end
+if vim.o.signcolumn == 'auto' then vim.o.signcolumn = 'yes' end
 
 local M = {}
 local s = {
     lsp_project_configs = {},
 }
 
-function M.cmp_format()
-    return {
-        fields = { 'abbr', 'menu', 'kind' },
-        format = function(entry, item)
-            local n = entry.source.name
-            if n == 'nvim_lsp' then
-                item.menu = '[LSP]'
-            elseif n == 'nvim_lua' then
-                item.menu = '[nvim]'
-            else
-                item.menu = string.format('[%s]', n)
-            end
-            return item
-        end,
-    }
-end
-
-function M.extend_cmp(opts) require('config.lsp.cmp').extend(opts) end
-
-function M.extend_lspconfig()
-    local Server = require('config.lsp.server')
-
-    if Server.setup_done then return end
-
-    if Server.has_configs() then
-        local msg = '[lsp-zero] Some language servers have been configured before\n'
-            .. 'you called the function .extend_lspconfig().\n\n'
-            .. 'Solution: Go to the place where you use lspconfig for the first time.\n'
-            .. 'Call the .extend_lspconfig() function before you setup the language server'
-
-        vim.notify(msg, vim.log.levels.WARN)
-        return
-    end
-
-    Server.has_lspconfig = true
-    Server.extend_lspconfig()
-end
-
-function M.setup_servers(list, opts)
-    if type(list) ~= 'table' then return end
-
-    opts = opts or {}
-
-    local Server = require('config.lsp.server')
-    local exclude = opts.exclude or {}
-
-    for _, name in ipairs(list) do
-        if not vim.tbl_contains(exclude, name) then Server.setup(name, {}) end
-    end
+local function store_config(name, opts)
+    if type(opts) == 'table' then s.lsp_project_configs[name] = opts end
 end
 
 function M.configure(name, opts)
     local Server = require('config.lsp.server')
 
-    M.store_config(name, opts)
+    store_config(name, opts)
     Server.setup(name, opts)
 end
 
@@ -281,164 +224,11 @@ function M.on_attach(fn)
     if type(fn) == 'function' then Server.common_attach = fn end
 end
 
-function M.set_server_config(opts)
-    if type(opts) == 'table' then
-        local Server = require('config.lsp.server')
-        Server.default_config = opts
-    end
-end
-
-function M.store_config(name, opts)
-    if type(opts) == 'table' then s.lsp_project_configs[name] = opts end
-end
-
-function M.use(servers, opts)
-    if type(servers) == 'string' then servers = { servers } end
-
-    -- local bufnr = vim.api.nvim_get_current_buf()
-    local has_filetype = not (vim.bo.filetype == '')
-    local buffer = vim.api.nvim_get_current_buf()
-    local lspconfig = require('lspconfig')
-    local user_opts = opts or {}
-
-    for _, name in ipairs(servers) do
-        local config = vim.tbl_deep_extend(
-            'force',
-            s.lsp_project_configs[name] or {},
-            user_opts
-        )
-
-        local lsp = lspconfig[name]
-        lsp.setup(config)
-
-        if lsp.manager and has_filetype then
-            pcall(function() lsp.manager:try_add_wrapper(buffer) end)
-        end
-    end
-end
-
-function M.nvim_lua_ls(opts)
-    return require('config.lsp.server').nvim_workspace(opts)
-end
-
-function M.set_sign_icons(opts)
-    require('config.lsp.server').set_sign_icons(opts)
-end
-
 function M.default_keymaps(opts)
     opts = opts or { buffer = 0 }
     require('config.lsp.server').default_keymaps(opts)
 end
 
-function M.get_capabilities()
-    return require('config.lsp.server').client_capabilities()
-end
-
-function M.new_client(opts)
-    if type(opts) ~= 'table' then return end
-
-    local name = opts.name or ''
-
-    local Server = require('config.lsp.server')
-
-    Server.skip_setup(name)
-
-    local defaults1 = {
-        capabilities = Server.client_capabilities(),
-        on_attach = function() end,
-    }
-
-    local config = vim.tbl_deep_extend(
-        'force',
-        defaults1,
-        Server.default_config or {},
-        opts or {}
-    )
-
-    if config.filetypes == nil then return end
-
-    local setup_id
-    local desc = 'Attach LSP server'
-    local defaults = {
-        capabilities = vim.lsp.protocol.make_client_capabilities(),
-        on_exit = vim.schedule_wrap(function()
-            if setup_id then pcall(vim.api.nvim_del_autocmd, setup_id) end
-        end),
-    }
-
-    local config2 = vim.tbl_deep_extend('force', defaults, config)
-
-    local get_root = config.root_dir
-    if type(get_root) == 'function' then config2.root_dir = nil end
-
-    if config.on_exit then
-        local cb = config.on_exit
-        local cleanup = defaults.on_exit
-        config2.on_exit = function(...)
-            cleanup()
-            cb(...)
-        end
-    end
-
-    if config2.name then
-        desc = string.format('Attach LSP: %s', config2.name)
-    end
-
-    local start_client = function()
-        if get_root then config2.root_dir = get_root() end
-
-        if config2.root_dir then vim.lsp.start(config2) end
-    end
-
-    setup_id = vim.api.nvim_create_autocmd('FileType', {
-        group = lsp_cmds,
-        pattern = config2.filetypes,
-        desc = desc,
-        callback = start_client,
-    })
-end
-
-function M.format_on_save(opts)
-    return require('config.lsp.format').format_on_save(opts)
-end
-
-function M.format_mapping(...)
-    return require('config.lsp.format').format_mapping(...)
-end
-
-function M.buffer_autoformat(...)
-    return require('config.lsp.format').buffer_autoformat(...)
-end
-
-function M.async_autoformat(...)
-    return require('config.lsp.format').async_autoformat(...)
-end
-
-M.dir = {}
-
-function M.dir.find_all(list) return require('config.lsp.dir').find_all(list) end
-
-function M.dir.find_first(list)
-    return require('config.lsp.dir').find_first(list)
-end
-
-M.omnifunc = {}
-
-function M.omnifunc.setup(opts) require('config.lsp.omnifunc').setup(opts) end
-
 if Setup.ok then Setup.extend_plugins() end
-
-M.defaults = {}
-
-function M.defaults.cmp_config(opts)
-    local defaults = require('config.lsp.cmp').base_config()
-
-    return vim.tbl_deep_extend('force', defaults, opts or {})
-end
-
-function M.defaults.cmp_mappings(opts)
-    local defaults = require('config.lsp.cmp').basic_mappings()
-    return vim.tbl_deep_extend('force', defaults, opts or {})
-end
 
 return M
