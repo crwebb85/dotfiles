@@ -73,14 +73,14 @@ function ToggleInlayHintsAutocmd()
         print("This version of neovim doesn't support inlay hints")
     end
 
-    vim.api.nvim_create_augroup('inlay_hints', { clear = true })
     isInlayHintsEnabled = not isInlayHintsEnabled
 
-    vim.lsp.inlay_hint(0, isInlayHintsEnabled)
+    vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled)
 
     vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+        group = vim.api.nvim_create_augroup('inlay_hints', { clear = true }),
         pattern = '?*',
-        callback = function() vim.lsp.inlay_hint(0, isInlayHintsEnabled) end,
+        callback = function() vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled) end,
     })
 end
 
