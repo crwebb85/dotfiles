@@ -33,7 +33,7 @@ local function inspect_config_source(input)
     local path = vim.api.nvim_get_runtime_file(mod:format(server), 0)
 
     if path[1] == nil then
-        local msg = "[lsp-zero] Could not find configuration for '%s'"
+        local msg = "[lsp] Could not find configuration for '%s'"
         vim.notify(msg:format(server), vim.log.levels.WARN)
         return
     end
