@@ -1,3 +1,23 @@
+local M = {}
+
+--- Toggle Inlay hints
+local isInlayHintsEnabled = false
+function M.toggleInlayHintsAutocmd()
+    if not vim.lsp.inlay_hint then
+        print("This version of neovim doesn't support inlay hints")
+    end
+
+    isInlayHintsEnabled = not isInlayHintsEnabled
+
+    vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled)
+
+    vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+        group = vim.api.nvim_create_augroup('inlay_hints', { clear = true }),
+        pattern = '?*',
+        callback = function() vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled) end,
+    })
+end
+
 ---
 -- Commands
 ---
@@ -18,6 +38,12 @@ vim.api.nvim_create_user_command('LspSetupServers', setup_server, {
 vim.api.nvim_create_user_command(
     'LspWorkspaceAdd',
     'lua vim.lsp.buf.add_workspace_folder()',
+    {}
+)
+
+vim.api.nvim_create_user_command(
+    'LspToggleInlayHints',
+    M.toggleInlayHintsAutocmd,
     {}
 )
 
@@ -200,6 +226,13 @@ local function default_keymaps(bufnr)
         remap = false,
         desc = 'LSP: Rename symbol',
     })
+    -- Toggle Inlay Hints
+    vim.keymap.set(
+        'n',
+        '<leader>vth',
+        function() M.toggleInlayHintsAutocmd() end,
+        { desc = 'Toggle Inlay Hints' }
+    )
 end
 
 local function lsp_attach(event)
@@ -235,8 +268,6 @@ vim.diagnostic.config({
 })
 
 if vim.o.signcolumn == 'auto' then vim.o.signcolumn = 'yes' end
-
-local M = {}
 
 function M.default_setup(name) require('config.lsp.server').setup(name, {}) end
 
