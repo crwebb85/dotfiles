@@ -56,3 +56,196 @@ Cool plugins:
 - https://github.com/ryanmsnyder/toggleterm-manager.nvim
 - https://github.com/anuvyklack/hydra.nvim
 
+
+lookinto functions from lsp-zero
+
+```lua
+
+function M.cmp_action()
+    local cmp_actions = {}
+
+    local function get_cmp()
+        local ok_cmp, cmp = pcall(require, 'cmp')
+        return ok_cmp and cmp or {}
+    end
+
+    local function get_luasnip()
+        local ok_luasnip, luasnip = pcall(require, 'luasnip')
+        return ok_luasnip and luasnip or {}
+    end
+
+    function cmp_actions.tab_complete(select_opts)
+        local cmp = get_cmp()
+        return cmp.mapping(function(fallback)
+            local col = vim.fn.col('.') - 1
+
+            if cmp.visible() then
+                cmp.select_next_item(select_opts)
+            elseif
+                col == 0 or vim.fn.getline('.'):sub(col, col):match('%s')
+            then
+                fallback()
+            else
+                cmp.complete()
+            end
+        end, { 'i', 's' })
+    end
+
+    function cmp_actions.select_prev_or_fallback(select_opts)
+        local cmp = get_cmp()
+        return cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_prev_item(select_opts)
+            else
+                fallback()
+            end
+        end, { 'i', 's' })
+    end
+
+    function cmp_actions.toggle_completion(opts)
+        opts = opts or {}
+        local cmp = get_cmp()
+
+        return cmp.mapping(function()
+            if cmp.visible() then
+                cmp.abort()
+            else
+                cmp.complete()
+            end
+        end, opts.modes)
+    end
+
+    function cmp_actions.luasnip_jump_forward()
+        local cmp = get_cmp()
+        local luasnip = get_luasnip()
+
+        return cmp.mapping(function(fallback)
+            if luasnip.jumpable(1) then
+                luasnip.jump(1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' })
+    end
+
+    function cmp_actions.luasnip_jump_backward()
+        local cmp = get_cmp()
+        local luasnip = get_luasnip()
+
+        return cmp.mapping(function(fallback)
+            if luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' })
+    end
+
+    function cmp_actions.luasnip_supertab(select_opts)
+        local cmp = get_cmp()
+        local luasnip = get_luasnip()
+
+        return cmp.mapping(function(fallback)
+            local col = vim.fn.col('.') - 1
+
+            if cmp.visible() then
+                cmp.select_next_item(select_opts)
+            elseif luasnip.expand_or_jumpable() then
+                luasnip.expand_or_jump()
+            elseif
+                col == 0 or vim.fn.getline('.'):sub(col, col):match('%s')
+            then
+                fallback()
+            else
+                cmp.complete()
+            end
+        end, { 'i', 's' })
+    end
+
+    function cmp_actions.luasnip_shift_supertab(select_opts)
+        local cmp = get_cmp()
+        local luasnip = get_luasnip()
+
+        return cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_prev_item(select_opts)
+            elseif luasnip.jumpable(-1) then
+                luasnip.jump(-1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' })
+    end
+
+    function cmp_actions.luasnip_next_or_expand(select_opts)
+        local cmp = get_cmp()
+        local luasnip = get_luasnip()
+
+        return cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_next_item(select_opts)
+            elseif luasnip.expand_or_jumpable() then
+                luasnip.expand_or_jump()
+            else
+                fallback()
+            end
+        end, { 'i', 's' })
+    end
+
+    function cmp_actions.luasnip_next(select_opts)
+        local cmp = get_cmp()
+        local luasnip = get_luasnip()
+
+        return cmp.mapping(function(fallback)
+            if cmp.visible() then
+                cmp.select_next_item(select_opts)
+            elseif luasnip.jumpable(1) then
+                luasnip.jump(1)
+            else
+                fallback()
+            end
+        end, { 'i', 's' })
+    end
+
+    return cmp_actions
+
+    --end lsp-zero.cmp_action
+    -- return require('lsp-zero.cmp-mapping')
+end
+
+
+function M.nvim_workspace(opts)
+    local runtime_path = vim.split(package.path, ';')
+    table.insert(runtime_path, 'lua/?.lua')
+    table.insert(runtime_path, 'lua/?/init.lua')
+
+    local config = {
+        settings = {
+            Lua = {
+                -- Disable telemetry
+                telemetry = { enable = false },
+                runtime = {
+                    -- Tell the language server which version of Lua you're using
+                    -- (most likely LuaJIT in the case of Neovim)
+                    version = 'LuaJIT',
+                    path = runtime_path,
+                },
+                diagnostics = {
+                    -- Get the language server to recognize the `vim` global
+                    globals = { 'vim' },
+                },
+                workspace = {
+                    checkThirdParty = false,
+                    library = {
+                        -- Make the server aware of Neovim runtime files
+                        vim.fn.expand('$VIMRUNTIME/lua'),
+                        vim.fn.stdpath('config') .. '/lua',
+                    },
+                },
+            },
+        },
+    }
+
+    return vim.tbl_deep_extend('force', config, opts or {})
+end
+```

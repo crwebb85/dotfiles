@@ -382,6 +382,91 @@ require('lazy').setup({
         event = 'VeryLazy',
         config = true,
     },
+    {
+        'ThePrimeagen/refactoring.nvim',
+        version = '*',
+        lazy = true,
+        config = true,
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'nvim-treesitter/nvim-treesitter',
+        },
+        cmd = { 'Refactor' },
+        keys = {
+            {
+                '<leader>re',
+                function() require('refactoring').refactor('Extract Function') end,
+                mode = { 'x' },
+                desc = 'Refactor: Extract Function',
+            },
+            {
+                '<leader>rf',
+                function()
+                    require('refactoring').refactor('Extract Function To File')
+                end,
+                mode = { 'x' },
+                desc = 'Refactor: Extract Function To File',
+            }, -- Extract variable supports only visual mode
+            {
+                '<leader>rv',
+                function() require('refactoring').refactor('Extract Variable') end,
+                mode = { 'x' },
+                desc = 'Refactor: Extract Variable',
+            }, -- Inline func supports only normal
+            {
+                '<leader>rI',
+                function() require('refactoring').refactor('Inline Function') end,
+                mode = { 'n' },
+                desc = 'Refactor: Inline Function',
+            }, -- Inline var supports both normal and visual mode
+            {
+                '<leader>ri',
+                function() require('refactoring').refactor('Inline Variable') end,
+                mode = { 'n', 'x' },
+                desc = 'Refactor: Inline Variable',
+            }, -- Extract block supports only normal mode
+            {
+                '<leader>rb',
+                function() require('refactoring').refactor('Extract Block') end,
+                mode = { 'n' },
+                desc = 'Refactor: Extract Block',
+            }, -- Extract block supports only normal mode
+            {
+                '<leader>rbf',
+                function()
+                    require('refactoring').refactor('Extract Block To File')
+                end,
+                mode = { 'n' },
+                desc = 'Refactor: Extract Block To File',
+            },
+            {
+                '<leader>rr',
+                function() require('refactoring').select_refactor() end,
+                mode = { 'n', 'x' },
+                desc = 'Refactor: Prompt for a refactor',
+            },
+            {
+                '<leader>rp',
+                function()
+                    require('refactoring').debug.printf({ below = false })
+                end,
+                mode = { 'n' },
+                desc = 'Refactor: Printf',
+            },
+            {
+                '<leader>rv',
+                function() require('refactoring').debug.print_var() end,
+                mode = { 'n', 'x' },
+                desc = 'Refactor: Print var',
+            },
+            {
+                '<leader>rc',
+                function() require('refactoring').debug.cleanup({}) end,
+                mode = { 'n' },
+                desc = 'Refactor: Cleanup debugging print statements',
+            },
+        },
+    },
     -- Open terminal within neovi
     {
         'akinsho/toggleterm.nvim',
@@ -522,7 +607,6 @@ require('lazy').setup({
         'mbbill/undotree',
         version = '*',
         lazy = true,
-        config = true,
         cmd = { 'UndotreeToggle', 'UndotreeShow' },
         keys = {
             {
@@ -860,72 +944,28 @@ require('lazy').setup({
         version = '*',
         lazy = true,
         config = function()
-            local lsp_zero = require('lsp-zero')
-
             require('mason-lspconfig').setup({
                 handlers = {
-                    lsp_zero.default_setup,
+                    --my handler requires neovim/lspconfig and hrsh7th/cmp-nvim-lsp
+                    --so those dependencies will get lazily loaded when the lsp attaches
+                    --if they haven't already been loaded
+                    require('config.lsp.lsp').default_setup,
                 },
             })
         end,
     },
 
-    -- LSP Support
-    {
-        'VonHeikemen/lsp-zero.nvim',
-        lazy = true,
-        config = function()
-            local lsp_zero = require('lsp-zero')
-
-            lsp_zero.preset('recommended')
-
-            lsp_zero.on_attach(function(_, bufnr)
-                -- see :help lsp-zero-keybindings
-                -- to learn the available actions
-                lsp_zero.default_keymaps({ buffer = bufnr })
-
-                vim.keymap.set(
-                    'n',
-                    '<leader>vca',
-                    function() vim.lsp.buf.code_action() end,
-                    {
-                        buffer = bufnr,
-                        remap = false,
-                        desc = 'LSP: Open Code Action menu',
-                    }
-                )
-                vim.keymap.set(
-                    'n',
-                    '<leader>vrr',
-                    function() vim.lsp.buf.references() end,
-                    {
-                        buffer = bufnr,
-                        remap = false,
-                        desc = 'LSP: Find references',
-                    }
-                )
-                vim.keymap.set(
-                    'n',
-                    '<leader>vrn',
-                    function() vim.lsp.buf.rename() end,
-                    {
-                        buffer = bufnr,
-                        remap = false,
-                        desc = 'LSP: Rename symbol',
-                    }
-                )
-            end)
-
-            lsp_zero.setup()
-        end,
-    },
     {
         'neovim/nvim-lspconfig',
         version = '*',
         lazy = true,
         dependencies = {
-            { 'VonHeikemen/lsp-zero.nvim' }, --need lsp zero configured before nvim-lspconfig
-            { 'hrsh7th/cmp-nvim-lsp' },
+            {
+                -- Provides a list of lsp capibilities to that cmp adds to neovim
+                -- I must have cmp-nvim-lsp load before nvim-lspconfig for
+                -- lua snips to show up in cmp
+                'hrsh7th/cmp-nvim-lsp',
+            },
         },
         config = function()
             local lspconfig = require('lspconfig')
@@ -980,38 +1020,111 @@ require('lazy').setup({
         event = 'InsertEnter',
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
-            { 'hrsh7th/cmp-buffer' },
-            { 'hrsh7th/cmp-path' },
-            { 'saadparwaiz1/cmp_luasnip' },
-            { 'hrsh7th/cmp-nvim-lsp' },
+            { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
+            { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
+            { 'hrsh7th/cmp-path' }, -- Completion for file paths
+            {
+                'hrsh7th/cmp-nvim-lua', -- Completion for lua api
+                lazy = true,
+                ft = 'lua',
+            },
+            { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capibilities to that cmp adds to neovim
+            { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
         },
         config = function()
             local cmp = require('cmp')
-            local cmp_action = require('lsp-zero').cmp_action()
-            local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
             cmp.setup({
+                sources = cmp.config.sources({
+                    { name = 'nvim_lua' },
+                    { name = 'nvim_lsp' },
+                    { name = 'luasnip' },
+                }, {
+                    { name = 'path' },
+                    { name = 'buffer', keyword_length = 5 },
+                }),
+                snippet = {
+                    expand = function(args)
+                        require('luasnip').lsp_expand(args.body)
+                    end,
+                },
+                formatting = {
+                    format = require('lspkind').cmp_format({
+                        with_text = true,
+                        menu = {
+                            buffer = '[buf]',
+                            nvim_lsp = '[LSP]',
+                            nvim_lua = '[api]',
+                            path = '[path]',
+                            luasnip = '[snip]',
+                        },
+                    }),
+                },
                 mapping = cmp.mapping.preset.insert({
-                    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-                    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-
+                    ['<C-y>'] = cmp.mapping.confirm({ select = false }),
+                    ['<C-e>'] = cmp.mapping.abort(),
+                    ['<Up>'] = cmp.mapping.select_prev_item({
+                        behavior = 'select',
+                    }),
+                    ['<Down>'] = cmp.mapping.select_next_item({
+                        behavior = 'select',
+                    }),
+                    ['<C-p>'] = cmp.mapping(function()
+                        if cmp.visible() then
+                            cmp.select_prev_item({ behavior = 'insert' })
+                        else
+                            cmp.complete()
+                        end
+                    end),
+                    ['<C-n>'] = cmp.mapping(function()
+                        if cmp.visible() then
+                            cmp.select_next_item({ behavior = 'insert' })
+                        else
+                            cmp.complete()
+                        end
+                    end),
                     -- `Enter` key to confirm completion
-                    ['<CR>'] = cmp.mapping.confirm({ select = false }),
+                    ['<CR>'] = cmp.mapping.confirm({
+                        select = false,
+                        behavior = cmp.ConfirmBehavior.Insert,
+                    }),
+                    ['<S-CR>'] = cmp.mapping.confirm({
+                        select = false,
+                        behavior = cmp.ConfirmBehavior.Replace,
+                    }),
 
                     -- Ctrl+Space to trigger completion menu
                     ['<C-Space>'] = cmp.mapping.complete(),
-
                     -- Complete common string
-                    ['<C-l>'] = cmp.mapping(function(fallback)
+                    ['<S-Space>'] = cmp.mapping(function(fallback)
                         if cmp.visible() then
                             return cmp.complete_common_string()
+                        else
+                            fallback()
                         end
-                        fallback()
-                    end, { 'i', 'c' }),
-
+                    end, { 'i', 's' }),
+                    ['<C-t>'] = cmp.mapping(function()
+                        if cmp.visible_docs() then
+                            cmp.close_docs()
+                        else
+                            cmp.open_docs()
+                        end
+                    end, { 'i', 's' }),
+                    -- Scroll up and down in the completion documentation
+                    ['<C-u>'] = cmp.mapping(function(falback)
+                        if cmp.visible() then
+                            cmp.mapping.scroll_docs(-4)
+                        else
+                            falback()
+                        end
+                    end, { 'i', 's' }),
+                    ['<C-d>'] = cmp.mapping(function(falback)
+                        if cmp.visible() then
+                            cmp.mapping.scroll_docs(4)
+                        else
+                            falback()
+                        end
+                    end, { 'i', 's' }),
                     -- Navigate between snippet placeholder
-                    ['<C-f>'] = cmp_action.luasnip_jump_forward(),
-                    ['<C-b>'] = cmp_action.luasnip_jump_backward(),
                     ['<Tab>'] = cmp.mapping(function(fallback)
                         local luasnip = require('luasnip')
                         if cmp.visible() then
@@ -1033,9 +1146,6 @@ require('lazy').setup({
                             fallback()
                         end
                     end, { 'i', 's' }),
-                    -- Scroll up and down in the completion documentation
-                    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-                    ['<C-d>'] = cmp.mapping.scroll_docs(4),
                 }),
             })
         end,

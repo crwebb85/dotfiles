@@ -1,0 +1,274 @@
+local M = {}
+
+--- Toggle Inlay hints
+local isInlayHintsEnabled = false
+function M.toggleInlayHintsAutocmd()
+    if not vim.lsp.inlay_hint then
+        print("This version of neovim doesn't support inlay hints")
+    end
+
+    isInlayHintsEnabled = not isInlayHintsEnabled
+
+    vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled)
+
+    vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+        group = vim.api.nvim_create_augroup('inlay_hints', { clear = true }),
+        pattern = '?*',
+        callback = function() vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled) end,
+    })
+end
+
+---
+-- Commands
+---
+local function setup_server(input)
+    local opts = {}
+    if input.bang then
+        opts.root_dir = function() return vim.fn.get_cwd() end
+    end
+
+    M.use(input.fargs, opts)
+end
+
+vim.api.nvim_create_user_command('LspSetupServers', setup_server, {
+    bang = true,
+    nargs = '*',
+})
+
+vim.api.nvim_create_user_command(
+    'LspWorkspaceAdd',
+    'lua vim.lsp.buf.add_workspace_folder()',
+    {}
+)
+
+vim.api.nvim_create_user_command(
+    'LspToggleInlayHints',
+    M.toggleInlayHintsAutocmd,
+    {}
+)
+
+vim.api.nvim_create_user_command(
+    'LspWorkspaceList',
+    'lua vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders()))',
+    {}
+)
+
+local function inspect_config_source(input)
+    local server = input.args
+    local mod = 'lua/lspconfig/server_configurations/%s.lua'
+    local path = vim.api.nvim_get_runtime_file(mod:format(server), false)
+
+    if path[1] == nil then
+        local msg = "[lsp] Could not find configuration for '%s'"
+        vim.notify(msg:format(server), vim.log.levels.WARN)
+        return
+    end
+
+    vim.cmd.sview({
+        args = { path[1] },
+        mods = { vertical = true },
+    })
+end
+
+local function config_source_complete(user_input)
+    local mod = 'lua/lspconfig/server_configurations'
+    local path = vim.api.nvim_get_runtime_file(mod, false)[1]
+    local pattern = '%s/*.lua'
+
+    local list = vim.split(vim.fn.glob(pattern:format(path)), '\n')
+    local res = {}
+
+    for _, i in ipairs(list) do
+        local name = vim.fn.fnamemodify(i, ':t:r')
+        if vim.startswith(name, user_input) then res[#res + 1] = name end
+    end
+
+    return res
+end
+
+vim.api.nvim_create_user_command('LspViewConfigSource', inspect_config_source, {
+    nargs = 1,
+    complete = config_source_complete,
+})
+
+---
+-- Autocommands
+---
+
+local function default_keymaps(bufnr)
+    vim.keymap.set(
+        'n',
+        'K',
+        function() vim.lsp.buf.hover() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gd',
+        function() vim.lsp.buf.definition() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gD',
+        function() vim.lsp.buf.declaration() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gi',
+        function() vim.lsp.buf.implementation() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'go',
+        function() vim.lsp.buf.type_definition() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gr',
+        function() vim.lsp.buf.references() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        'gs',
+        function() vim.lsp.buf.signature_help() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '<F2>',
+        function() vim.lsp.buf.rename() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '<F3>',
+        function() vim.lsp.buf.format({ async = true }) end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'x',
+        '<F3>',
+        function() vim.lsp.buf.format({ async = true }) end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '<F4>',
+        function() vim.lsp.buf.code_action() end,
+        { buffer = bufnr }
+    )
+
+    if vim.lsp.buf.range_code_action then
+        vim.keymap.set(
+            'x',
+            '<F4>',
+            function() vim.lsp.buf.range_code_action() end,
+            { buffer = bufnr }
+        )
+    else
+        vim.keymap.set(
+            'x',
+            '<F4>',
+            function() vim.lsp.buf.code_action() end,
+            { buffer = bufnr }
+        )
+    end
+
+    vim.keymap.set(
+        'n',
+        'gl',
+        function() vim.diagnostic.open_float() end,
+        { buffer = bufnr }
+    )
+    vim.keymap.set(
+        'n',
+        '[d',
+        require('config.utils').dot_repeat(
+            function() vim.diagnostic.goto_prev() end
+        ),
+        { buffer = bufnr, expr = true }
+    )
+    vim.keymap.set(
+        'n',
+        ']d',
+        require('config.utils').dot_repeat(
+            function() vim.diagnostic.goto_next() end
+        ),
+        { buffer = bufnr, expr = true }
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>vca',
+        function() vim.lsp.buf.code_action() end,
+        {
+            buffer = bufnr,
+            remap = false,
+            desc = 'LSP: Open Code Action menu',
+        }
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>vrr',
+        function() vim.lsp.buf.references() end,
+        {
+            buffer = bufnr,
+            remap = false,
+            desc = 'LSP: Find references',
+        }
+    )
+    vim.keymap.set('n', '<leader>vrn', function() vim.lsp.buf.rename() end, {
+        buffer = bufnr,
+        remap = false,
+        desc = 'LSP: Rename symbol',
+    })
+    -- Toggle Inlay Hints
+    vim.keymap.set(
+        'n',
+        '<leader>vth',
+        function() M.toggleInlayHintsAutocmd() end,
+        { desc = 'Toggle Inlay Hints' }
+    )
+end
+
+local function lsp_attach(event)
+    vim.api.nvim_buf_create_user_command(
+        event.buf,
+        'LspWorkspaceRemove',
+        'lua vim.lsp.buf.remove_workspace_folder()',
+        {}
+    )
+
+    default_keymaps(event.buf)
+end
+
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('lsp_attach', { clear = true }),
+    desc = 'lsp on_attach',
+    callback = lsp_attach,
+})
+
+---
+-- UI settings
+---
+local border_style = 'rounded'
+
+vim.lsp.handlers['textDocument/hover'] =
+    vim.lsp.with(vim.lsp.handlers.hover, { border = border_style })
+
+vim.lsp.handlers['textDocument/signatureHelp'] =
+    vim.lsp.with(vim.lsp.handlers.signature_help, { border = border_style })
+
+vim.diagnostic.config({
+    float = { border = border_style },
+})
+
+if vim.o.signcolumn == 'auto' then vim.o.signcolumn = 'yes' end
+
+function M.default_setup(name) require('config.lsp.server').setup(name, {}) end
+
+return M
