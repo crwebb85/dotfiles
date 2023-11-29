@@ -1096,7 +1096,6 @@ require('lazy').setup({
                     ['<C-Space>'] = cmp.mapping.complete(),
                     -- Complete common string
                     ['<S-Space>'] = cmp.mapping(function(fallback)
-                        print('hi from <S-Space>')
                         if cmp.visible() then
                             return cmp.complete_common_string()
                         else
@@ -1104,7 +1103,6 @@ require('lazy').setup({
                         end
                     end, { 'i', 's' }),
                     ['<C-t>'] = cmp.mapping(function()
-                        print('hi from <C-t>')
                         if cmp.visible_docs() then
                             cmp.close_docs()
                         else
@@ -1113,7 +1111,6 @@ require('lazy').setup({
                     end, { 'i', 's' }),
                     -- Scroll up and down in the completion documentation
                     ['<C-u>'] = cmp.mapping(function(falback)
-                        print('hi from <C-u>')
                         if cmp.visible() then
                             cmp.mapping.scroll_docs(-4)
                         else
@@ -1121,7 +1118,6 @@ require('lazy').setup({
                         end
                     end, { 'i', 's' }),
                     ['<C-d>'] = cmp.mapping(function(falback)
-                        print('hi from <C-d>')
                         if cmp.visible() then
                             cmp.mapping.scroll_docs(4)
                         else
@@ -1130,7 +1126,6 @@ require('lazy').setup({
                     end, { 'i', 's' }),
                     -- Navigate between snippet placeholder
                     ['<Tab>'] = cmp.mapping(function(fallback)
-                        print('hi from <Tab>')
                         local luasnip = require('luasnip')
                         if cmp.visible() then
                             cmp.select_next_item()
@@ -1142,7 +1137,6 @@ require('lazy').setup({
                     end, { 'i', 's' }),
 
                     ['<S-Tab>'] = cmp.mapping(function(fallback)
-                        print('hi from <S-Tab>')
                         local luasnip = require('luasnip')
                         if cmp.visible() then
                             cmp.select_prev_item()
