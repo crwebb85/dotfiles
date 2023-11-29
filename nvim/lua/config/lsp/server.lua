@@ -1,7 +1,5 @@
 local M = {
     default_config = false,
-    has_lspconfig = false,
-    cmp_capabilities = false,
     setup_done = false,
 }
 
@@ -24,24 +22,17 @@ end
 
 local function set_capabilities(current)
     if state.capabilities == nil then
-        local cmp_default_capabilities = {}
-        local base = {}
+        local base_capabilities =
+            require('lspconfig.util').default_config.capabilities
+        -- if I ever stop using lspconfig the alternative is
+        -- local base_capabilities = vim.lsp.protocol.make_client_capabilities()
 
-        if M.has_lspconfig then
-            base = require('lspconfig.util').default_config.capabilities
-        else
-            base = vim.lsp.protocol.make_client_capabilities()
-        end
-
-        local ok, cmp_lsp = pcall(require, 'cmp_nvim_lsp')
-        if ok then
-            M.cmp_capabilities = true
-            cmp_default_capabilities = cmp_lsp.default_capabilities()
-        end
+        local cmp_default_capabilities =
+            require('cmp_nvim_lsp').default_capabilities()
 
         state.capabilities = vim.tbl_deep_extend(
             'force',
-            base,
+            base_capabilities,
             cmp_default_capabilities,
             current or {}
         )
@@ -118,14 +109,14 @@ function M.extend_lspconfig()
             -- looks like some lsp servers can override the capabilities option
             -- during "config definition". so, now we have to do this.
             ensure_capabilities(config, user_config)
-
+            -- TODO figure out why lsp config did this because as of now my config never sets
+            -- M.default_config to a table
             if type(M.default_config) == 'table' then
                 apply_global_config(config, user_config, M.default_config)
             end
         end
     )
 
-    M.has_lspconfig = true
     M.setup_done = true
 end
 

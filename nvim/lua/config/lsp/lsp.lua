@@ -56,7 +56,7 @@ vim.api.nvim_create_user_command(
 local function inspect_config_source(input)
     local server = input.args
     local mod = 'lua/lspconfig/server_configurations/%s.lua'
-    local path = vim.api.nvim_get_runtime_file(mod:format(server), 0)
+    local path = vim.api.nvim_get_runtime_file(mod:format(server), false)
 
     if path[1] == nil then
         local msg = "[lsp] Could not find configuration for '%s'"
@@ -72,7 +72,7 @@ end
 
 local function config_source_complete(user_input)
     local mod = 'lua/lspconfig/server_configurations'
-    local path = vim.api.nvim_get_runtime_file(mod, 0)[1]
+    local path = vim.api.nvim_get_runtime_file(mod, false)[1]
     local pattern = '%s/*.lua'
 
     local list = vim.split(vim.fn.glob(pattern:format(path)), '\n')
