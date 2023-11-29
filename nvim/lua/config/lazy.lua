@@ -946,6 +946,9 @@ require('lazy').setup({
         config = function()
             require('mason-lspconfig').setup({
                 handlers = {
+                    --my handler requires neovim/lspconfig and hrsh7th/cmp-nvim-lsp
+                    --so those dependencies will get lazily loaded when the lsp attaches
+                    --if they haven't already been loaded
                     require('config.lsp.lsp').default_setup,
                 },
             })
@@ -957,7 +960,12 @@ require('lazy').setup({
         version = '*',
         lazy = true,
         dependencies = {
-            { 'hrsh7th/cmp-nvim-lsp' },
+            {
+                -- Provides a list of lsp capibilities to that cmp adds to neovim
+                -- I must have cmp-nvim-lsp load before nvim-lspconfig for
+                -- lua snips to show up in cmp
+                'hrsh7th/cmp-nvim-lsp',
+            },
         },
         config = function()
             local lspconfig = require('lspconfig')
@@ -1012,6 +1020,7 @@ require('lazy').setup({
         event = 'InsertEnter',
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
+            { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
             { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
             { 'hrsh7th/cmp-path' }, -- Completion for file paths
             {
@@ -1019,9 +1028,8 @@ require('lazy').setup({
                 lazy = true,
                 ft = 'lua',
             },
-            { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
-            { 'hrsh7th/cmp-nvim-lsp' }, -- Completion for lsp
-            { 'onsails/lspkind.nvim' },
+            { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capibilities to that cmp adds to neovim
+            { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
         },
         config = function()
             local cmp = require('cmp')
