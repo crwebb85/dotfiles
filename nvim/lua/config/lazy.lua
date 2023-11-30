@@ -18,14 +18,12 @@ require('lazy').setup({
     -- Git integration
     {
         'tpope/vim-fugitive',
-        version = '*',
         lazy = true,
         event = 'VeryLazy',
     },
     -- Adds git diffview
     {
         'sindrets/diffview.nvim',
-        version = '*',
         lazy = true,
         config = function()
             local actions = require('diffview.actions')
@@ -146,7 +144,6 @@ require('lazy').setup({
     -- Adds sidbar showing lines changed
     {
         'lewis6991/gitsigns.nvim',
-        version = '*',
         lazy = true,
         event = 'VeryLazy',
         config = true,
@@ -209,7 +206,6 @@ require('lazy').setup({
         dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
         },
-        version = '*',
         lazy = true,
         cmd = { 'Telescope' },
         keys = {
@@ -273,7 +269,6 @@ require('lazy').setup({
     -- Harpoon (fast file navigation between pinned files)
     {
         'theprimeagen/harpoon',
-        version = '*',
         lazy = true,
         config = true,
         keys = {
@@ -349,7 +344,6 @@ require('lazy').setup({
     -- Autopair brackets and quotes
     {
         'echasnovski/mini.pairs',
-        version = '*',
         lazy = true,
         event = 'VeryLazy',
         config = true,
@@ -357,7 +351,6 @@ require('lazy').setup({
     -- Comment toggling
     {
         'echasnovski/mini.comment',
-        version = '*',
         lazy = true,
         event = 'VeryLazy',
         config = true,
@@ -377,14 +370,12 @@ require('lazy').setup({
     -- using the same motions I use to yank text
     {
         'kylechui/nvim-surround',
-        version = '*',
         lazy = true,
         event = 'VeryLazy',
         config = true,
     },
     {
         'ThePrimeagen/refactoring.nvim',
-        version = '*',
         lazy = true,
         config = true,
         dependencies = {
@@ -470,7 +461,6 @@ require('lazy').setup({
     -- Open terminal within neovi
     {
         'akinsho/toggleterm.nvim',
-        version = '*',
         lazy = true,
         config = true,
         cmd = { 'ToggleTerm' },
@@ -493,7 +483,6 @@ require('lazy').setup({
     {
         'folke/trouble.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
-        version = '*',
         lazy = true,
         config = true,
         cmd = { 'Trouble', 'TroubleToggle' },
@@ -567,7 +556,6 @@ require('lazy').setup({
         dependencies = {
             'nvim-lua/plenary.nvim',
         },
-        version = '*',
         lazy = true,
         config = true,
         -- All the user commands added by the plugin
@@ -605,7 +593,6 @@ require('lazy').setup({
     -- Undotree the solution to screwups
     {
         'mbbill/undotree',
-        version = '*',
         lazy = true,
         cmd = { 'UndotreeToggle', 'UndotreeShow' },
         keys = {
@@ -621,7 +608,6 @@ require('lazy').setup({
     -- Parser for syntax highlighting
     {
         'nvim-treesitter/nvim-treesitter',
-        version = '*',
         lazy = true,
         event = 'VeryLazy',
         build = ':TSUpdate',
@@ -744,7 +730,6 @@ require('lazy').setup({
     -- - terminate the debugger `<leader>dt`
     {
         'mfussenegger/nvim-dap',
-        version = '*',
         lazy = true,
         keys = {
             {
@@ -830,7 +815,6 @@ require('lazy').setup({
     -- - toggle debugger UI manually with `<leader>du`
     {
         'rcarriga/nvim-dap-ui',
-        version = '*',
         lazy = true,
         dependencies = 'mfussenegger/nvim-dap',
         keys = {
@@ -859,7 +843,6 @@ require('lazy').setup({
     -- Configuration for the python debugger
     {
         'mfussenegger/nvim-dap-python',
-        version = '*',
         lazy = true,
         ft = 'python',
         dependencies = 'mfussenegger/nvim-dap',
@@ -879,7 +862,6 @@ require('lazy').setup({
     -- Adds workspace configuration file support
     {
         'folke/neoconf.nvim',
-        version = '*',
         lazy = false,
         config = true,
     },
@@ -887,9 +869,7 @@ require('lazy').setup({
     -- Configure Lua LSP to know about neovim plugins when in neovim config
     {
         'folke/neodev.nvim',
-        version = '*',
-        lazy = true,
-        ft = 'lua',
+        lazy = true, -- Will lazy load before lspconfig since I marked it as a dependency
         config = function()
             require('neodev').setup({
                 -- -- Workaround to get correctly configure lua_ls for neovim config
@@ -905,7 +885,6 @@ require('lazy').setup({
     -- auto-install of those external tools
     {
         'WhoIsSethDaniel/mason-tool-installer.nvim',
-        version = '*',
         lazy = true,
         event = 'VeryLazy',
         dependencies = {
@@ -921,6 +900,7 @@ require('lazy').setup({
                 'isort', -- python organize imports
                 'taplo', -- LSP for toml (for pyproject.toml files)
 
+                'lua_ls',
                 'lua-language-server', -- LSP for lua files
                 'stylua', -- Formatter for lua files
 
@@ -935,13 +915,11 @@ require('lazy').setup({
     },
     {
         'williamboman/mason.nvim',
-        version = '*',
         lazy = true,
         config = true,
     },
     {
         'williamboman/mason-lspconfig.nvim',
-        version = '*',
         lazy = true,
         config = function()
             require('mason-lspconfig').setup({
@@ -957,11 +935,12 @@ require('lazy').setup({
 
     {
         'neovim/nvim-lspconfig',
-        version = '*',
         lazy = true,
         dependencies = {
             {
-                -- Provides a list of lsp capibilities to that cmp adds to neovim
+                -- neodev must load before lspconfig to load in the lua_ls LSP settings
+                'folke/neodev.nvim',
+                -- cmp-nvim-lsp provides a list of lsp capibilities to that cmp adds to neovim
                 -- I must have cmp-nvim-lsp load before nvim-lspconfig for
                 -- lua snips to show up in cmp
                 'hrsh7th/cmp-nvim-lsp',
@@ -1015,7 +994,6 @@ require('lazy').setup({
     -- Autocompletion
     {
         'hrsh7th/nvim-cmp',
-        version = '*',
         lazy = true,
         event = 'InsertEnter',
         dependencies = {
@@ -1154,7 +1132,6 @@ require('lazy').setup({
     -- Snippets
     {
         'L3MON4D3/LuaSnip',
-        version = '*',
         lazy = true,
         dependencies = {
             'rafamadriz/friendly-snippets',
@@ -1199,7 +1176,6 @@ require('lazy').setup({
     -- - Select a virtual environment with `:VenvSelect`
     {
         'linux-cultist/venv-selector.nvim',
-        version = '*',
         lazy = true,
         ft = 'python',
         dependencies = {
