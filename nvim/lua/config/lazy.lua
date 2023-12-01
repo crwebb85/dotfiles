@@ -18,6 +18,7 @@ require('lazy').setup({
     -- Git integration
     {
         'tpope/vim-fugitive',
+        version = '*',
         lazy = true,
         event = 'VeryLazy',
     },
