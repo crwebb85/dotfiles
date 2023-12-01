@@ -925,9 +925,12 @@ require('lazy').setup({
 
                 'ansible-language-server',
                 'ansible-lint',
+
+                'rust-analyzer',
             },
         },
     },
+
     {
         'williamboman/mason.nvim',
         lazy = true,
