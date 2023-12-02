@@ -1224,6 +1224,8 @@ require('lazy').setup({
                 typescript = { 'prettier' },
                 javascript = { 'prettier' },
                 yaml = { 'prettier' },
+                ansible = { 'prettier' },
+                ['yaml.ansible'] = { 'prettier' },
                 -- "inject" is a "special" formatter from conform.nvim, which
                 -- formats treesitter-injected code. In effect, hits will make
                 -- conform.nvim format any python codeblocks inside a markdown file.
