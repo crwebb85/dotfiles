@@ -763,7 +763,7 @@ require('lazy').setup({
             {
                 '<leader>dj',
                 function() require('dap').down() end,
-                desc = 'Down',
+                desc = 'Debug: Down',
             },
             {
                 '<leader>dk',
