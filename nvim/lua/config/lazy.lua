@@ -1225,6 +1225,8 @@ require('lazy').setup({
                 javascript = { 'prettier' },
                 yaml = { 'prettier' },
                 ansible = { 'prettier' },
+                --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
+                -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
                 ['yaml.ansible'] = { 'prettier' },
                 -- "inject" is a "special" formatter from conform.nvim, which
                 -- formats treesitter-injected code. In effect, hits will make

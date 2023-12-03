@@ -30,6 +30,8 @@
 - `:vimgrep "\%^" **/*.md` add all files with md extension to quick fix list (`\%^` is the regex for the first line of a file)
 - `:Git Difftool` adds all git changes to the quick fix list
 
+-`gv` re-select last selection
+
 You can pass arbitrary data to a User autocmd callback by doing
 ```lua
 vim.api.nvim_exec_autocmds('User', {
