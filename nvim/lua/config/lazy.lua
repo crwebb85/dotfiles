@@ -569,6 +569,45 @@ require('lazy').setup({
             },
         },
     },
+    {
+        'stevearc/stickybuf.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        config = function()
+            require('stickybuf').setup({
+                -- This function is run on BufEnter to determine pinning should be activated
+                get_auto_pin = function(bufnr)
+                    --[[
+                    TODO play around with either this libray or create my own autocmds
+                    to handle auto closing popup windows figure out how to handle diffview
+                    --]]
+                    -- local buftype = vim.bo[bufnr].buftype
+                    -- local filetype = vim.bo[bufnr].filetype
+                    -- local bufname = vim.api.nvim_buf_get_name(bufnr)
+                    -- if vim.startswith(bufname, 'diffview:') then
+                    --     return bufnr
+                    -- end
+                    -- if buftype == 'nofile' then
+                    --     local filetypes_of_buffers_to_close_set =
+                    --         require('config.utils').set({
+                    --             'lazy',
+                    --             'mason',
+                    --             'lspinfo',
+                    --         })
+                    --     if
+                    --         filetypes_of_buffers_to_close_set[filetype] ~= nil
+                    --     then
+                    --         return filetype
+                    --     end
+                    -- end
+                    -- You can return "bufnr", "buftype", "filetype", or a custom function to set how the window will be pinned.
+                    -- You can instead return an table that will be passed in as "opts" to `stickybuf.pin`.
+                    -- The function below encompasses the default logic. Inspect the source to see what it does.
+                    return require('stickybuf').should_auto_pin(bufnr)
+                end,
+            })
+        end,
+    },
 
     ---------------------------------------------------------------------------
     -- Clipboard support (copy from vim to the outside world)

@@ -34,6 +34,7 @@
   "ollama.nvim": { "branch": "main", "commit": "6ae7f78ea08a3eb38972617f994bd846352eda9c" },
   "plenary.nvim": { "branch": "master", "commit": "55d9fe89e33efd26f532ef20223e5f9430c8b0c0" },
   "refactoring.nvim": { "branch": "master", "commit": "156532476deb10b1b2a32cb38e1078b3f9951c42" },
+  "stickybuf.nvim": { "branch": "master", "commit": "4271bfc6c85dc035eb9e8484954f9179d90e87ab" },
   "telescope-luasnip.nvim": { "branch": "master", "commit": "2ef7da3a363890686dbaad18ddbf59177cfe4f78" },
   "telescope.nvim": { "branch": "master", "commit": "84c5a71d825b6687a55aed6f41e98b92fd8e5454" },
   "toggleterm.nvim": { "branch": "main", "commit": "6b334b9d1266b0f58ab1b6965c1e5b7eb5c34523" },

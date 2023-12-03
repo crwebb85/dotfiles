@@ -4,6 +4,15 @@ function M.trim(s)
     return s:match('^()%s*$') and '' or s:match('^%s*(.*%S)')
 end
 
+--From https://www.lua.org/pil/11.5.html
+function M.set(list)
+    local set = {}
+    for _, l in ipairs(list) do
+        set[l] = true
+    end
+    return set
+end
+
 function M.getBufferViewPath(viewNumber)
     local path = vim.fn.fnamemodify(vim.fn.bufname('%'), ':p')
     if path == nil then error('path to buffer is unexpectedly nil') end

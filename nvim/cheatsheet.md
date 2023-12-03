@@ -30,7 +30,7 @@
 - `:vimgrep "\%^" **/*.md` add all files with md extension to quick fix list (`\%^` is the regex for the first line of a file)
 - `:Git Difftool` adds all git changes to the quick fix list
 
--`gv` re-select last selection
+- `gv` re-select last selection
 
 You can pass arbitrary data to a User autocmd callback by doing
 ```lua
@@ -51,3 +51,13 @@ vim.api.nvim_create_autocmd('User', {
 - `o` create new line below current line and go to it
 - `O` create new line above current line and go to it
 
+- `:nmap` to see normal mode mappings
+- `:vmap` to see visual mode mappings
+- `:imap` to see insert mode mappings
+- `:Man make` open the man page for program for this example it would be for `make`
+
+- `help various-motions` - list useful movement motions
+
+### Split line
+- `r<CR>` split line (will delete character cursor is on)
+- `s<CR>` split line and will preserve indentation (will delete character cursor is on)
