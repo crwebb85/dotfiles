@@ -73,13 +73,42 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
     -- if you only want these mappings for toggle term use term://*toggleterm#* instead
     pattern = 'term://*',
     callback = function()
-        local opts = { buffer = 0 }
-        vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
-        vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], opts)
-        vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
-        vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
-        vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
-        vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
+        vim.keymap.set(
+            't',
+            '<esc>',
+            [[<C-\><C-n>]],
+            { buffer = 0, desc = 'Terminal: Esc to terminal normal mode' }
+        )
+        vim.keymap.set(
+            't',
+            '<C-h>',
+            [[<Cmd>wincmd h<CR>]],
+            { buffer = 0, desc = 'Terminal: Move to left window' }
+        )
+        vim.keymap.set(
+            't',
+            '<C-j>',
+            [[<Cmd>wincmd j<CR>]],
+            { buffer = 0, desc = 'Terminal: Move to lower window' }
+        )
+        vim.keymap.set(
+            't',
+            '<C-k>',
+            [[<Cmd>wincmd k<CR>]],
+            { buffer = 0, desc = 'Terminal: Move to upper window' }
+        )
+        vim.keymap.set(
+            't',
+            '<C-l>',
+            [[<Cmd>wincmd l<CR>]],
+            { buffer = 0, desc = 'Terminal: Move to right window' }
+        )
+        vim.keymap.set(
+            't',
+            '<C-w>',
+            [[<C-\><C-n><C-w>]],
+            { buffer = 0, desc = 'Terminal: Trigger Window keymaps' }
+        )
     end,
 })
 
@@ -137,7 +166,7 @@ vim.api.nvim_create_autocmd('FileType', {
             'n',
             'q',
             '<cmd>close<CR>',
-            { buffer = event.buf, silent = true }
+            { buffer = event.buf, silent = true, desc = 'Custom: Close window' }
         )
         vim.cmd([[
       setlocal colorcolumn=0
@@ -149,7 +178,14 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Close man pages with <q>
 vim.api.nvim_create_autocmd('FileType', {
     pattern = 'man',
-    command = [[nnoremap <buffer><silent> q :quit<CR>]],
+    callback = function()
+        vim.keymap.set(
+            'n',
+            'q',
+            ':quit<CR>',
+            { buffer = 0, silent = true, desc = 'Custom: Close window' }
+        )
+    end,
 })
 
 -- Pressing enter on item in quickfix list will take me to that file and line
@@ -158,12 +194,11 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.api.nvim_create_autocmd('FileType', {
     pattern = 'qf',
     callback = function(event)
-        vim.keymap.set(
-            'n',
-            '<CR>',
-            '<CR>',
-            { buffer = event.buf, silent = true }
-        )
+        vim.keymap.set('n', '<CR>', '<CR>', {
+            buffer = event.buf,
+            silent = true,
+            desc = 'Custom - Quick Fix List: Go to quickfix item under cursor',
+        })
     end,
 })
 

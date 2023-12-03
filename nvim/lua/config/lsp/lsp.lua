@@ -96,121 +96,30 @@ vim.api.nvim_create_user_command('LspViewConfigSource', inspect_config_source, {
 ---
 
 local function default_keymaps(bufnr)
-    vim.keymap.set(
-        'n',
-        'K',
-        function() vim.lsp.buf.hover() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        'gd',
-        function() vim.lsp.buf.definition() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        'gD',
-        function() vim.lsp.buf.declaration() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        'gi',
-        function() vim.lsp.buf.implementation() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        'go',
-        function() vim.lsp.buf.type_definition() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        'gr',
-        function() vim.lsp.buf.references() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        'gs',
-        function() vim.lsp.buf.signature_help() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        '<F2>',
-        function() vim.lsp.buf.rename() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        '<F3>',
-        function() vim.lsp.buf.format({ async = true }) end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'x',
-        '<F3>',
-        function() vim.lsp.buf.format({ async = true }) end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        '<F4>',
-        function() vim.lsp.buf.code_action() end,
-        { buffer = bufnr }
-    )
-
-    if vim.lsp.buf.range_code_action then
-        vim.keymap.set(
-            'x',
-            '<F4>',
-            function() vim.lsp.buf.range_code_action() end,
-            { buffer = bufnr }
-        )
-    else
-        vim.keymap.set(
-            'x',
-            '<F4>',
-            function() vim.lsp.buf.code_action() end,
-            { buffer = bufnr }
-        )
-    end
-
-    vim.keymap.set(
-        'n',
-        'gl',
-        function() vim.diagnostic.open_float() end,
-        { buffer = bufnr }
-    )
-    vim.keymap.set(
-        'n',
-        '[d',
-        require('config.utils').dot_repeat(
-            function() vim.diagnostic.goto_prev() end
-        ),
-        { buffer = bufnr, expr = true }
-    )
-    vim.keymap.set(
-        'n',
-        ']d',
-        require('config.utils').dot_repeat(
-            function() vim.diagnostic.goto_next() end
-        ),
-        { buffer = bufnr, expr = true }
-    )
-    vim.keymap.set(
-        'n',
-        '<leader>vca',
-        function() vim.lsp.buf.code_action() end,
-        {
-            buffer = bufnr,
-            remap = false,
-            desc = 'LSP: Open Code Action menu',
-        }
-    )
+    vim.keymap.set('n', 'K', function() vim.lsp.buf.hover() end, {
+        buffer = bufnr,
+        desc = [[LSP: Displays hover information about the symbol under the cursor in a floating window. Calling the function twice will jump into the floating window.]],
+    })
+    vim.keymap.set('n', 'gd', function() vim.lsp.buf.definition() end, {
+        buffer = bufnr,
+        desc = 'LSP: Jumps to the definition of the symbol under the cursor.',
+    })
+    vim.keymap.set('n', 'gD', function() vim.lsp.buf.declaration() end, {
+        buffer = bufnr,
+        desc = 'LSP: Jumps to the declaration of the symbol under the cursor.',
+    })
+    vim.keymap.set('n', 'gi', function() vim.lsp.buf.implementation() end, {
+        buffer = bufnr,
+        desc = 'Lists all the implementations for the symbol under the cursor in the quickfix window.',
+    })
+    vim.keymap.set('n', 'go', function() vim.lsp.buf.type_definition() end, {
+        buffer = bufnr,
+        desc = 'LSP: Jumps to the definition of the type of the symbol under the cursor.',
+    })
+    vim.keymap.set('n', 'gr', function() vim.lsp.buf.references() end, {
+        buffer = bufnr,
+        desc = 'LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
+    })
     vim.keymap.set(
         'n',
         '<leader>vrr',
@@ -218,20 +127,88 @@ local function default_keymaps(bufnr)
         {
             buffer = bufnr,
             remap = false,
-            desc = 'LSP: Find references',
+            desc = 'LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
         }
     )
+    vim.keymap.set('n', 'gs', function() vim.lsp.buf.signature_help() end, {
+        buffer = bufnr,
+        desc = 'LSP: Displays signature information about the symbol under the cursor in a floating window.',
+    })
+    vim.keymap.set('n', '<F2>', function() vim.lsp.buf.rename() end, {
+        buffer = bufnr,
+        desc = 'LSP: Renames all references to the symbol under the cursor.',
+    })
     vim.keymap.set('n', '<leader>vrn', function() vim.lsp.buf.rename() end, {
         buffer = bufnr,
         remap = false,
         desc = 'LSP: Rename symbol',
     })
+    vim.keymap.set('n', '<F4>', function() vim.lsp.buf.code_action() end, {
+        buffer = bufnr,
+        desc = 'LSP: Selects a code action available at the current cursor position.',
+    })
+
+    if vim.lsp.buf.range_code_action then
+        vim.keymap.set(
+            'x',
+            '<F4>',
+            function() vim.lsp.buf.range_code_action() end,
+            {
+                buffer = bufnr,
+                desc = 'LSP: Selects a code action available for the current range selection.',
+            }
+        )
+    else
+        vim.keymap.set('x', '<F4>', function() vim.lsp.buf.code_action() end, {
+            buffer = bufnr,
+            desc = 'LSP: Selects a code action available at the current cursor position.',
+        })
+    end
+
+    vim.keymap.set(
+        'n',
+        '<leader>vca',
+        function() vim.lsp.buf.code_action() end,
+        {
+            buffer = bufnr,
+            remap = false,
+            desc = 'LSP: Selects a code action available at the current cursor position.',
+        }
+    )
+    vim.keymap.set('n', 'gl', function() vim.diagnostic.open_float() end, {
+        buffer = bufnr,
+        desc = 'LSP Diagnostic: Show diagnostics in a floating window.',
+    })
+    vim.keymap.set(
+        'n',
+        '[d',
+        require('config.utils').dot_repeat(
+            function() vim.diagnostic.goto_prev() end
+        ),
+        {
+            buffer = bufnr,
+            expr = true,
+            desc = 'LSP Diagnostic: Move to the previous diagnostic in the current buffer. (Dot repeatable)',
+        }
+    )
+    vim.keymap.set(
+        'n',
+        ']d',
+        require('config.utils').dot_repeat(
+            function() vim.diagnostic.goto_next() end
+        ),
+        {
+            buffer = bufnr,
+            expr = true,
+            desc = 'LSP Diagnostic: Move to the next diagnostic. (Dot repeatable)',
+        }
+    )
     -- Toggle Inlay Hints
     vim.keymap.set(
         'n',
         '<leader>vth',
         function() M.toggleInlayHintsAutocmd() end,
-        { desc = 'Toggle Inlay Hints' }
+        { desc = 'LSP: Toggle Inlay Hints' }
     )
 end
 

@@ -28,53 +28,36 @@ require('lazy').setup({
         lazy = true,
         config = function()
             local actions = require('diffview.actions')
+            local diffview_keymaps = {
+                {
+                    'n',
+                    '<leader>ggo',
+                    actions.goto_file_tab,
+                    {
+                        desc = 'Diffview: Open the file in a new tabpage',
+                    },
+                },
+                {
+                    'n',
+                    'q',
+                    '<cmd>DiffviewClose<CR>',
+                    { silent = true },
+                },
+                {
+                    'n',
+                    '<leader>gc',
+                    ':tab Git commit<CR>',
+                    {
+                        desc = 'Diffview: Open commit message with Vim Fugitive',
+                    },
+                },
+            }
+
             require('diffview').setup({
                 keymaps = {
-                    view = {
-                        {
-                            'n',
-                            '<leader>ggo',
-                            actions.goto_file_tab,
-                            { desc = 'Open the file in a new tabpage' },
-                        },
-                        {
-                            'n',
-                            'q',
-                            '<cmd>DiffviewClose<CR>',
-                            { silent = true },
-                        },
-                        { 'n', '<leader>gc', ':tab Git commit<CR>' },
-                    },
-                    file_panel = {
-                        {
-                            'n',
-                            '<leader>ggo',
-                            actions.goto_file_tab,
-                            { desc = 'Open the file in a new tabpage' },
-                        },
-                        {
-                            'n',
-                            'q',
-                            '<cmd>DiffviewClose<CR>',
-                            { silent = true },
-                        },
-                        { 'n', '<leader>gc', ':tab Git commit<CR>' },
-                    },
-                    file_history_panel = {
-                        {
-                            'n',
-                            '<leader>ggo',
-                            actions.goto_file_tab,
-                            { desc = 'Open the file in a new tabpage' },
-                        },
-                        {
-                            'n',
-                            'q',
-                            '<cmd>DiffviewClose<CR>',
-                            { silent = true },
-                        },
-                        { 'n', '<leader>gc', ':tab Git commit<CR>' },
-                    },
+                    view = diffview_keymaps,
+                    file_panel = diffview_keymaps,
+                    file_history_panel = diffview_keymaps,
                 },
             })
         end,
@@ -88,31 +71,31 @@ require('lazy').setup({
                         require('diffview').close()
                     end
                 end,
-                desc = 'Toggle Git DiffView',
+                desc = 'Diffview: Toggle',
             },
             {
                 '<leader>gh',
                 '<cmd>DiffviewFileHistory<cr>',
-                { desc = 'Open Git Repo history' },
+                desc = 'Diffview: Open Git Repo history',
             },
 
             {
                 '<leader>ghf',
                 '<cmd>DiffviewFileHistory --follow %<cr>',
-                { desc = 'Open Git File history' },
+                desc = 'Diffview: Open Git File history',
             },
 
             {
                 '<leader>ghl',
                 "<Esc><Cmd>'<,'>DiffviewFileHistory --follow<CR>",
                 mode = 'v',
-                { desc = 'Open Git File history over selected text' },
+                desc = 'Diffview: Open Git File history over selected text',
             },
 
             {
                 '<leader>ghl',
                 '<Cmd>.DiffviewFileHistory --follow<CR>',
-                { desc = 'Open Git history for the line' },
+                desc = 'Diffview: Open Git history for the line',
             },
 
             -- Diff against local master branch
@@ -124,7 +107,7 @@ require('lazy').setup({
                             .. require('config.utils').get_default_branch_name()
                     )
                 end,
-                { desc = 'Diff against master' },
+                desc = 'Diffview: Diff against master',
             },
 
             -- Diff against remote master branch
@@ -136,7 +119,7 @@ require('lazy').setup({
                             .. require('config.utils').get_default_branch_name()
                     )
                 end,
-                { desc = 'Diff against origin/master' },
+                desc = 'Diffview: Diff against origin/master',
             },
         },
     },
@@ -154,26 +137,26 @@ require('lazy').setup({
             {
                 '<leader>gvw',
                 function() require('gitsigns').toggle_word_diff() end,
-                { desc = 'Gitsigns: Toggle word diff' },
+                desc = 'Gitsigns: Toggle word diff',
             },
 
             -- Highlight added lines.
             {
                 '<leader>gvl',
                 function() require('gitsigns').toggle_linehl() end,
-                { desc = 'Gitsigns: Toggle line highlight' },
+                desc = 'Gitsigns: Toggle line highlight',
             },
 
             -- Highlight removed lines.
             {
                 '<leader>gvd',
                 function() require('gitsigns').toggle_deleted() end,
-                { desc = 'Gitsigns: Toggle deleted (all)' },
+                desc = 'Gitsigns: Toggle deleted (all)',
             },
             {
                 '<leader>gvh',
                 function() require('gitsigns').preview_hunk() end,
-                { desc = 'Gitsigns: Preview hunk' },
+                desc = 'Gitsigns: Preview hunk',
             },
             {
                 ']h',
@@ -276,12 +259,12 @@ require('lazy').setup({
             {
                 '<leader>a',
                 function() require('harpoon.mark').add_file() end,
-                desc = 'Add file to harpoon',
+                desc = 'Harpoon: Add file',
             },
             {
                 '<C-e>',
                 function() require('harpoon.ui').toggle_quick_menu() end,
-                desc = 'Toggle harpoon quick menu',
+                desc = 'Harpoon: Toggle quick menu',
             },
             -- Protip: To reorder the entries in harpoon quick menu use `Vd` to cut the line and `P` to paste where you want it
 
@@ -289,52 +272,52 @@ require('lazy').setup({
             {
                 '<leader>1',
                 function() require('harpoon.ui').nav_file(1) end,
-                desc = 'Go to harpoon file 1',
+                desc = 'Harpoon: Go to file 1',
             },
             {
                 '<leader>2',
                 function() require('harpoon.ui').nav_file(2) end,
-                desc = 'Go to harpoon file 2',
+                desc = 'Harpoon: Go to file 2',
             },
             {
                 '<leader>3',
                 function() require('harpoon.ui').nav_file(3) end,
-                desc = 'Go to harpoon file 3',
+                desc = 'Harpoon: Go to file 3',
             },
             {
                 '<leader>4',
                 function() require('harpoon.ui').nav_file(4) end,
-                desc = 'Go to harpoon file 4',
+                desc = 'Harpoon: Go to file 4',
             },
             {
                 '<leader>5',
                 function() require('harpoon.ui').nav_file(5) end,
-                desc = 'Go to harpoon file 5',
+                desc = 'Harpoon: Go to file 5',
             },
             {
                 '<leader>6',
                 function() require('harpoon.ui').nav_file(6) end,
-                desc = 'Go to harpoon file 6',
+                desc = 'Harpoon: Go to file 6',
             },
             {
                 '<leader>7',
                 function() require('harpoon.ui').nav_file(7) end,
-                desc = 'Go to harpoon file 7',
+                desc = 'Harpoon: Go to file 7',
             },
             {
                 '<leader>8',
                 function() require('harpoon.ui').nav_file(8) end,
-                desc = 'Go to harpoon file 8',
+                desc = 'Harpoon: Go to file 8',
             },
             {
                 '<leader>9',
                 function() require('harpoon.ui').nav_file(9) end,
-                desc = 'Go to harpoon file 9',
+                desc = 'Harpoon: Go to file 9',
             },
             {
                 '<leader>0',
                 function() require('harpoon.ui').nav_file(0) end,
-                desc = 'Go to harpoon file 10',
+                desc = 'Harpoon: Go to file 0',
             },
         },
     },
@@ -483,13 +466,13 @@ require('lazy').setup({
             {
                 '<leader>tt',
                 '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-                desc = 'Toggle ToggleTerm',
+                desc = 'Toggleterm: Toggle',
             },
             {
 
                 [[<C-\>]],
                 '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-                desc = 'Toggle ToggleTerm',
+                desc = 'ToggleTerm: Toggle',
                 mode = { 'n', 'i' },
             },
         },
@@ -581,7 +564,7 @@ require('lazy').setup({
             {
                 '<leader>oo',
                 ":<c-u>lua require('ollama').prompt()<cr>",
-                desc = 'ollama prompt',
+                desc = 'Ollama: Open prompt',
                 mode = { 'n', 'v' },
             },
         },
@@ -614,7 +597,7 @@ require('lazy').setup({
             {
                 '<leader>u',
                 vim.cmd.UndotreeToggle,
-                desc = 'Toggle Undotree pluggin',
+                desc = 'Undotree: Toggle Undotree',
             },
         },
     },
@@ -689,13 +672,13 @@ require('lazy').setup({
     {
         'Vigemus/iron.nvim',
         keys = {
-            { '<leader>i', vim.cmd.IronRepl, desc = '󱠤 Toggle REPL' },
-            { '<leader>I', vim.cmd.IronRestart, desc = '󱠤 Restart REPL' },
+            { '<leader>i', vim.cmd.IronRepl, desc = 'Iron: Toggle REPL' },
+            { '<leader>I', vim.cmd.IronRestart, desc = 'Iron: Restart REPL' },
 
             -- these keymaps need no right-hand-side, since that is defined by the
             -- plugin config further below
-            { '+', mode = { 'n', 'x' }, desc = '󱠤 Send-to-REPL Operator' },
-            { '++', desc = '󱠤 Send Line to REPL' },
+            { '+', mode = { 'n', 'x' }, desc = 'Iron: Send-to-REPL Operator' },
+            { '++', desc = 'Iron: Send Line to REPL' },
         },
 
         -- since irons's setup call is `require("iron.core").setup`, instead of
@@ -836,7 +819,7 @@ require('lazy').setup({
             {
                 '<leader>du',
                 function() require('dapui').toggle() end,
-                desc = 'Debug: Toggle Debugger UI',
+                desc = 'Debug: Toggle debugger UI',
             },
         },
         -- automatically open/close the DAP UI when starting/stopping the debugger
@@ -1216,6 +1199,13 @@ require('lazy').setup({
     {
         'stevearc/conform.nvim',
         event = 'BufWritePre', -- load the plugin before saving
+        keys = {
+            {
+                '<leader>f',
+                function() require('conform').format({ lsp_fallback = true }) end,
+                desc = 'Conform: Format buffer',
+            },
+        },
         opts = {
             formatters_by_ft = {
                 lua = { 'stylua' },
