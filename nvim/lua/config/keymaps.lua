@@ -177,3 +177,11 @@ vim.keymap.set(
     '<esc><cmd>CompareClipboardSelection<cr>',
     { desc = 'Compare Clipboard Selection' }
 )
+
+-- Reverse letters https://vim.fandom.com/wiki/Reverse_letters
+vim.keymap.set(
+    'v',
+    '<leader>ir',
+    [[c<C-O>:set ri<CR><C-R>"<Esc>:set nori<CR>]],
+    { desc = 'Reverse text selection' }
+)
