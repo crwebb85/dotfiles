@@ -175,6 +175,36 @@ local function default_keymaps(bufnr)
             desc = 'LSP: Selects a code action available at the current cursor position.',
         }
     )
+
+    if vim.lsp.buf.range_code_action then
+        vim.keymap.set(
+            'x',
+            '<leader>vca',
+            function() vim.lsp.buf.range_code_action() end,
+            {
+                buffer = bufnr,
+                desc = 'LSP: Selects a code action available for the current range selection.',
+            }
+        )
+    else
+        vim.keymap.set(
+            'x',
+            '<leader>vca',
+            function() vim.lsp.buf.code_action() end,
+            {
+                buffer = bufnr,
+                desc = 'LSP: Selects a code action available at the current cursor position.',
+            }
+        )
+    end
+
+    vim.keymap.set(
+        { 'v', 'n' },
+        'gf',
+        require('actions-preview').code_actions,
+        { desc = 'LSP - Actions Preview: Code action preview menu' }
+    )
+
     vim.keymap.set('n', 'gl', function() vim.diagnostic.open_float() end, {
         buffer = bufnr,
         desc = 'LSP Diagnostic: Show diagnostics in a floating window.',

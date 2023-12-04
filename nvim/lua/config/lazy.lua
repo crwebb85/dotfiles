@@ -456,7 +456,7 @@ require('lazy').setup({
             },
         },
     },
-    -- Open terminal within neovi
+    -- Open terminal within neovim
     {
         'akinsho/toggleterm.nvim',
         lazy = true,
@@ -1273,6 +1273,13 @@ require('lazy').setup({
                 return { timeout_ms = 500, lsp_fallback = true }
             end,
         },
+    },
+
+    -- Code Action preview
+    {
+        'aznhe21/actions-preview.nvim',
+        lazy = true,
+        config = true,
     },
 
     ---------------------------------------------------------------------------
