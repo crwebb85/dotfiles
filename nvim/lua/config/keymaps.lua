@@ -92,25 +92,25 @@ vim.keymap.set(
 -- Quick fix navigation
 vim.keymap.set(
     'n',
-    '<C-k>',
+    '<C-j>',
     '<cmd>cnext<CR>zz',
     { desc = 'Custom - Quick Fix List: cnext quick fix navigation' }
 )
 vim.keymap.set(
     'n',
-    '<C-j>',
+    '<C-k>',
     '<cmd>cprev<CR>zz',
     { desc = 'Custom - Quick Fix List: cprev quick fix navigation' }
 )
 vim.keymap.set(
     'n',
-    '<leader>k',
+    '<leader>j',
     '<cmd>lnext<CR>zz',
     { desc = 'Custom - Location List: lnext location list navigation' }
 )
 vim.keymap.set(
     'n',
-    '<leader>j',
+    '<leader>k',
     '<cmd>lprev<CR>zz',
     { desc = 'Custom - Location List: lprev location list navigation' }
 )
@@ -135,7 +135,7 @@ vim.keymap.set(
 -- Compare buffer to clipboard
 vim.keymap.set(
     'n',
-    '<leader>vc',
+    '<leader>vcc',
     '<cmd>CompareClipboard<cr>',
     { desc = 'Custom: Compare Clipboard', silent = true }
 )
@@ -143,7 +143,7 @@ vim.keymap.set(
 -- Compare Clipboard to selected text
 vim.keymap.set(
     'v',
-    '<leader>vc',
+    '<leader>vcc',
     '<esc><cmd>CompareClipboardSelection<cr>',
     { desc = 'Custom: Compare Clipboard Selection' }
 )
