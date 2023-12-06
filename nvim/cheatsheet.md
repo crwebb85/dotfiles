@@ -61,3 +61,9 @@ vim.api.nvim_create_autocmd('User', {
 ### Split line
 - `r<CR>` split line (will delete character cursor is on)
 - `s<CR>` split line and will preserve indentation (will delete character cursor is on)
+
+### Other
+```
+:lua = vim.lsp.handlers
+:ScratchTab | :put =execute(':lua =vim.lsp.get_clients()[1].server_capabilities')
+```

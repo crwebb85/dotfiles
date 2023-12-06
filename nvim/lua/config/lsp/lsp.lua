@@ -80,7 +80,9 @@ local function config_source_complete(user_input)
 
     for _, i in ipairs(list) do
         local name = vim.fn.fnamemodify(i, ':t:r')
-        if vim.startswith(name, user_input) then res[#res + 1] = name end
+        if name ~= nil and vim.startswith(name, user_input) then
+            res[#res + 1] = name
+        end
     end
 
     return res
@@ -238,17 +240,69 @@ local function default_keymaps(bufnr)
         'n',
         '<leader>vth',
         function() M.toggleInlayHintsAutocmd() end,
-        { desc = 'LSP: Toggle Inlay Hints' }
+        { desc = 'LSP: Toggle Inlay Hints', buffer = bufnr }
+    )
+
+    -- Toggle Codelens
+    vim.keymap.set(
+        'n',
+        '<leader>vtc',
+        function() require('config.lsp.codelens').toggle_virtlines() end,
+        { desc = 'LSP: Toggle Codelens', buffer = bufnr }
+    )
+
+    -- Toggle Codelens
+    vim.keymap.set(
+        'n',
+        '<leader>lr',
+        function() require('config.lsp.codelens').run() end,
+        { desc = 'LSP: Run Codelens', buffer = bufnr }
     )
 end
 
+local augroup_codelens =
+    vim.api.nvim_create_augroup('custom-lsp-codelens', { clear = true })
+
+--- @class lsp_attach_event_data
+--- @field client_id? integer
+
+--- @class lsp_attach_event
+--- @field buf? integer
+--- @field data? lsp_attach_event_data
+--- @field event? string
+--- @field match? string
+--- @field id? integer
+--- @field group? integer
+--- @field file? string
+
+-- Example of what event fields are present
+-- {
+--   buf = 4,
+--   data = {
+--     client_id = 1
+--   },
+--   event = "LspAttach",
+--   file = "/home/chris/.config/nvim/lua/config/lazy.lua",
+--   group = 42,
+--   id = 52,
+--   match = "/home/chris/.config/nvim/lua/config/lazy.lua"
+-- }
+--- @param event lsp_attach_event
 local function lsp_attach(event)
+    -- vim.print(event)
     vim.api.nvim_buf_create_user_command(
         event.buf,
         'LspWorkspaceRemove',
         'lua vim.lsp.buf.remove_workspace_folder()',
         {}
     )
+
+    vim.api.nvim_clear_autocmds({ group = augroup_codelens, buffer = event.buf })
+    vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'CursorHold' }, {
+        group = augroup_codelens,
+        callback = require('config.lsp.codelens').refresh_virtlines,
+        buffer = event.buf,
+    })
 
     default_keymaps(event.buf)
 end
