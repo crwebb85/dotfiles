@@ -339,6 +339,11 @@ require('lazy').setup({
     ---------------------------------------------------------------------------
     -- Utils
 
+    {
+        'nvim-lua/plenary.nvim', -- a util library
+        lazy = true,
+    },
+
     -- Autopair brackets and quotes
     {
         'echasnovski/mini.pairs',
@@ -762,12 +767,47 @@ require('lazy').setup({
     -- DEBUGGING
 
     -- DAP Client for nvim
-    -- - start the debugger with `<leader>dc`
-    -- - add breakpoints with `<leader>db`
-    -- - terminate the debugger `<leader>dt`
     {
         'mfussenegger/nvim-dap',
         lazy = true,
+        config = function(_, _)
+            local dap = require('dap')
+            dap.adapters.codelldb = {
+                type = 'server',
+                port = '${port}',
+                executable = {
+                    -- CHANGE THIS to your path!
+                    command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
+                    args = { '--port', '${port}' },
+
+                    -- On windows you may have to uncomment this:
+                    -- detached = false,
+                },
+            }
+            dap.adapters.executable = {
+                type = 'executable',
+                command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
+                name = 'lldb1',
+                host = '127.0.0.1',
+                port = 13000,
+            }
+            dap.configurations.rust = {
+                {
+                    name = 'Launch file',
+                    type = 'codelldb',
+                    request = 'launch',
+                    program = function()
+                        return vim.fn.input(
+                            'Path to executable: ',
+                            vim.fn.getcwd() .. '/',
+                            'file'
+                        )
+                    end,
+                    cwd = '${workspaceFolder}',
+                    stopOnEntry = false,
+                },
+            }
+        end,
         keys = {
             {
                 '<leader>dc',
@@ -949,6 +989,7 @@ require('lazy').setup({
                 'ansible-lint',
 
                 'rust-analyzer',
+                'codelldb',
             },
         },
     },

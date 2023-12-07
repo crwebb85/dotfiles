@@ -290,6 +290,9 @@ local augroup_codelens =
 --- @param event lsp_attach_event
 local function lsp_attach(event)
     -- vim.print(event)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if client == nil then return end
+
     vim.api.nvim_buf_create_user_command(
         event.buf,
         'LspWorkspaceRemove',
@@ -305,6 +308,10 @@ local function lsp_attach(event)
     })
 
     default_keymaps(event.buf)
+    vim.print(client.name)
+    if client.name == 'rust_analyzer' then
+        require('config.lsp.codelens').init_rust_commands()
+    end
 end
 
 vim.api.nvim_create_autocmd('LspAttach', {

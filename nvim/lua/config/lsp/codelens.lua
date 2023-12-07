@@ -1,35 +1,137 @@
+local utils = require('config.utils')
+local latest_buf_id = nil
+
+local function get_command(args)
+    local ret = ' '
+
+    local dir = args.workspaceRoot
+
+    ret = string.format("cd '%s' && cargo ", dir)
+
+    for _, value in ipairs(args.cargoArgs) do
+        ret = ret .. value .. ' '
+    end
+
+    for _, value in ipairs(args.cargoExtraArgs) do
+        ret = ret .. value .. ' '
+    end
+
+    if not vim.tbl_isempty(args.executableArgs) then
+        ret = ret .. '-- '
+        for _, value in ipairs(args.executableArgs) do
+            ret = ret .. value .. ' '
+        end
+    end
+    return ret
+end
+
+local function create_debug_args(runnable_args)
+    local cargo_args = runnable_args.cargoArgs
+
+    if cargo_args[1] == 'run' then
+        cargo_args[1] = 'build'
+    elseif cargo_args[1] == 'test' then
+        table.insert(cargo_args, 2, '--no-run')
+    end
+
+    table.insert(cargo_args, '--message-format=json')
+
+    for _, value in ipairs(runnable_args.cargoExtraArgs) do
+        table.insert(cargo_args, value)
+    end
+    local exec_args = {}
+    if not vim.tbl_isempty(runnable_args.executableArgs) then
+        table.insert(exec_args, '--')
+        table.insert(cargo_args, '--')
+        for _, value in ipairs(runnable_args.executableArgs) do
+            table.insert(exec_args, value)
+            table.insert(cargo_args, value)
+        end
+    end
+    return cargo_args, exec_args
+end
+
+local function run_command(args)
+    -- check if a buffer with the latest id is already open, if it is then
+    -- delete it and continue
+    utils.delete_buf(latest_buf_id)
+
+    -- create the new buffer
+    latest_buf_id = vim.api.nvim_create_buf(false, true)
+
+    -- split the window to create a new buffer and set it to our window
+    utils.split(latest_buf_id)
+
+    utils.resize('-5')
+
+    local command = get_command(args)
+
+    -- run the command
+    vim.fn.termopen(command)
+
+    -- when the buffer is closed, set the latest buf id to nil else there are
+    -- some edge cases with the id being sit but a buffer not being open
+    local function onDetach(_, _) latest_buf_id = nil end
+    vim.api.nvim_buf_attach(latest_buf_id, false, { on_detach = onDetach })
+end
+
+local function run_debug(executable, exec_args, rust_debug_adapter, cwd)
+    local launch = {
+        name = 'Rust debug',
+        type = rust_debug_adapter,
+        request = 'launch',
+        program = executable,
+        sourceLanguages = { 'rust' },
+        args = exec_args,
+        cwd = cwd,
+        stopOnEntry = false,
+    }
+    require('dap').run(launch)
+end
+
+local function debug_command(args, rust_debug_adapter)
+    rust_debug_adapter = 'codelldb' -- TODO change if I use a different debug adapter
+
+    local cargo_args, exec_args = create_debug_args(args)
+    local Job = require('plenary.job')
+    Job
+        :new({
+            command = 'cargo',
+            args = cargo_args,
+            cwd = args.workspaceRoot,
+            on_exit = function(j, code)
+                if code and code > 0 then
+                    utils.scheduled_error(
+                        'An error occured while compiling. Please fix all compilation issues and try again.'
+                    )
+                    return
+                end
+                vim.schedule(function()
+                    for _, value in pairs(j:result()) do
+                        local json = vim.fn.json_decode(value)
+                        if
+                            type(json) == 'table'
+                            and json.executable ~= vim.NIL
+                            and json.executable ~= nil
+                        then
+                            run_debug(
+                                json.executable,
+                                exec_args,
+                                rust_debug_adapter,
+                                args.workspaceRoot
+                            )
+                            break
+                        end
+                    end
+                end)
+            end,
+        })
+        :start()
+end
+
 local M = {}
 
-M.run = function()
-    vim.lsp.codelens.run()
-    -- if vim.o.modified then vim.cmd([[w]]) end
-    --
-    -- local bufnr = vim.api.nvim_get_current_buf()
-    -- local line = vim.api.nvim_win_get_cursor(0)[1]
-    --
-    -- local lenses = vim.deepcopy(vim.lsp.codelens.get(bufnr))
-    -- vim.print(lenses)
-    -- lenses = vim.tbl_filter(
-    --     function(v) return v.range.start.line < line end,
-    --     lenses
-    -- )
-    --
-    -- table.sort(
-    --     lenses,
-    --     function(a, b) return a.range.start.line < b.range.start.line end
-    -- )
-    --
-    -- local _, lens = next(lenses)
-    --
-    -- local client_id = next(vim.lsp.get_clients({ bufnr = bufnr }))
-    -- local client = vim.lsp.get_client_by_id(client_id)
-    -- if client == nil then return {} end
-    -- client.request('workspace/executeCommand', lens.command, function(...)
-    --     local result = vim.lsp.handlers['workspace/executeCommand'](...)
-    --     vim.lsp.codelens.refresh()
-    --     return result
-    -- end, bufnr)
-end
+M.run = function() vim.lsp.codelens.run() end
 
 local virtlines_enabled = true
 M.toggle_virtlines = function()
@@ -37,53 +139,16 @@ M.toggle_virtlines = function()
     M.refresh_virtlines()
 end
 
--- local colors = require('tokyonight.colors').setup()
--- vim.api.nvim_set_hl(0, 'VirtNonText', { fg = colors.dark3, italic = true })
+M.refresh_virtlines = function() vim.lsp.codelens.refresh() end
 
-M.refresh_virtlines = function()
-    vim.lsp.codelens.refresh()
-
-    -- local bufnr = vim.api.nvim_get_current_buf()
-    -- local params = { textDocument = vim.lsp.util.make_text_document_params() }
-    -- vim.lsp.buf_request(
-    --     bufnr,
-    --     'textDocument/codeLens',
-    --     params,
-    --     function(err, result, _, _)
-    --         if err or result == nil then return end
-    --
-    --         local ns = vim.api.nvim_create_namespace('custom-lsp-codelens')
-    --         vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-    --
-    --         if not virtlines_enabled then return end
-    --
-    --         for _, lens in ipairs(result) do
-    --             local title = lens.command.title
-    --             local range = lens.range
-    --             local prefix = string.rep(' ', lens.range.start.character)
-    --             local text = prefix .. title
-    --
-    --             local lines = { { { text, 'VirtNonText' } } }
-    --             if string.len(text) > 100 then
-    --                 vim.g.something = true
-    --                 lines = {}
-    --
-    --                 local split_text = vim.split(text, '->')
-    --
-    --                 for i, line in ipairs(split_text) do
-    --                     if i ~= #split_text then line = line .. ' ->' end
-    --
-    --                     table.insert(lines, { { line, 'VirtNonText' } })
-    --                 end
-    --             end
-    --
-    --             vim.api.nvim_buf_set_extmark(bufnr, ns, range.start.line, 0, {
-    --                 virt_lines_above = true,
-    --                 virt_lines = lines,
-    --             })
-    --         end
-    --     end
-    -- )
+function M.init_rust_commands()
+    -- based on https://github.com/E-ricus/lsp_codelens_extensions.nvim/tree/main
+    vim.lsp.commands['rust-analyzer.runSingle'] = function(command)
+        run_command(command.arguments[1].args)
+    end
+    vim.lsp.commands['rust-analyzer.debugSingle'] = function(command)
+        debug_command(command.arguments[1].args)
+    end
 end
 
 return M
