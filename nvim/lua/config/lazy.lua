@@ -233,6 +233,9 @@ require('lazy').setup({
         },
         config = function()
             require('telescope').setup({
+                defaults = {
+                    initial_mode = 'normal', -- Selecting a file with telescope will open it in normal mode
+                },
                 pickers = {
                     find_files = {
                         find_command = {
