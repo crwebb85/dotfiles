@@ -300,12 +300,25 @@ local function lsp_attach(event)
         {}
     )
 
-    vim.api.nvim_clear_autocmds({ group = augroup_codelens, buffer = event.buf })
-    vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'CursorHold' }, {
-        group = augroup_codelens,
-        callback = require('config.lsp.codelens').refresh_virtlines,
-        buffer = event.buf,
-    })
+    -- vim.print(client.server_capabilities)
+
+    if
+        client.server_capabilities.codeLensProvider ~= nil
+        and client.server_capabilities.codeLensProvider.resolveProvider
+    then
+        vim.api.nvim_clear_autocmds({
+            group = augroup_codelens,
+            buffer = event.buf,
+        })
+        vim.api.nvim_create_autocmd(
+            { 'BufEnter', 'BufWritePost', 'CursorHold' },
+            {
+                group = augroup_codelens,
+                callback = require('config.lsp.codelens').refresh_virtlines,
+                buffer = event.buf,
+            }
+        )
+    end
 
     default_keymaps(event.buf)
     vim.print(client.name)
