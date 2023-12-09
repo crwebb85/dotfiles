@@ -37,7 +37,24 @@ vim.api.nvim_create_autocmd(
         pattern = '?*',
         -- nested is needed by bufwrite* (if triggered via other autocmd)
         nested = true,
-        callback = require('config.utils').saveView,
+        callback = function(args)
+            if
+                vim.api.nvim_get_option_value('buftype', { buf = args.buf })
+                    ~= ''
+                --I am checking by proxy if the buffer is a not a file so there will be false positives
+                --But this saves me from setting up folding on every buffer
+                or vim.api.nvim_get_option_value(
+                        'filetype',
+                        { buf = args.buf }
+                    )
+                    == 'gitcommit'
+                -- I don't want my cursor position remembered for gitcommit buffers
+            then
+                return
+            end
+
+            require('config.utils').saveView()
+        end,
     }
 )
 
@@ -46,7 +63,22 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
     desc = 'Loads the view file for the buffer (reloads open/closed folds)',
     group = remember_folds_group,
     pattern = '?*',
-    callback = function()
+    callback = function(args)
+        -- vim.print(args)
+        -- vim.print(vim.api.nvim_get_option_value('buftype', { buf = args.buf }))
+
+        if
+            vim.api.nvim_get_option_value('buftype', { buf = args.buf })
+                ~= ''
+            --I am checking by proxy if the buffer is a not a file so there will be false false positives
+            --But this saves me from setting up folding on every buffer
+            or vim.api.nvim_get_option_value('filetype', { buf = args.buf })
+                == 'gitcommit'
+            -- I don't want my cursor position remembered for gitcommit buffers
+        then
+            return
+        end
+
         if
             not vim.api.nvim_get_option_value('diff', {})
             and vim.api.nvim_get_option_value('foldmethod', {}) == 'diff'
