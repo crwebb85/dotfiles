@@ -321,7 +321,7 @@ local function lsp_attach(event)
     end
 
     default_keymaps(event.buf)
-    vim.print(client.name)
+    -- vim.print(client.name)
     if client.name == 'rust_analyzer' then
         require('config.lsp.codelens').init_rust_commands()
     end
