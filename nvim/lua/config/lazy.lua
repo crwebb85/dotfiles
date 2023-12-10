@@ -239,6 +239,8 @@ require('lazy').setup({
                     -- which is sometimes useful but not something I want normally enabled
 
                     -- initial_mode = 'normal',
+
+                    dynamic_preview_title = true,
                 },
                 mapping = {
                     i = {
