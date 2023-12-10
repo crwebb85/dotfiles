@@ -51,6 +51,7 @@ vim.api.nvim_create_autocmd('User', {
 - `o` create new line below current line and go to it
 - `O` create new line above current line and go to it
 
+- use `verbose` in front of a command to get verbose into such as `:verbose map`
 - `:nmap` to see normal mode mappings
 - `:vmap` to see visual mode mappings
 - `:imap` to see insert mode mappings
@@ -66,4 +67,23 @@ vim.api.nvim_create_autocmd('User', {
 ```
 :lua = vim.lsp.handlers
 :ScratchTab | :put =execute(':lua =vim.lsp.get_clients()[1].server_capabilities')
+:verbose pwd
+:Git rev-parse --show-toplevel
+:lua= vim.fn.getcwd()
 ```
+useful api functions:
+
+- fnameescape()
+- nvim_list_bufs()
+- nvim_buf_is_loaded()
+- nvim_list_wins()
+- nvim_replace_termcodes()
+- nvim_select_popupmenu_item()
+- nvim_buf_is_loaded()
+- nvim_win_get_buf()
+- nvim_win_get_number()
+- nvim_get_current_win()
+- nvim_win_get_var()
+- nvim_buf_get_var()
+- https://neovim.io/doc/user/api.html#api-floatwin
+- setreg() - used to set a register
