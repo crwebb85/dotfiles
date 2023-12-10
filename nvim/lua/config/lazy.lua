@@ -236,6 +236,14 @@ require('lazy').setup({
                 defaults = {
                     initial_mode = 'normal', -- Selecting a file with telescope will open it in normal mode
                 },
+                mapping = {
+                    i = {
+                        ['<CR>'] = function()
+                            require('telescope.actions').select_default()
+                            vim.cmd('<ESC>') -- Set mode to normal mode
+                        end,
+                    },
+                },
                 pickers = {
                     find_files = {
                         find_command = {
