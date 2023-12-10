@@ -32,6 +32,15 @@ vim.api.nvim_create_user_command(
     { nargs = 0 }
 )
 
+-- Messages
+vim.api.nvim_create_user_command('MessagesTab', function()
+    vim.cmd([[
+		    " open new tab, set options to prevent save prompt when closing
+		    execute "tabnew | setlocal buftype=nofile bufhidden=hide noswapfile | :put =execute(':messages')"
+	    ]])
+    --TODO add a autocmd to auto refresh the buffer contents with new messages
+end, { nargs = 0 })
+
 -- Diff Clipboard https://www.naseraleisa.com/posts/diff#file-1
 -- TODO cleanup these user commands to not us vim.cmd
 -- Create a new scratch buffer
