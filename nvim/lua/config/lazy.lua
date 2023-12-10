@@ -985,30 +985,35 @@ require('lazy').setup({
             { 'williamboman/mason.nvim' },
             { 'williamboman/mason-lspconfig.nvim' },
         },
-        opts = {
-            ensure_installed = {
-                'pyright', -- LSP for python
-                'ruff-lsp', -- linter for python (includes flake8, pep8, etc.)
-                'debugpy', -- python debugger
-                'black', -- python formatter
-                'isort', -- python organize imports
-                'taplo', -- LSP for toml (for pyproject.toml files)
+        config = function(_, _)
+            require('mason-tool-installer').setup({
+                ensure_installed = {
+                    'pyright', -- LSP for python
+                    'ruff-lsp', -- linter for python (includes flake8, pep8, etc.)
+                    'debugpy', -- python debugger
+                    'black', -- python formatter
+                    'isort', -- python organize imports
+                    'taplo', -- LSP for toml (for pyproject.toml files)
 
-                'lua_ls',
-                'lua-language-server', -- LSP for lua files
-                'stylua', -- Formatter for lua files
+                    'lua_ls',
+                    'lua-language-server', -- LSP for lua files
+                    'stylua', -- Formatter for lua files
 
-                'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
-                'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
+                    'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
+                    'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
+                    'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
 
-                'ansible-language-server',
-                'ansible-lint',
+                    'ansible-language-server',
+                    'ansible-lint',
 
-                'rust-analyzer',
-                'codelldb',
-            },
-        },
+                    'rust-analyzer',
+                    'codelldb',
+
+                    'marksman',
+                },
+            })
+            require('mason-tool-installer').run_on_start() -- Fix Issue: https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/issues/37
+        end,
     },
 
     {
