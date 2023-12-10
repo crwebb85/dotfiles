@@ -234,7 +234,11 @@ require('lazy').setup({
         config = function()
             require('telescope').setup({
                 defaults = {
-                    initial_mode = 'normal', -- Selecting a file with telescope will open it in normal mode
+                    -- setting initial mode to 'normal'
+                    -- will allow me to have the telescope prompt in normal mode
+                    -- which is sometimes useful but not something I want normally enabled
+
+                    -- initial_mode = 'normal',
                 },
                 mapping = {
                     i = {
