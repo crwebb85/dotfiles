@@ -244,12 +244,6 @@ require('lazy').setup({
                     mappings = {
                         i = {
 
-                            -- ['q'] = function()
-                            --     require('telescope.actions').close(0)
-                            -- end,
-                            -- ['<ESC>'] = function()
-                            --     vim.cmd('<ESC>') -- Set mode to normal mode
-                            -- end,
                             ['<CR>'] = function(...)
                                 require('telescope.actions').select_default(...)
 
