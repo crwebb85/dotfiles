@@ -1107,7 +1107,7 @@ require('lazy').setup({
     {
         'hrsh7th/nvim-cmp',
         lazy = true,
-        event = 'InsertEnter',
+        event = { 'InsertEnter', 'CmdlineEnter' },
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
             { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
@@ -1128,9 +1128,9 @@ require('lazy').setup({
                     { name = 'nvim_lua' },
                     { name = 'nvim_lsp' },
                     { name = 'luasnip' },
+                    { name = 'buffer', keyword_length = 5 },
                 }, {
                     { name = 'path' },
-                    { name = 'buffer', keyword_length = 5 },
                 }),
                 snippet = {
                     expand = function(args)
@@ -1143,7 +1143,7 @@ require('lazy').setup({
                         menu = {
                             buffer = '[buf]',
                             nvim_lsp = '[LSP]',
-                            nvim_lua = '[api]',
+                            nvim_lua = '[API]',
                             path = '[path]',
                             luasnip = '[snip]',
                         },
@@ -1173,13 +1173,39 @@ require('lazy').setup({
                         end
                     end),
                     -- `Enter` key to confirm completion
-                    ['<CR>'] = cmp.mapping.confirm({
-                        select = false,
-                        behavior = cmp.ConfirmBehavior.Insert,
+                    ['<CR>'] = cmp.mapping({
+                        i = function(fallback)
+                            if cmp.visible() and cmp.get_active_entry() then
+                                cmp.confirm({
+                                    behavior = cmp.ConfirmBehavior.Insert,
+                                    select = false,
+                                })
+                            else
+                                fallback()
+                            end
+                        end,
+                        s = cmp.mapping.confirm({ select = true }),
+                        c = cmp.mapping.confirm({
+                            --Allows selecting suggestions in the command window using enter
+                            --without immediately running the command
+                            behavior = cmp.ConfirmBehavior.Insert,
+                            select = true,
+                        }),
                     }),
-                    ['<S-CR>'] = cmp.mapping.confirm({
-                        select = false,
-                        behavior = cmp.ConfirmBehavior.Replace,
+                    ['<S-CR>'] = cmp.mapping({
+                        i = function(fallback)
+                            -- when using specific terminals you may need to update
+                            -- the settings so that they pass the correct key-codes
+                            -- for shift+enter https://stackoverflow.com/a/42461580
+                            if cmp.visible() and cmp.get_active_entry() then
+                                cmp.confirm({
+                                    behavior = cmp.ConfirmBehavior.Replace,
+                                    select = false,
+                                })
+                            else
+                                fallback()
+                            end
+                        end,
                     }),
 
                     -- Ctrl+Space to trigger completion menu
