@@ -241,13 +241,28 @@ require('lazy').setup({
                     -- initial_mode = 'normal',
 
                     dynamic_preview_title = true,
-                },
-                mapping = {
-                    i = {
-                        ['<CR>'] = function()
-                            require('telescope.actions').select_default()
-                            vim.cmd('<ESC>') -- Set mode to normal mode
-                        end,
+                    mappings = {
+                        i = {
+
+                            -- ['q'] = function()
+                            --     require('telescope.actions').close(0)
+                            -- end,
+                            -- ['<ESC>'] = function()
+                            --     vim.cmd('<ESC>') -- Set mode to normal mode
+                            -- end,
+                            ['<CR>'] = function(...)
+                                require('telescope.actions').select_default(...)
+
+                                local escape_key =
+                                    vim.api.nvim_replace_termcodes(
+                                        '<ESC>',
+                                        true,
+                                        false,
+                                        true
+                                    )
+                                vim.api.nvim_feedkeys(escape_key, 'm', false) -- Set mode to normal mode
+                            end,
+                        },
                     },
                 },
                 pickers = {
