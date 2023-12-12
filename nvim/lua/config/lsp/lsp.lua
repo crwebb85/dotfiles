@@ -325,7 +325,7 @@ local function lsp_attach(event)
 
         -- Show a lightbulb when code actions are available at the cursor position
         vim.api.nvim_create_autocmd(
-            { 'CursorHold', 'CursorHoldI', 'WinScrolled' },
+            { 'BufEnter', 'CursorHold', 'CursorHoldI', 'WinScrolled' },
             {
                 group = 'code_action',
                 callback = require('config.lsp.lightbulb').show_lightbulb,
