@@ -1208,8 +1208,11 @@ require('lazy').setup({
                         end,
                     }),
 
-                    -- Ctrl+Space to trigger completion menu
-                    ['<C-Space>'] = cmp.mapping.complete(),
+                    -- Ctrl+Enter to trigger completion menu
+                    ['<C-CR>'] = cmp.mapping(
+                        cmp.mapping.complete(),
+                        { 'i', 'c' }
+                    ),
                     -- Complete common string
                     ['<S-Space>'] = cmp.mapping(function(fallback)
                         if cmp.visible() then
