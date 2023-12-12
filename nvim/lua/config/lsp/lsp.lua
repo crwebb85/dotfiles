@@ -334,6 +334,12 @@ local function lsp_attach(event)
         )
     end
 
+    vim.api.nvim_create_autocmd({ 'LspProgress' }, {
+        pattern = '*',
+        group = vim.api.nvim_create_augroup('lsp_progress', { clear = true }),
+        callback = require('config.lsp.progress').update_lsp_progress_display,
+    })
+
     default_keymaps(event.buf)
     -- vim.print(client.name)
     if client.name == 'rust_analyzer' then

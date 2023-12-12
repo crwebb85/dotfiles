@@ -1,5 +1,7 @@
 --source: https://github.com/rockyzhang24/dotfiles/blob/master/.config/nvim/lua/rockyz/lsp/progress.lua
 --
+local M = {}
+
 -- Buffer number and window id for the floating window
 local bufnr
 local winid
@@ -49,48 +51,47 @@ local function get_lsp_progress_msg()
     return message
 end
 
-vim.api.nvim_create_autocmd({ 'LspProgress' }, {
-    pattern = '*',
-    callback = function()
-        -- The row position of the floating window. Just right above the status line.
-        local win_row = vim.o.lines - vim.o.cmdheight - 4
-        local message = get_lsp_progress_msg()
-        if
-            winid == nil
-            or not vim.api.nvim_win_is_valid(winid)
-            or vim.api.nvim_win_get_tabpage(winid)
-                ~= vim.api.nvim_get_current_tabpage()
-        then
-            bufnr = vim.api.nvim_create_buf(false, true)
-            winid = vim.api.nvim_open_win(bufnr, false, {
-                relative = 'editor',
-                width = #message,
-                height = 1,
-                row = win_row,
-                col = vim.o.columns - #message,
-                style = 'minimal',
-                noautocmd = true,
-                border = vim.g.border_style,
-            })
-        else
-            vim.api.nvim_win_set_config(winid, {
-                relative = 'editor',
-                width = #message,
-                row = win_row,
-                col = vim.o.columns - #message,
-            })
+function M.update_lsp_progress_display()
+    -- The row position of the floating window. Just right above the status line.
+    local win_row = vim.o.lines - vim.o.cmdheight - 4
+    local message = get_lsp_progress_msg()
+    if
+        winid == nil
+        or not vim.api.nvim_win_is_valid(winid)
+        or vim.api.nvim_win_get_tabpage(winid)
+            ~= vim.api.nvim_get_current_tabpage()
+    then
+        bufnr = vim.api.nvim_create_buf(false, true)
+        winid = vim.api.nvim_open_win(bufnr, false, {
+            relative = 'editor',
+            width = #message,
+            height = 1,
+            row = win_row,
+            col = vim.o.columns - #message,
+            style = 'minimal',
+            noautocmd = true,
+            border = vim.g.border_style,
+        })
+    else
+        vim.api.nvim_win_set_config(winid, {
+            relative = 'editor',
+            width = #message,
+            row = win_row,
+            col = vim.o.columns - #message,
+        })
+    end
+    vim.wo[winid].winhl = 'Normal:Normal'
+    vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { message })
+    if isDone then
+        if vim.api.nvim_win_is_valid(winid) then
+            vim.api.nvim_win_close(winid, true)
         end
-        vim.wo[winid].winhl = 'Normal:Normal'
-        vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { message })
-        if isDone then
-            if vim.api.nvim_win_is_valid(winid) then
-                vim.api.nvim_win_close(winid, true)
-            end
-            if vim.api.nvim_buf_is_valid(bufnr) then
-                vim.api.nvim_buf_delete(bufnr, { force = true })
-            end
-            winid = nil
-            idx = 0
+        if vim.api.nvim_buf_is_valid(bufnr) then
+            vim.api.nvim_buf_delete(bufnr, { force = true })
         end
-    end,
-})
+        winid = nil
+        idx = 0
+    end
+end
+
+return M
