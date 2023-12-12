@@ -320,6 +320,20 @@ local function lsp_attach(event)
         )
     end
 
+    if client.server_capabilities.codeActionProvider ~= nil then
+        vim.api.nvim_create_augroup('code_action', { clear = true })
+
+        -- Show a lightbulb when code actions are available at the cursor position
+        vim.api.nvim_create_autocmd(
+            { 'CursorHold', 'CursorHoldI', 'WinScrolled' },
+            {
+                group = 'code_action',
+                callback = require('config.lsp.lightbulb').show_lightbulb,
+                buffer = event.buf,
+            }
+        )
+    end
+
     default_keymaps(event.buf)
     -- vim.print(client.name)
     if client.name == 'rust_analyzer' then

@@ -158,25 +158,6 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 -------------------------------------------------------------------------------
---- Lightbulb code action virtual text
-
-local lightbulb = require('config.lightbulb')
-
--- Show a lightbulb when code actions are available at the cursor position
-vim.api.nvim_create_augroup('code_action', { clear = true })
-vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI', 'WinScrolled' }, {
-    group = 'code_action',
-    pattern = '*',
-    callback = lightbulb.show_lightbulb,
-})
--- Remove lightbulb from terminal buffers
-vim.api.nvim_create_autocmd({ 'TermEnter' }, {
-    group = 'code_action',
-    pattern = '*',
-    callback = lightbulb.remove_bulb,
-})
-
--------------------------------------------------------------------------------
 --- Check if we need to reload the file when it changed
 vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
     group = vim.api.nvim_create_augroup('checktime', { clear = true }),
