@@ -1,24 +1,3 @@
-vim.api.nvim_create_user_command(
-    'ViewOpen',
-    function(opts) require('config.utils').openView(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-vim.api.nvim_create_user_command(
-    'ViewPrintPath',
-    function(opts) require('config.utils').printViewPath(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-vim.api.nvim_create_user_command(
-    'ViewReset',
-    function(opts) require('config.utils').resetView(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-vim.api.nvim_create_user_command(
-    'ViewDelete',
-    function(opts) require('config.utils').deleteView(tonumber(opts.args)) end,
-    { nargs = '?' }
-)
-
 -- Scratch
 
 vim.api.nvim_create_user_command(
