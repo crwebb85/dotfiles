@@ -1065,9 +1065,6 @@ require('lazy').setup({
                 settings = {
                     Lua = {
                         runtime = { version = 'LuaJIT' },
-                        completion = {
-                            callSnippet = 'Replace',
-                        },
                         hint = { enable = true },
                     },
                 },
