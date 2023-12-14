@@ -1354,6 +1354,7 @@ require('lazy').setup({
                 typescript = { 'prettier' },
                 javascript = { 'prettier' },
                 yaml = { 'prettier' },
+                json = { 'prettier' },
                 ansible = { 'prettier' },
                 --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
                 -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
