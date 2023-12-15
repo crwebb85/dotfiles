@@ -1323,10 +1323,13 @@ require('lazy').setup({
             'nvim-telescope/telescope.nvim',
             'mfussenegger/nvim-dap-python',
         },
-        opts = {
-            dap_enabled = true, -- makes the debugger work with venv
-            name = { 'venv', '.venv' },
-        },
+        config = function(_, _)
+            require('venv-selector').setup({
+                dap_enabled = true, -- makes the debugger work with venv
+                name = { 'venv', '.venv' },
+            })
+            require('venv-selector').retrieve_from_cache()
+        end,
     },
 
     -- Formatting client: conform.nvim
