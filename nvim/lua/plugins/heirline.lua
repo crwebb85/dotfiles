@@ -275,7 +275,7 @@ local config = function()
 
     local LSPActive = {
         condition = conditions.lsp_attached,
-        update = { 'LspAttach', 'LspDetach' },
+        update = { 'LspAttach', 'LspDetach', 'BufEnter' },
 
         Space,
         {
