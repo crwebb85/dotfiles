@@ -315,7 +315,12 @@ local config = function()
                 local names = {}
                 local formatters =
                     require('conform').formatters_by_ft[vim.bo.filetype]
-                if formatters == nil then formatters = {} end
+                if formatters == nil then return ' [LSPFallback]' end
+                if type(formatters) == 'function' then
+                    -- if filetype is configured to use a callback to determine the formatters
+                    -- then call the callback for the current buffer to get the list
+                    formatters = formatters(0)
+                end
                 for i, formatterName in pairs(formatters) do
                     table.insert(
                         names,

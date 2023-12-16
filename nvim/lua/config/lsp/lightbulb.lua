@@ -119,7 +119,8 @@ function M.show_lightbulb()
                 local icon = ''
                 -- Calculate the row position of the lightbulb relative to the cursor
                 local row = 0
-                local cur_indent = vim.fn.indent('.')
+                local line_number = vim.fn.line('.') or 0
+                local cur_indent = vim.fn.indent(line_number)
                 if cur_indent <= 2 then
                     if vim.fn.line('.') == vim.fn.line('w0') then
                         row = 1
