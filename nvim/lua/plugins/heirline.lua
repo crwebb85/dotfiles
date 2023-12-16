@@ -296,13 +296,26 @@ local config = function()
         Seperator,
     }
 
+    local function getLspFormatters()
+        ---@type string[]
+        local formattingLSPs = {}
+        for _, lsp_client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+            if lsp_client.supports_method('textDocument/formatting') then
+                table.insert(formattingLSPs, lsp_client.name)
+            end
+        end
+        -- vim.print(formattingLSPs)
+        return formattingLSPs
+    end
     local FormatterActive = {
         condition = function(self)
             local ok, conform = pcall(require, 'conform')
             self.conform = conform
-            return ok
+            return (
+                ok
                 and require('conform').formatters_by_ft[vim.bo.filetype]
                     ~= nil
+            ) or #getLspFormatters() > 0
         end,
         update = {
             'BufEnter',
@@ -315,7 +328,20 @@ local config = function()
                 local names = {}
                 local formatters =
                     require('conform').formatters_by_ft[vim.bo.filetype]
-                if formatters == nil then return ' [LSPFallback]' end
+                if formatters == nil then
+                    local lsp_formatter_names = getLspFormatters()
+                    if #lsp_formatter_names == 0 then
+                        return 'Invalid' -- This shouldn't happen
+                    end
+                    for i, lsp_name in pairs(getLspFormatters()) do
+                        table.insert(names, lsp_name)
+                        if i > 4 then
+                            table.insert(names, '...') -- I don't want the list of LSP's to get too long
+                            break
+                        end
+                    end
+                    return ' [' .. table.concat(names, ' ') .. ']'
+                end
                 if type(formatters) == 'function' then
                     -- if filetype is configured to use a callback to determine the formatters
                     -- then call the callback for the current buffer to get the list
