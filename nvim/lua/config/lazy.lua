@@ -703,6 +703,7 @@ require('lazy').setup({
                     'markdown_inline',
                     'python',
                     'toml',
+                    'regex',
                 },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
