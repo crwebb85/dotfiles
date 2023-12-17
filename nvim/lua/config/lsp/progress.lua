@@ -51,27 +51,69 @@ local function get_lsp_progress_msg()
     return message
 end
 
+function M.log_progress_display_vars()
+    local display_winid = winid
+    if winid == nil then display_winid = 'nil' end
+    local progress_tabpage = nil
+    if winid ~= nil and vim.api.nvim_win_is_valid(winid) then
+        progress_tabpage = vim.api.nvim_win_get_tabpage(winid)
+    end
+    local status = {
+        progress_bufnr = bufnr,
+        progress_winid = display_winid,
+        progress_tabpage = progress_tabpage,
+        current_tabpage = vim.api.nvim_get_current_tabpage(),
+        spinner = spinner,
+        idx = idx,
+        isDone = isDone,
+        progress_message = get_lsp_progress_msg(),
+    }
+    vim.print(status)
+end
+
+vim.api.nvim_create_user_command(
+    'LspLogProgressDisplayVars',
+    M.log_progress_display_vars,
+    { nargs = 0 }
+)
+
+local function cleanup_old_progress_bar()
+    if vim.api.nvim_win_is_valid(winid) then
+        vim.api.nvim_win_close(winid, true)
+    end
+    if vim.api.nvim_buf_is_valid(bufnr) then
+        vim.api.nvim_buf_delete(bufnr, { force = true })
+    end
+    winid = nil
+    idx = 0
+end
+
+local function create_progress_bar_window_and_buffer(message, win_row)
+    bufnr = vim.api.nvim_create_buf(false, true)
+    winid = vim.api.nvim_open_win(bufnr, false, {
+        relative = 'editor',
+        width = #message,
+        height = 1,
+        row = win_row,
+        col = vim.o.columns - #message,
+        style = 'minimal',
+        noautocmd = true,
+        border = vim.g.border_style,
+    })
+end
+
 function M.update_lsp_progress_display()
     -- The row position of the floating window. Just right above the status line.
     local win_row = vim.o.lines - vim.o.cmdheight - 4
     local message = get_lsp_progress_msg()
-    if
-        winid == nil
-        or not vim.api.nvim_win_is_valid(winid)
-        or vim.api.nvim_win_get_tabpage(winid)
-            ~= vim.api.nvim_get_current_tabpage()
+    if winid == nil or not vim.api.nvim_win_is_valid(winid) then
+        create_progress_bar_window_and_buffer(message, win_row)
+    elseif
+        vim.api.nvim_win_get_tabpage(winid)
+        ~= vim.api.nvim_get_current_tabpage()
     then
-        bufnr = vim.api.nvim_create_buf(false, true)
-        winid = vim.api.nvim_open_win(bufnr, false, {
-            relative = 'editor',
-            width = #message,
-            height = 1,
-            row = win_row,
-            col = vim.o.columns - #message,
-            style = 'minimal',
-            noautocmd = true,
-            border = vim.g.border_style,
-        })
+        cleanup_old_progress_bar()
+        create_progress_bar_window_and_buffer(message, win_row)
     else
         vim.api.nvim_win_set_config(winid, {
             relative = 'editor',
@@ -82,16 +124,7 @@ function M.update_lsp_progress_display()
     end
     vim.wo[winid].winhl = 'Normal:Normal'
     vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { message })
-    if isDone then
-        if vim.api.nvim_win_is_valid(winid) then
-            vim.api.nvim_win_close(winid, true)
-        end
-        if vim.api.nvim_buf_is_valid(bufnr) then
-            vim.api.nvim_buf_delete(bufnr, { force = true })
-        end
-        winid = nil
-        idx = 0
-    end
+    if isDone then cleanup_old_progress_bar() end
 end
 
 return M
