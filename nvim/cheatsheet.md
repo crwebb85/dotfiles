@@ -58,6 +58,10 @@ vim.api.nvim_create_autocmd('User', {
 - `:Man make` open the man page for program for this example it would be for `make`
 
 - `help various-motions` - list useful movement motions
+- `:h user-manual`
+
+- `<c-f>` in command mode lets you edit commands as if you were in normal mode
+- `q:` from normal mode will also open the same command prompt
 
 ### Split line
 - `r<CR>` split line (will delete character cursor is on)
@@ -87,3 +91,6 @@ useful api functions:
 - nvim_buf_get_var()
 - https://neovim.io/doc/user/api.html#api-floatwin
 - setreg() - used to set a register
+
+# Useful resources
+[Lua Type Checking Guide](https://mrcjkb.dev/posts/2023-08-17-lua-adts.html)
