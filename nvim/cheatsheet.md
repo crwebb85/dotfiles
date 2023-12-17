@@ -1,4 +1,5 @@
 # Useful command
+
 - `:help <a neovim api function/object>` opens help for the function
 - `:help motions.txt` opens help page for learning vim motions
 - `:help vim-diff.txt` list differences between vim
@@ -14,7 +15,6 @@
 - `:DiffviewOpen` to open the git diff for current changes
 
 - `:Mason` to open the package manager for LSPs, linters, formatters, and debugers.
-
 
 - `:lua= vim.lsp.get_active_clients({ name = "lua_ls" })[1].config.settings.Lua` to print info about the lua lsp config
 - `:Gitsigns toggle_current_line_blame` to toggle git blame
@@ -33,14 +33,17 @@
 - `gv` re-select last selection
 
 You can pass arbitrary data to a User autocmd callback by doing
+
 ```lua
 vim.api.nvim_exec_autocmds('User', {
   pattern = '<event-name>',
   data = <some-data>
 })
 ```
+
 then receive it using
-```
+
+```lua
 vim.api.nvim_create_autocmd('User', {
   pattern = '<event-name>',
   callback = function(event)
@@ -48,6 +51,7 @@ vim.api.nvim_create_autocmd('User', {
   end
 })
 ```
+
 - `o` create new line below current line and go to it
 - `O` create new line above current line and go to it
 
@@ -64,10 +68,12 @@ vim.api.nvim_create_autocmd('User', {
 - `q:` from normal mode will also open the same command prompt
 
 ### Split line
+
 - `r<CR>` split line (will delete character cursor is on)
 - `s<CR>` split line and will preserve indentation (will delete character cursor is on)
 
 ### Other
+
 ```
 :lua = vim.lsp.handlers
 :ScratchTab | :put =execute(':lua =vim.lsp.get_clients()[1].server_capabilities')
@@ -75,6 +81,7 @@ vim.api.nvim_create_autocmd('User', {
 :Git rev-parse --show-toplevel
 :lua= vim.fn.getcwd()
 ```
+
 useful api functions:
 
 - fnameescape()
@@ -93,4 +100,5 @@ useful api functions:
 - setreg() - used to set a register
 
 # Useful resources
+
 [Lua Type Checking Guide](https://mrcjkb.dev/posts/2023-08-17-lua-adts.html)
