@@ -1,4 +1,7 @@
 local M = {}
+
+---@param s string the string to trim
+---@return string
 function M.trim(s)
     --Trim leading and ending whitespace from string
     return s:match('^()%s*$') and '' or s:match('^%s*(.*%S)')

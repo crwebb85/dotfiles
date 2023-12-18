@@ -54,6 +54,7 @@ local config = function()
     local RightSep = { provider = '' }
 
     local diagnostics_spacer = ' '
+    -- TODO add type
     local Diagnostics = {
         condition = conditions.has_diagnostics,
         static = {
@@ -141,6 +142,7 @@ local config = function()
     }
 
     -- Show which vim mode I am using
+    -- TODO add type
     local ViMode = {
         -- get vim current mode, this information will be required by the provider
         -- and the highlight functions, so we compute it only once per component
@@ -230,6 +232,7 @@ local config = function()
         },
     }
 
+    -- TODO add type
     local Git = {
         condition = conditions.is_git_repo,
         init = function(self)
@@ -273,6 +276,7 @@ local config = function()
         Seperator,
     }
 
+    ---@type StatusLine
     local LSPActive = {
         condition = conditions.lsp_attached,
         update = { 'LspAttach', 'LspDetach', 'BufEnter' },
@@ -296,27 +300,93 @@ local config = function()
         Seperator,
     }
 
-    local function getLspFormatters()
-        ---@type string[]
-        local formattingLSPs = {}
-        for _, lsp_client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-            if lsp_client.supports_method('textDocument/formatting') then
-                table.insert(formattingLSPs, lsp_client.name)
+    ---@class (exact) FormatterDetails
+    ---@field name string
+    ---@field available boolean
+    ---@field available_msg? string
+
+    ---@param bufnr? integer the buffer number. Defaults to buffer 0.
+    ---@return FormatterDetails[]
+    local function get_buffer_formatter_details(bufnr)
+        ---@type FormatterDetails[]
+        local all_info = {}
+
+        local names = require('conform').list_formatters_for_buffer()
+        for _, name in ipairs(names) do
+            if type(name) == 'string' then
+                local info = require('conform').get_formatter_info(name, bufnr)
+                ---@type FormatterDetails
+                local details = {
+                    name = info.name,
+                    available = info.available,
+                    available_msg = info.available_msg,
+                }
+                table.insert(all_info, details)
+            else
+                -- If this is an alternation, take the first one that's available
+                for _, v in ipairs(name) do
+                    local info = require('conform').get_formatter_info(v, bufnr)
+                    if info.available then
+                        ---@type FormatterDetails
+                        local details = {
+                            name = info.name,
+                            available = info.available,
+                            available_msg = info.available_msg,
+                        }
+                        table.insert(all_info, details)
+                        break
+                    end
+                end
             end
         end
-        -- vim.print(formattingLSPs)
-        return formattingLSPs
+        if require('conform').will_fallback_lsp() then
+            for _, lsp_client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+                if lsp_client.supports_method('textDocument/formatting') then
+                    ---@type FormatterDetails
+                    local details = {
+                        name = lsp_client.name,
+                        available = true,
+                        available_msg = nil,
+                    }
+                    table.insert(all_info, details)
+                end
+            end
+        end
+        return all_info
     end
-    local FormatterActive = {
-        condition = function(self)
-            local ok, conform = pcall(require, 'conform')
-            self.conform = conform
-            return (
-                ok
-                and require('conform').formatters_by_ft[vim.bo.filetype]
-                    ~= nil
-            ) or #getLspFormatters() > 0
+
+    local formatter_component_block = {
+        update = {
+            'BufEnter',
+            'User',
+            pattern = { '*.*', 'DisabledFormatter', 'EnabledFormatter' },
+        },
+        init = function(self)
+            local children = {}
+            local formatter_details_list = get_buffer_formatter_details()
+            for i, formatter_details in pairs(formatter_details_list) do
+                ---@type StatusLine
+                local formatter_component = {
+                    provider = require('config.utils').trim(
+                        formatter_details.name
+                    ),
+                }
+                if not formatter_details.available then
+                    formatter_component.hl = { fg = 'red', bold = true }
+                end
+                table.insert(children, formatter_component)
+                if i < #formatter_details_list then
+                    table.insert(children, Space)
+                end
+            end
+            self.child = self:new(children, 1)
         end,
+        provider = function(self) return self.child:eval() end,
+    }
+
+    ---@type StatusLine
+    local FormatterActive = {
+        condition = function(_) return #get_buffer_formatter_details() > 0 end,
         update = {
             'BufEnter',
             'User',
@@ -324,41 +394,14 @@ local config = function()
         },
         Space,
         {
-            provider = function()
-                local names = {}
-                local formatters =
-                    require('conform').formatters_by_ft[vim.bo.filetype]
-                if formatters == nil then
-                    local lsp_formatter_names = getLspFormatters()
-                    if #lsp_formatter_names == 0 then
-                        return 'Invalid' -- This shouldn't happen
-                    end
-                    for i, lsp_name in pairs(getLspFormatters()) do
-                        table.insert(names, lsp_name)
-                        if i > 4 then
-                            table.insert(names, '...') -- I don't want the list of LSP's to get too long
-                            break
-                        end
-                    end
-                    return ' [' .. table.concat(names, ' ') .. ']'
-                end
-                if type(formatters) == 'function' then
-                    -- if filetype is configured to use a callback to determine the formatters
-                    -- then call the callback for the current buffer to get the list
-                    formatters = formatters(0)
-                end
-                for i, formatterName in pairs(formatters) do
-                    table.insert(
-                        names,
-                        require('config.utils').trim(formatterName)
-                    )
-                    if i > 4 then
-                        table.insert(names, '...') -- I don't want the list of LSP's to get too long
-                        break
-                    end
-                end
-                return ' [' .. table.concat(names, ' ') .. ']'
-            end,
+            {
+                provider = ' [',
+            },
+
+            formatter_component_block,
+            {
+                provider = ']',
+            },
             hl = function()
                 if vim.g.disable_autoformat or vim.b[0].disable_autoformat then
                     return { fg = 'red', bold = true }
@@ -371,6 +414,7 @@ local config = function()
         Seperator,
     }
 
+    -- TODO add type
     local MacroRecording = {
         condition = conditions.is_active,
         init = function(self)
@@ -417,6 +461,7 @@ local config = function()
         update = { 'RecordingEnter', 'RecordingLeave' },
     }
 
+    ---@type StatusLine
     local Snippets = {
         -- check that we are in insert or select mode
         condition = function()
@@ -437,6 +482,7 @@ local config = function()
         Seperator,
     }
 
+    ---@type StatusLine
     local Ruler = {
         condition = function() return scrollbar_enabled() end,
         -- %l = current line number
@@ -446,6 +492,7 @@ local config = function()
         provider = '%7(%l/%3L%):%2c %P',
     }
 
+    -- TODO add type
     local ScrollBar = {
         condition = function() return scrollbar_enabled() end,
         static = {
@@ -463,6 +510,7 @@ local config = function()
         },
     }
 
+    ---@type StatusLine
     local InactiveStatusline = {
         condition = function() conditions.buffer_matches(status_inactive) end,
         provider = function() return '%=' end,
@@ -477,6 +525,7 @@ local config = function()
 
     local ComponentDelimiter = { '', ' |' }
 
+    ---@type StatusLine
     local ActiveStatusline = {
         condition = function()
             return not conditions.buffer_matches(status_inactive)
@@ -500,6 +549,7 @@ local config = function()
         end,
     }
 
+    ---@type StatusLine
     local StatusLines = {
         condition = function()
             for _, c in ipairs(cmdtype_inactive) do
@@ -513,6 +563,7 @@ local config = function()
 
     ---------------------------------------------------------------------------
     -- Winbar
+    ---@type StatusLine
     local ActiveWindow = {
         hl = function()
             if conditions.is_active() then
@@ -523,6 +574,7 @@ local config = function()
         end,
     }
 
+    ---@type StatusLine
     local ActiveBlock = {
         hl = function()
             if conditions.is_active() then
@@ -533,6 +585,7 @@ local config = function()
         end,
     }
 
+    ---@type StatusLine
     local ActiveSep = {
         hl = function()
             if conditions.is_active() then
@@ -544,12 +597,14 @@ local config = function()
     }
 
     -- Italicizes the buffer file name if it has been modified
+    ---@type StatusLine
     local FileNameModifer = {
         hl = function()
             if vim.bo.modified then return { italic = true, force = true } end
         end,
     }
 
+    -- TODO add type
     local FileIcon = {
         init = function(self)
             local filename = self.filename
@@ -571,6 +626,7 @@ local config = function()
         hl = function(self) return { fg = self.icon_color } end,
     }
 
+    -- TODO add type
     local FileName = {
         provider = function(self)
             local filename = vim.fn.fnamemodify(self.filename, ':t')
@@ -583,6 +639,7 @@ local config = function()
         hl = { fg = colors.magenta2, bold = true },
     }
 
+    ---@type StatusLine
     local FileFlags = {
         {
             -- shows if buffer is unsaved
@@ -602,6 +659,7 @@ local config = function()
         },
     }
 
+    ---@type StatusLine
     local FileType = {
         condition = function()
             return conditions.buffer_matches({ filetype = { 'coderunner' } })
@@ -610,6 +668,7 @@ local config = function()
         hl = { fg = colors.magenta, bold = true },
     }
 
+    -- TODO add type
     local FileNameBlock = {
         init = function(self) self.filename = vim.api.nvim_buf_get_name(0) end,
         FileType,
@@ -620,6 +679,7 @@ local config = function()
         { provider = '%<' },
     }
 
+    ---@type StatusLine
     local ActiveWinbar = {
         condition = function()
             local empty_buffer = function()
@@ -631,10 +691,10 @@ local config = function()
         heirlineUtils.insert(ActiveBlock, FileNameBlock),
     }
 
+    ---@type StatusLine
     local WinBars = {
         heirlineUtils.insert(ActiveWindow, ActiveWinbar),
     }
-
     ---------------------------------------------------------------------------
     -- Heirline Setup
     heirline.setup({

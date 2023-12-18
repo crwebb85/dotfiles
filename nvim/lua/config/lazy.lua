@@ -1010,6 +1010,7 @@ require('lazy').setup({
                     'stylua', -- Formatter for lua files
 
                     'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
+                    'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
                     'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
                     'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
 
@@ -1352,18 +1353,18 @@ require('lazy').setup({
                 lua = { 'stylua' },
                 -- first use isort and then black
                 python = { 'isort', 'black' },
-                typescript = { 'prettier' },
-                javascript = { 'prettier' },
-                yaml = { 'prettier' },
-                json = { 'prettier' },
-                ansible = { 'prettier' },
+                typescript = { { 'prettierd', 'prettier' } },
+                javascript = { { 'prettierd', 'prettier' } },
+                yaml = { { 'prettierd', 'prettier' } },
+                json = { { 'prettierd', 'prettier' } },
+                ansible = { { 'prettierd', 'prettier' } },
                 --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
                 -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
-                ['yaml.ansible'] = { 'prettier' },
+                ['yaml.ansible'] = { { 'prettierd', 'prettier' } },
                 -- "inject" is a "special" formatter from conform.nvim, which
                 -- formats treesitter-injected code. In effect, hits will make
                 -- conform.nvim format any python codeblocks inside a markdown file.
-                markdown = { 'prettier', 'inject' },
+                markdown = { { 'prettierd', 'prettier' }, 'inject' },
             },
             -- enable format-on-save
             format_on_save = function(bufnr)
