@@ -356,11 +356,7 @@ local config = function()
     end
 
     local formatter_component_block = {
-        update = {
-            'BufEnter',
-            'User',
-            pattern = { '*.*', 'DisabledFormatter', 'EnabledFormatter' },
-        },
+        update = { 'LspAttach', 'LspDetach', 'BufEnter' },
         init = function(self)
             local children = {}
             local formatter_details_list = get_buffer_formatter_details()
