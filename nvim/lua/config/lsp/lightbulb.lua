@@ -50,6 +50,7 @@ function M.remove_bulb()
     if bulb_bufnr ~= nil and vim.fn.getcmdwintype() ~= '' then
         --Since we can't delete buffers while the command-window is open we have to schedule
         --The cleanup till after the command-window is closed
+        --related to https://github.com/neovim/neovim/issues/24452 so this functionality may change at some point
         vim.api.nvim_create_autocmd({ 'CmdwinLeave' }, {
             group = vim.api.nvim_create_augroup('CleanupLightbulb', {
                 clear = true,

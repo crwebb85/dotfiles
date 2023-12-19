@@ -84,6 +84,7 @@ local function cleanup_old_progress_bar()
 
         --Since we can't delete buffers while the command-window is open we have to schedule
         --The cleanup till after the command-window is closed
+        --related to https://github.com/neovim/neovim/issues/24452 so this functionality may change at some point
         vim.api.nvim_create_autocmd({ 'CmdwinLeave' }, {
             group = vim.api.nvim_create_augroup('CleanupLspProgressBar', {
                 clear = true,
