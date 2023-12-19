@@ -1297,15 +1297,6 @@ require('lazy').setup({
                             end
                         end,
                     },
-                    -- ['<CR>'] = {
-                    --
-                    --     c = cmp.mapping.confirm({
-                    --         --Allows selecting suggestions in the command window using enter
-                    --         --without immediately running the command
-                    --         behavior = cmp.ConfirmBehavior.Insert,
-                    --         select = true,
-                    --     }),
-                    -- },
                 }),
                 sources = cmp.config.sources({
                     { name = 'path' },

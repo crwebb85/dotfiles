@@ -78,6 +78,43 @@ vim.api.nvim_create_user_command(
 )
 
 local function cleanup_old_progress_bar()
+    if vim.fn.getcmdwintype() ~= '' then
+        -- Go ahead and clear the message since so its no longer in the way
+        vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '' })
+
+        --Since we can't delete buffers while the command-window is open we have to schedule
+        --The cleanup till after the command-window is closed
+        vim.api.nvim_create_autocmd({ 'CmdwinLeave' }, {
+            group = vim.api.nvim_create_augroup('CleanupLspProgressBar', {
+                clear = true,
+            }),
+            callback = function()
+                vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+                    group = vim.api.nvim_create_augroup(
+                        'CleanupLspProgressBar',
+                        {
+                            clear = true,
+                        }
+                    ),
+                    callback = function()
+                        if vim.api.nvim_win_is_valid(winid) then
+                            vim.api.nvim_win_close(winid, true)
+                        end
+                        if vim.api.nvim_buf_is_valid(bufnr) then
+                            vim.api.nvim_buf_delete(bufnr, { force = true })
+                        end
+
+                        winid = nil
+                        idx = 0
+                    end,
+                    once = true,
+                })
+            end,
+            once = true,
+        })
+        --Early return since we can't cleanup until the command-window is closed
+        return
+    end
     if vim.api.nvim_win_is_valid(winid) then
         vim.api.nvim_win_close(winid, true)
     end

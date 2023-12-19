@@ -16,6 +16,9 @@ TODO:
 - https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3
 - interesting cmp and luasnip config https://www.reddit.com/r/neovim/comments/wmkf9o/comment/ik0mcwk/?utm_source=share&utm_medium=web2x&context=3
 - add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
+- BUG: when trying to close a sticky buffer like quick fix list and I also have unsaved changes, nvim will prompt me to go to the unsaved buffer. And when I do it upens the buffer in a new tab
+- BUG: which-key gets stuck when in command-window (`q:`)
+- BUG: lightbulb/lsp progress bar acted weird when in command-window
 
 Cool plugins:
 
