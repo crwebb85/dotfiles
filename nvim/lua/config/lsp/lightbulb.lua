@@ -47,7 +47,30 @@ local prev_bufnr = nil
 local code_action_support = false
 
 function M.remove_bulb()
-    if bulb_bufnr ~= nil then
+    if bulb_bufnr ~= nil and vim.fn.getcmdwintype() ~= '' then
+        --Since we can't delete buffers while the command-window is open we have to schedule
+        --The cleanup till after the command-window is closed
+        vim.api.nvim_create_autocmd({ 'CmdwinLeave' }, {
+            group = vim.api.nvim_create_augroup('CleanupLightbulb', {
+                clear = true,
+            }),
+            callback = function()
+                vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+                    group = vim.api.nvim_create_augroup('CleanupLightbulb', {
+                        clear = true,
+                    }),
+                    callback = function()
+                        vim.cmd(('noautocmd bwipeout %d'):format(bulb_bufnr))
+                        bulb_bufnr = nil
+                    end,
+                    once = true,
+                })
+            end,
+            once = true,
+        })
+        --Early return since we can't cleanup until the command-window is closed
+        return
+    elseif bulb_bufnr ~= nil then
         vim.cmd(('noautocmd bwipeout %d'):format(bulb_bufnr))
         bulb_bufnr = nil
     end
