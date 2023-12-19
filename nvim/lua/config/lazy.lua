@@ -1112,6 +1112,7 @@ require('lazy').setup({
             { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
             { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
             { 'hrsh7th/cmp-path' }, -- Completion for file paths
+            { 'hrsh7th/cmp-cmdline' },
             {
                 'hrsh7th/cmp-nvim-lua', -- Completion for lua api
                 lazy = true,
@@ -1119,6 +1120,12 @@ require('lazy').setup({
             },
             { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capibilities to that cmp adds to neovim
             { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
+            {
+                'petertriho/cmp-git', -- Provides info about git repo
+                lazy = true,
+                ft = 'gitcommit',
+                dependencies = { 'nvim-lua/plenary.nvim' },
+            },
         },
         config = function()
             local cmp = require('cmp')
@@ -1128,7 +1135,6 @@ require('lazy').setup({
                     { name = 'nvim_lsp' },
                     { name = 'luasnip' },
                     { name = 'buffer', keyword_length = 5 },
-                }, {
                     { name = 'path' },
                 }),
                 snippet = {
@@ -1145,32 +1151,28 @@ require('lazy').setup({
                             nvim_lua = '[API]',
                             path = '[path]',
                             luasnip = '[snip]',
+                            git = '[git]',
+                            cmdline = '[cmd]',
                         },
                     }),
                 },
-                mapping = cmp.mapping.preset.insert({
-                    ['<C-y>'] = cmp.mapping.confirm({ select = false }),
-                    ['<C-e>'] = cmp.mapping.abort(),
-                    ['<Up>'] = cmp.mapping.select_prev_item({
-                        behavior = 'select',
-                    }),
-                    ['<Down>'] = cmp.mapping.select_next_item({
-                        behavior = 'select',
-                    }),
-                    ['<C-p>'] = cmp.mapping(function()
-                        if cmp.visible() then
-                            cmp.select_prev_item({ behavior = 'insert' })
-                        else
-                            cmp.complete()
-                        end
-                    end),
-                    ['<C-n>'] = cmp.mapping(function()
-                        if cmp.visible() then
-                            cmp.select_next_item({ behavior = 'insert' })
-                        else
-                            cmp.complete()
-                        end
-                    end),
+                mapping = {
+                    ['<Down>'] = {
+                        i = cmp.mapping.select_next_item({
+                            behavior = 'select',
+                        }),
+                    },
+                    ['<Up>'] = {
+                        i = cmp.mapping.select_prev_item({
+                            behavior = 'select',
+                        }),
+                    },
+                    ['<C-y>'] = {
+                        i = cmp.mapping.confirm({ select = false }),
+                    },
+                    ['<C-e>'] = {
+                        i = cmp.mapping.abort(),
+                    },
                     -- `Enter` key to confirm completion
                     ['<CR>'] = cmp.mapping({
                         i = function(fallback)
@@ -1183,13 +1185,7 @@ require('lazy').setup({
                                 fallback()
                             end
                         end,
-                        s = cmp.mapping.confirm({ select = true }),
-                        c = cmp.mapping.confirm({
-                            --Allows selecting suggestions in the command window using enter
-                            --without immediately running the command
-                            behavior = cmp.ConfirmBehavior.Insert,
-                            select = true,
-                        }),
+                        -- s = cmp.mapping.confirm({ select = true }),
                     }),
                     ['<S-CR>'] = cmp.mapping({
                         i = function(fallback)
@@ -1208,10 +1204,7 @@ require('lazy').setup({
                     }),
 
                     -- Ctrl+Enter to trigger completion menu
-                    ['<C-CR>'] = cmp.mapping(
-                        cmp.mapping.complete(),
-                        { 'i', 'c' }
-                    ),
+                    ['<C-CR>'] = cmp.mapping(cmp.mapping.complete(), { 'i' }),
                     -- Complete common string
                     ['<S-Space>'] = cmp.mapping(function(fallback)
                         if cmp.visible() then
@@ -1266,6 +1259,57 @@ require('lazy').setup({
                             fallback()
                         end
                     end, { 'i', 's' }),
+                },
+            })
+
+            cmp.setup.filetype('gitcommit', {
+                sources = cmp.config.sources({
+                    { name = 'git' },
+                    { name = 'luasnip' },
+                    { name = 'buffer', keyword_length = 5 },
+                }),
+            })
+
+            -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+            cmp.setup.cmdline({ '/', '?' }, {
+                mapping = cmp.mapping.preset.cmdline(),
+                sources = {
+                    { name = 'buffer', keyword_length = 3 },
+                },
+            })
+
+            -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+            cmp.setup.cmdline(':', {
+                mapping = cmp.mapping.preset.cmdline({
+                    ['<Tab>'] = {
+                        c = function(_)
+                            if cmp.visible() then
+                                if #cmp.get_entries() == 1 then
+                                    cmp.confirm({ select = true })
+                                else
+                                    cmp.select_next_item()
+                                end
+                            else
+                                cmp.complete()
+                                if #cmp.get_entries() == 1 then
+                                    cmp.confirm({ select = true })
+                                end
+                            end
+                        end,
+                    },
+                    -- ['<CR>'] = {
+                    --
+                    --     c = cmp.mapping.confirm({
+                    --         --Allows selecting suggestions in the command window using enter
+                    --         --without immediately running the command
+                    --         behavior = cmp.ConfirmBehavior.Insert,
+                    --         select = true,
+                    --     }),
+                    -- },
+                }),
+                sources = cmp.config.sources({
+                    { name = 'path' },
+                    { name = 'cmdline' },
                 }),
             })
         end,

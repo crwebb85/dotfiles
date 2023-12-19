@@ -99,6 +99,22 @@ useful api functions:
 - https://neovim.io/doc/user/api.html#api-floatwin
 - setreg() - used to set a register
 
+### Notes
+
+The command buffer that opens with `q:` has:
+
+- filetype = vim
+- buftype nofile
+- ':h cmdline.txt'
+
+|CmdwinEnter| and |CmdwinLeave|
+shellescape()
+
+getcmdwintype() _getcmdwintype()_
+Return the current |command-line-window| type. Possible return
+values are the same as |getcmdtype()|. Returns an empty string
+when not in the command-line window.
+
 # Useful resources
 
 [Lua Type Checking Guide](https://mrcjkb.dev/posts/2023-08-17-lua-adts.html)
