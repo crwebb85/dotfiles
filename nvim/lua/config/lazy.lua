@@ -1119,6 +1119,7 @@ require('lazy').setup({
                 ft = 'lua',
             },
             { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capibilities to that cmp adds to neovim
+            { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function paramaters
             { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
             {
                 'petertriho/cmp-git', -- Provides info about git repo
@@ -1131,8 +1132,9 @@ require('lazy').setup({
             local cmp = require('cmp')
             cmp.setup({
                 sources = cmp.config.sources({
-                    { name = 'nvim_lua' },
                     { name = 'nvim_lsp' },
+                    { name = 'nvim_lsp_signature_help' },
+                    { name = 'nvim_lua' },
                     { name = 'luasnip' },
                     { name = 'buffer', keyword_length = 5 },
                     { name = 'path' },
@@ -1153,6 +1155,7 @@ require('lazy').setup({
                             luasnip = '[snip]',
                             git = '[git]',
                             cmdline = '[cmd]',
+                            nvim_lsp_signature_help = '[info]',
                         },
                     }),
                 },

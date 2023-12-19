@@ -13,8 +13,6 @@ TODO:
 
 - figure out how to create custom keymaps that use motions for example a custom yank function that lets me also use the motion commands to select what to yank
 - setup code lens to show number of variable/function references https://www.reddit.com/r/neovim/comments/12hf3k3/comment/jfom79l/?utm_medium=android_app&utm_source=share&context=3
-- https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3
-- interesting cmp and luasnip config https://www.reddit.com/r/neovim/comments/wmkf9o/comment/ik0mcwk/?utm_source=share&utm_medium=web2x&context=3
 - add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
 - BUG: when trying to close a sticky buffer like quick fix list and I also have unsaved changes, nvim will prompt me to go to the unsaved buffer. And when I do it upens the buffer in a new tab
 - BUG: which-key gets stuck when in command-window (`q:`)
@@ -72,6 +70,7 @@ Interesting Articles/Posts:
 - [Discussion of editting visual selection within temp buffer](https://www.reddit.com/r/neovim/comments/18dhi3g/looking_for_a_plugin_to_do_markdown_hoisting/?utm_source=share&utm_medium=web2x&context=3)
 - [Understanding Neovim Playlist](https://www.youtube.com/watch?v=87AXw9Quy9U&list=PLx2ksyallYzW4WNYHD9xOFrPRYGlntAft)
 - [Explanation for wierd lsp error](https://www.reddit.com/r/neovim/comments/18cb9d8/comment/kc9lre2/?utm_medium=android_app&utm_source=share&context=3)
+- [Telescope and quick fix list](https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3)
 
 dotfiles to look into:
 
