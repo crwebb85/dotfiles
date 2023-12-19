@@ -1188,7 +1188,6 @@ require('lazy').setup({
                                 fallback()
                             end
                         end,
-                        -- s = cmp.mapping.confirm({ select = true }),
                     }),
                     ['<S-CR>'] = cmp.mapping({
                         i = function(fallback)
@@ -1275,7 +1274,59 @@ require('lazy').setup({
 
             -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
             cmp.setup.cmdline({ '/', '?' }, {
-                mapping = cmp.mapping.preset.cmdline(),
+                mapping = {
+                    ['<C-z>'] = {
+                        c = function()
+                            if cmp.visible() then
+                                cmp.select_next_item()
+                            else
+                                cmp.complete()
+                            end
+                        end,
+                    },
+                    ['<Tab>'] = {
+                        c = function()
+                            if cmp.visible() then
+                                cmp.select_next_item()
+                            else
+                                cmp.complete()
+                            end
+                        end,
+                    },
+                    ['<S-Tab>'] = {
+                        c = function()
+                            if cmp.visible() then
+                                cmp.select_prev_item()
+                            else
+                                cmp.complete()
+                            end
+                        end,
+                    },
+                    ['<C-n>'] = {
+                        c = function(fallback)
+                            if cmp.visible() then
+                                cmp.select_next_item()
+                            else
+                                fallback()
+                            end
+                        end,
+                    },
+                    ['<C-p>'] = {
+                        c = function(fallback)
+                            if cmp.visible() then
+                                cmp.select_prev_item()
+                            else
+                                fallback()
+                            end
+                        end,
+                    },
+                    ['<C-e>'] = {
+                        c = cmp.mapping.abort(),
+                    },
+                    ['<C-y>'] = {
+                        c = cmp.mapping.confirm({ select = false }),
+                    },
+                },
                 sources = {
                     { name = 'buffer', keyword_length = 3 },
                 },
@@ -1283,7 +1334,17 @@ require('lazy').setup({
 
             -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
             cmp.setup.cmdline(':', {
-                mapping = cmp.mapping.preset.cmdline({
+                mapping = {
+
+                    ['<C-z>'] = {
+                        c = function()
+                            if cmp.visible() then
+                                cmp.select_next_item()
+                            else
+                                cmp.complete()
+                            end
+                        end,
+                    },
                     ['<Tab>'] = {
                         c = function(_)
                             if cmp.visible() then
@@ -1300,7 +1361,40 @@ require('lazy').setup({
                             end
                         end,
                     },
-                }),
+                    ['<S-Tab>'] = {
+                        c = function()
+                            if cmp.visible() then
+                                cmp.select_prev_item()
+                            else
+                                cmp.complete()
+                            end
+                        end,
+                    },
+                    ['<C-n>'] = {
+                        c = function(fallback)
+                            if cmp.visible() then
+                                cmp.select_next_item()
+                            else
+                                fallback()
+                            end
+                        end,
+                    },
+                    ['<C-p>'] = {
+                        c = function(fallback)
+                            if cmp.visible() then
+                                cmp.select_prev_item()
+                            else
+                                fallback()
+                            end
+                        end,
+                    },
+                    ['<C-e>'] = {
+                        c = cmp.mapping.abort(),
+                    },
+                    ['<C-y>'] = {
+                        c = cmp.mapping.confirm({ select = false }),
+                    },
+                },
                 sources = cmp.config.sources({
                     { name = 'path' },
                     { name = 'cmdline' },
