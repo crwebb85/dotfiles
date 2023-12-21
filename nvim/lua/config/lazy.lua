@@ -976,6 +976,7 @@ require('lazy').setup({
         lazy = true, -- Will lazy load before lspconfig since I marked it as a dependency
         config = function()
             require('neodev').setup({
+                setup_jsonls = false, -- I will do this manually in my lspconfig setup
                 -- -- Workaround to get correctly configure lua_ls for neovim config
                 -- -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
                 -- override = function(_, library)
@@ -1029,7 +1030,6 @@ require('lazy').setup({
                     'pyright', -- LSP for python
                     'ruff-lsp', -- linter for python (includes flake8, pep8, etc.)
                     'marksman',
-                    'taplo', -- LSP for toml (for pyproject.toml files)
                     'lua-language-server', -- (lua_ls) LSP for lua files
                     'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
                     'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
@@ -1038,6 +1038,7 @@ require('lazy').setup({
                     'rust-analyzer',
                     'yamlls', -- (yaml-language-server)
                     'jsonls', -- (json-lsp)
+                    'taplo', -- LSP for toml (for pyproject.toml files)
 
                     -- Formatters
                     'black', -- python formatter
@@ -1253,24 +1254,31 @@ require('lazy').setup({
 
             -- jsonls config is based on article https://www.arthurkoziel.com/json-schemas-in-neovim/
             -- Config type is defined in https://github.com/microsoft/vscode/blob/30b777312745e84972956d4361465d4d38aa0f78/extensions/json-language-features/server/src/jsonServer.ts#L202C2-L218C3
+            local json_schemas = require('schemastore').json.schemas({
+                select = {
+                    'Renovate',
+                    'GitHub Workflow Template Properties',
+                },
+                -- extra = {
+                --     {
+                --         description = 'Schema for luals lsp configuration file',
+                --         name = 'LuaLS Settings',
+                --         url = 'https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json',
+                --         fileMatch = { '.luarc.json', '.luarc.jsonc' },
+                --     },
+                -- },
+            })
+            -- Adding the schemas to the extra tab doesn't seem to be working
+            table.insert(json_schemas, {
+                description = 'Schema for luals lsp configuration file',
+                name = 'LuaLS Settings',
+                url = 'https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json',
+                fileMatch = { '.luarc.json', '.luarc.jsonc' },
+            })
             local jsonls_cfg = {
                 settings = {
                     json = {
-                        schemas = require('schemastore').json.schemas({
-                            select = {
-                                'Renovate',
-                                'GitHub Workflow Template Properties',
-                            },
-                            extra = {
-
-                                description = 'Schema for luals lsp configuration file',
-                                fileMatch = {
-                                    '.luarc.json',
-                                },
-                                name = '.luarc.json',
-                                url = 'https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json',
-                            },
-                        }),
+                        schemas = json_schemas,
                         validate = { enable = true },
                     },
                 },

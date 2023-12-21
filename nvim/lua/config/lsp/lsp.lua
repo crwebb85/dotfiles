@@ -342,15 +342,19 @@ local function lsp_attach(event)
 
     default_keymaps(event.buf)
     -- vim.print(client.name)
-    if client.name == 'rust_analyzer' then
-        require('config.lsp.codelens').init_rust_commands()
-    end
 end
 
 vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('lsp_attach', { clear = true }),
     desc = 'lsp on_attach',
     callback = lsp_attach,
+})
+
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('init_commands', { clear = true }),
+    desc = 'lsp on_attach',
+    callback = require('config.lsp.commands').setup,
+    once = true,
 })
 
 ---
