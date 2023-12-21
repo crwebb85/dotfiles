@@ -276,6 +276,13 @@ local config = function()
         Seperator,
     }
 
+    ---@return string
+    local function get_yaml_schema_name()
+        local schema = require('yaml-companion').get_buf_schema(0)
+        if schema.result[1].name == 'none' then return '' end
+        return schema.result[1].name
+    end
+
     ---@type StatusLine
     local LSPActive = {
         condition = conditions.lsp_attached,
@@ -285,12 +292,12 @@ local config = function()
         {
             provider = function()
                 local names = {}
-                for i, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-                    table.insert(names, server.name)
-                    if i > 4 then
-                        table.insert(names, '...') -- I don't want the list of LSP's to get too long
-                        break
+                for _, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+                    local name = server.name
+                    if server.name == 'yamlls' then
+                        name = 'yamlls(' .. get_yaml_schema_name() .. ')'
                     end
+                    table.insert(names, name)
                 end
                 return ' [' .. table.concat(names, ' ') .. ']'
             end,

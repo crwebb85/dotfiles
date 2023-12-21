@@ -32,6 +32,8 @@
     "/home/chris/.local/share/nvim/lazy/nvim-dap-ui/lua",
     "/home/chris/.local/share/nvim/lazy/heirline.nvim/lua",
     "/home/chris/.local/share/nvim/lazy/nvim-web-devicons/lua",
+    "/home/chris/.local/share/nvim/lazy/yaml-companion.nvim/lua",
+    "/home/chris/.local/share/nvim/lazy/schemastore.nvim/lua",
     "/home/chris/.config/nvim/lua",
     "${3rd}/luv/library"
   ],

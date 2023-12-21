@@ -690,6 +690,7 @@ require('lazy').setup({
                     'tsx',
                     'css',
                     'json',
+                    'jsonc',
                     'html',
                     'xml',
                     'yaml',
@@ -984,6 +985,33 @@ require('lazy').setup({
             })
         end,
     },
+
+    -- Helps configure which json and yaml schemas to use for the corresponding lsp
+    -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
+    -- Catalog of kubernetes schemas: https://github.com/datreeio/CRDs-catalog/tree/main
+    -- Note: The setup for this plugin is in the lspconfig plugin's setup function
+    {
+        'b0o/schemastore.nvim',
+        lazy = true, -- my setup for lspconfig will lazy load this plugin
+    },
+
+    -- A frontend for yaml schemas to use
+    -- Adds a telescope picker via `Telescope yaml_schema`
+    -- Adds a hook to determine which shema is selected (useful for statusline)
+    -- Enhances auto-completion descriptions
+    -- Adds detection mechanism for kubernetes files as they are context dependent rather the file name dependent
+    -- Note: Most of the setup for this is in the lspconfig plugin's setup function
+    {
+        'someone-stole-my-name/yaml-companion.nvim',
+        lazy = true, -- my setup for lspconfig will lazy load this plugin
+        dependencies = {
+            { 'neovim/nvim-lspconfig' },
+            { 'nvim-lua/plenary.nvim' },
+            { 'nvim-telescope/telescope.nvim' },
+        },
+        config = function() require('telescope').load_extension('yaml_schema') end,
+    },
+
     -- Manager for external tools (LSPs, linters, debuggers, formatters)
     -- auto-install of those external tools
     {
@@ -1008,6 +1036,8 @@ require('lazy').setup({
                     'ansible-language-server',
                     'ansible-lint',
                     'rust-analyzer',
+                    'yamlls', -- (yaml-language-server)
+                    'jsonls', -- (json-lsp)
 
                     -- Formatters
                     'black', -- python formatter
@@ -1098,8 +1128,173 @@ require('lazy').setup({
                     },
                 },
             })
+
+            -- yamlls config is based on article https://www.arthurkoziel.com/json-schemas-in-neovim/
+            local yamlls_cfg = require('yaml-companion').setup({
+                -- detect k8s schemas based on file content
+                builtin_matchers = {
+                    kubernetes = { enabled = true },
+                },
+
+                -- schemas available in Telescope picker
+                -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
+                -- Catalog of kubernetes schemas: https://github.com/datreeio/CRDs-catalog/tree/main
+                schemas = {
+                    -- not loaded automatically, manually select with
+                    -- :Telescope yaml_schema
+                    {
+                        name = 'Argo CD Application',
+                        uri = 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj.io/application_v1alpha1.json',
+                    },
+                    {
+                        name = 'SealedSecret',
+                        uri = 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/bitnami.com/sealedsecret_v1alpha1.json',
+                    },
+                    -- schemas below are automatically loaded, but added
+                    -- them here so that they show up in the statusline
+                    {
+                        name = 'Kustomization',
+                        uri = 'https://json.schemastore.org/kustomization.json',
+                    },
+                    {
+                        name = 'GitHub Workflow',
+                        uri = 'https://json.schemastore.org/github-workflow.json',
+                    },
+                    {
+                        name = 'Ansible Execution Environment',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json',
+                    },
+                    {
+                        name = 'Ansible Meta',
+                        url = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json',
+                    },
+                    {
+                        name = 'Ansible Meta Runtime',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta-runtime.json',
+                    },
+                    {
+                        name = 'Ansible Argument Specs',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json',
+                    },
+                    {
+                        name = 'Ansible Requirements',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json',
+                    },
+                    {
+                        name = 'Ansible Vars File',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/vars.json',
+                    },
+                    {
+                        name = 'Ansible Tasks File',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/tasks',
+                    },
+                    {
+                        name = 'Ansible Playbook',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook',
+                    },
+                    {
+                        name = 'Ansible Rulebook',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json',
+                    },
+                    {
+                        name = 'Ansible Inventory',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json',
+                    },
+                    {
+                        name = 'Ansible Collection Galaxy',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/galaxy.json',
+                    },
+                    {
+                        name = 'Ansible-lint Configuration',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json',
+                    },
+                    {
+                        name = 'Ansible Navigator Configuration',
+                        uri = 'https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json',
+                    },
+                },
+
+                lspconfig = {
+                    settings = {
+                        yaml = {
+                            validate = true,
+                            schemaStore = {
+                                enable = false,
+                                url = '',
+                            },
+
+                            -- schemas from store, matched by filename
+                            -- loaded automatically
+                            -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
+                            schemas = require('schemastore').yaml.schemas({
+                                select = {
+                                    'kustomization.yaml',
+                                    'GitHub Workflow',
+                                    'Ansible Execution Environment',
+                                    'Ansible Meta',
+                                    'Ansible Meta Runtime',
+                                    'Ansible Argument Specs',
+                                    'Ansible Requirements',
+                                    'Ansible Vars File',
+                                    'Ansible Tasks File',
+                                    'Ansible Playbook',
+                                    'Ansible Rulebook',
+                                    'Ansible Inventory',
+                                    'Ansible Collection Galaxy',
+                                    'Ansible-lint Configuration',
+                                    'Ansible Navigator Configuration',
+                                },
+                            }),
+                        },
+                    },
+                },
+            })
+            lspconfig.yamlls.setup(yamlls_cfg)
+
+            -- jsonls config is based on article https://www.arthurkoziel.com/json-schemas-in-neovim/
+            -- Config type is defined in https://github.com/microsoft/vscode/blob/30b777312745e84972956d4361465d4d38aa0f78/extensions/json-language-features/server/src/jsonServer.ts#L202C2-L218C3
+            local jsonls_cfg = {
+                settings = {
+                    json = {
+                        schemas = require('schemastore').json.schemas({
+                            select = {
+                                'Renovate',
+                                'GitHub Workflow Template Properties',
+                            },
+                            extra = {
+
+                                description = 'Schema for luals lsp configuration file',
+                                fileMatch = {
+                                    '.luarc.json',
+                                },
+                                name = '.luarc.json',
+                                url = 'https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json',
+                            },
+                        }),
+                        validate = { enable = true },
+                    },
+                },
+            }
+            -- vim.print(jsonls_cfg)
+            lspconfig.jsonls.setup(jsonls_cfg)
+
+            -- taplo config is based on article https://www.arthurkoziel.com/json-schemas-in-neovim/
+            -- tablo loads all toml schemas from https://www.schemastore.org/api/json/catalog.json with little customization
+            lspconfig.taplo.setup({
+                settings = {
+                    evenBetterToml = {
+                        schema = {
+                            -- add additional schemas
+                            -- associations = {
+                            --     ['example\\.toml$'] = 'https://json.schemastore.org/example.json',
+                            -- },
+                        },
+                    },
+                },
+            })
         end,
     },
+
     -- Autocompletion
     {
         'hrsh7th/nvim-cmp',

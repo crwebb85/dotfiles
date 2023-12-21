@@ -1,5 +1,7 @@
 # Useful command
 
+"$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+
 - `:help <a neovim api function/object>` opens help for the function
 - `:help motions.txt` opens help page for learning vim motions
 - `:help vim-diff.txt` list differences between vim
@@ -31,6 +33,8 @@
 - `:Git Difftool` adds all git changes to the quick fix list
 
 - `gv` re-select last selection
+
+- `vim.fn.expand('%')` get current path
 
 You can pass arbitrary data to a User autocmd callback by doing
 
