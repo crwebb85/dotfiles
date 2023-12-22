@@ -332,6 +332,12 @@ local function lsp_attach(event)
                 buffer = event.buf,
             }
         )
+
+        vim.api.nvim_create_autocmd({ 'BufLeave' }, {
+            group = 'code_action',
+            callback = require('config.lsp.lightbulb').remove_bulb,
+            buffer = event.buf,
+        })
     end
 
     vim.api.nvim_create_autocmd({ 'LspProgress' }, {
