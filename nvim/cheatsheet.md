@@ -40,8 +40,10 @@ You can pass arbitrary data to a User autocmd callback by doing
 
 ```lua
 vim.api.nvim_exec_autocmds('User', {
-  pattern = '<event-name>',
-  data = <some-data>
+    pattern = 'EventName>',
+    data = {
+        -- Data you want to send on event
+    },
 })
 ```
 
@@ -49,10 +51,10 @@ then receive it using
 
 ```lua
 vim.api.nvim_create_autocmd('User', {
-  pattern = '<event-name>',
-  callback = function(event)
-    -- event.data == <some-data>
-  end
+    pattern = '<event-name>',
+    callback = function(event)
+        -- event.data == <some-data>
+    end,
 })
 ```
 

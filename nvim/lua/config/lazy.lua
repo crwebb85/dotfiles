@@ -1695,35 +1695,40 @@ require('lazy').setup({
                 desc = 'Conform: Format buffer',
             },
         },
-        opts = {
-            formatters_by_ft = {
-                lua = { 'stylua' },
-                -- first use isort and then black
-                python = { 'isort', 'black' },
-                typescript = { { 'prettierd', 'prettier' } },
-                javascript = { { 'prettierd', 'prettier' } },
-                yaml = { { 'prettierd', 'prettier' } },
-                json = { { 'prettierd', 'prettier' } },
-                ansible = { { 'prettierd', 'prettier' } },
-                --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
-                -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
-                ['yaml.ansible'] = { { 'prettierd', 'prettier' } },
-                -- "inject" is a "special" formatter from conform.nvim, which
-                -- formats treesitter-injected code. In effect, hits will make
-                -- conform.nvim format any python codeblocks inside a markdown file.
-                markdown = { { 'prettierd', 'prettier' }, 'inject' },
-            },
-            -- enable format-on-save
-            format_on_save = function(bufnr)
-                -- Disable with a global or buffer-local variable
-                if
-                    vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat
-                then
-                    return
-                end
-                return { timeout_ms = 500, lsp_fallback = true }
-            end,
-        },
+        config = function(_, _)
+            require('conform').setup({
+                formatters_by_ft = {
+                    lua = { 'stylua' },
+                    -- first use isort and then black
+                    python = { 'isort', 'black' },
+                    typescript = { { 'prettierd', 'prettier' } },
+                    javascript = { { 'prettierd', 'prettier' } },
+                    yaml = { { 'prettierd', 'prettier' } },
+                    json = { { 'prettierd', 'prettier' } },
+                    ansible = { { 'prettierd', 'prettier' } },
+                    --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
+                    -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
+                    ['yaml.ansible'] = { { 'prettierd', 'prettier' } },
+                    -- "inject" is a "special" formatter from conform.nvim, which
+                    -- formats treesitter-injected code. In effect, hits will make
+                    -- conform.nvim format any python codeblocks inside a markdown file.
+                    markdown = { { 'prettierd', 'prettier' }, 'injected' },
+                },
+                -- enable format-on-save
+                format_on_save = function(bufnr)
+                    -- Disable with a global or buffer-local variable
+                    if
+                        vim.g.disable_autoformat
+                        or vim.b[bufnr].disable_autoformat
+                    then
+                        return
+                    end
+                    return { timeout_ms = 500, lsp_fallback = true }
+                end,
+            })
+            -- -- Set this value to true to silence errors when formatting a block fails
+            -- require('conform.formatters.injected').options.ignore_errors = false
+        end,
     },
 
     -- Code Action preview
