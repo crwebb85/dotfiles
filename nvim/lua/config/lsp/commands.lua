@@ -5,10 +5,7 @@ local M = {}
 -------------------------------------------------------------------------------
 ---jsonls commands
 
-local function sort_json(command)
-    vim.print('TODO implement json sort')
-    vim.print(command)
-end
+local function sort_json(_) require('ipc_tools.ipc_client').sort_json_file() end
 
 -------------------------------------------------------------------------------
 --- rust-analyzer commands

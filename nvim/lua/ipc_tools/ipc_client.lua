@@ -130,52 +130,51 @@ local function create_venv()
     end
 end
 
-function M.init()
+function M.init_venv()
     vim.print('VENV_DIR:' .. VENV_DIR)
     vim.print('EDITOR_CLI_DIR:' .. EDITOR_CLI_DIR)
     vim.print('Creating virtual environment…\n')
     create_venv()
 end
 
+function M.hello_world()
+    local python_executable_path = find_venv_executable('python')
+
+    vim.print(python_executable_path)
+    local output = vim.fn.system({
+        python_executable_path,
+        EDITOR_CLI_FILE_PATH,
+        'hello',
+    })
+    if output then print(output) end
+end
+
+function M.sort_json_file()
+    local python_executable_path = find_venv_executable('python')
+
+    local file_path = vim.fn.expand('%p')
+    if file_path == nil then
+        error('Buffer needs to be a file on system')
+    elseif type(file_path) == 'table' then
+        error("Multiple files returned by expand (this shouldn't happen)")
+    end
+    vim.print(python_executable_path)
+    local output = vim.fn.system({
+        python_executable_path,
+        EDITOR_CLI_FILE_PATH,
+        'sortjsonfile',
+        file_path,
+    })
+    if output then print(output) end
+
+    -- reload current file
+    vim.cmd([[:e]])
+end
+
 M.setup = function()
-    vim.api.nvim_create_user_command(
-        'EditorToolsInit',
-        function() M.init() end,
-        {}
-    )
-    vim.api.nvim_create_user_command('Hello', function()
-        local python_executable_path = find_venv_executable('python')
-
-        vim.print(python_executable_path)
-        local output = vim.fn.system({
-            python_executable_path,
-            EDITOR_CLI_FILE_PATH,
-            'hello',
-        })
-        if output then print(output) end
-    end, {})
-
-    vim.api.nvim_create_user_command('SortJson', function()
-        local python_executable_path = find_venv_executable('python')
-
-        local file_path = vim.fn.expand('%p')
-        if file_path == nil then
-            error('Buffer needs to be a file on system')
-        elseif type(file_path) == 'table' then
-            error("Multiple files returned by expand (this shouldn't happen)")
-        end
-        vim.print(python_executable_path)
-        local output = vim.fn.system({
-            python_executable_path,
-            EDITOR_CLI_FILE_PATH,
-            'sortjson',
-            file_path,
-        })
-        if output then print(output) end
-
-        -- reload current file
-        vim.cmd([[:e]])
-    end, {})
+    vim.api.nvim_create_user_command('EditorToolsInit', M.init_venv, {})
+    vim.api.nvim_create_user_command('Hello', M.hello_world, {})
+    vim.api.nvim_create_user_command('SortJsonFile', M.sort_json_file, {})
 end
 
 return M

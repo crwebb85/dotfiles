@@ -20,6 +20,7 @@
 - look into skeleton (file template) plugins/configuration
 - add a save and save all button to heirline so I know when I have unsaved buffers
 - Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
+- Lightbulb still doesn't get removed in some case like when opening help docs with telescope
 
 ### Cool plugins:
 

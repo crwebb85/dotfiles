@@ -12,7 +12,7 @@ def hello():
 
 
 @app.command()
-def sortjson(path: Path):
+def sortjsonfile(path: Path):
     sorted_json = ""
     with open(path, mode="r") as file:
         contents = file.read()
