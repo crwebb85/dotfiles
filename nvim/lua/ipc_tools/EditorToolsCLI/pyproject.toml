@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "EditorToolsCLI"
+version = "0.0.1"
+description = "CLI tools for extra editor features"
+dependencies = ["typer[all]"]
+
+[project.scripts]
+myneovimtools = "src.__main__:main"
+
+[tool.setuptools]
+packages = ["src"]
+include-package-data = false
