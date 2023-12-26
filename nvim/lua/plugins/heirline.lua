@@ -6,25 +6,27 @@ local config = function()
 
     heirline.load_colors(colors)
 
-    local status_inactive = {
-        buftype = {
-            'dashboard',
-            'quickfix',
-            'locationlist',
-            'quickfix',
-            'scratch',
-            'prompt',
-            'nofile',
-        },
-        filetype = {
-            'dashboard',
-            'harpoon',
-            'startuptime',
-            'mason.nvim',
-            'terminal',
-            'gypsy',
-        },
-    }
+    local background_color = colors.bg_dark
+    local active_background_color = colors.fg_dark
+    local inactive_background_color = background_color
+
+    local recording_background_color = colors.bg_highlight
+    local diagnostics_error_foreground = colors.red
+    local recording_foreground_color = colors.red
+    local scrollbar_foreground_color = colors.fg_sidebar
+    local scrollbar_background_color = background_color
+    local diagnostics_warning_foreground_color = colors.warning
+    local diagnostics_info_foreground_color = colors.info
+    local diagnostics_hint_foreground_color = colors.hint
+    local git_branch_name_foreground_color = colors.green2
+    local gitsigns_add_foreground_color = colors.gitSigns.add
+    local gitsigns_delete_foreground_color = colors.gitSigns.delete
+    local gitsigns_change_foreground_color = colors.gitSigns.change
+    local macro_recording_forground_color = colors.red1
+    local filename_foreground_color = colors.magenta2
+    local file_flags_foreground_color = colors.green2
+    local filetype_foreground_color = colors.magenta
+
     local winbar_inactive = {
         buftype = { 'nofile', 'prompt', 'quickfix', 'terminal' },
         filetype = { 'toggleterm', 'qf', 'terminal', 'gypsy' },
@@ -35,14 +37,6 @@ local config = function()
         '?',
     }
 
-    local recording_background_color = colors.bg_highlight
-    local recording_foreground_color = colors.red
-    local active_background_color = colors.bg_popup
-    local active_foreground_color = colors.fg_popup
-    local inactive_background_color = colors.bg_dark
-    local scrollbar_foreground_color = colors.fg_sidebar
-    local scrollbar_background_color = active_background_color
-
     local scrollbar_enabled = function()
         return vim.api.nvim_buf_line_count(0) > 99 and conditions.is_active()
     end
@@ -50,11 +44,8 @@ local config = function()
     local Align = { provider = '%=' }
     local Space = { provider = ' ' }
     local Seperator = { provider = '|' }
-    local LeftSep = { provider = '' }
-    local RightSep = { provider = '' }
 
     local diagnostics_spacer = ' '
-    -- TODO add type
     local Diagnostics = {
         condition = conditions.has_diagnostics,
         static = {
@@ -86,22 +77,6 @@ local config = function()
             )
         end,
         update = { 'DiagnosticChanged', 'BufEnter', 'WinEnter' },
-        {
-            RightSep,
-            hl = function()
-                if conditions.is_active() then
-                    return {
-                        fg = active_foreground_color,
-                        bg = active_background_color,
-                    }
-                else
-                    return {
-                        fg = active_foreground_color,
-                        bg = inactive_background_color,
-                    }
-                end
-            end,
-        },
         Space,
         {
             provider = function(self)
@@ -109,28 +84,28 @@ local config = function()
                         and (self.error_icon .. self.errors .. diagnostics_spacer)
                     or ''
             end,
-            hl = { fg = colors.red },
+            hl = { fg = diagnostics_error_foreground },
         },
         {
             provider = function(self)
                 return self.warnings > 0
                     and (self.warn_icon .. self.warnings .. diagnostics_spacer)
             end,
-            hl = { fg = colors.warning },
+            hl = { fg = diagnostics_warning_foreground_color },
         },
         {
             provider = function(self)
                 return self.info > 0
                     and (self.info_icon .. self.info .. diagnostics_spacer)
             end,
-            hl = { fg = colors.info },
+            hl = { fg = diagnostics_info_foreground_color },
         },
         {
             provider = function(self)
                 return self.hints > 0
                     and (self.hint_icon .. self.hints .. diagnostics_spacer)
             end,
-            hl = { fg = colors.hint },
+            hl = { fg = diagnostics_hint_foreground_color },
         },
         {
             condition = function() return not scrollbar_enabled() end,
@@ -138,11 +113,10 @@ local config = function()
                 Space,
             },
         },
-        hl = { bg = active_foreground_color },
+        hl = { bg = background_color },
     }
 
     -- Show which vim mode I am using
-    -- TODO add type
     local ViMode = {
         -- get vim current mode, this information will be required by the provider
         -- and the highlight functions, so we compute it only once per component
@@ -232,7 +206,6 @@ local config = function()
         },
     }
 
-    -- TODO add type
     local Git = {
         condition = conditions.is_git_repo,
         init = function(self)
@@ -246,7 +219,11 @@ local config = function()
             provider = function(self)
                 return ' ' .. self.status_dict.head .. ' '
             end,
-            hl = { fg = colors.green2, bold = true, italic = true },
+            hl = {
+                fg = git_branch_name_foreground_color,
+                bold = true,
+                italic = true,
+            },
         },
         {
             condition = function(self) return self.has_changes end,
@@ -255,23 +232,23 @@ local config = function()
                     local count = self.status_dict.added or 0
                     return count > 0 and ('+' .. count .. ' ')
                 end,
-                hl = { fg = colors.gitSigns.add, bold = true },
+                hl = { fg = gitsigns_add_foreground_color, bold = true },
             },
             {
                 provider = function(self)
                     local count = self.status_dict.removed or 0
                     return count > 0 and ('-' .. count .. ' ')
                 end,
-                hl = { fg = colors.gitSigns.delete, bold = true },
+                hl = { fg = gitsigns_delete_foreground_color, bold = true },
             },
             {
                 provider = function(self)
                     local count = self.status_dict.changed or 0
                     return count > 0 and ('~' .. count .. ' ')
                 end,
-                hl = { fg = colors.gitSigns.change, bold = true },
+                hl = { fg = gitsigns_change_foreground_color, bold = true },
             },
-            hl = { bg = active_foreground_color },
+            hl = { bg = background_color },
         },
         Seperator,
     }
@@ -417,7 +394,6 @@ local config = function()
         Seperator,
     }
 
-    -- TODO add type
     local MacroRecording = {
         condition = conditions.is_active,
         init = function(self)
@@ -431,16 +407,8 @@ local config = function()
         {
             condition = function(self) return self.reg_recording ~= '' end,
             {
-                condition = function(self) return self.has_changes end,
-                LeftSep,
-                hl = {
-                    bg = recording_background_color,
-                    fg = active_background_color,
-                },
-            },
-            {
                 provider = '   ',
-                hl = { fg = colors.red1 },
+                hl = { fg = macro_recording_forground_color },
             },
             {
                 provider = function(self) return '@' .. self.reg_recording end,
@@ -448,13 +416,6 @@ local config = function()
             },
             {
                 Space,
-            },
-            {
-                LeftSep,
-                hl = {
-                    bg = active_background_color,
-                    fg = recording_background_color,
-                },
             },
             hl = {
                 bg = recording_background_color,
@@ -495,7 +456,6 @@ local config = function()
         provider = '%7(%l/%3L%):%2c %P',
     }
 
-    -- TODO add type
     local ScrollBar = {
         condition = function() return scrollbar_enabled() end,
         static = {
@@ -513,25 +473,15 @@ local config = function()
         },
     }
 
-    ---@type StatusLine
-    local InactiveStatusline = {
-        condition = function() conditions.buffer_matches(status_inactive) end,
-        provider = function() return '%=' end,
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_background_color }
-            else
-                return { bg = inactive_background_color }
-            end
-        end,
-    }
-
     local ComponentDelimiter = { '', ' |' }
 
     ---@type StatusLine
-    local ActiveStatusline = {
+    local StatusLines = {
         condition = function()
-            return not conditions.buffer_matches(status_inactive)
+            for _, c in ipairs(cmdtype_inactive) do
+                if vim.fn.getcmdtype() == c then return false end
+            end
+            return true
         end,
         MacroRecording,
         heirlineUtils.surround(ComponentDelimiter, nil, ViMode),
@@ -543,25 +493,7 @@ local config = function()
         Diagnostics,
         Ruler,
         ScrollBar,
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_background_color }
-            else
-                return { bg = inactive_background_color }
-            end
-        end,
-    }
-
-    ---@type StatusLine
-    local StatusLines = {
-        condition = function()
-            for _, c in ipairs(cmdtype_inactive) do
-                if vim.fn.getcmdtype() == c then return false end
-            end
-            return true
-        end,
-        InactiveStatusline,
-        ActiveStatusline,
+        hl = { bg = background_color },
     }
 
     ---------------------------------------------------------------------------
@@ -581,20 +513,9 @@ local config = function()
     local ActiveBlock = {
         hl = function()
             if conditions.is_active() then
-                return { bg = active_foreground_color }
+                return { bg = active_background_color }
             else
-                return { bg = active_foreground_color }
-            end
-        end,
-    }
-
-    ---@type StatusLine
-    local ActiveSep = {
-        hl = function()
-            if conditions.is_active() then
-                return { fg = active_background_color }
-            else
-                return { fg = inactive_background_color }
+                return { bg = inactive_background_color }
             end
         end,
     }
@@ -607,7 +528,6 @@ local config = function()
         end,
     }
 
-    -- TODO add type
     local FileIcon = {
         init = function(self)
             local filename = self.filename
@@ -629,7 +549,6 @@ local config = function()
         hl = function(self) return { fg = self.icon_color } end,
     }
 
-    -- TODO add type
     local FileName = {
         provider = function(self)
             local filename = vim.fn.fnamemodify(self.filename, ':t')
@@ -639,7 +558,7 @@ local config = function()
             end
             return filename
         end,
-        hl = { fg = colors.magenta2, bold = true },
+        hl = { fg = filename_foreground_color, bold = true },
     }
 
     ---@type StatusLine
@@ -649,7 +568,11 @@ local config = function()
             provider = function()
                 if vim.bo.modified then return '[+] ' end
             end,
-            hl = { fg = colors.green, bold = true, italic = true },
+            hl = {
+                fg = file_flags_foreground_color,
+                bold = true,
+                italic = true,
+            },
         },
         {
             -- shows a lock if the file is readonly
@@ -658,7 +581,11 @@ local config = function()
                     return ' '
                 end
             end,
-            hl = { fg = colors.green2, bold = true, italic = true },
+            hl = {
+                fg = file_flags_foreground_color,
+                bold = true,
+                italic = true,
+            },
         },
     }
 
@@ -668,14 +595,12 @@ local config = function()
             return conditions.buffer_matches({ filetype = { 'coderunner' } })
         end,
         provider = function() return vim.bo.filetype end,
-        hl = { fg = colors.magenta, bold = true },
+        hl = { fg = filetype_foreground_color, bold = true },
     }
 
-    -- TODO add type
     local FileNameBlock = {
         init = function(self) self.filename = vim.api.nvim_buf_get_name(0) end,
         FileType,
-        heirlineUtils.insert(ActiveSep, LeftSep),
         Space,
         unpack(FileFlags),
         heirlineUtils.insert(FileNameModifer, FileName, Space, FileIcon),
@@ -688,7 +613,6 @@ local config = function()
             local empty_buffer = function()
                 return vim.bo.ft == '' and vim.bo.buftype == ''
             end
-            -- return not conditions.buffer_matches(winbar_inactive) and not empty_buffer()
             return not empty_buffer()
         end,
         heirlineUtils.insert(ActiveBlock, FileNameBlock),
