@@ -485,7 +485,7 @@ require('lazy').setup({
             },
             {
                 '<leader>rr',
-                function() require('refactoring').select_refactor() end,
+                function() require('refactoring').select_refactor({}) end,
                 mode = { 'n', 'x' },
                 desc = 'Refactor: Prompt for a refactor',
             },
@@ -499,7 +499,7 @@ require('lazy').setup({
             },
             {
                 '<leader>rv',
-                function() require('refactoring').debug.print_var() end,
+                function() require('refactoring').debug.print_var({}) end,
                 mode = { 'n', 'x' },
                 desc = 'Refactor: Print var',
             },
