@@ -35,6 +35,7 @@
 - `gv` re-select last selection
 
 - `vim.fn.expand('%')` get current path
+- `:echo stdpath('data')` to find the path that neovim saves user data to
 
 You can pass arbitrary data to a User autocmd callback by doing
 
@@ -124,3 +125,34 @@ when not in the command-line window.
 # Useful resources
 
 [Lua Type Checking Guide](https://mrcjkb.dev/posts/2023-08-17-lua-adts.html)
+
+# Windows install
+[Wezterm config help](https://gilbertsanchez.com/posts/my-terminal-wezterm/)
+
+```ps1
+# if pwsh is not a command 
+winget install --id Microsoft.Powershell --source winget
+
+# Then install
+choco install mingw
+choco install ripgrep
+```
+
+Other requirements:
+
+- node
+- npm
+- python
+- pip
+
+Add Environment Variables:
+
+- User variables
+  - XDG_CONFIG_HOME=%USERPROFILE%\Documents\.config\
+  - Path=%USERPROFILE%\AppData\Local\nvim-data\mason\bin
+- System Variables:
+  - Path=C:\Program Files\WezTerm
+  - Path=C:\nvim-win64\bin
+  - Path=C:\Program Files\nodejs
+  - Path=C:\ProgramData\chocolatey\bin
+  - Path=C:\Program Files\PowerShell\7
