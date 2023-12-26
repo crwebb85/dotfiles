@@ -15,8 +15,18 @@ vim.opt.wrap = false
 
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.undodir =
-    require('utils.path').concat({ os.getenv('HOME'), '.vim', 'undodir' })
+vim.undodir = (function()
+    if require('utils.platform').is.win then
+        require('utils.path').concat({
+            os.getenv('UserProfile'),
+            'Documents',
+            '.vim',
+            'undodir',
+        })
+    else
+        require('utils.path').concat({ os.getenv('HOME'), '.vim', 'undodir' })
+    end
+end)()
 vim.opt.undofile = true
 
 vim.opt.hlsearch = false
