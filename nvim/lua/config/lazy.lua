@@ -407,6 +407,26 @@ require('lazy').setup({
         event = 'VeryLazy',
         config = true,
     },
+    -- Adds markdown preview (opens in browser)
+    {
+        'iamcco/markdown-preview.nvim',
+        cmd = {
+            'MarkdownPreviewToggle',
+            'MarkdownPreview',
+            'MarkdownPreviewStop',
+        },
+        ft = { 'markdown' },
+        build = function() vim.fn['mkdp#util#install']() end,
+    },
+    -- Opens markdown preview in floating window
+    { 'ellisonleao/glow.nvim', config = true, cmd = 'Glow' },
+    -- Adds image preview support
+    {
+        'https://github.com/adelarsq/image_preview.nvim',
+        event = 'VeryLazy',
+        config = function() require('image_preview').setup() end,
+    },
+    -- Adds refactor commands
     {
         'ThePrimeagen/refactoring.nvim',
         lazy = true,

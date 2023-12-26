@@ -21,8 +21,13 @@
 - add a save and save all button to heirline so I know when I have unsaved buffers
 - Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
 - Lightbulb still doesn't get removed in some case like when opening help docs with telescope
+- Add to my cli tool
+- Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
+- When lazy.nvim installs a new pluggin for the first time on startup my line numbers stop working until I close and reopen
 
 ### Cool plugins:
+
+- https://github.com/iamcco/markdown-preview.nvim
 
 - https://github.com/rockerBOO/awesome-neovim
 - https://github.com/carbon-steel/detour.nvim/tree/main
@@ -33,7 +38,6 @@
 - https://github.com/soulis-1256/hoverhints.nvim
 - https://github.com/rgroli/other.nvim
 - https://github.com/jmederosalvarado/roslyn.nvim
-- https://github.com/iamcco/markdown-preview.nvim
 - https://github.com/anuvyklack/hydra.nvim
 - https://github.com/AndrewRadev/inline_edit.vim
 - https://github.com/HakonHarnes/img-clip.nvim
