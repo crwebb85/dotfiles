@@ -127,10 +127,11 @@ when not in the command-line window.
 [Lua Type Checking Guide](https://mrcjkb.dev/posts/2023-08-17-lua-adts.html)
 
 # Windows install
+
 [Wezterm config help](https://gilbertsanchez.com/posts/my-terminal-wezterm/)
 
 ```ps1
-# if pwsh is not a command 
+# if pwsh is not a command
 winget install --id Microsoft.Powershell --source winget
 
 # Then install
@@ -156,3 +157,14 @@ Add Environment Variables:
   - Path=C:\Program Files\nodejs
   - Path=C:\ProgramData\chocolatey\bin
   - Path=C:\Program Files\PowerShell\7
+
+I also had issues with treesitter markdown support `Error in decoration provider treesitter/highlighter.win: Error executing lua: ...im`
+I solved it by trying:
+
+```
+:TSUninstall markdown
+:TSUninstall markdown_inline
+```
+
+Those commands failed for some reason but the error message told me the file path they
+were downloaded at and I manually deleted them and it fixed the problem

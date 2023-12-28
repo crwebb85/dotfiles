@@ -355,7 +355,6 @@ require('lazy').setup({
     {
         'stevearc/oil.nvim',
         lazy = true,
-        config = true,
         keys = {
             {
                 '<leader>ol',
@@ -364,6 +363,30 @@ require('lazy').setup({
             },
         },
         dependencies = { 'nvim-tree/nvim-web-devicons' },
+        opts = {
+            keymaps = {
+                ['<leader>p'] = {
+                    function()
+                        local oil = require('oil')
+                        local entry = oil.get_cursor_entry()
+
+                        if entry == nil then return end
+                        if entry['type'] == 'file' then
+                            local dir = oil.get_current_dir()
+                            local fileName = entry['name']
+                            local fullName = dir .. fileName
+
+                            require('utils.image_preview').preview_image(
+                                fullName
+                            )
+                        end
+                    end,
+                    desc = 'Open image preview',
+                    mode = 'n',
+                },
+            },
+        },
+        config = function(_, opts) require('oil').setup(opts) end,
     },
 
     ---------------------------------------------------------------------------
@@ -417,14 +440,7 @@ require('lazy').setup({
         },
         ft = { 'markdown' },
         build = function() vim.fn['mkdp#util#install']() end,
-    },
-    -- Opens markdown preview in floating window
-    { 'ellisonleao/glow.nvim', config = true, cmd = 'Glow' },
-    -- Adds image preview support
-    {
-        'https://github.com/adelarsq/image_preview.nvim',
-        event = 'VeryLazy',
-        config = function() require('image_preview').setup() end,
+        lazy = true,
     },
     -- Adds refactor commands
     {
@@ -1058,7 +1074,7 @@ require('lazy').setup({
                     'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
                     'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
                     'ansible-language-server',
-                    'ansible-lint',
+                    -- 'ansible-lint',
                     'rust-analyzer',
                     'yamlls', -- (yaml-language-server)
                     'jsonls', -- (json-lsp)

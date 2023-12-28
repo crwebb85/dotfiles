@@ -124,6 +124,14 @@
 - [JS Dap discussion](https://www.reddit.com/r/neovim/comments/186ntnw/does_anyone_have_a_working_dap_for_js_please/?utm_medium=android_app&utm_source=share)
 - [JS Dap discussion](https://www.reddit.com/r/neovim/comments/1861hzm/i_finally_configured_nvimdap_to_debug_nodejs_apps/?utm_medium=android_app&utm_source=share)
 - [Java discussion](https://www.reddit.com/r/neovim/comments/1862kxo/is_it_help_to_bring_more_java_devs_to_nvim/?utm_medium=android_app&utm_source=share)
+
+### Jupyter notebook support
+
+- [Best Jupyter noebook discussion](https://www.reddit.com/r/neovim/comments/17ynpg2/how_to_edit_jupyter_notebooks_in_neovim_with_very/)
+  - I wasn't able to get this working yet and wanted to move on but it seems that the plugin [quarto-nvim](https://github.com/quarto-dev/quarto-nvim) is what I need to figure out next
+  - [Dotfiles from Author of molten plugin](https://github.com/benlubas/.dotfiles/tree/main)
+  - I found the some plugins don't support windows like [3rd/image.nvim](https://github.com/3rd/image.nvim)
+  - The author of molten also uses his own fork of image.nvim [benlubas/image.nvim](https://github.com/benlubas/image.nvim)
 - [Jupyter notebook discussion](https://www.reddit.com/r/neovim/comments/185uv3f/announcing_jupytextnvim/?utm_medium=android_app&utm_source=share)
 
 ### dotfiles to look into:
