@@ -362,11 +362,13 @@ require('lazy').setup({
                 desc = 'Oil: Open parent directory',
             },
         },
-        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        dependencies = {
+            'nvim-tree/nvim-web-devicons',
+        },
         opts = {
             keymaps = {
-                ['<leader>p'] = {
-                    function()
+                ['<leader>gf'] = {
+                    callback = function()
                         local oil = require('oil')
                         local entry = oil.get_cursor_entry()
 
@@ -375,9 +377,8 @@ require('lazy').setup({
                             local dir = oil.get_current_dir()
                             local fileName = entry['name']
                             local fullName = dir .. fileName
-
                             require('utils.image_preview').preview_image(
-                                fullName
+                                vim.fs.normalize(fullName)
                             )
                         end
                     end,
