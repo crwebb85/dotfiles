@@ -42,7 +42,7 @@
   "schemastore.nvim": { "branch": "main", "commit": "771c9517bf36f431361cbaac1ddc8499c7e5c5d3" },
   "stickybuf.nvim": { "branch": "master", "commit": "4271bfc6c85dc035eb9e8484954f9179d90e87ab" },
   "telescope-luasnip.nvim": { "branch": "master", "commit": "2ef7da3a363890686dbaad18ddbf59177cfe4f78" },
-  "telescope-media-files.nvim": { "branch": "master", "commit": "e4199d4440dfe5de7ad4ca29f320dfd684089f33" },
+  "telescope-media-files.nvim": { "branch": "master", "commit": "46af264c76782a2fda6dd74c5ebb282c5cc3eb9f" },
   "telescope.nvim": { "branch": "master", "commit": "f336f8cfab38a82f9f00df380d28f0c2a572f862" },
   "toggleterm.nvim": { "branch": "main", "commit": "91be5f327e42aa016da13b277540de8dba0b14e3" },
   "tokyonight.nvim": { "branch": "main", "commit": "f247ee700b569ed43f39320413a13ba9b0aef0db" },
