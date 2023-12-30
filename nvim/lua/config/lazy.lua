@@ -189,6 +189,10 @@ require('lazy').setup({
         'nvim-telescope/telescope.nvim',
         dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
+            {
+                'crwebb85/telescope-media-files.nvim',
+                -- dev = true,
+            },
         },
         lazy = true,
         cmd = { 'Telescope' },
@@ -231,52 +235,62 @@ require('lazy').setup({
                 desc = 'Telescope: suggest spelling (search dictionary)',
             },
         },
-        config = function()
-            require('telescope').setup({
-                defaults = {
-                    -- setting initial mode to 'normal'
-                    -- will allow me to have the telescope prompt in normal mode
-                    -- which is sometimes useful but not something I want normally enabled
+        opts = {
+            defaults = {
+                -- setting initial mode to 'normal'
+                -- will allow me to have the telescope prompt in normal mode
+                -- which is sometimes useful but not something I want normally enabled
 
-                    -- initial_mode = 'normal',
+                -- initial_mode = 'normal',
 
-                    dynamic_preview_title = true,
-                    mappings = {
-                        i = {
+                dynamic_preview_title = true,
+                mappings = {
+                    i = {
 
-                            ['<CR>'] = function(...)
-                                require('telescope.actions').select_default(...)
+                        ['<CR>'] = function(...)
+                            require('telescope.actions').select_default(...)
 
-                                local escape_key =
-                                    vim.api.nvim_replace_termcodes(
-                                        '<ESC>',
-                                        true,
-                                        false,
-                                        true
-                                    )
-                                vim.api.nvim_feedkeys(escape_key, 'm', false) -- Set mode to normal mode
-                            end,
-                        },
+                            local escape_key = vim.api.nvim_replace_termcodes(
+                                '<ESC>',
+                                true,
+                                false,
+                                true
+                            )
+                            vim.api.nvim_feedkeys(escape_key, 'm', false) -- Set mode to normal mode
+                        end,
                     },
                 },
-                pickers = {
-                    find_files = {
-                        find_command = {
-                            'rg',
-                            '--files',
-                            '--hidden',
-                            '--glob',
-                            '!.git',
-                            '--glob',
-                            '!node_modules',
-                            '--glob',
-                            '!venv',
-                            '--glob',
-                            '!.venv',
-                        },
+            },
+            pickers = {
+                find_files = {
+                    find_command = {
+                        'rg',
+                        '--files',
+                        '--hidden',
+                        '--glob',
+                        '!.git',
+                        '--glob',
+                        '!node_modules',
+                        '--glob',
+                        '!venv',
+                        '--glob',
+                        '!.venv',
                     },
                 },
-            })
+            },
+            extensions = {
+                media_files = {
+                    -- filetypes whitelist
+                    -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
+                    filetypes = { 'png', 'webp', 'jpg', 'jpeg' },
+                    -- find command (defaults to `fd`)
+                    find_cmd = 'rg',
+                },
+            },
+        },
+        config = function(_, opts)
+            require('telescope').setup(opts)
+            require('telescope').load_extension('media_files')
         end,
     },
 
@@ -532,7 +546,22 @@ require('lazy').setup({
     {
         'akinsho/toggleterm.nvim',
         lazy = true,
-        config = true,
+        config = function(_, opts)
+            local powershell_options = {
+                shell = vim.fn.executable('pwsh') == 1 and 'pwsh'
+                    or 'powershell',
+                shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::Default;',
+                shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait',
+                shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode',
+                shellquote = '',
+                shellxquote = '',
+            }
+
+            for option, value in pairs(powershell_options) do
+                vim.opt[option] = value
+            end
+            require('toggleterm').setup(opts)
+        end,
         cmd = { 'ToggleTerm' },
         keys = {
             {

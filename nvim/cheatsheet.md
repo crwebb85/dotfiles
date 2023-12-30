@@ -137,6 +137,7 @@ winget install --id Microsoft.Powershell --source winget
 # Then install
 choco install mingw
 choco install ripgrep
+winget install hpjansson.Chafa
 ```
 
 Other requirements:

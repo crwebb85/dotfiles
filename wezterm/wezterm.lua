@@ -7,7 +7,8 @@ local mouse_bindings = {}
 local launch_menu = {}
 
 config.color_scheme = "Tokyo Night"
-config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe" }
+-- config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe" }
+config.default_prog = { "pwsh.exe", "-NoLogo" }
 
 table.insert(launch_menu, {
 	label = "GitBash",
