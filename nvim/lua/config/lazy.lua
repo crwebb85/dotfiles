@@ -223,6 +223,34 @@ require('lazy').setup({
                 '<leader>fh',
                 function() require('telescope.builtin').help_tags() end,
                 desc = 'Telescope: help tags',
+                mode = { 'n' },
+            },
+            {
+                '<leader>fh',
+                function()
+                    -- based on https://github.com/nvim-telescope/telescope.nvim/issues/1923#issuecomment-1122642431
+                    local function getVisualSelection()
+                        vim.cmd('noau normal! "vy"')
+                        local text = vim.fn.getreg('v')
+                        vim.fn.setreg('v', {})
+
+                        if type(text) ~= 'string' then return '' end
+
+                        text = string.gsub(text, '\n', '')
+                        if #text > 0 then
+                            return text
+                        else
+                            return ''
+                        end
+                    end
+
+                    local text = getVisualSelection()
+                    require('telescope.builtin').help_tags({
+                        default_text = text,
+                    })
+                end,
+                desc = 'Telescope: help tags',
+                mode = { 'v' },
             },
             {
                 '<leader>fk',
