@@ -178,6 +178,13 @@ local function default_keymaps(bufnr)
         }
     )
 
+    vim.keymap.set(
+        { 'v', 'n' },
+        '<F3>',
+        require('actions-preview').code_actions,
+        { desc = 'LSP - Actions Preview: Code action preview menu' }
+    )
+
     if vim.lsp.buf.range_code_action then
         vim.keymap.set(
             'x',
@@ -199,13 +206,6 @@ local function default_keymaps(bufnr)
             }
         )
     end
-
-    vim.keymap.set(
-        { 'v', 'n' },
-        'gf',
-        require('actions-preview').code_actions,
-        { desc = 'LSP - Actions Preview: Code action preview menu' }
-    )
 
     vim.keymap.set('n', 'gl', function() vim.diagnostic.open_float() end, {
         buffer = bufnr,
