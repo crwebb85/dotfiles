@@ -5,7 +5,8 @@ local act = wezterm.action
 local config = {}
 local mouse_bindings = {}
 local launch_menu = {}
-
+-- config.term = "wezterm"
+-- config.term = "iterm2, iTerm2.app"
 config.color_scheme = "Tokyo Night"
 -- config.default_prog = { "C:\\Program Files\\Git\\bin\\bash.exe" }
 config.default_prog = { "pwsh.exe", "-NoLogo" }

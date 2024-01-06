@@ -902,7 +902,10 @@ require('lazy').setup({
                 type = 'server',
                 port = '${port}',
                 executable = {
-                    command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
+                    command = require('utils.path').get_mason_tool_path(
+                        'codelldb'
+                    ),
+                    -- command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
                     args = { '--port', '${port}' },
 
                     -- On windows you may have to uncomment this:
@@ -911,7 +914,8 @@ require('lazy').setup({
             }
             dap.adapters.executable = {
                 type = 'executable',
-                command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
+                command = require('utils.path').get_mason_tool_path('codelldb'),
+                -- command = vim.fn.stdpath('data') .. '/mason/bin/codelldb',
                 name = 'lldb1',
                 host = '127.0.0.1',
                 port = 13000,
@@ -1132,6 +1136,7 @@ require('lazy').setup({
                     'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
                     'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
                     'ansible-language-server',
+                    'omnisharp',
                     -- 'ansible-lint',
                     'rust-analyzer',
                     'yamlls', -- (yaml-language-server)
@@ -1406,6 +1411,17 @@ require('lazy').setup({
                             -- },
                         },
                     },
+                },
+            })
+
+            local pid = vim.fn.getpid()
+
+            lspconfig.omnisharp.setup({
+                cmd = {
+                    require('utils.path').get_mason_tool_path('omnisharp'),
+                    '--languageserver',
+                    '--hostPID',
+                    tostring(pid),
                 },
             })
         end,
