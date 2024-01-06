@@ -1067,12 +1067,12 @@ require('lazy').setup({
     ---------------------------------------------------------------------------
     --- LSP's and more
 
-    -- Adds workspace configuration file support
-    {
-        'folke/neoconf.nvim',
-        lazy = false,
-        config = true,
-    },
+    -- -- Adds workspace configuration file support
+    -- {
+    --     'folke/neoconf.nvim',
+    --     lazy = false,
+    --     config = true,
+    -- },
 
     -- Configure Lua LSP to know about neovim plugins when in neovim config
     {
