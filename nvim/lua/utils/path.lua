@@ -34,14 +34,27 @@ function M.get_mason_tool_path(mason_tool_name)
     elseif type(data_path) == 'table' then
         error('data path was an array but a string was expected')
     end
-    local executable_path = vim.fn.exepath(M.concat({
+
+    local predicted_executable_path = M.concat({
         data_path,
         'mason',
         'bin',
         mason_tool_name,
-    }))
+    })
+
+    local executable_path = vim.fn.exepath(predicted_executable_path)
     if executable_path == '' then
-        error('No mason tool called ' .. mason_tool_name)
+        vim.print(
+            'Cannot find mason tool called '
+                .. mason_tool_name
+                .. '. Things may not work correctly if it is not installed by the time it needs to be used.'
+        )
+
+        if require('utils.platform').is.win then
+            executable_path = predicted_executable_path .. '.cmd'
+        else
+            executable_path = predicted_executable_path
+        end
     end
     return executable_path
 end
