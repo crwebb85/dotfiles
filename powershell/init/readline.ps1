@@ -6,6 +6,16 @@ Import-Module PSReadLine
 
 # Set-PSReadLineOption -EditMode Vi
 
+
+if ((Get-Module -ListAvailable -Name PSFzf) -and (Get-Command "fzf.exe" -ErrorAction SilentlyContinue)) {
+    # replace default ReadLine'Ctrl+t' and 'Ctrl+r' keymaps a version that uses fzf for selection
+    Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
+    # Use fzf for selecting tab completion
+    Set-PSReadLineKeyHandler -Key Tab -ScriptBlock { Invoke-FzfTabCompletion }
+    # Typeing a backslash while fzf is tab completing will select folder and then prompt you to select the next folder with fzf
+    Set-PsFzfOption -TabExpansion
+} 
+
 # Searching for commands with up/down arrow is really handy.  The
 # option "moves to end" is useful if you want the cursor at the end
 # of the line while cycling through history like it does w/o searching,
