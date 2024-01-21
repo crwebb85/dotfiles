@@ -6,6 +6,11 @@ Import-Module PSReadLine
 
 # Set-PSReadLineOption -EditMode Vi
 
+if (Get-Command "zoxide.exe" -ErrorAction SilentlyContinue) {
+    # Init zoxide and setup aliases
+    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+} 
+
 
 if ((Get-Module -ListAvailable -Name PSFzf) -and (Get-Command "fzf.exe" -ErrorAction SilentlyContinue)) {
     # replace default ReadLine'Ctrl+t' and 'Ctrl+r' keymaps a version that uses fzf for selection
