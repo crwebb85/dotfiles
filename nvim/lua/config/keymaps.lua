@@ -193,3 +193,19 @@ vim.keymap.set(
     end,
     { desc = 'Custom: Cycle line numbers/relative line numbers for the buffer' }
 )
+
+vim.keymap.set(
+    'n',
+    '<leader>;',
+    [[A;<Esc>]],
+    { desc = 'Custom: Add semicolon to end of line' }
+)
+
+vim.keymap.set(
+    'v',
+    '<leader>;',
+    ':s/[^;]$/;/<CR>',
+    {
+        desc = 'Custom: Add semicolon to end of each line in visual selection excluding lines that already have semicolons',
+    }
+)
