@@ -1151,6 +1151,7 @@ require('lazy').setup({
                     'stylua', -- Formatter for lua files
                     'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
                     'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
+                    'xmlformatter',
 
                     -- Debuggers
                     'codelldb',
@@ -1825,6 +1826,7 @@ require('lazy').setup({
                     -- formats treesitter-injected code. In effect, hits will make
                     -- conform.nvim format any python codeblocks inside a markdown file.
                     markdown = { { 'prettierd', 'prettier' }, 'injected' },
+                    xml = { 'xmlformat' },
                 },
                 -- enable format-on-save
                 format_on_save = function(bufnr)
