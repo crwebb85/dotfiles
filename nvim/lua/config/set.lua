@@ -45,3 +45,9 @@ vim.opt.colorcolumn = '80'
 vim.opt.foldcolumn = '1'
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+
+vim.filetype.add({
+    extension = {
+        json = 'jsonc', -- This ensures that I can comment lines in json configuration files even if the extension is .json
+    },
+})
