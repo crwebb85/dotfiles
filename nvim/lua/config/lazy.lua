@@ -442,9 +442,10 @@ require('lazy').setup({
 
     -- Comment toggling
     {
-        'echasnovski/mini.comment',
+        'numToStr/Comment.nvim',
         lazy = true,
         event = 'VeryLazy',
+        opts = {},
         config = true,
     },
     -- Keymap suggestions
