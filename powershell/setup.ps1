@@ -2,5 +2,8 @@
 
 $profile_dest = $PROFILE | Select -ExpandProperty CurrentUserAllHosts
 $profile_src = "$Env:userprofile\Documents\.config\powershell\profile.ps1"
+echo "Creating profile directory if it does not exist"
+$profile_dest_parent = Split-Path -parent $profile_dest
+New-Item -ItemType Directory -Force -Path $profile_dest_parent
 echo "Copying $profile_src to $profile_dest"
 Copy-Item -Path $profile_src -Destination $profile_dest
