@@ -124,6 +124,15 @@ local function default_keymaps(bufnr)
     })
     vim.keymap.set(
         'n',
+        'gR',
+        function() require('trouble').toggle('lsp_references') end,
+        {
+            buffer = bufnr,
+            desc = 'LSP: Lists all the references to the symbol under the cursor in the the trouble quickfix window.',
+        }
+    )
+    vim.keymap.set(
+        'n',
         '<leader>vrr',
         function() vim.lsp.buf.references() end,
         {
