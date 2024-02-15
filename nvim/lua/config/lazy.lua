@@ -440,13 +440,6 @@ require('lazy').setup({
         lazy = true,
     },
 
-    -- Autopair brackets and quotes
-    {
-        'echasnovski/mini.pairs',
-        lazy = true,
-        event = 'VeryLazy',
-        config = true,
-    },
     -- Comment toggling
     {
         'echasnovski/mini.comment',
