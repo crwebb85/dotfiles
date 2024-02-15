@@ -286,6 +286,14 @@ require('lazy').setup({
                             )
                             vim.api.nvim_feedkeys(escape_key, 'm', false) -- Set mode to normal mode
                         end,
+                        ['<C-b>'] = function(args)
+                            require('telescope.actions').delete_buffer(args)
+                        end,
+                    },
+                    n = {
+                        ['<C-b>'] = function(args)
+                            require('telescope.actions').delete_buffer(args)
+                        end,
                     },
                 },
             },
