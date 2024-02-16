@@ -1,4 +1,4 @@
-$moduleNames = "PSReadLine", "PSFzf"
+$moduleNames = "PSReadLine"
 foreach ($moduleName in $moduleNames) {
 
     if (Get-Module -ListAvailable -Name $moduleName) {

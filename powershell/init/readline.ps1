@@ -12,7 +12,7 @@ if (Get-Command "zoxide.exe" -ErrorAction SilentlyContinue) {
 } 
 
 
-if ((Get-Module -ListAvailable -Name PSFzf) -and (Get-Command "fzf.exe" -ErrorAction SilentlyContinue)) {
+if (Get-Command "fzf.exe" -ErrorAction SilentlyContinue) {
     # replace default ReadLine'Ctrl+t' and 'Ctrl+r' keymaps a version that uses fzf for selection
     Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
     # Use fzf for selecting tab completion
