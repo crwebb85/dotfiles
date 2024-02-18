@@ -21,6 +21,8 @@ if (Get-Command "fzf.exe" -ErrorAction SilentlyContinue) {
     Set-PsFzfOption -TabExpansion
 } 
 
+Set-Alias -Name keymaps -Value Get-PSReadLineKeyHandler
+
 # Searching for commands with up/down arrow is really handy.  The
 # option "moves to end" is useful if you want the cursor at the end
 # of the line while cycling through history like it does w/o searching,
