@@ -813,6 +813,11 @@ require('lazy').setup({
                 desc = 'Undotree: Toggle Undotree',
             },
         },
+        config = function(_, _)
+            if require('utils.platform').is.win then
+                vim.g.undotree_DiffCommand = 'FC'
+            end
+        end,
     },
 
     ---------------------------------------------------------------------------

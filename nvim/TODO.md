@@ -12,9 +12,7 @@
 ```
 
 - figure out how to create custom keymaps that use motions for example a custom yank function that lets me also use the motion commands to select what to yank
-- setup code lens to show number of variable/function references https://www.reddit.com/r/neovim/comments/12hf3k3/comment/jfom79l/?utm_medium=android_app&utm_source=share&context=3
 - add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
-- BUG: when trying to close a sticky buffer like quick fix list and I also have unsaved changes, nvim will prompt me to go to the unsaved buffer. And when I do it upens the buffer in a new tab
 - BUG: which-key gets stuck when in command-window (`q:`) [PR #503](https://github.com/folke/which-key.nvim/pull/503)
 - Review clipboard code as neovim has added more features which may make using a plugin unneeded
 - look into skeleton (file template) plugins/configuration
@@ -24,6 +22,8 @@
 - Add to my cli tool
 - Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
 - When lazy.nvim installs a new pluggin for the first time on startup my line numbers stop working until I close and reopen
+- redo cmp shortcuts
+- remap from shift+k for lsp hover to some other keymap
 
 ### Cool plugins:
 
