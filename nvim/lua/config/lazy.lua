@@ -1800,6 +1800,18 @@ require('lazy').setup({
                 end,
                 { 'vscode', 'snipmate', 'lua' }
             )
+            local config_path = vim.fn.stdpath('config')
+            if config_path ~= nil and type(config_path) == 'string' then
+                local luasnip_path = require('utils.path').concat({
+                    config_path,
+                    'LuaSnip/',
+                })
+                require('luasnip.loaders.from_lua').load({
+                    paths = {
+                        luasnip_path,
+                    },
+                })
+            end
             -- friendly-snippets - enable standardized comments snippets
             require('luasnip').filetype_extend('typescript', { 'tsdoc' })
             require('luasnip').filetype_extend('javascript', { 'jsdoc' })
