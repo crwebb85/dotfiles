@@ -1195,6 +1195,8 @@ require('lazy').setup({
                     'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
                     'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
                     'xmlformatter',
+                    'jq', --json formatter
+                    -- 'fixjson', -- json fixer, fixes invalid json like trailing commas
 
                     -- Debuggers
                     'codelldb',
@@ -1861,6 +1863,8 @@ require('lazy').setup({
                     javascript = { { 'prettierd', 'prettier' } },
                     yaml = { { 'prettierd', 'prettier' } },
                     json = { { 'prettierd', 'prettier' } },
+                    jsonc = { { 'prettierd', 'prettier' } },
+                    json5 = { { 'prettierd', 'prettier' } },
                     ansible = { { 'prettierd', 'prettier' } },
                     --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
                     -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
