@@ -380,8 +380,11 @@ local config = function()
         },
         Space,
         {
+            provider = ' ',
+        },
+        {
             {
-                provider = ' [',
+                provider = '[',
             },
 
             formatter_component_block,
@@ -389,15 +392,20 @@ local config = function()
                 provider = ']',
             },
             hl = function()
-                if vim.g.disable_autoformat or vim.b[0].disable_autoformat then
+                if vim.b[0].disable_autoformat then
                     return { fg = 'red', bold = true }
-                else
-                    return { fg = 'green', bold = true }
                 end
             end,
         },
         Space,
         Seperator,
+        hl = function()
+            if vim.g.disable_autoformat then
+                return { fg = 'red', bold = true }
+            else
+                return { fg = 'green', bold = true }
+            end
+        end,
     }
 
     local MacroRecording = {
