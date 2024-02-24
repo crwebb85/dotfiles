@@ -45,24 +45,52 @@ vim.api.nvim_create_user_command(
     }
 )
 
-vim.api.nvim_create_user_command('FormatDisable', function(args)
-    -- FormatDisable! will disable formatting just for this buffer
+vim.api.nvim_create_user_command('FormatDisableBuffer', function(_)
+    vim.print('Format on save disabled for buffer')
     vim.b.disable_autoformat = true
-    if not args.bang then vim.g.disable_autoformat = true end
 
     vim.api.nvim_exec_autocmds('User', { pattern = 'DisabledFormatter' })
 end, {
-    desc = 'Disable autoformat-on-save',
-    bang = true,
+    desc = 'Disable autoformat-on-save for the buffer',
 })
 
-vim.api.nvim_create_user_command('FormatEnable', function(args)
-    -- FormatDisable! will enable formatting just for this buffer
-    vim.b.disable_autoformat = false
-    if not args.bang then vim.g.disable_autoformat = false end
+vim.api.nvim_create_user_command('FormatDisableProject', function(_)
+    vim.print('Format on save disabled project wide')
+    vim.g.disable_autoformat = true
+
+    vim.api.nvim_exec_autocmds('User', { pattern = 'DisabledFormatter' })
+end, {
+    desc = 'Disable autoformat-on-save project wide',
+})
+
+vim.api.nvim_create_user_command('FormatEnableBuffer', function(_)
+    if vim.g.disable_autoformat == true then
+        vim.print(
+            "Enabled format on save for buffer but this won't go into effect because formating is disabled project wide"
+        )
+        vim.b.disable_autoformat = false
+    elseif vim.b.disable_autoformat == false then
+        vim.print('Format on save already enabled for buffer')
+    else
+        vim.print('Enabled format on save for buffer')
+        vim.b.disable_autoformat = false
+    end
+    vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
+end, {
+    desc = 'Re-enable autoformat-on-save for buffer.',
+})
+
+vim.api.nvim_create_user_command('FormatEnableProject', function(_)
+    if vim.g.disable_autoformat == false then
+        vim.print('Format on save already enabled project wide')
+    else
+        vim.g.disable_autoformat = false
+        vim.print(
+            'Enabled format on save project wide. Note: Did not change buffer specific settings'
+        )
+    end
 
     vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
 end, {
-    desc = 'Re-enable autoformat-on-save',
-    bang = true,
+    desc = 'Re-enable autoformat-on-save project wide',
 })

@@ -1894,6 +1894,12 @@ require('lazy').setup({
                 },
                 -- enable format-on-save
                 format_on_save = function(bufnr)
+                    if vim.g.disabled_formatters then
+                        vim.print(vim.g.disabled_formatters)
+                    end
+                    if vim.b[bufnr].disabled_formatters then
+                        vim.print(vim.b[bufnr].disabled_formatters)
+                    end
                     -- Disable with a global or buffer-local variable
                     if
                         vim.g.disable_autoformat
@@ -1902,6 +1908,7 @@ require('lazy').setup({
                         return
                     end
                     return { timeout_ms = 500, lsp_fallback = true }
+                    -- return { timeout_ms = 500, formatters = {--[[ list of formatters ]]} lsp_fallback = true }
                 end,
             })
             -- -- Set this value to true to silence errors when formatting a block fails
