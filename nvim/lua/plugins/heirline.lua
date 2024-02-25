@@ -284,61 +284,6 @@ local config = function()
         Seperator,
     }
 
-    ---@class (exact) FormatterDetails
-    ---@field name string
-    ---@field available boolean
-    ---@field available_msg? string
-
-    ---@param bufnr? integer the buffer number. Defaults to buffer 0.
-    ---@return FormatterDetails[]
-    local function get_buffer_formatter_details(bufnr)
-        ---@type FormatterDetails[]
-        local all_info = {}
-
-        local names = require('conform').list_formatters_for_buffer()
-        for _, name in ipairs(names) do
-            if type(name) == 'string' then
-                local info = require('conform').get_formatter_info(name, bufnr)
-                ---@type FormatterDetails
-                local details = {
-                    name = info.name,
-                    available = info.available,
-                    available_msg = info.available_msg,
-                }
-                table.insert(all_info, details)
-            else
-                -- If this is an alternation, take the first one that's available
-                for _, v in ipairs(name) do
-                    local info = require('conform').get_formatter_info(v, bufnr)
-                    if info.available then
-                        ---@type FormatterDetails
-                        local details = {
-                            name = info.name,
-                            available = info.available,
-                            available_msg = info.available_msg,
-                        }
-                        table.insert(all_info, details)
-                        break
-                    end
-                end
-            end
-        end
-        if require('conform').will_fallback_lsp() then
-            for _, lsp_client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-                if lsp_client.supports_method('textDocument/formatting') then
-                    ---@type FormatterDetails
-                    local details = {
-                        name = lsp_client.name,
-                        available = true,
-                        available_msg = nil,
-                    }
-                    table.insert(all_info, details)
-                end
-            end
-        end
-        return all_info
-    end
-
     local formatter_component_block = {
         update = {
             'LspAttach',
@@ -349,7 +294,8 @@ local config = function()
         },
         init = function(self)
             local children = {}
-            local formatter_details_list = get_buffer_formatter_details()
+            local formatter_details_list =
+                require('config.utils').get_buffer_formatter_details()
             for i, formatter_details in pairs(formatter_details_list) do
                 ---@type StatusLine
                 local formatter_component = {
@@ -372,7 +318,11 @@ local config = function()
 
     ---@type StatusLine
     local FormatterActive = {
-        condition = function(_) return #get_buffer_formatter_details() > 0 end,
+        condition = function(_)
+            local buffer_formatter_details =
+                require('config.utils').get_buffer_formatter_details()
+            return #buffer_formatter_details > 0
+        end,
         update = {
             'BufEnter',
             'User',
