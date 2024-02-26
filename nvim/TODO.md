@@ -23,7 +23,6 @@
 - Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
 - When lazy.nvim installs a new pluggin for the first time on startup my line numbers stop working until I close and reopen
 - redo cmp shortcuts
-- remap from shift+k for lsp hover to some other keymap
 
 ### Cool plugins:
 
