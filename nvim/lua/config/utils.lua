@@ -1,3 +1,5 @@
+local Set = require('utils.datastructure').Set
+
 local M = {}
 
 ---@param s string the string to trim
@@ -99,12 +101,28 @@ end
 ---@field name string
 ---@field available boolean
 ---@field available_msg? string
+---@field buffer_disabled boolean
+---@field project_disabled boolean
 
 ---@param bufnr? integer the buffer number. Defaults to buffer 0.
 ---@return FormatterDetails[]
 function M.get_buffer_formatter_details(bufnr)
     ---@type FormatterDetails[]
     local all_info = {}
+    if bufnr == nil then bufnr = 0 end
+    local buffer_disabled_formatters = vim.b[bufnr].disabled_formatters
+    local project_disabled_formatters = vim.g.disabled_formatters
+
+    if buffer_disabled_formatters == nil then
+        buffer_disabled_formatters = {}
+    end
+
+    if project_disabled_formatters == nil then
+        project_disabled_formatters = {}
+    end
+
+    local buffer_disabled_formatters_set = Set:new(buffer_disabled_formatters)
+    local project_disabled_formatters_set = Set:new(project_disabled_formatters)
 
     local names = require('conform').list_formatters_for_buffer()
     for _, name in ipairs(names) do
@@ -115,6 +133,8 @@ function M.get_buffer_formatter_details(bufnr)
                 name = info.name,
                 available = info.available,
                 available_msg = info.available_msg,
+                buffer_disabled = buffer_disabled_formatters_set:has(name),
+                project_disabled = project_disabled_formatters_set:has(name),
             }
             table.insert(all_info, details)
         else
@@ -127,6 +147,12 @@ function M.get_buffer_formatter_details(bufnr)
                         name = info.name,
                         available = info.available,
                         available_msg = info.available_msg,
+                        buffer_disabled = buffer_disabled_formatters_set:has(
+                            info.name
+                        ),
+                        project_disabled = project_disabled_formatters_set:has(
+                            info.name
+                        ),
                     }
                     table.insert(all_info, details)
                     break
@@ -142,11 +168,18 @@ function M.get_buffer_formatter_details(bufnr)
                     name = lsp_client.name,
                     available = true,
                     available_msg = nil,
+                    buffer_disabled = buffer_disabled_formatters_set:has(
+                        lsp_client.name
+                    ),
+                    project_disabled = project_disabled_formatters_set:has(
+                        lsp_client.name
+                    ),
                 }
                 table.insert(all_info, details)
             end
         end
     end
+    -- vim.print(all_info)
     return all_info
 end
 return M

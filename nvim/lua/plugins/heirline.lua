@@ -305,6 +305,10 @@ local config = function()
                 }
                 if not formatter_details.available then
                     formatter_component.hl = { fg = 'red', bold = true }
+                elseif formatter_details.project_disabled then
+                    formatter_component.hl = { fg = 'orange', bold = true }
+                elseif formatter_details.buffer_disabled then
+                    formatter_component.hl = { fg = 'yellow', bold = true }
                 end
                 table.insert(children, formatter_component)
                 if i < #formatter_details_list then

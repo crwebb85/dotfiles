@@ -1894,21 +1894,63 @@ require('lazy').setup({
                 },
                 -- enable format-on-save
                 format_on_save = function(bufnr)
-                    if vim.g.disabled_formatters then
-                        vim.print(vim.g.disabled_formatters)
-                    end
-                    if vim.b[bufnr].disabled_formatters then
-                        vim.print(vim.b[bufnr].disabled_formatters)
-                    end
                     -- Disable with a global or buffer-local variable
                     if
                         vim.g.disable_autoformat
                         or vim.b[bufnr].disable_autoformat
                     then
                         return
+                    elseif
+                        vim.g.disabled_formatters ~= nil
+                        or vim.b[bufnr] ~= nil
+                    then
+                        if vim.g.disabled_formatters then
+                            vim.print(
+                                'Project disabled formatters:',
+                                vim.g.disabled_formatters
+                            )
+                        end
+                        if vim.b[bufnr].disabled_formatters then
+                            vim.print(
+                                'Buffer disabled formatters:',
+                                vim.b[bufnr].disabled_formatters
+                            )
+                        end
+
+                        local buffer_formatters =
+                            require('config.utils').get_buffer_formatter_details(
+                                bufnr
+                            )
+
+                        local is_lsp_fallback_enabled = true --hack
+                        local formatter_names = {}
+                        for _, formatter_info in pairs(buffer_formatters) do
+                            if
+                                not formatter_info.buffer_disabled
+                                and not formatter_info.project_disabled
+                            then
+                                table.insert(
+                                    formatter_names,
+                                    formatter_info.name
+                                )
+                            else
+                                is_lsp_fallback_enabled = false --hack
+                            end
+                        end
+                        vim.print(
+                            'Formatting with the formatters:',
+                            formatter_names
+                        )
+                        --I'm not going to worry about lsp fallback edgecases as I would need to rethink too much logic
+                        --Instead if any formatter for that buffer is disabled I just won't do lsp_fallback
+                        --#TODO don't disable lsp formatters by name
+                        return {
+                            timeout_ms = 500,
+                            formatters = formatter_names,
+                            lsp_fallback = is_lsp_fallback_enabled,
+                        }
                     end
                     return { timeout_ms = 500, lsp_fallback = true }
-                    -- return { timeout_ms = 500, formatters = {--[[ list of formatters ]]} lsp_fallback = true }
                 end,
             })
             -- -- Set this value to true to silence errors when formatting a block fails
