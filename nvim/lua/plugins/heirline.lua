@@ -292,10 +292,11 @@ local config = function()
             'User',
             pattern = { '*.*', 'DisabledFormatter', 'EnabledFormatter' },
         },
+        --TODO add lsp formatters to heirline
         init = function(self)
             local children = {}
             local formatter_details_list =
-                require('config.utils').get_buffer_formatter_details()
+                require('config.formatter').get_buffer_formatter_details()
             for i, formatter_details in pairs(formatter_details_list) do
                 ---@type StatusLine
                 local formatter_component = {
@@ -324,7 +325,7 @@ local config = function()
     local FormatterActive = {
         condition = function(_)
             local buffer_formatter_details =
-                require('config.utils').get_buffer_formatter_details()
+                require('config.formatter').get_buffer_formatter_details()
             return #buffer_formatter_details > 0
         end,
         update = {
@@ -346,7 +347,11 @@ local config = function()
                 provider = ']',
             },
             hl = function()
-                if vim.b[0].disable_autoformat then
+                if
+                    require('config.formatter').properties.is_buffer_autoformat_disabled(
+                        0 --TODO determine if this works correctly when not my active buffer
+                    )
+                then
                     return { fg = 'red', bold = true }
                 end
             end,
@@ -354,7 +359,9 @@ local config = function()
         Space,
         Seperator,
         hl = function()
-            if vim.g.disable_autoformat then
+            if
+                require('config.formatter').properties.is_project_autoformat_disabled()
+            then
                 return { fg = 'red', bold = true }
             else
                 return { fg = 'green', bold = true }
