@@ -571,7 +571,7 @@ local config = function()
         provider = function(self)
             local filename = vim.fn.fnamemodify(self.filename, ':~:.')
             if filename == '' then return '' end
-            if not conditions.width_percent_below(#filename, 0.5) then
+            if not conditions.width_percent_below(#filename, 1) then
                 filename = vim.fn.pathshorten(filename)
             end
             return filename
@@ -627,12 +627,12 @@ local config = function()
 
     ---@type StatusLine
     local ActiveWinbar = {
-        condition = function()
-            local empty_buffer = function()
-                return vim.bo.ft == '' and vim.bo.buftype == ''
-            end
-            return not empty_buffer()
-        end,
+        -- condition = function()
+        --     local empty_buffer = function()
+        --         return vim.bo.ft == '' and vim.bo.buftype == ''
+        --     end
+        --     return not empty_buffer()
+        -- end,
         heirlineUtils.insert(ActiveBlock, FileNameBlock),
     }
 
