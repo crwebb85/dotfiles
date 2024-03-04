@@ -1896,6 +1896,12 @@ require('lazy').setup({
                     markdown = { { 'prettierd', 'prettier' }, 'injected' },
                     xml = { 'xmlformat' },
                 },
+                formatters = {
+                    xmlformat = {
+                        command = 'xmlformat',
+                        args = { '--selfclose', '-' },
+                    },
+                },
                 -- enable format-on-save
                 format_on_save = require('config.formatter').construct_conform_autoformat_params,
             })
