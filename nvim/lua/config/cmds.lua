@@ -246,12 +246,16 @@ vim.api.nvim_create_user_command(
         local strategy = format_properties.LspFormatStrategyEnums[strategy_name]
         if strategy == nil then error('Invalid LSP format strategy') end
         format_properties.set_buffer_lsp_format_strategy(strategy)
+
+        vim.api.nvim_exec_autocmds('User', {
+            pattern = 'ChangedLspFormatStrategy',
+        })
     end,
     {
         complete = function()
             local strategies = {}
             for strategy_name, _ in
-            pairs(format_properties.LspFormatStrategyEnums)
+                pairs(format_properties.LspFormatStrategyEnums)
             do
                 table.insert(strategies, strategy_name)
             end
@@ -271,12 +275,15 @@ vim.api.nvim_create_user_command(
         local filetype = vim.bo.filetype
         if filetype == nil then error('The buffer has no file type') end
         format_properties.set_filetype_lsp_format_strategy(filetype, strategy)
+        vim.api.nvim_exec_autocmds('User', {
+            pattern = 'ChangedLspFormatStrategy',
+        })
     end,
     {
         complete = function()
             local strategies = {}
             for strategy_name, _ in
-            pairs(format_properties.LspFormatStrategyEnums)
+                pairs(format_properties.LspFormatStrategyEnums)
             do
                 table.insert(strategies, strategy_name)
             end

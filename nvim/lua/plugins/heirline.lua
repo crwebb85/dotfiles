@@ -290,13 +290,18 @@ local config = function()
             'LspDetach',
             'BufEnter',
             'User',
-            pattern = { '*.*', 'DisabledFormatter', 'EnabledFormatter' },
+            pattern = {
+                '*.*',
+                'DisabledFormatter',
+                'EnabledFormatter',
+                'ChangedLspFormatStrategy',
+            },
         },
-        --TODO add lsp formatters to heirline
         init = function(self)
             local children = {}
             local formatter_details_list =
                 require('config.formatter').get_buffer_formatter_details()
+            local is_formatter_available = false
             for i, formatter_details in pairs(formatter_details_list) do
                 ---@type StatusLine
                 local formatter_component = {
@@ -310,12 +315,43 @@ local config = function()
                     formatter_component.hl = { fg = 'orange', bold = true }
                 elseif formatter_details.buffer_disabled then
                     formatter_component.hl = { fg = 'yellow', bold = true }
+                else
+                    is_formatter_available = true
                 end
                 table.insert(children, formatter_component)
                 if i < #formatter_details_list then
                     table.insert(children, Space)
                 end
             end
+            local conform_params =
+                require('config.formatter').construct_conform_formatting_params()
+            -- vim.print(
+            --     require('config.formatter').get_buffer_formatter_details()
+            -- )
+            if
+                conform_params.lsp_fallback == 'always'
+                or (
+                    conform_params.lsp_fallback == true
+                    and is_formatter_available == false
+                )
+            then
+                local lsp_formatters =
+                    require('config.formatter').get_buffer_lsp_formatters()
+                if #lsp_formatters > 0 and #formatter_details_list > 0 then
+                    table.insert(children, Space)
+                end
+                for i, lsp_name in pairs(lsp_formatters) do
+                    ---@type StatusLine
+                    local formatter_component = {
+                        provider = require('config.utils').trim(lsp_name),
+                    }
+                    table.insert(children, formatter_component)
+                    if i < #lsp_formatters then
+                        table.insert(children, Space)
+                    end
+                end
+            end
+
             self.child = self:new(children, 1)
         end,
         provider = function(self) return self.child:eval() end,
@@ -326,12 +362,19 @@ local config = function()
         condition = function(_)
             local buffer_formatter_details =
                 require('config.formatter').get_buffer_formatter_details()
-            return #buffer_formatter_details > 0
+            local lsp_formatters =
+                require('config.formatter').get_buffer_lsp_formatters()
+            return #buffer_formatter_details > 0 or #lsp_formatters > 0
         end,
         update = {
             'BufEnter',
             'User',
-            pattern = { '*.*', 'DisabledFormatter', 'EnabledFormatter' },
+            pattern = {
+                '*.*',
+                'DisabledFormatter',
+                'EnabledFormatter',
+                'ChangedLspFormatStrategy',
+            },
         },
         Space,
         {

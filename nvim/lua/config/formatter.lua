@@ -286,14 +286,14 @@ function M.construct_conform_formatting_params(bufnr)
     local project_disabled_formatters = P.get_project_disabled_formatters()
     local buffer_disabled_formatters = P.get_buffer_disabled_formatters(bufnr)
     if #project_disabled_formatters > 0 or #buffer_disabled_formatters > 0 then
-        if #project_disabled_formatters > 0 then
-            vim.print('Project disabled formatters:')
-            vim.print(project_disabled_formatters)
-        end
-        if #buffer_disabled_formatters > 0 then
-            vim.print('Buffer disabled formatters:')
-            vim.print(buffer_disabled_formatters)
-        end
+        -- if #project_disabled_formatters > 0 then
+        --     vim.print('Project disabled formatters:')
+        --     vim.print(project_disabled_formatters)
+        -- end
+        -- if #buffer_disabled_formatters > 0 then
+        --     vim.print('Buffer disabled formatters:')
+        --     vim.print(buffer_disabled_formatters)
+        -- end
 
         local buffer_formatters = M.get_buffer_formatter_details(bufnr)
 
@@ -306,7 +306,7 @@ function M.construct_conform_formatting_params(bufnr)
                 table.insert(formatter_names, formatter_info.name)
             end
         end
-        vim.print('Formatting with the formatters:', formatter_names)
+        -- vim.print('Formatting with the formatters:', formatter_names)
 
         return {
             timeout_ms = P.get_formatting_timeout(),
@@ -337,4 +337,3 @@ end
 
 M.properties = P
 return M
-
