@@ -443,8 +443,17 @@ require('lazy').setup({
     ---------------------------------------------------------------------------
     -- Utils
 
+    --Big file/Macro speed increases
     {
-        'nvim-lua/plenary.nvim', -- a util library
+        'pteroctopus/faster.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        config = true,
+    },
+
+    -- A util library
+    {
+        'nvim-lua/plenary.nvim',
         lazy = true,
     },
 
@@ -940,6 +949,88 @@ require('lazy').setup({
     },
 
     ---------------------------------------------------------------------------
+    -- Testing
+
+    {
+        'nvim-neotest/neotest',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'antoinemadec/FixCursorHold.nvim',
+            'nvim-treesitter/nvim-treesitter',
+            --adapters
+            'rouge8/neotest-rust',
+            'nvim-neotest/neotest-python',
+            'Issafalcon/neotest-dotnet',
+        },
+        lazy = true,
+        event = 'VeryLazy',
+        keys = {
+            {
+                '<leader>tr',
+                function() require('neotest').run.run() end,
+                desc = 'Neotest: Run the nearest test',
+            },
+            {
+                '<leader>tc',
+                function() require('neotest').run.run(vim.fn.expand('%')) end,
+                desc = 'Neotest: Run the current file',
+            },
+            {
+                '<leader>td',
+                function() require('neotest').run.run({ strategy = 'dap' }) end,
+                desc = 'Neotest: Debug the nearest test',
+            },
+            {
+                '<leader>ts',
+                function() require('neotest').run.stop() end,
+                desc = 'Neotest: Stop the nearest test',
+            },
+            {
+                '<leader>ta',
+                function() require('neotest').run.attach() end,
+                desc = 'Neotest: Attach to the nearest test',
+            },
+        },
+        config = function(_, _)
+            require('neotest').setup({
+                adapters = {
+                    require('neotest-python')({
+                        dap = { justMyCode = false },
+                    }),
+                    require('neotest-rust')({
+                        -- args = { '--no-capture' },
+                        -- dap_adapter = 'lldb',
+                    }),
+                    require('neotest-dotnet')({
+                        dap = {
+                            -- Extra arguments for nvim-dap configuration
+                            -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
+                            args = { justMyCode = false },
+                            -- Enter the name of your dap adapter, the default value is netcoredbg
+                            adapter_name = 'netcoredbg',
+                        },
+                        -- Let the test-discovery know about your custom attributes (otherwise tests will not be picked up)
+                        -- Note: Only custom attributes for non-parameterized tests should be added here. See the support note about parameterized tests
+                        -- custom_attributes = {
+                        --     xunit = { 'MyCustomFactAttribute' },
+                        --     nunit = { 'MyCustomTestAttribute' },
+                        --     mstest = { 'MyCustomTestMethodAttribute' },
+                        -- },
+                        -- Provide any additional "dotnet test" CLI commands here. These will be applied to ALL test runs performed via neotest. These need to be a table of strings, ideally with one key-value pair per item.
+                        -- dotnet_additional_args = {
+                        --     '--verbosity detailed',
+                        -- },
+                        -- Tell neotest-dotnet to use either solution (requires .sln file) or project (requires .csproj or .fsproj file) as project root
+                        -- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
+                        --       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
+                        -- discovery_root = 'project', -- Default
+                    }),
+                },
+            })
+        end,
+    },
+
+    ---------------------------------------------------------------------------
     -- DEBUGGING
 
     -- DAP Client for nvim
@@ -1206,6 +1297,7 @@ require('lazy').setup({
                     -- Debuggers
                     'codelldb',
                     'debugpy', -- python debugger
+                    'netcoredbg',
                 },
             })
             require('mason-tool-installer').run_on_start() -- Fix Issue: https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/issues/37
