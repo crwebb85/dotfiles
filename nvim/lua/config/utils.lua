@@ -25,6 +25,7 @@ function M.resize(amount, split_vertical)
 
     vim.cmd(cmd)
 end
+
 function M.scheduled_error(err)
     vim.schedule(function() vim.notify(err, vim.log.levels.ERROR) end)
 end
@@ -36,40 +37,6 @@ function M.set(list)
         set[l] = true
     end
     return set
-end
-
-function M.openNewScratchBuffer()
-    vim.cmd([[
-		execute 'vsplit | enew'
-		setlocal buftype=nofile
-		setlocal bufhidden=hide
-		setlocal noswapfile
-	]])
-end
-
-function M.compareClipboardToBuffer()
-    local ftype = vim.api.nvim_eval('&filetype') -- original filetype
-    vim.cmd([[
-		tabnew %
-		Ns
-		normal! P
-		windo diffthis
-	]])
-    vim.cmd('set filetype=' .. ftype)
-end
-
-function M.compareClipboardToSelection()
-    vim.cmd([[
-		" yank visual selection to z register
-		normal! gv"zy
-		" open new tab, set options to prevent save prompt when closing
-		execute 'tabnew | setlocal buftype=nofile bufhidden=hide noswapfile'
-		" paste z register into new buffer
-		normal! V"zp
-		Ns
-		normal! Vp
-		windo diffthis
-	]])
 end
 
 function M.get_default_branch_name()

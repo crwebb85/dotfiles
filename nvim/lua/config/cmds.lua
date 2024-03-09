@@ -1,52 +1,138 @@
 local Set = require('utils.datastructure').Set
 local format_properties = require('config.formatter').properties
 
+-------------------------------------------------------------------------------
 -- Scratch
+
 vim.api.nvim_create_user_command(
     'ScratchTab',
     function()
         vim.cmd([[
 		    " open new tab, set options to prevent save prompt when closing
-		    execute 'tabnew | setlocal buftype=nofile bufhidden=hide noswapfile'
+		    execute 'tabnew' 
+            setlocal buftype=nofile 
+            setlocal bufhidden=hide 
+            setlocal noswapfile
 	    ]])
     end,
-    { nargs = 0 }
+    { nargs = 0, desc = 'Creates a scratch buffer in a new tab' }
 )
 
+-- Create a new scratch buffer to the right
+vim.api.nvim_create_user_command('Scratch', function()
+    local old_splitright_value = vim.go.splitright
+    vim.opt.splitright = true
+    vim.cmd([[
+            execute 'vsplit | enew'
+            setlocal buftype=nofile
+            setlocal bufhidden=hide
+            setlocal noswapfile
+        ]])
+    vim.opt.splitright = old_splitright_value
+end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
+
+-------------------------------------------------------------------------------
 -- Messages
+
 vim.api.nvim_create_user_command('MessagesTab', function()
     vim.cmd([[
 		    " open new tab, set options to prevent save prompt when closing
-		    execute "tabnew | setlocal buftype=nofile bufhidden=hide noswapfile | :put =execute(':messages')"
+		    execute 'tabnew' 
+            setlocal buftype=nofile 
+			setlocal bufhidden=delete
+            setlocal noswapfile 
+            execute ":put =execute(':messages')"
 	    ]])
-    --TODO add a autocmd to auto refresh the buffer contents with new messages
-end, { nargs = 0 })
 
+    vim.print('Refresh message buffer with "<leader>R"')
+    vim.keymap.set(
+        'n',
+        '<leader>R',
+        function() vim.cmd([[execute ":%delete_ | :put =execute(':messages')"]]) end,
+        {
+            buffer = 0,
+            desc = [[Messages: Refreshes messages buffer with latest messages]],
+        }
+    )
+end, {
+    nargs = 0,
+    desc = 'Open vim messages in a temporary scratch buffer in new tab',
+})
+
+vim.api.nvim_create_user_command('Messages', function()
+    local old_splitright_value = vim.go.splitright
+    vim.opt.splitright = true
+    vim.cmd([[
+		    " open new tab, set options to prevent save prompt when closing
+            execute 'vsplit | enew'
+            setlocal buftype=nofile 
+			setlocal bufhidden=delete
+            setlocal noswapfile 
+            execute ":put =execute(':messages')"
+	    ]])
+    vim.opt.splitright = old_splitright_value
+
+    vim.print('Refresh message buffer with "<leader>R"')
+    vim.keymap.set(
+        'n',
+        '<leader>R',
+        function() vim.cmd([[execute ":%delete_ | :put =execute(':messages')"]]) end,
+        {
+            buffer = 0,
+            desc = [[Messages: Refreshes messages buffer with latest messages]],
+        }
+    )
+end, { nargs = 0, desc = 'Open vim messages in a temporary scratch buffer' })
+
+-------------------------------------------------------------------------------
 -- Diff Clipboard https://www.naseraleisa.com/posts/diff#file-1
--- TODO cleanup these user commands to not us vim.cmd
--- Create a new scratch buffer
-vim.api.nvim_create_user_command(
-    'Ns',
-    require('config.utils').openNewScratchBuffer,
-    { nargs = 0 }
-)
 
 -- Compare clipboard to current buffer
-vim.api.nvim_create_user_command(
-    'CompareClipboard',
-    require('config.utils').compareClipboardToBuffer,
-    { nargs = 0 }
-)
+vim.api.nvim_create_user_command('CompareClipboard', function()
+    local ftype = vim.api.nvim_eval('&filetype') -- original filetype
+    vim.cmd([[
+		tabnew %
+	    
+        "create scratch buffer that will contain contents of buffer
+        execute 'vsplit | enew'
+        setlocal buftype=nofile
+        setlocal bufhidden=hide
+        setlocal noswapfile
+        " paste clipboard into scratch buffer
+		normal! P
+		windo diffthis
+	]])
+    vim.cmd('set filetype=' .. ftype)
+end, { nargs = 0, desc = 'Compares buffer file with clipboard contents' })
 
-vim.api.nvim_create_user_command(
-    'CompareClipboardSelection',
-    require('config.utils').compareClipboardToSelection,
-    {
-        nargs = 0,
-        range = true,
-    }
-)
+vim.api.nvim_create_user_command('CompareClipboardSelection', function()
+    --TODO fix this command it is not yanking into correct registers
+    vim.cmd([[
+		" yank visual selection to z register
+		normal! gv"zy
+		" open new tab, set options to prevent save prompt when closing
+		execute 'tabnew'
+        setlocal buftype=nofile
+        setlocal bufhidden=hide
+        setlocal noswapfile
+		" paste z register into new buffer
+		normal! V"zp
+        " create comparison buffer
+        execute 'vsplit | enew'
+        setlocal buftype=nofile
+        setlocal bufhidden=hide
+        setlocal noswapfile
+         
+		normal! Vp
+		windo diffthis
+	]])
+end, {
+    nargs = 0,
+    desc = 'Compare visual selection with clipboard contents',
+    range = true,
+})
 
+-------------------------------------------------------------------------------
 --Formatting
 
 local function get_buffer_formatter_names()
