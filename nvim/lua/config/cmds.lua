@@ -105,25 +105,64 @@ vim.api.nvim_create_user_command('CompareClipboard', function()
     vim.cmd('set filetype=' .. ftype)
 end, { nargs = 0, desc = 'Compares buffer file with clipboard contents' })
 
+---Get the text in the visual selection
+---@param bufnr number of the buffer with text selected
+---@return string[]
+local function get_visual_selection(bufnr)
+    local start_pos = vim.api.nvim_buf_get_mark(0, '<')
+    local start_row = start_pos[1]
+    local start_col = start_pos[2]
+
+    local end_pos = vim.api.nvim_buf_get_mark(0, '>')
+    local end_row = end_pos[1]
+    local end_col = end_pos[2]
+    -- vim.print(start_pos)
+    -- vim.print(end_pos)
+
+    ---@type string[]
+    local text = {}
+
+    if end_col == 2147483647 then
+        text = vim.api.nvim_buf_get_lines(bufnr, start_row - 1, end_row, true)
+    else
+        text = vim.api.nvim_buf_get_text(
+            bufnr,
+            start_row - 1,
+            start_col,
+            end_row - 1,
+            end_col + 1,
+            {}
+        )
+    end
+    return text
+end
+
 vim.api.nvim_create_user_command('CompareClipboardSelection', function()
-    --TODO fix this command it is not yanking into correct registers
+    local file_type = vim.opt_local.filetype
+    local selection_text = get_visual_selection(0)
     vim.cmd([[
-		" yank visual selection to z register
-		normal! gv"zy
 		" open new tab, set options to prevent save prompt when closing
 		execute 'tabnew'
         setlocal buftype=nofile
         setlocal bufhidden=hide
         setlocal noswapfile
-		" paste z register into new buffer
-		normal! V"zp
+    ]])
+    vim.opt_local.filetype = file_type -- setfile type of first buffer
+    vim.api.nvim_buf_set_lines(0, 0, 1, true, selection_text)
+
+    vim.cmd([[
         " create comparison buffer
         execute 'vsplit | enew'
         setlocal buftype=nofile
         setlocal bufhidden=hide
         setlocal noswapfile
          
-		normal! Vp
+	]])
+
+    vim.opt_local.filetype = file_type -- set filetype of second buffer
+
+    vim.cmd([[
+		normal! VP
 		windo diffthis
 	]])
 end, {
