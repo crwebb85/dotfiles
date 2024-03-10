@@ -31,11 +31,6 @@ local config = function()
         buftype = { 'nofile', 'prompt', 'quickfix', 'terminal' },
         filetype = { 'toggleterm', 'qf', 'terminal', 'gypsy' },
     }
-    local cmdtype_inactive = {
-        ':',
-        '/',
-        '?',
-    }
 
     local scrollbar_enabled = function()
         return vim.api.nvim_buf_line_count(0) > 99 and conditions.is_active()
@@ -495,12 +490,6 @@ local config = function()
 
     ---@type StatusLine
     local StatusLines = {
-        condition = function()
-            for _, c in ipairs(cmdtype_inactive) do
-                if vim.fn.getcmdtype() == c then return false end
-            end
-            return true
-        end,
         MacroRecording,
         heirlineUtils.surround(ComponentDelimiter, nil, ViMode),
         Git,
