@@ -418,3 +418,116 @@ vim.api.nvim_create_user_command(
         desc = 'Sets the formatter timeout in milliseconds',
     }
 )
+
+-------------------------------------------------------------------------------
+---Quickfix and Location list
+
+vim.cmd([[
+    function! RemoveDuplicateLocListFiles()
+        let a = getloclist(0)
+        let file = {}
+        let result = []
+        for entry in a
+            if !has_key(file, entry.bufnr)
+                call add(result, entry)
+                let file[entry.bufnr]=1
+            endif
+        endfor
+        if !empty(result)
+            call setloclist(0, result, 'r')
+        endif
+    endfu
+]])
+
+vim.api.nvim_create_user_command(
+    'LocRemoveDuplicateFiles',
+    function(_) vim.fn['RemoveDuplicateLocListFiles']() end,
+    {
+        desc = 'Removes duplicate files from Loc List',
+    }
+)
+
+vim.cmd([[
+    function! RemoveDuplicateQFListFiles()
+        let a = getqflist()
+        let file = {}
+        let result = []
+        for entry in a
+            if !has_key(file, entry.bufnr)
+                call add(result, entry)
+                let file[entry.bufnr] = 1
+            endif
+        endfor
+        if !empty(result)
+            call setqflist(result, 'r')
+        endif
+    endfu
+]])
+
+vim.api.nvim_create_user_command(
+    'QFRemoveDuplicateFiles',
+    function(_) vim.fn['FilterQFListToUniqueFiles']() end,
+    {
+        desc = 'Removes duplicate files from Quick Fix List',
+    }
+)
+
+vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
+    if args.args == 'ERROR' then
+        vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })
+    elseif args.args == 'WARN' then
+        vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.WARN })
+    elseif args.args == 'HINT' then
+        vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.HINT })
+    elseif args.args == 'INFO' then
+        vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.INFO })
+    else
+        vim.diagnostic.setqflist({})
+    end
+end, {
+    desc = 'Adds lsp diagnostic to the Quickfix list',
+    complete = function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end,
+    nargs = '?',
+})
+
+vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
+    if args.args == 'ERROR' then
+        vim.diagnostic.setloclist({ severity = vim.diagnostic.severity.ERROR })
+    elseif args.args == 'WARN' then
+        vim.diagnostic.setloclist({ severity = vim.diagnostic.severity.WARN })
+    elseif args.args == 'HINT' then
+        vim.diagnostic.setloclist({ severity = vim.diagnostic.severity.HINT })
+    elseif args.args == 'INFO' then
+        vim.diagnostic.setloclist({ severity = vim.diagnostic.severity.INFO })
+    else
+        vim.diagnostic.setloclist({})
+    end
+end, {
+    desc = 'Adds lsp diagnostic to the Quickfix list',
+    complete = function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end,
+    nargs = '?',
+})
+
+vim.api.nvim_create_user_command(
+    'QFCopyToLoc',
+    function(_)
+        vim.cmd(
+            [[call setloclist(0, [], ' ', {'items': get(getqflist({'items': 1}), 'items')})]]
+        )
+    end,
+    {
+        desc = 'Copies QF list to Loc list',
+    }
+)
+
+vim.api.nvim_create_user_command(
+    'LocCopyToQF',
+    function(_)
+        vim.cmd(
+            [[call setqflist([], ' ', {'items': get(getloclist(0, {'items': 1}), 'items')})]]
+        )
+    end,
+    {
+        desc = 'Copies QF list to Loc list',
+    }
+)
