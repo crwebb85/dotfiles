@@ -493,27 +493,6 @@ local config = function()
 
     ---------------------------------------------------------------------------
     -- Winbar
-    ---@type StatusLine
-    local ActiveWindow = {
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_background_color }
-            else
-                return { bg = inactive_background_color }
-            end
-        end,
-    }
-
-    ---@type StatusLine
-    local ActiveBlock = {
-        hl = function()
-            if conditions.is_active() then
-                return { bg = active_background_color }
-            else
-                return { bg = inactive_background_color }
-            end
-        end,
-    }
 
     -- Italicizes the buffer file name if it has been modified
     ---@type StatusLine
@@ -594,6 +573,10 @@ local config = function()
     }
 
     local FileNameBlock = {
+        condition = function()
+            if vim.bo.buftype == 'quickfix' then return false end
+            return true
+        end,
         init = function(self) self.filename = vim.api.nvim_buf_get_name(0) end,
         FileType,
         Space,
@@ -603,19 +586,24 @@ local config = function()
     }
 
     ---@type StatusLine
-    local ActiveWinbar = {
-        -- condition = function()
-        --     local empty_buffer = function()
-        --         return vim.bo.ft == '' and vim.bo.buftype == ''
-        --     end
-        --     return not empty_buffer()
-        -- end,
-        heirlineUtils.insert(ActiveBlock, FileNameBlock),
-    }
-
-    ---@type StatusLine
     local WinBars = {
-        heirlineUtils.insert(ActiveWindow, ActiveWinbar),
+        {
+            {
+                FileNameBlock,
+                {
+                    condition = function() return vim.bo.buftype == 'quickfix' end,
+                    provider = "%t%{exists('w:quickfix_title')? ' '.w:quickfix_title : ''}",
+                    hl = { fg = filename_foreground_color, bold = true },
+                },
+                hl = function()
+                    if conditions.is_active() then
+                        return { bg = active_background_color }
+                    else
+                        return { bg = inactive_background_color }
+                    end
+                end,
+            },
+        },
     }
     ---------------------------------------------------------------------------
     -- Heirline Setup
