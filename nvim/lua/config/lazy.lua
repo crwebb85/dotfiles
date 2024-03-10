@@ -1601,6 +1601,9 @@ require('lazy').setup({
         config = function()
             local cmp = require('cmp')
             cmp.setup({
+                performance = {
+                    max_view_entries = 15,
+                },
                 sources = cmp.config.sources({
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lsp_signature_help' },
@@ -1708,24 +1711,42 @@ require('lazy').setup({
                         end
                     end, { 'i', 's' }),
                     -- Navigate between snippet placeholder
-                    ['<Tab>'] = cmp.mapping(function(fallback)
+                    -- ['<Tab>'] = cmp.mapping(function(fallback)
+                    --     local luasnip = require('luasnip')
+                    --
+                    --     if cmp.visible() and cmp.get_active_entry() ~= nil then
+                    --         cmp.select_next_item()
+                    --     elseif luasnip.expand_or_jumpable() then
+                    --         luasnip.expand_or_jump()
+                    --     else
+                    --         fallback()
+                    --     end
+                    -- end, { 'i', 's' }),
+                    --
+                    -- ['<S-Tab>'] = cmp.mapping(function(fallback)
+                    --     local luasnip = require('luasnip')
+                    --
+                    --     if cmp.visible() and cmp.get_active_entry() ~= nil then
+                    --         cmp.select_prev_item()
+                    --     elseif luasnip.jumpable(-1) then
+                    --         luasnip.jump(-1)
+                    --     else
+                    --         fallback()
+                    --     end
+                    -- end, { 'i', 's' }),
+                    ['<C-n>'] = cmp.mapping(function(fallback)
                         local luasnip = require('luasnip')
-
-                        if cmp.visible() and cmp.get_active_entry() ~= nil then
-                            cmp.select_next_item()
-                        elseif luasnip.expand_or_jumpable() then
+                        if luasnip.expand_or_jumpable() then
                             luasnip.expand_or_jump()
                         else
                             fallback()
                         end
                     end, { 'i', 's' }),
 
-                    ['<S-Tab>'] = cmp.mapping(function(fallback)
+                    ['<C-p>'] = cmp.mapping(function(fallback)
                         local luasnip = require('luasnip')
 
-                        if cmp.visible() and cmp.get_active_entry() ~= nil then
-                            cmp.select_prev_item()
-                        elseif luasnip.jumpable(-1) then
+                        if luasnip.jumpable(-1) then
                             luasnip.jump(-1)
                         else
                             fallback()
