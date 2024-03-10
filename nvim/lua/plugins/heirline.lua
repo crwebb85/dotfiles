@@ -32,10 +32,6 @@ local config = function()
         filetype = { 'toggleterm', 'qf', 'terminal', 'gypsy' },
     }
 
-    local scrollbar_enabled = function()
-        return vim.api.nvim_buf_line_count(0) > 99 and conditions.is_active()
-    end
-
     local Align = { provider = '%=' }
     local Space = { provider = ' ' }
     local Seperator = { provider = '|' }
@@ -101,12 +97,6 @@ local config = function()
                     and (self.hint_icon .. self.hints .. diagnostics_spacer)
             end,
             hl = { fg = diagnostics_hint_foreground_color },
-        },
-        {
-            condition = function() return not scrollbar_enabled() end,
-            {
-                Space,
-            },
         },
         hl = { bg = background_color },
     }
@@ -461,7 +451,6 @@ local config = function()
 
     ---@type StatusLine
     local Ruler = {
-        condition = function() return scrollbar_enabled() end,
         -- %l = current line number
         -- %L = number of lines in the buffer
         -- %c = column number
@@ -470,7 +459,6 @@ local config = function()
     }
 
     local ScrollBar = {
-        condition = function() return scrollbar_enabled() end,
         static = {
             sbar = { '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█' },
         },
