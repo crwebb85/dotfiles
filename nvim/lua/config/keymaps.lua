@@ -104,13 +104,13 @@ vim.keymap.set(
 )
 vim.keymap.set(
     'n',
-    '<leader>j',
+    '<C-l>',
     '<cmd>lnext<CR>zz',
     { desc = 'Custom - Location List: lnext location list navigation' }
 )
 vim.keymap.set(
     'n',
-    '<leader>k',
+    '<C-h>',
     '<cmd>lprev<CR>zz',
     { desc = 'Custom - Location List: lprev location list navigation' }
 )
