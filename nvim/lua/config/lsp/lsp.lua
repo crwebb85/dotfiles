@@ -1,56 +1,45 @@
+local lsp_codelens = require('config.lsp.codelens')
+local lsp_links = require('config.lsp.lsplinks')
+local lsp_lightbulb = require('config.lsp.lightbulb')
+local lsp_commands = require('config.lsp.commands')
+local lsp_progress = require('config.lsp.progress')
+local lsp_server = require('config.lsp.server')
+local lsp_inlayhints = require('config.lsp.inlayhints')
+
 local M = {}
-
---- Toggle Inlay hints
-local isInlayHintsEnabled = false
-function M.toggleInlayHintsAutocmd()
-    if not vim.lsp.inlay_hint then
-        print("This version of neovim doesn't support inlay hints")
-    end
-
-    isInlayHintsEnabled = not isInlayHintsEnabled
-
-    vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled)
-
-    vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
-        group = vim.api.nvim_create_augroup('inlay_hints', { clear = true }),
-        pattern = '?*',
-        callback = function() vim.lsp.inlay_hint.enable(0, isInlayHintsEnabled) end,
-    })
-end
 
 ---
 -- Commands
 ---
-local function setup_server(input)
-    local opts = {}
-    if input.bang then
-        opts.root_dir = function() return vim.fn.get_cwd() end
-    end
-
-    M.use(input.fargs, opts)
-end
-
-vim.api.nvim_create_user_command('LspSetupServers', setup_server, {
-    bang = true,
-    nargs = '*',
-})
 
 vim.api.nvim_create_user_command(
     'LspWorkspaceAdd',
-    'lua vim.lsp.buf.add_workspace_folder()',
-    {}
+    function() vim.lsp.buf.add_workspace_folder() end,
+    { desc = 'LSP: Add folder from workspace' }
 )
 
 vim.api.nvim_create_user_command(
-    'LspToggleInlayHints',
-    M.toggleInlayHintsAutocmd,
-    {}
+    'LspWorkspaceRemove',
+    function() vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
+    { desc = 'LSP: Remove folder from workspace' }
 )
 
 vim.api.nvim_create_user_command(
     'LspWorkspaceList',
-    'lua vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders()))',
-    {}
+    function() vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
+    { desc = 'LSP: List workspace folders' }
+)
+
+vim.api.nvim_create_user_command(
+    'LspToggleInlayHints',
+    lsp_inlayhints.toggle_inlay_hints,
+    { desc = 'LSP: Toggle Inlay Hints' }
+)
+
+vim.api.nvim_create_user_command(
+    'LspToggleCodeLens',
+    lsp_codelens.toggle_codelens,
+    { desc = 'LSP: Toggle Codelens' }
 )
 
 local function inspect_config_source(input)
@@ -97,7 +86,10 @@ vim.api.nvim_create_user_command('LspViewConfigSource', inspect_config_source, {
 -- Autocommands
 ---
 
-local function default_keymaps(bufnr)
+---Sets keymaps for the lsp buffer
+---@param bufnr any
+---@param client any
+local function default_keymaps(bufnr, client)
     vim.keymap.set('n', 'K', function() vim.lsp.buf.hover() end, {
         buffer = bufnr,
         desc = [[LSP: Displays hover information about the symbol under the cursor in a floating window. Calling the function twice will jump into the floating window.]],
@@ -137,7 +129,7 @@ local function default_keymaps(bufnr)
         function() vim.lsp.buf.references() end,
         {
             buffer = bufnr,
-            remap = false,
+            -- remap = false,
             desc = 'LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
         }
     )
@@ -151,7 +143,7 @@ local function default_keymaps(bufnr)
     })
     vim.keymap.set('n', '<leader>vrn', function() vim.lsp.buf.rename() end, {
         buffer = bufnr,
-        remap = false,
+        -- remap = false,
         desc = 'LSP: Rename symbol',
     })
     vim.keymap.set('n', '<F4>', function() vim.lsp.buf.code_action() end, {
@@ -182,7 +174,7 @@ local function default_keymaps(bufnr)
         function() vim.lsp.buf.code_action() end,
         {
             buffer = bufnr,
-            remap = false,
+            -- remap = false,
             desc = 'LSP: Selects a code action available at the current cursor position.',
         }
     )
@@ -191,7 +183,10 @@ local function default_keymaps(bufnr)
         { 'v', 'n' },
         '<F3>',
         require('actions-preview').code_actions,
-        { desc = 'LSP - Actions Preview: Code action preview menu' }
+        {
+            buffer = bufnr,
+            desc = 'LSP - Actions Preview: Code action preview menu',
+        }
     )
 
     if vim.lsp.buf.range_code_action then
@@ -244,33 +239,21 @@ local function default_keymaps(bufnr)
             desc = 'LSP Diagnostic: Move to the next diagnostic. (Dot repeatable)',
         }
     )
-    -- Toggle Inlay Hints
-    vim.keymap.set(
-        'n',
-        '<leader>vth',
-        function() M.toggleInlayHintsAutocmd() end,
-        { desc = 'LSP: Toggle Inlay Hints', buffer = bufnr }
-    )
 
-    -- Toggle Codelens
-    vim.keymap.set(
-        'n',
-        '<leader>vtc',
-        function() require('config.lsp.codelens').toggle_virtlines() end,
-        { desc = 'LSP: Toggle Codelens', buffer = bufnr }
-    )
-
-    -- Toggle Codelens
     vim.keymap.set(
         'n',
         '<leader>lr',
-        function() require('config.lsp.codelens').run() end,
+        function() lsp_codelens.run() end,
         { desc = 'LSP: Run Codelens', buffer = bufnr }
     )
-end
 
-local augroup_codelens =
-    vim.api.nvim_create_augroup('custom-lsp-codelens', { clear = true })
+    if client.server_capabilities.documentLinkProvider ~= nil then
+        vim.keymap.set('n', 'gx', require('config.lsp.lsplinks').gx, {
+            desc = 'LSP Remap: Open lsp links if exists. Otherwise, fallback to default neovim functionality for open link',
+            buffer = bufnr,
+        })
+    end
+end
 
 --- @class lsp_attach_event_data
 --- @field client_id? integer
@@ -302,19 +285,14 @@ local function lsp_attach(event)
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     if client == nil then return end
 
-    vim.api.nvim_buf_create_user_command(
-        event.buf,
-        'LspWorkspaceRemove',
-        'lua vim.lsp.buf.remove_workspace_folder()',
-        {}
-    )
-
     -- vim.print(client.server_capabilities)
 
     if
         client.server_capabilities.codeLensProvider ~= nil
         and client.server_capabilities.codeLensProvider.resolveProvider
     then
+        local augroup_codelens =
+            vim.api.nvim_create_augroup('lsp_codelens', { clear = true })
         vim.api.nvim_clear_autocmds({
             group = augroup_codelens,
             buffer = event.buf,
@@ -323,33 +301,47 @@ local function lsp_attach(event)
             { 'BufEnter', 'BufWritePost', 'CursorHold' },
             {
                 group = augroup_codelens,
-                callback = require('config.lsp.codelens').refresh_virtlines,
+                callback = function() lsp_codelens.refresh_codelens(event.buf) end,
                 buffer = event.buf,
             }
         )
     end
 
     if client.server_capabilities.codeActionProvider ~= nil then
-        vim.api.nvim_create_augroup('code_action', { clear = true })
+        local augroup_lsp_lightbulb =
+            vim.api.nvim_create_augroup('lsp_lightbulb', { clear = true })
 
         -- Show a lightbulb when code actions are available at the cursor position
         vim.api.nvim_create_autocmd(
             { 'BufEnter', 'CursorHold', 'CursorHoldI', 'WinScrolled' },
             {
-                group = 'code_action',
-                callback = require('config.lsp.lightbulb').show_lightbulb,
+                group = augroup_lsp_lightbulb,
+                callback = lsp_lightbulb.show_lightbulb,
                 buffer = event.buf,
             }
         )
 
         vim.api.nvim_create_autocmd({ 'BufLeave' }, {
-            group = 'code_action',
-            callback = require('config.lsp.lightbulb').remove_bulb,
+            group = augroup_lsp_lightbulb,
+            callback = lsp_lightbulb.remove_lightbulb,
             buffer = event.buf,
         })
     end
 
-    default_keymaps(event.buf)
+    if client.server_capabilities.documentLinkProvider ~= nil then
+        vim.print('lsp has documentLinkProvider')
+        vim.api.nvim_create_autocmd(
+            { 'InsertLeave', 'BufEnter', 'CursorHold', 'LspAttach' },
+            {
+                group = vim.api.nvim_create_augroup(
+                    'lsplinks',
+                    { clear = true }
+                ),
+                callback = lsp_links.refresh,
+            }
+        )
+    end
+    default_keymaps(event.buf, client)
     -- vim.print(client.name)
 end
 
@@ -362,14 +354,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('init_commands', { clear = true }),
     desc = 'lsp on_attach',
-    callback = require('config.lsp.commands').setup,
+    callback = lsp_commands.setup,
     once = true,
 })
 
 vim.api.nvim_create_autocmd({ 'LspProgress' }, {
     pattern = '*',
     group = vim.api.nvim_create_augroup('lsp_progress', { clear = true }),
-    callback = require('config.lsp.progress').update_lsp_progress_display,
+    callback = lsp_progress.update_lsp_progress_display,
 })
 ---
 -- UI settings
@@ -388,6 +380,266 @@ vim.diagnostic.config({
 
 if vim.o.signcolumn == 'auto' then vim.o.signcolumn = 'yes' end
 
-function M.default_setup(name) require('config.lsp.server').setup(name, {}) end
+-------------------------------------------------------------------------------
+---Server Setup functions (sets the lsp-config opts)
+---https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+
+function M.default_lsp_server_setup(name) lsp_server.setup(name, {}) end
+
+function M.setup_lua_ls(name)
+    lsp_server.setup(name, {
+        settings = {
+            Lua = {
+                runtime = { version = 'LuaJIT' },
+                hint = { enable = true },
+            },
+        },
+    })
+end
+function M.setup_pyright(name)
+    lsp_server.setup(name, {
+        settings = {
+            python = {
+                -- Note autoImportCompletions only shows imports that have been used in other files that have already been opened
+                -- See https://github.com/hrsh7th/nvim-cmp/issues/426#issuecomment-1185144017
+                -- TODO see if there is a way to get it to at least suggest imports without having to open all workspace files
+                autoImportCompletions = true,
+            },
+        },
+    })
+end
+
+function M.setup_tsserver(name)
+    lsp_server.setup(name, {
+        settings = {
+            typescript = {
+                inlayHints = {
+                    -- taken from https://github.com/typescript-language-server/typescript-language-server#workspacedidchangeconfiguration
+                    includeInlayEnumMemberValueHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayParameterNameHints = 'all',
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                },
+            },
+            javascript = {
+                inlayHints = {
+                    includeInlayEnumMemberValueHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayParameterNameHints = 'all',
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                },
+            },
+        },
+    })
+end
+
+function M.setup_yamlls(name)
+    -- yamlls config is based on article https://www.arthurkoziel.com/json-schemas-in-neovim/
+    local yamlls_cfg = require('yaml-companion').setup({
+        -- detect k8s schemas based on file content
+        builtin_matchers = {
+            kubernetes = { enabled = true },
+        },
+
+        -- schemas available in Telescope picker
+        -- :Telescope yaml_schema
+        -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
+        -- Catalog of kubernetes schemas: https://github.com/datreeio/CRDs-catalog/tree/main
+        schemas = {
+            {
+                name = 'Argo CD Application',
+                uri = 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj.io/application_v1alpha1.json',
+            },
+            {
+                name = 'SealedSecret',
+                uri = 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/bitnami.com/sealedsecret_v1alpha1.json',
+            },
+            {
+                name = 'Kustomization',
+                uri = 'https://json.schemastore.org/kustomization.json',
+            },
+            {
+                name = 'GitHub Workflow',
+                uri = 'https://json.schemastore.org/github-workflow.json',
+            },
+            {
+                name = 'Ansible Execution Environment',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/execution-environment.json',
+            },
+            {
+                name = 'Ansible Meta',
+                url = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta.json',
+            },
+            {
+                name = 'Ansible Meta Runtime',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/meta-runtime.json',
+            },
+            {
+                name = 'Ansible Argument Specs',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/role-arg-spec.json',
+            },
+            {
+                name = 'Ansible Requirements',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/requirements.json',
+            },
+            {
+                name = 'Ansible Vars File',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/vars.json',
+            },
+            {
+                name = 'Ansible Tasks File',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/tasks',
+            },
+            {
+                name = 'Ansible Playbook',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible.json#/$defs/playbook',
+            },
+            {
+                name = 'Ansible Rulebook',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-rulebook/main/ansible_rulebook/schema/ruleset_schema.json',
+            },
+            {
+                name = 'Ansible Inventory',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/inventory.json',
+            },
+            {
+                name = 'Ansible Collection Galaxy',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/galaxy.json',
+            },
+            {
+                name = 'Ansible-lint Configuration',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-lint/main/src/ansiblelint/schemas/ansible-lint-config.json',
+            },
+            {
+                name = 'Ansible Navigator Configuration',
+                uri = 'https://raw.githubusercontent.com/ansible/ansible-navigator/main/src/ansible_navigator/data/ansible-navigator.json',
+            },
+            {
+                name = 'OpenAPI 3.0',
+                uri = 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.json',
+            },
+            {
+                name = 'OpenAPI 3.1',
+                uri = 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.1/schema.json',
+            },
+            {
+                name = 'Swagger API 2.0',
+                uri = 'https://json.schemastore.org/swagger-2.0.json',
+            },
+        },
+
+        lspconfig = {
+            settings = {
+                yaml = {
+                    validate = true,
+                    schemaStore = {
+                        enable = false,
+                        url = '',
+                    },
+
+                    -- schemas from store, matched by filename
+                    -- loaded automatically
+                    -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
+                    schemas = require('schemastore').yaml.schemas({
+                        select = {
+                            'kustomization.yaml',
+                            'GitHub Workflow',
+                            'Ansible Execution Environment',
+                            'Ansible Meta',
+                            'Ansible Meta Runtime',
+                            'Ansible Argument Specs',
+                            'Ansible Requirements',
+                            'Ansible Vars File',
+                            'Ansible Tasks File',
+                            'Ansible Playbook',
+                            'Ansible Rulebook',
+                            'Ansible Inventory',
+                            'Ansible Collection Galaxy',
+                            'Ansible-lint Configuration',
+                            'Ansible Navigator Configuration',
+                            'openapi.json',
+                            'Swagger API 2.0',
+                        },
+                    }),
+                },
+            },
+        },
+    })
+
+    lsp_server.setup(name, yamlls_cfg)
+end
+
+function M.setup_jsonls(name)
+    -- jsonls config is based on article https://www.arthurkoziel.com/json-schemas-in-neovim/
+    -- Config type is defined in https://github.com/microsoft/vscode/blob/30b777312745e84972956d4361465d4d38aa0f78/extensions/json-language-features/server/src/jsonServer.ts#L202C2-L218C3
+    local json_schemas = require('schemastore').json.schemas({
+        select = {
+            'Renovate',
+            'GitHub Workflow Template Properties',
+        },
+        -- extra = {
+        --     {
+        --         description = 'Schema for luals lsp configuration file',
+        --         name = 'LuaLS Settings',
+        --         url = 'https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json',
+        --         fileMatch = { '.luarc.json', '.luarc.jsonc' },
+        --     },
+        -- },
+    })
+    -- Adding the schemas to the extra tab doesn't seem to be working
+    table.insert(json_schemas, {
+        description = 'Schema for luals lsp configuration file',
+        name = 'LuaLS Settings',
+        url = 'https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json',
+        fileMatch = { '.luarc.json', '.luarc.jsonc' },
+    })
+    local jsonls_cfg = {
+        settings = {
+            json = {
+                schemas = json_schemas,
+                validate = { enable = true },
+            },
+        },
+    }
+
+    lsp_server.setup(name, jsonls_cfg)
+end
+
+function M.setup_tablo(name)
+    -- taplo config is based on article https://www.arthurkoziel.com/json-schemas-in-neovim/
+    -- tablo loads all toml schemas from https://www.schemastore.org/api/json/catalog.json with little customization
+    lsp_server.setup(name, {
+        settings = {
+            evenBetterToml = {
+                schema = {
+                    -- add additional schemas
+                    -- associations = {
+                    --     ['example\\.toml$'] = 'https://json.schemastore.org/example.json',
+                    -- },
+                },
+            },
+        },
+    })
+end
+
+function M.setup_omnisharp(name)
+    local pid = vim.fn.getpid()
+    lsp_server.setup(name, {
+        cmd = {
+            require('utils.path').get_mason_tool_path('omnisharp'),
+            '--languageserver',
+            '--hostPID',
+            tostring(pid),
+        },
+    })
+end
 
 return M

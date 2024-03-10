@@ -2,12 +2,18 @@ local M = {}
 
 M.run = function() vim.lsp.codelens.run() end
 
-local virtlines_enabled = true
-M.toggle_virtlines = function()
-    virtlines_enabled = not virtlines_enabled
-    M.refresh_virtlines()
+local codelens_enabled = true
+M.toggle_codelens = function()
+    codelens_enabled = not codelens_enabled
+    M.refresh_codelens()
 end
 
-M.refresh_virtlines = function() vim.lsp.codelens.refresh() end
+M.refresh_codelens = function(bufnr)
+    if codelens_enabled == true then
+        vim.lsp.codelens.refresh()
+    else
+        vim.lsp.codelens.clear(nil, bufnr)
+    end
+end
 
 return M

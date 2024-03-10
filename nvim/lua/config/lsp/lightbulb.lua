@@ -46,7 +46,7 @@ local prev_topline_num = nil
 local prev_bufnr = nil
 local code_action_support = false
 
-function M.remove_bulb()
+function M.remove_lightbulb()
     if bulb_bufnr ~= nil and vim.fn.getcmdwintype() ~= '' then
         --Since we can't delete buffers while the command-window is open we have to schedule
         --The cleanup till after the command-window is closed
@@ -94,7 +94,7 @@ function M.show_lightbulb()
         end
     end
     if code_action_support == false then
-        M.remove_bulb()
+        M.remove_lightbulb()
         return
     end
     local context = {
@@ -137,7 +137,7 @@ function M.show_lightbulb()
                     return
                 end
                 -- Remove the old bulb if necessary, and then create a new bulb
-                M.remove_bulb()
+                M.remove_lightbulb()
                 prev_lnum = cur_lnum
                 prev_topline_num = cur_topline_num
                 local icon = ''
@@ -184,7 +184,7 @@ function M.show_lightbulb()
                 return
             end
             -- If no actions, remove the bulb if it is existing
-            if has_actions == false then M.remove_bulb() end
+            if has_actions == false then M.remove_lightbulb() end
         end
     )
 end
