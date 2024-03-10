@@ -329,7 +329,7 @@ local function lsp_attach(event)
     end
 
     if client.server_capabilities.documentLinkProvider ~= nil then
-        vim.print('lsp has documentLinkProvider')
+        -- vim.print('lsp has documentLinkProvider')
         vim.api.nvim_create_autocmd(
             { 'InsertLeave', 'BufEnter', 'CursorHold', 'LspAttach' },
             {

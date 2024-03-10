@@ -5,18 +5,6 @@ local log = vim.lsp.log
 local api = vim.api
 local M = {}
 
----@class lsp.Position
----@field line integer
----@field character integer
-
----@class lsp.Range
----@field start lsp.Position
----@field end lsp.Position
-
----@class lsp.DocumentLink
----@field range lsp.Range
----@field target string
-
 ---@type table<integer, lsp.DocumentLink[]>
 local links_by_buf = {} --TODO handle memory leaks
 
@@ -105,7 +93,7 @@ end
 --- Convinience function which opens current link with fallback
 --- to default gx behaviour
 function M.gx()
-    vim.print(links_by_buf)
+    -- vim.print(links_by_buf)
     local uri = M.current() or vim.fn.expand('<cfile>')
     M.open(uri)
 end

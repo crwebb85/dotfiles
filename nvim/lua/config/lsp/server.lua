@@ -47,6 +47,9 @@ function M.setup(name, opts)
         set_capabilities({
             textDocument = {
                 documentLink = {
+                    -- this might not be needed because document links to the golang
+                    -- documentation from a go import statment seems to work without this line
+                    -- I am leaving this here in case there is an LSP that needs it explicitly set
                     dynamicRegistration = true,
                 },
             },
