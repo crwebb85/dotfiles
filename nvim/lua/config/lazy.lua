@@ -1218,6 +1218,8 @@ require('lazy').setup({
                     'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
                     'xmlformatter',
                     'jq', --json formatter
+                    'shfmt',
+
                     -- 'fixjson', -- json fixer, fixes invalid json like trailing commas
 
                     -- Debuggers
@@ -1688,6 +1690,9 @@ require('lazy').setup({
                 desc = 'Conform: Format buffer',
             },
         },
+        init = function()
+            vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+        end,
         config = function(_, _)
             require('conform').setup({
                 formatters_by_ft = {
@@ -1696,6 +1701,9 @@ require('lazy').setup({
                     python = { 'isort', 'black' },
                     typescript = { { 'prettierd', 'prettier' } },
                     javascript = { { 'prettierd', 'prettier' } },
+                    typescriptreact = { { 'prettierd', 'prettier' } },
+                    javascriptreact = { { 'prettierd', 'prettier' } },
+                    css = { { 'prettierd', 'prettier' } },
                     yaml = { { 'prettierd', 'prettier' } },
                     json = { { 'prettierd', 'prettier' } },
                     jsonc = { { 'prettierd', 'prettier' } },
@@ -1709,6 +1717,8 @@ require('lazy').setup({
                     -- conform.nvim format any python codeblocks inside a markdown file.
                     markdown = { { 'prettierd', 'prettier' }, 'injected' },
                     xml = { 'xmlformat' },
+                    graphql = { { 'prettierd', 'prettier' } },
+                    sh = { 'shfmt' },
                 },
                 formatters = {
                     xmlformat = {
@@ -1729,6 +1739,23 @@ require('lazy').setup({
         'aznhe21/actions-preview.nvim',
         lazy = true,
         config = true,
+    },
+
+    ---------------------------------------------------------------------------
+    --- Task Runner
+
+    { -- The task runner we use
+        'stevearc/overseer.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        opts = {
+            task_list = {
+                direction = 'bottom',
+                min_height = 25,
+                max_height = 25,
+                default_detail = 1,
+            },
+        },
     },
 
     ---------------------------------------------------------------------------
