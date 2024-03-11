@@ -105,41 +105,9 @@ vim.api.nvim_create_user_command('CompareClipboard', function()
     vim.cmd('set filetype=' .. ftype)
 end, { nargs = 0, desc = 'Compares buffer file with clipboard contents' })
 
----Get the text in the visual selection
----@param bufnr number of the buffer with text selected
----@return string[]
-local function get_visual_selection(bufnr)
-    local start_pos = vim.api.nvim_buf_get_mark(0, '<')
-    local start_row = start_pos[1]
-    local start_col = start_pos[2]
-
-    local end_pos = vim.api.nvim_buf_get_mark(0, '>')
-    local end_row = end_pos[1]
-    local end_col = end_pos[2]
-    -- vim.print(start_pos)
-    -- vim.print(end_pos)
-
-    ---@type string[]
-    local text = {}
-
-    if end_col == 2147483647 then
-        text = vim.api.nvim_buf_get_lines(bufnr, start_row - 1, end_row, true)
-    else
-        text = vim.api.nvim_buf_get_text(
-            bufnr,
-            start_row - 1,
-            start_col,
-            end_row - 1,
-            end_col + 1,
-            {}
-        )
-    end
-    return text
-end
-
 vim.api.nvim_create_user_command('CompareClipboardSelection', function()
     local file_type = vim.opt_local.filetype
-    local selection_text = get_visual_selection(0)
+    local selection_text = require('utils.misc').get_visual_selection(0)
     vim.cmd([[
 		" open new tab, set options to prevent save prompt when closing
 		execute 'tabnew'
@@ -531,3 +499,118 @@ vim.api.nvim_create_user_command(
         desc = 'Copies QF list to Loc list',
     }
 )
+
+-------------------------------------------------------------------------------
+---Task runner commands
+
+vim.api.nvim_create_user_command('Make', function(params)
+    -- Insert args at the '$*' in the makeprg
+    local cmd, num_subs = vim.o.makeprg:gsub('%$%*', params.args)
+    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    local task = require('overseer').new_task({
+        cmd = vim.fn.expandcmd(cmd),
+        components = {
+            { 'on_output_quickfix', open = not params.bang, open_height = 8 },
+            'default',
+        },
+    })
+    task:start()
+end, {
+    desc = 'Run your makeprg as an Overseer task',
+    nargs = '*',
+    bang = true,
+})
+
+vim.api.nvim_create_user_command('OverseerRestartLast', function()
+    local overseer = require('overseer')
+    local tasks = overseer.list_tasks({ recent_first = true })
+    if vim.tbl_isempty(tasks) then
+        vim.notify('No tasks found', vim.log.levels.WARN)
+    else
+        overseer.run_action(tasks[1], 'restart')
+    end
+end, {})
+
+vim.api.nvim_create_user_command('Grep', function(params)
+    local overseer = require('overseer')
+    -- Insert args at the '$*' in the grepprg
+    local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
+    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    local task = overseer.new_task({
+        cmd = vim.fn.expandcmd(cmd),
+        components = {
+            {
+                'on_output_quickfix',
+                errorformat = vim.o.grepformat,
+                open = not params.bang,
+                open_height = 8,
+                items_only = true,
+            },
+            -- We don't care to keep this around as long as most tasks
+            { 'on_complete_dispose', timeout = 30 },
+            'default',
+        },
+    })
+    task:start()
+end, { nargs = '*', bang = true, complete = 'file' })
+
+--https://github.com/stevearc/dotfiles/blob/master/.config/nvim/plugin/stacktrace.lua
+vim.api.nvim_create_user_command('Stacktrace', function(params)
+    local selection_text = {}
+
+    if params.range == 2 then
+        selection_text = require('utils.misc').get_visual_selection(0)
+    end
+
+    local bufnr = vim.api.nvim_create_buf(false, true)
+
+    vim.bo[bufnr].bufhidden = 'wipe'
+    local winid = vim.api.nvim_open_win(bufnr, true, {
+        relative = 'editor',
+        width = vim.o.columns,
+        height = vim.o.lines,
+        row = 1,
+        col = 1,
+        border = 'rounded',
+        style = 'minimal',
+        title = 'Stacktrace',
+        title_pos = 'center',
+    })
+
+    vim.api.nvim_buf_set_lines(bufnr, 0, 1, true, selection_text)
+
+    local cancel
+    local confirm
+    cancel = function()
+        cancel = function() end
+        confirm = function() end
+        vim.api.nvim_win_close(winid, true)
+    end
+    confirm = function()
+        local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, true)
+        cancel()
+        local items = vim.fn.getqflist({
+            lines = lines,
+        }).items
+        -- Use :Stacktrace! to not filter out invalid lines
+        if not params.bang then
+            items = vim.tbl_filter(
+                function(item) return item.valid == 1 end,
+                items
+            )
+        end
+        vim.fn.setqflist({}, ' ', {
+            title = 'Stacktrace',
+            items = items,
+        })
+        vim.cmd('copen')
+    end
+    vim.keymap.set('n', 'q', cancel, { buffer = bufnr })
+    vim.keymap.set({ 'n', 'i' }, '<C-c>', cancel, { buffer = bufnr })
+    vim.keymap.set('n', '<CR>', confirm, { buffer = bufnr })
+    vim.keymap.set({ 'n', 'i' }, '<C-s>', confirm, { buffer = bufnr })
+end, {
+    desc = 'Parse a stacktrace using errorformat and add to quickfix',
+    bang = true,
+    range = true,
+})
