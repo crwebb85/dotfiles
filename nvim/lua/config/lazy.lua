@@ -1733,7 +1733,6 @@ require('lazy').setup({
             -- require('conform.formatters.injected').options.ignore_errors = false
         end,
     },
-
     -- Code Action preview
     {
         'aznhe21/actions-preview.nvim',
