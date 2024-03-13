@@ -554,6 +554,12 @@ vim.api.nvim_create_user_command('Grep', function(params)
     task:start()
 end, { nargs = '*', bang = true, complete = 'file' })
 
+vim.api.nvim_create_user_command(
+    'OverseerDebugParser',
+    function() require('overseer').debug_parser() end,
+    {}
+)
+
 --https://github.com/stevearc/dotfiles/blob/master/.config/nvim/plugin/stacktrace.lua
 vim.api.nvim_create_user_command('Stacktrace', function(params)
     local selection_text = {}
@@ -579,6 +585,22 @@ vim.api.nvim_create_user_command('Stacktrace', function(params)
 
     vim.api.nvim_buf_set_lines(bufnr, 0, 1, true, selection_text)
 
+    local colors = require('tokyonight.colors').setup()
+    vim.api.nvim_set_hl(0, 'stacktrace_quickfix_item_hl_group', {
+        fg = colors.dark3,
+        italic = true,
+    })
+    vim.fn.matchadd(
+        'stacktrace_quickfix_item_hl_group',
+        '[^%s].\\+:\\d\\+:\\(\\d\\+:\\)\\= .\\+'
+        --matches text like the following lines
+        --[[ 
+            .\hello-world.go:6: undefined: mt
+            adfas .\hello-world.go:3:8: "fmt" imported and not used
+            .\hello-world.go:6:2: undefined: mt
+        ]]
+        --
+    )
     local cancel
     local confirm
     cancel = function()
