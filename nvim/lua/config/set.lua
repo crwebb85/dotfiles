@@ -64,3 +64,7 @@ vim.filetype.add({
         json = 'jsonc', -- This ensures that I can comment lines in json configuration files even if the extension is .json
     },
 })
+
+-- Error format for nuget restore:
+-- helloworld\helloworld.csproj : warning NU1901: Package 'my.helloworld' 1.0.0 has a known low severity vulnerability
+vim.cmd([[ set errorformat+=%f:\ %tarning\ %m ]])
