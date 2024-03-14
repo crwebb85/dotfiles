@@ -123,9 +123,9 @@ require('lazy').setup({
             },
         },
     },
-    -- Adds an api wrapper arround git which I use in my heirline setup
-    -- Adds Gitblame
-    -- Adds sidbar showing lines changed
+    -- Adds an API wrapper around git which I use in my heirline setup
+    -- Adds Git blame
+    -- Adds sidebar showing lines changed
     {
         'lewis6991/gitsigns.nvim',
         lazy = true,
@@ -316,7 +316,7 @@ require('lazy').setup({
             },
             extensions = {
                 media_files = {
-                    -- filetypes whitelist
+                    -- file types white list
                     -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
                     filetypes = { 'png', 'webp', 'jpg', 'jpeg' },
                     -- find command (defaults to `fd`)
@@ -476,7 +476,7 @@ require('lazy').setup({
         end,
         config = true,
     },
-    -- Adds motions to wrap text in qoutes/brackets/tags/etc
+    -- Adds motions to wrap text in quotes/brackets/tags/etc
     -- using the same motions I use to yank text
     {
         'kylechui/nvim-surround',
@@ -736,7 +736,7 @@ require('lazy').setup({
     },
 
     ---------------------------------------------------------------------------
-    -- Undotree the solution to screwups
+    -- Undotree the solution to screw ups
     {
         'mbbill/undotree',
         lazy = true,
@@ -1291,8 +1291,8 @@ require('lazy').setup({
                 lazy = true,
                 ft = 'lua',
             },
-            { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capibilities to that cmp adds to neovim
-            { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function paramaters
+            { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capabilities to that cmp adds to neovim
+            { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
             { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
             {
                 'petertriho/cmp-git', -- Provides info about git repo

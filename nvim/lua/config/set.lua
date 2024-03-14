@@ -9,6 +9,31 @@ vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
+-- local function get_spellfile_path()
+--     local path_utils = require('utils.path')
+--     local data_path = vim.fn.stdpath('config')
+--     if type(data_path) ~= 'string' then
+--         error('something went wrong getting the datapath')
+--     end
+--     local path = path_utils.concat({
+--         data_path,
+--         'spell',
+--         -- 'en.utf-8.spl',
+--         'en.utf-8.add',
+--     })
+--     -- path = vim.fn.expand(path)
+--     vim.print(path)
+--     return path
+-- end
+-- get_spellfile_path()
+
+-- vim.g.spellfile_URL = 'https://ftp.nluug.nl/vim/runtime/spell'
+vim.opt.spell = true
+vim.opt.spelllang = 'en_us'
+-- vim.opt.spellfile = get_spellfile_path()
+
+-- vim.cmd([[set spellfile="]] .. get_spellfile_path() .. [["]])
+
 vim.opt.smartindent = true
 
 vim.opt.wrap = false
