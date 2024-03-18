@@ -31,6 +31,25 @@ vim.api.nvim_create_user_command('Scratch', function()
     vim.opt.splitright = old_splitright_value
 end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
 
+-- Create a new scratch buffer to the left that will push my working window
+-- closer to the center so that I am not hurting my neck
+-- https://github.com/smithbm2316/centerpad.nvim/
+vim.api.nvim_create_user_command('CenterWindow', function()
+    local old_splitright_value = vim.go.splitright
+    vim.opt.splitright = false
+    local leftpad_size = 36
+    local main_win = vim.api.nvim_get_current_win()
+    vim.cmd(string.format('%svnew', leftpad_size))
+    local leftpad_bufnr = vim.api.nvim_get_current_buf()
+    vim.api.nvim_buf_set_name(leftpad_bufnr, 'leftpad')
+    vim.bo[leftpad_bufnr].buftype = 'nofile'
+    vim.bo[leftpad_bufnr].bufhidden = 'hide'
+    vim.bo[leftpad_bufnr].swapfile = false
+    vim.api.nvim_set_current_win(main_win)
+
+    vim.opt.splitright = old_splitright_value
+end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
+
 -------------------------------------------------------------------------------
 -- Messages
 
@@ -635,4 +654,13 @@ end, {
     desc = 'Parse a stacktrace using errorformat and add to quickfix',
     bang = true,
     range = true,
+})
+
+vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
+    local items = vim.fn.getqflist()
+    items = vim.tbl_filter(function(item) return item.valid == 1 end, items)
+    vim.fn.setqflist({}, ' ', { items = items })
+    vim.cmd('open')
+end, {
+    desc = 'Remove invalid quickfix items',
 })

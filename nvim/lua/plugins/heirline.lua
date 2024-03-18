@@ -589,6 +589,12 @@ local config = function()
     local WinBars = {
         {
             {
+
+                {
+                    condition = function() return vim.wo.previewwindow end,
+                    provider = 'Preview: ',
+                    hl = { fg = filename_foreground_color, bold = true },
+                },
                 FileNameBlock,
                 {
                     condition = function() return vim.bo.buftype == 'quickfix' end,
@@ -602,6 +608,20 @@ local config = function()
                         return { bg = inactive_background_color }
                     end
                 end,
+            },
+            Align,
+            {
+                provider = function(_)
+                    return 'bufnr:' .. vim.api.nvim_get_current_buf()
+                end,
+            },
+            Space,
+            {
+                provider = function(_) return 'winid:' .. vim.fn.win_getid() end,
+            },
+            Space,
+            {
+                provider = function(_) return 'winnr:' .. vim.fn.winnr() end,
             },
         },
     }

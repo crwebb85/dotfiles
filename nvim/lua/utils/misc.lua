@@ -1,4 +1,5 @@
 local M = {}
+---TODO replace with :h getregion which is in newer versions of neovim
 ---Get the text in the visual selection
 ---@param bufnr number of the buffer with text selected
 ---@return string[]

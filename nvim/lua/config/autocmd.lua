@@ -130,20 +130,6 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
--- Pressing enter on item in quickfix list will take me to that file and line
--- TODO determine why I need this since I believe this should be a default
--- keymapping but something is overridding it
-vim.api.nvim_create_autocmd('FileType', {
-    pattern = 'qf',
-    callback = function(event)
-        vim.keymap.set('n', '<CR>', '<CR>', {
-            buffer = event.buf,
-            silent = true,
-            desc = 'Custom - Quick Fix List: Go to quickfix item under cursor',
-        })
-    end,
-})
-
 -------------------------------------------------------------------------------
 --- Check if we need to reload the file when it changed
 vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {

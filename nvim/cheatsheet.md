@@ -73,6 +73,7 @@ vim.api.nvim_create_autocmd('User', {
 
 - `<c-f>` in command mode lets you edit commands as if you were in normal mode
 - `q:` from normal mode will also open the same command prompt
+- `<C-r><C-w>` used to copy cursor word into command window
 
 ### Split line
 
@@ -105,6 +106,7 @@ useful api functions:
 - nvim_buf_get_var()
 - https://neovim.io/doc/user/api.html#api-floatwin
 - setreg() - used to set a register
+- confirm({msg} [, {choices} [, {default} [, {type}]]]) - used to create confirmation dialog boxes
 
 ### Notes
 
