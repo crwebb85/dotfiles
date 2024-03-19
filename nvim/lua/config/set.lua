@@ -59,6 +59,9 @@ vim.opt.foldcolumn = '1'
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 
+vim.opt.pumheight = 15 -- limits the size of the completion menu to only show 15 items at a time
+vim.opt.pumblend = 15 -- makes the completion menu slightly transparent
+
 vim.filetype.add({
     extension = {
         json = 'jsonc', -- This ensures that I can comment lines in json configuration files even if the extension is .json

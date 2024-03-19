@@ -1304,9 +1304,9 @@ require('lazy').setup({
         config = function()
             local cmp = require('cmp')
             cmp.setup({
-                performance = {
-                    max_view_entries = 15,
-                },
+                -- performance = {
+                --     max_view_entries = 15,
+                -- },
                 sources = cmp.config.sources({
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lsp_signature_help' },
