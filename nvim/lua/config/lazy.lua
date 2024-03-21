@@ -880,6 +880,7 @@ require('lazy').setup({
     {
         'nvim-neotest/neotest',
         dependencies = {
+            'nvim-neotest/nvim-nio',
             'nvim-lua/plenary.nvim',
             'antoinemadec/FixCursorHold.nvim',
             'nvim-treesitter/nvim-treesitter',
@@ -903,7 +904,10 @@ require('lazy').setup({
             },
             {
                 '<leader>td',
-                function() require('neotest').run.run({ strategy = 'dap' }) end,
+                function()
+                    vim.cmd([[set noshellslash]])
+                    require('neotest').run.run({ strategy = 'dap' })
+                end,
                 desc = 'Neotest: Debug the nearest test',
             },
             {
@@ -1056,10 +1060,10 @@ require('lazy').setup({
                 type = 'executable',
                 command = get_mason_tool_netcoredbg_path(),
                 args = { '--interpreter=vscode' },
-                -- options = {
-                --     --https://github.com/Wiebesiek/ZeoVim
-                --     detached = false, -- Will put the output in the REPL. #CloseEnough
-                -- },
+                options = {
+                    --https://github.com/Wiebesiek/ZeoVim
+                    detached = false, -- Will put the output in the REPL. #CloseEnough
+                },
             }
 
             --configurations
