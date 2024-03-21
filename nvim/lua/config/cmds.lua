@@ -540,6 +540,113 @@ end, {
     bang = true,
 })
 
+--- Given a path, open the file, extract all the Makefile keys,
+--  and return them as a list.
+---@param path string
+---@return table options A telescope options list like
+--{ { text: "1 - all", value="all" }, { text: "2 - hello", value="hello" } ...}
+local function get_makefile_options(path)
+    local options = {}
+
+    -- Open the Makefile for reading
+    local file = io.open(path, 'r')
+
+    if file then
+        local in_target = false
+        local count = 0
+
+        -- Iterate through each line in the Makefile
+        for line in file:lines() do
+            -- Check for lines starting with a target rule (e.g., "target: dependencies")
+            local target = line:match('^(.-):')
+            if target then
+                in_target = true
+                count = count + 1
+                -- Exclude the ":" and add the option to the list with text and value fields
+                table.insert(
+                    options,
+                    { text = count .. ' - ' .. target, value = target }
+                )
+            elseif in_target then
+                -- If we're inside a target block, stop adding options
+                in_target = false
+            end
+        end
+
+        -- Close the Makefile
+        file:close()
+    else
+        vim.notify(
+            'Unable to open a Makefile in the current working dir.',
+            vim.log.levels.ERROR,
+            {
+                title = 'Makeit.nvim',
+            }
+        )
+    end
+
+    return options
+end
+
+vim.api.nvim_create_user_command('Makeit', function(_)
+    -- dependencies
+    local conf = require('telescope.config').values
+    local actions = require('telescope.actions')
+    local state = require('telescope.actions.state')
+    local pickers = require('telescope.pickers')
+    local finders = require('telescope.finders')
+    local options = get_makefile_options(
+        require('utils.path').concat({ vim.fn.getcwd(), 'Makefile' })
+    )
+
+    --- On option selected → Run action depending of the language
+    local function on_option_selected(prompt_bufnr)
+        actions.close(prompt_bufnr) -- Close Telescope on selection
+        local selection = state.get_selected_entry()
+        _G.makeit_redo = selection.value -- Save redo
+        if selection then
+            vim.cmd([[Make ]] .. selection.value) --TODO replace with a local function
+        end
+    end
+
+    --- Show telescope
+    local function open_telescope()
+        pickers
+            .new({}, {
+                prompt_title = 'Makeit',
+                results_title = 'Options',
+                finder = finders.new_table({
+                    results = options,
+                    entry_maker = function(entry)
+                        return {
+                            display = entry.text,
+                            value = entry.value,
+                            ordinal = entry.text,
+                        }
+                    end,
+                }),
+                sorter = conf.generic_sorter(),
+                attach_mappings = function(_, map)
+                    map(
+                        'i',
+                        '<CR>',
+                        function(prompt_bufnr) on_option_selected(prompt_bufnr) end
+                    )
+                    map(
+                        'n',
+                        '<CR>',
+                        function(prompt_bufnr) on_option_selected(prompt_bufnr) end
+                    )
+                    return true
+                end,
+            })
+            :find()
+    end
+    open_telescope() -- Entry point
+end, {
+    desc = 'Opens telescope picker to pick the Make task to run',
+})
+
 vim.api.nvim_create_user_command('OverseerRestartLast', function()
     local overseer = require('overseer')
     local tasks = overseer.list_tasks({ recent_first = true })
