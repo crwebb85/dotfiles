@@ -965,6 +965,8 @@ require('lazy').setup({
         lazy = true,
         config = function(_, _)
             local dap = require('dap')
+
+            --Adapters
             dap.adapters.codelldb = {
                 type = 'server',
                 port = '${port}',
@@ -987,6 +989,80 @@ require('lazy').setup({
                 host = '127.0.0.1',
                 port = 13000,
             }
+            --Things that make dotnet debugging work
+            --```csproj
+            -- <Project Sdk="Microsoft.NET.Sdk">
+            --   <PropertyGroup>
+            --     <OutputType>Exe</OutputType>
+            --     <TargetFramework>net8.0</TargetFramework>
+            --     <ImplicitUsings>enable</ImplicitUsings>
+            --     <Nullable>enable</Nullable>
+            --     <DebugSymbols>true</DebugSymbols>
+            --     <DebugType>portable</DebugType>
+            --   </PropertyGroup>
+            -- </Project>
+            -- ```
+            --
+            -- DebugType must be set to portable
+            --
+            -- Then set the vim option `set noshellslash` setting it in the dap.configurations.cs.program function was the most consistent
+            -- maybe it is getting overwritten somewhere else in my config
+            --
+            -- Then directly use the netcoredbg.exe not the netcoredbg.cmd that mason downloads
+            --
+
+            --- I was having problems with using the cmd file mason creates when installing netcoredbg on windows
+            --- where using the cmd file for debugging wouldn't work. Instead I had to use the exe file directly
+            ---@return string
+            local function get_mason_tool_netcoredbg_path()
+                local data_path = vim.fn.stdpath('data')
+                if data_path == nil then
+                    error('data path was nil but a string was expected')
+                elseif type(data_path) == 'table' then
+                    error('data path was an array but a string was expected')
+                end
+
+                if require('utils.platform').is.win then
+                    return require('utils.path').concat({
+                        data_path,
+                        'mason',
+                        'packages',
+                        'netcoredbg',
+                        'netcoredbg',
+                        'netcoredbg.exe',
+                    })
+                else
+                    return require('utils.path').get_mason_tool_path(
+                        'netcoredbg'
+                    )
+                end
+            end
+
+            dap.adapters.coreclr = {
+                type = 'executable',
+                command = get_mason_tool_netcoredbg_path(),
+                -- command = require('utils.path').get_mason_tool_path(
+                --     'netcoredbg'
+                -- ),
+                args = { '--interpreter=vscode' },
+                options = {
+                    --https://github.com/Wiebesiek/ZeoVim
+                    detached = false, -- Will put the output in the REPL. #CloseEnough
+                },
+            }
+
+            -- Neotest Test runner looks at this table
+            dap.adapters.netcoredbg = {
+                type = 'executable',
+                command = get_mason_tool_netcoredbg_path(),
+                args = { '--interpreter=vscode' },
+                -- options = {
+                --     --https://github.com/Wiebesiek/ZeoVim
+                --     detached = false, -- Will put the output in the REPL. #CloseEnough
+                -- },
+            }
+
+            --configurations
             dap.configurations.rust = {
                 {
                     name = 'Launch file',
@@ -1001,6 +1077,202 @@ require('lazy').setup({
                     end,
                     cwd = '${workspaceFolder}',
                     stopOnEntry = false,
+                },
+            }
+            local dotnet_build_project = function()
+                local default_path = vim.fn.getcwd() .. '/'
+                if vim.g['dotnet_last_proj_path'] ~= nil then
+                    default_path = vim.g['dotnet_last_proj_path']
+                end
+                local path = vim.fn.input(
+                    'Path to your *proj file',
+                    default_path,
+                    'file'
+                )
+                vim.g['dotnet_last_proj_path'] = path
+                local cmd = 'dotnet build -c Debug ' .. path .. ' > /dev/null'
+                print('')
+                print('Cmd to execute: ' .. cmd)
+                local f = os.execute(cmd)
+                if f == 0 then
+                    print('\nBuild: ✔️ ')
+                else
+                    print('\nBuild: ❌ (code: ' .. f .. ')')
+                end
+            end
+
+            local dotnet_get_dll_path = function()
+                local request = function()
+                    return vim.fn.input(
+                        'Path to dll',
+                        vim.fn.getcwd() .. '/bin/Debug/',
+                        'file'
+                    )
+                end
+
+                if vim.g['dotnet_last_dll_path'] == nil then
+                    vim.g['dotnet_last_dll_path'] = request()
+                else
+                    if
+                        vim.fn.confirm(
+                            'Do you want to change the path to dll?\n'
+                                .. vim.g['dotnet_last_dll_path'],
+                            '&yes\n&no',
+                            2
+                        ) == 1
+                    then
+                        vim.g['dotnet_last_dll_path'] = request()
+                    end
+                end
+
+                return vim.g['dotnet_last_dll_path']
+            end
+
+            dap.configurations.cs = {
+                {
+                    type = 'coreclr',
+                    name = 'build and launch - netcoredbg',
+                    request = 'launch',
+                    program = function()
+                        vim.cmd([[set noshellslash]])
+                        if
+                            vim.fn.confirm(
+                                'Should I recompile first?',
+                                '&yes\n&no',
+                                2
+                            ) == 1
+                        then
+                            dotnet_build_project()
+                        end
+                        return dotnet_get_dll_path()
+                    end,
+                },
+                {
+                    type = 'coreclr',
+                    name = 'launch via telescope - netcoredbg',
+                    request = 'launch',
+                    console = 'integratedTerminal',
+                    program = function()
+                        vim.cmd([[set noshellslash]])
+                        local pickers = require('telescope.pickers')
+                        local finders = require('telescope.finders')
+                        local conf = require('telescope.config').values
+                        local actions = require('telescope.actions')
+                        local action_state = require('telescope.actions.state')
+                        return coroutine.create(function(coro)
+                            local opts = {}
+                            pickers
+                                .new(opts, {
+                                    prompt_title = 'Path to executable/dll',
+                                    finder = finders.new_oneshot_job({
+                                        'rg',
+                                        '--files',
+                                        '--hidden',
+                                        '--glob',
+                                        '!.git',
+                                        '--glob',
+                                        '!node_modules',
+                                        '--glob',
+                                        '!venv',
+                                        '--glob',
+                                        '!.venv',
+                                    }, {}),
+                                    sorter = conf.generic_sorter(opts),
+                                    attach_mappings = function(buffer_number)
+                                        actions.select_default:replace(
+                                            function()
+                                                actions.close(buffer_number)
+                                                coroutine.resume(
+                                                    coro,
+                                                    action_state.get_selected_entry()[1]
+                                                )
+                                            end
+                                        )
+                                        return true
+                                    end,
+                                })
+                                :find()
+                        end)
+                    end,
+                },
+                {
+                    type = 'coreclr',
+                    name = 'launch via input - netcoredbg',
+                    request = 'launch',
+                    program = function()
+                        vim.cmd([[set noshellslash]])
+                        return vim.fn.input(
+                            'Path to dll',
+                            vim.fn.getcwd() .. '/bin/Debug/',
+                            'file'
+                        )
+                    end,
+                },
+                {
+                    type = 'coreclr',
+                    name = 'attach - netcoredbg',
+                    request = 'attach',
+                    processId = require('dap.utils').pick_process,
+                },
+                --TODO - possibly useful snippet https://www.reddit.com/r/csharp/comments/15ktebq/comment/ks2dvb0/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+                -- local dir = vim.loop.cwd() .. '/' .. vim.fn.glob 'bin/Debug/net*/linux-x64/'
+                -- local name = dir .. vim.fn.glob('*.csproj'):gsub('%.csproj$', '.dll')
+                -- if not exists(name) then os.execute 'dotnet build -r linux-x64' end
+                -- return name
+
+                -- {
+                --     type = 'coreclr',
+                --     name = 'launch - netcoredbg',
+                --     request = 'launch',
+                --     env = 'ASPNETCORE_ENVIRONMENT=Development',
+                --     args = {
+                --         '/p:EnvironmentName=Development', -- this is a msbuild jk
+                --         --  this is set via environment variable ASPNETCORE_ENVIRONMENT=Development
+                --         '--urls=http://localhost:5002',
+                --         '--environment=Development',
+                --     },
+                --     program = function()
+                --         local get_root_dir = function ()
+                --             vim.fn.getcwd()
+                --         end
+                --         -- return vim.fn.getcwd() .. "/bin/Debug/net8.0/FlareHotspotServer.dll"
+                --         local files = ls_dir(get_root_dir() .. '/bin/Debug/')
+                --         if #files == 1 then
+                --             local dotnet_dir = get_root_dir()
+                --                 .. '/bin/Debug/'
+                --                 .. files[1]
+                --             files = ls_dir(dotnet_dir)
+                --             for _, file in ipairs(files) do
+                --                 if file:match('.*%.dll') then
+                --                     return dotnet_dir .. '/' .. file
+                --                 end
+                --             end
+                --         end
+                --         return vim.fn.input({
+                --             prompt = 'Path to dll',
+                --             default = get_root_dir() .. '/bin/Debug/',
+                --         })
+                --     end,
+                -- },
+            }
+
+            dap.configurations.fsharp = {
+                {
+                    type = 'coreclr',
+                    name = 'launch - netcoredbg',
+                    request = 'launch',
+                    program = function()
+                        if
+                            vim.fn.confirm(
+                                'Should I recompile first?',
+                                '&yes\n&no',
+                                2
+                            ) == 1
+                        then
+                            dotnet_build_project()
+                        end
+                        return dotnet_get_dll_path()
+                    end,
                 },
             }
         end,
@@ -1104,12 +1376,12 @@ require('lazy').setup({
             listener.after.event_initialized['dapui_config'] = function()
                 require('dapui').open()
             end
-            listener.before.event_terminated['dapui_config'] = function()
-                require('dapui').close()
-            end
-            listener.before.event_exited['dapui_config'] = function()
-                require('dapui').close()
-            end
+            -- listener.before.event_terminated['dapui_config'] = function()
+            --     require('dapui').close()
+            -- end
+            -- listener.before.event_exited['dapui_config'] = function()
+            --     require('dapui').close()
+            -- end
         end,
     },
 
@@ -1267,7 +1539,7 @@ require('lazy').setup({
             {
                 -- neodev must load before lspconfig to load in the lua_ls LSP settings
                 'folke/neodev.nvim',
-                -- cmp-nvim-lsp provides a list of lsp capibilities to that cmp adds to neovim
+                -- cmp-nvim-lsp provides a list of lsp capabilities to that cmp adds to neovim
                 -- I must have cmp-nvim-lsp load before nvim-lspconfig for
                 -- lua snips to show up in cmp
                 'hrsh7th/cmp-nvim-lsp',
@@ -1275,7 +1547,7 @@ require('lazy').setup({
         },
     },
 
-    -- Autocompletion
+    -- Auto completion
     {
         'hrsh7th/nvim-cmp',
         lazy = true,
