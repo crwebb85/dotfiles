@@ -32,4 +32,14 @@ function M.get_visual_selection(bufnr)
     return text
 end
 
+---Hack to fix processes that get confused on windows when paths use a forward slash
+---This must as close to the line of code that is having issues as possible and for some
+---reason must be reran each time.
+---
+---I am using this primarily for debuggers on windows as they seem to have issues
+---finding the pdb files
+function M.shellslash_hack()
+    if require('utils.platform').is.win then vim.cmd([[set noshellslash]]) end
+end
+
 return M

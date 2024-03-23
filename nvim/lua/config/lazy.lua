@@ -1,4 +1,5 @@
 vim.g.mapleader = ' '
+local shellslash_hack = require('utils.misc').shellslash_hack
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
@@ -552,24 +553,7 @@ require('lazy').setup({
     {
         'akinsho/toggleterm.nvim',
         lazy = true,
-        config = function(_, opts)
-            if require('utils.platform').is.win then
-                local powershell_options = {
-                    shell = vim.fn.executable('pwsh') == 1 and 'pwsh'
-                        or 'powershell',
-                    shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::Default;',
-                    shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait',
-                    shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode',
-                    shellquote = '',
-                    shellxquote = '',
-                }
-
-                for option, value in pairs(powershell_options) do
-                    vim.opt[option] = value
-                end
-            end
-            require('toggleterm').setup(opts)
-        end,
+        config = true,
         cmd = { 'ToggleTerm' },
         keys = {
             {
@@ -905,7 +889,7 @@ require('lazy').setup({
             {
                 '<leader>td',
                 function()
-                    vim.cmd([[set noshellslash]])
+                    shellslash_hack()
                     require('neotest').run.run({ strategy = 'dap' })
                 end,
                 desc = 'Neotest: Debug the nearest test',
@@ -1138,7 +1122,7 @@ require('lazy').setup({
                     name = 'build and launch - netcoredbg',
                     request = 'launch',
                     program = function()
-                        vim.cmd([[set noshellslash]])
+                        shellslash_hack()
                         if
                             vim.fn.confirm(
                                 'Should I recompile first?',
@@ -1157,7 +1141,7 @@ require('lazy').setup({
                     request = 'launch',
                     console = 'integratedTerminal',
                     program = function()
-                        vim.cmd([[set noshellslash]])
+                        shellslash_hack()
                         local pickers = require('telescope.pickers')
                         local finders = require('telescope.finders')
                         local conf = require('telescope.config').values
@@ -1204,7 +1188,7 @@ require('lazy').setup({
                     name = 'launch via input - netcoredbg',
                     request = 'launch',
                     program = function()
-                        vim.cmd([[set noshellslash]])
+                        shellslash_hack()
                         return vim.fn.input(
                             'Path to dll',
                             vim.fn.getcwd() .. '/bin/Debug/',

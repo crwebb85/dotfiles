@@ -71,3 +71,13 @@ vim.filetype.add({
 -- Error format for nuget restore:
 -- helloworld\helloworld.csproj : warning NU1901: Package 'my.helloworld' 1.0.0 has a known low severity vulnerability
 vim.cmd([[ set errorformat+=%f:\ %tarning\ %m ]])
+
+if require('utils.platform').is.win then
+    vim.opt.shell = vim.fn.executable('pwsh') == 1 and 'pwsh' or 'powershell'
+    vim.opt.shellcmdflag =
+        '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::Default;'
+    vim.opt.shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait'
+    vim.opt.shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'
+    vim.opt.shellquote = ''
+    vim.opt.shellxquote = ''
+end

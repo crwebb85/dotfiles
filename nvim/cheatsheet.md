@@ -37,6 +37,8 @@
 - `vim.fn.expand('%')` get current path
 - `:echo stdpath('data')` to find the path that neovim saves user data to
 
+- `:wshada!` will fix most shada errors (I believe it overwrites the shada file)
+
 You can pass arbitrary data to a User autocmd callback by doing
 
 ```lua
@@ -123,6 +125,11 @@ getcmdwintype() _getcmdwintype()_
 Return the current |command-line-window| type. Possible return
 values are the same as |getcmdtype()|. Returns an empty string
 when not in the command-line window.
+
+# Do more reading
+
+- `:h shellslash`
+- `:h completeslash`
 
 # Useful resources
 
