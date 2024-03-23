@@ -35,13 +35,21 @@ end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
 -- closer to the center so that I am not hurting my neck
 -- https://github.com/smithbm2316/centerpad.nvim/
 vim.api.nvim_create_user_command('CenterWindow', function()
+    --TODO maybe add a toggle
     local old_splitright_value = vim.go.splitright
     vim.opt.splitright = false
     local leftpad_size = 36
     local main_win = vim.api.nvim_get_current_win()
-    vim.cmd(string.format('%svnew', leftpad_size))
-    local leftpad_bufnr = vim.api.nvim_get_current_buf()
-    vim.api.nvim_buf_set_name(leftpad_bufnr, 'leftpad')
+    local leftpad_buf_name = 'leftpad'
+    local leftpad_bufnr = vim.fn.bufnr(leftpad_buf_name)
+    if leftpad_bufnr < 0 then -- reopen the same scratch buffer if it already exists
+        vim.cmd(string.format('%svnew', leftpad_size))
+        leftpad_bufnr = vim.api.nvim_get_current_buf()
+    else
+        vim.cmd(string.format('%svsplit', leftpad_size))
+        vim.api.nvim_set_current_buf(leftpad_bufnr)
+    end
+    vim.api.nvim_buf_set_name(leftpad_bufnr, leftpad_buf_name)
     vim.bo[leftpad_bufnr].buftype = 'nofile'
     vim.bo[leftpad_bufnr].bufhidden = 'hide'
     vim.bo[leftpad_bufnr].swapfile = false
