@@ -779,3 +779,28 @@ vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
 end, {
     desc = 'Remove invalid quickfix items',
 })
+
+vim.api.nvim_create_user_command('ConvertLineEndings', function(params)
+    vim.print(params)
+    local line_ending = params.args
+    if line_ending == 'lf' then
+        vim.cmd([[
+                :update
+                :e ++ff=dos
+                :setlocal ff=unix
+                :w
+            ]])
+    elseif line_ending == 'crlf' then
+        vim.cmd([[
+                :update
+                :e ++ff=dos
+                :w
+            ]])
+    else
+        vim.print('Invalid line_ending name of:' .. line_ending)
+    end
+end, {
+    nargs = 1,
+    bang = true,
+    complete = function() return { 'lf', 'crlf' } end,
+})
