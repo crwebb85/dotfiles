@@ -131,6 +131,10 @@ require('lazy').setup({
         'lewis6991/gitsigns.nvim',
         lazy = true,
         event = 'VeryLazy',
+        opts = {
+            -- Disable trouble plugin for :Gitsigns setqflist and :Gitsigns setloclist
+            trouble = false,
+        },
         config = true,
         keys = {
 
@@ -445,8 +449,26 @@ require('lazy').setup({
     -- Utils
 
     --Big file/Macro speed increases
+    -- Removed faster.nvim because I couldn't disable macro functionality.
+    -- Not sure if I had a typo but I'm going to try bigfile.nvim instead
+    -- {
+    --     'pteroctopus/faster.nvim',
+    --     lazy = true,
+    --     event = 'VeryLazy',
+    --     opts = {
+    --         behaviours = {
+    --
+    --             fastmacro = {
+    --                 on = false,
+    --             },
+    --         },
+    --     },
+    --     config = function(_, opts) require('faster').setup(opts) end,
+    -- },
+
+    --Big file speed increases (by disabling features)
     {
-        'pteroctopus/faster.nvim',
+        'LunarVim/bigfile.nvim',
         lazy = true,
         event = 'VeryLazy',
         config = true,
