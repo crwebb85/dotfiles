@@ -155,6 +155,7 @@ vim.keymap.set('n', '<CR>', function()
     else
         vim.cmd([[:cc ]] .. item_id)
     end
+    vim.cmd([[:norm zR ]]) --Open folds
 end, {
     buffer = qf_bufnr,
     silent = true,
