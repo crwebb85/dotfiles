@@ -563,53 +563,95 @@ local config = function()
         },
     }
 
-    ---@type StatusLine
-    local FileType = {
-        condition = function()
-            return conditions.buffer_matches({ filetype = { 'coderunner' } })
+    local HelpFileName = {
+        condition = function() return vim.bo.filetype == 'help' end,
+        provider = function()
+            local filename = vim.api.nvim_buf_get_name(0)
+            return vim.fn.fnamemodify(filename, ':t')
         end,
-        provider = function() return vim.bo.filetype end,
-        hl = { fg = filetype_foreground_color, bold = true },
+        hl = { fg = colors.blue },
     }
 
     local FileNameBlock = {
-        condition = function()
-            if vim.bo.buftype == 'quickfix' then return false end
-            return true
-        end,
         init = function(self) self.filename = vim.api.nvim_buf_get_name(0) end,
-        FileType,
-        Space,
         unpack(FileFlags),
         heirlineUtils.insert(FileNameModifer, FileName, Space, FileIcon),
         { provider = '%<' },
     }
 
+    local WinBarTitleBlock = {
+        fallthrough = false, -- only display the first element that the condition matches
+        {
+            condition = function() return vim.wo.previewwindow end,
+            {
+                provider = 'Preview: ',
+            },
+            FileNameBlock,
+            hl = { fg = filename_foreground_color, bold = true },
+        },
+        {
+            condition = function() return vim.bo.filetype == 'help' end,
+            provider = function()
+                local filename = vim.api.nvim_buf_get_name(0)
+                return 'Help: ' .. vim.fn.fnamemodify(filename, ':t')
+            end,
+            hl = { fg = filename_foreground_color, bold = true },
+        },
+        {
+            condition = function() return vim.bo.buftype == 'quickfix' end,
+            provider = "%t%{exists('w:quickfix_title')? ' '.w:quickfix_title : ''}",
+            hl = { fg = filename_foreground_color, bold = true },
+        },
+        {
+            condition = function() return vim.bo.buftype == 'terminal' end,
+            provider = function()
+                local tname, _ = vim.api.nvim_buf_get_name(0):gsub('.*:', '')
+                return ' ' .. tname
+            end,
+            hl = { fg = filename_foreground_color, bold = true },
+        },
+        FileNameBlock,
+        hl = function()
+            if conditions.is_active() then
+                return { bg = active_background_color }
+            else
+                return { bg = inactive_background_color }
+            end
+        end,
+    }
+
+    ---@type StatusLine
+    local FileType = {
+        provider = function() return vim.bo.filetype end,
+        hl = { fg = filetype_foreground_color, bold = true },
+    }
+
+    local FileEncoding = {
+        provider = function()
+            local enc = (vim.bo.fenc ~= '' and vim.bo.fenc) or vim.o.enc -- :h 'enc'
+            return enc:upper()
+        end,
+    }
+
+    local FileFormat = {
+
+        provider = function()
+            local fmt = vim.bo.fileformat
+            return fmt:upper()
+        end,
+    }
+
     ---@type StatusLine
     local WinBars = {
         {
-            {
-
-                {
-                    condition = function() return vim.wo.previewwindow end,
-                    provider = 'Preview: ',
-                    hl = { fg = filename_foreground_color, bold = true },
-                },
-                FileNameBlock,
-                {
-                    condition = function() return vim.bo.buftype == 'quickfix' end,
-                    provider = "%t%{exists('w:quickfix_title')? ' '.w:quickfix_title : ''}",
-                    hl = { fg = filename_foreground_color, bold = true },
-                },
-                hl = function()
-                    if conditions.is_active() then
-                        return { bg = active_background_color }
-                    else
-                        return { bg = inactive_background_color }
-                    end
-                end,
-            },
+            WinBarTitleBlock,
             Align,
+            FileType,
+            Space,
+            FileEncoding,
+            Space,
+            FileFormat,
+            Space,
             {
                 provider = function(_)
                     return 'bufnr:' .. vim.api.nvim_get_current_buf()

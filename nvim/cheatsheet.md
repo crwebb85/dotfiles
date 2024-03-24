@@ -134,6 +134,7 @@ when not in the command-line window.
 # Useful resources
 
 [Lua Type Checking Guide](https://mrcjkb.dev/posts/2023-08-17-lua-adts.html)
+[Compile in Vim](https://learnvim.irian.to/basics/compile)
 
 # Windows install
 

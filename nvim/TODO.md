@@ -1,7 +1,5 @@
 ### TODO:
 
-- the plugin mini-pairs is decent but I find getting annoyed when a it creates a pair I didn't want
-  - I think I will replace this plugin with snippets and nvim-surround
 - telescope spell_suggest currently overrides my paste register with my misspelling. I don't want it to do this.
 - Create a fileencoding picker heirline element https://stackoverflow.com/questions/16507777/set-encoding-and-fileencoding-to-utf-8-in-vim
 
@@ -22,7 +20,9 @@
 - Add to my cli tool
 - Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
 - When lazy.nvim installs a new pluggin for the first time on startup my line numbers stop working until I close and reopen
-- redo cmp shortcuts
+- keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
+- show workspace diagnostic counts in heirline
+- make quickfix/loc list editable
 
 ### Cool plugins:
 
@@ -57,6 +57,9 @@
 - https://github.com/nvim-java/nvim-java
 - https://github.com/kamalsacranie/nvim-mapper
 
+- https://github.com/ronakg/quickr-preview.vim/tree/master
+- https://github.com/NicholasMata/nvim-dap-cs
+
 ### Cool LSPs
 
 - https://github.com/mattn/efm-langserver
@@ -68,6 +71,9 @@
 - https://editorconfig.org/ support for neovim
 - [cmp sources](https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources)
 - [nvim-dap extensions](https://github.com/mfussenegger/nvim-dap/wiki/Extensions)
+- [nvim-dap cookbook](https://github.com/mfussenegger/nvim-dap/wiki/Cookbook)
+- [lua async tutorial](https://github.com/ms-jpq/lua-async-await)
+- [git message guide](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
 - jsonc filetype (`vim.filetype.add({ pattern = { ["appsettings.*.json"] = "jsonc" }, })`)
 - `:h vim.filetyp.add()`
 - `:h skeleton` - for info about file templates
