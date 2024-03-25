@@ -893,7 +893,10 @@ require('lazy').setup({
             --adapters
             'rouge8/neotest-rust',
             'nvim-neotest/neotest-python',
-            'Issafalcon/neotest-dotnet',
+            {
+                'Issafalcon/neotest-dotnet',
+                -- dev = true
+            },
         },
         lazy = true,
         event = 'VeryLazy',
@@ -960,6 +963,7 @@ require('lazy').setup({
                         -- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
                         --       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
                         -- discovery_root = 'project', -- Default
+                        discovery_root = 'solution',
                     }),
                 },
             })
@@ -2042,4 +2046,9 @@ require('lazy').setup({
     ---------------------------------------------------------------------------
     -- Import plugins defined in the plugins folder
     { import = 'plugins' },
+}, {
+    dev = {
+        -- Directory where you store your local plugin projects
+        -- path = ''
+    },
 })
