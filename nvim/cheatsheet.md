@@ -1,3 +1,29 @@
+# File character fixes for none standard files
+
+Remove the end of the line at end of file
+
+- Normally when you save a file vim will save the file with an extra
+  newline that does not appear in the buffer. This is normal because it allows programs like
+  cat to append files like you would expect aka with a \n between them. However sometime you don't want that
+  and the following fixes it
+
+```vim
+set noendofline
+set nofixendofline
+```
+
+Show whitespace characters
+
+```vim
+set list
+```
+
+Use \t instead of spaces when typing tab
+
+```vim
+:set noexpandtab
+```
+
 # Useful command
 
 "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",

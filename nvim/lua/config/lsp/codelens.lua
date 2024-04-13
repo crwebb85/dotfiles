@@ -10,7 +10,7 @@ end
 
 M.refresh_codelens = function(bufnr)
     if codelens_enabled == true then
-        vim.lsp.codelens.refresh()
+        vim.lsp.codelens.refresh({ bufnr = bufnr })
     else
         vim.lsp.codelens.clear(nil, bufnr)
     end

@@ -50,22 +50,11 @@ local config = function()
             -- hint_icon = vim.fn.sign_getdefined("DiagnosticSignHint")[1].text,
         },
         init = function(self)
-            self.errors = #vim.diagnostic.get(
-                0,
-                { severity = vim.diagnostic.severity.ERROR }
-            )
-            self.warnings = #vim.diagnostic.get(
-                0,
-                { severity = vim.diagnostic.severity.WARN }
-            )
-            self.hints = #vim.diagnostic.get(
-                0,
-                { severity = vim.diagnostic.severity.HINT }
-            )
-            self.info = #vim.diagnostic.get(
-                0,
-                { severity = vim.diagnostic.severity.INFO }
-            )
+            local buf_sev_counts = vim.diagnostic.count(0, {})
+            self.errors = buf_sev_counts[vim.diagnostic.severity.ERROR] or 0
+            self.warnings = buf_sev_counts[vim.diagnostic.severity.WARN] or 0
+            self.hints = buf_sev_counts[vim.diagnostic.severity.HINT] or 0
+            self.info = buf_sev_counts[vim.diagnostic.severity.INFO] or 0
         end,
         update = { 'DiagnosticChanged', 'BufEnter', 'WinEnter' },
         Space,
@@ -561,15 +550,6 @@ local config = function()
                 italic = true,
             },
         },
-    }
-
-    local HelpFileName = {
-        condition = function() return vim.bo.filetype == 'help' end,
-        provider = function()
-            local filename = vim.api.nvim_buf_get_name(0)
-            return vim.fn.fnamemodify(filename, ':t')
-        end,
-        hl = { fg = colors.blue },
     }
 
     local FileNameBlock = {

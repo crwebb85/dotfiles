@@ -23,6 +23,16 @@
 - keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
 - show workspace diagnostic counts in heirline
 - make quickfix/loc list editable
+- try out new features:
+  - winfixbuf
+  - vim.ringbuf
+  - builtin commenting support
+  - vim.region()
+  - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
+    `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
+  - |vim.lsp.start()| now maps |K| to use |vim.lsp.buf.hover()| if the server
+    supports it, unless |'keywordprg'| was customized before calling
+    |vim.lsp.start()|.
 
 ### Cool plugins:
 
