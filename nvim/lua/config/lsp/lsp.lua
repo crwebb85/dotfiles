@@ -5,7 +5,7 @@ local lsp_commands = require('config.lsp.commands')
 local lsp_progress = require('config.lsp.progress')
 local lsp_server = require('config.lsp.server')
 local lsp_inlayhints = require('config.lsp.inlayhints')
-
+require('config.lsp.codeaction')
 local M = {}
 
 ---

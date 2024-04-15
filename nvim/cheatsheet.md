@@ -65,6 +65,8 @@ Use \t instead of spaces when typing tab
 
 - `:wshada!` will fix most shada errors (I believe it overwrites the shada file)
 
+- `lua= vim.lsp.protocol.make_client_capabilities()` to see lsp capabilities
+
 You can pass arbitrary data to a User autocmd callback by doing
 
 ```lua
