@@ -263,15 +263,17 @@ local config = function()
             'LspAttach',
             'LspDetach',
             'BufEnter',
+            'FileType',
             'User',
-            pattern = {
-                '*.*',
-                'DisabledFormatter',
-                'EnabledFormatter',
-                'ChangedLspFormatStrategy',
-            },
+            -- I only need this to update for the following User commands but
+            -- there isn't a good way limit the pattern to them while still updating
+            -- when the other autocmd types trigger.
+            -- - DisabledFormatter
+            -- - EnabledFormatter
+            -- - ChangedLspFormatStrategy
         },
         init = function(self)
+            -- vim.print(self)
             local children = {}
             local formatter_details_list =
                 require('config.formatter').get_buffer_formatter_details()
@@ -341,14 +343,17 @@ local config = function()
             return #buffer_formatter_details > 0 or #lsp_formatters > 0
         end,
         update = {
+            'LspAttach',
+            'LspDetach',
             'BufEnter',
+            'FileType',
             'User',
-            pattern = {
-                '*.*',
-                'DisabledFormatter',
-                'EnabledFormatter',
-                'ChangedLspFormatStrategy',
-            },
+            -- I only need this to update for the following User commands but
+            -- there isn't a good way limit the pattern to them while still updating
+            -- when the other autocmd types trigger.
+            -- - DisabledFormatter
+            -- - EnabledFormatter
+            -- - ChangedLspFormatStrategy
         },
         Space,
         {
