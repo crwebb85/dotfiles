@@ -137,6 +137,7 @@ useful api functions:
 - https://neovim.io/doc/user/api.html#api-floatwin
 - setreg() - used to set a register
 - confirm({msg} [, {choices} [, {default} [, {type}]]]) - used to create confirmation dialog boxes
+- vim.ui.select()
 
 ### Notes
 
@@ -208,3 +209,77 @@ I solved it by trying:
 
 Those commands failed for some reason but the error message told me the file path they
 were downloaded at and I manually deleted them and it fixed the problem
+
+# Code snippets
+
+Popup window snippet (base on plenary.nvim) would need to do some work to make this work well
+
+```lua
+local bounded = function(value, min, max)
+    min = min or 0
+    max = max or math.huge
+
+    if min then value = math.max(value, min) end
+    if max then value = math.min(value, max) end
+
+    return value
+end
+
+local function create_popup_window(lines)
+    local menu_config = {}
+    local minwidth = menu_config.minheight or 60
+    local minheight = menu_config.minheight or 10
+    local maxwidth = menu_config.maxwidth
+    local maxheight = menu_config.maxheight
+    local bufnr = vim.api.nvim_create_buf(false, false)
+
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, lines)
+
+    local line = math.floor(((vim.o.lines - minheight) / 2) - 1)
+    local col = math.floor((vim.o.columns - minwidth) / 2)
+
+    local win_opts = {
+        relative = 'editor',
+        style = 'minimal',
+    }
+
+    local width = 1 -- some height calculation
+    local height = 1 -- some height calculation
+    win_opts.width = bounded(width, minwidth, maxwidth)
+    win_opts.height = bounded(height, minheight, maxheight)
+
+    if line and line ~= 0 then
+        win_opts.row = line - 1
+    else
+        win_opts.row = math.floor((vim.o.lines - win_opts.height) / 2)
+    end
+
+    if col and col ~= 0 then
+        win_opts.col = col - 1
+    else
+        win_opts.col = math.floor((vim.o.columns - win_opts.width) / 2)
+    end
+
+    win_opts.anchor = 'NW'
+
+    if
+        win_opts.row + win_opts.height > vim.o.lines
+        and win_opts.row * 2 > vim.o.lines
+    then
+        win_opts.row = win_opts.row - win_opts.height - 2
+    end
+
+    win_opts.zindex = 50
+    win_opts.noautocmd = true
+    win_opts.focusable = false
+
+    local win_id = vim.api.nvim_open_win(bufnr, false, win_opts)
+
+    vim.api.nvim_set_current_win(win_id)
+
+    return {
+        bufnr = bufnr,
+        win_id = win_id,
+    }
+end
+```

@@ -2043,12 +2043,33 @@ require('lazy').setup({
         },
     },
 
+    {
+        'crwebb85/mark-code-action.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        opts = {
+
+            marks = {
+                DisableDiagnostic = {
+                    client_name = 'lua_ls',
+                    kind = 'quickfix',
+                    title = 'Disable diagnostics on this line (undefined-field).',
+                },
+                CleanImports = {
+                    client_name = 'omnisharp',
+                    kind = 'quickfix',
+                    title = 'Remove unnecessary usings',
+                },
+            },
+        },
+        config = true,
+        -- dev = true,
+    },
     ---------------------------------------------------------------------------
     -- Import plugins defined in the plugins folder
     { import = 'plugins' },
 }, {
     dev = {
         -- Directory where you store your local plugin projects
-        -- path = ''
     },
 })
