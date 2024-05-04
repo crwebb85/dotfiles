@@ -34,49 +34,6 @@ local function range_from_selection(bufnr, mode)
     }
 end
 
-vim.keymap.set('n', '<leader>test', function()
-    local options = {}
-    vim.validate({ options = { options, 't', true } })
-    options = options or {}
-    local context = options.context or {}
-    if not context.diagnostics then
-        local bufnr = vim.api.nvim_get_current_buf()
-        context.diagnostics = vim.lsp.diagnostic.get_line_diagnostics(bufnr)
-    end
-    local params
-    local mode = vim.api.nvim_get_mode().mode
-    if options.range then
-        assert(
-            type(options.range) == 'table',
-            'code_action range must be a table'
-        )
-        local start =
-            assert(options.range.start, 'range must have a `start` property')
-        local end_ =
-            assert(options.range['end'], 'range must have a `end` property')
-        params = vim.lsp.util.make_given_range_params(start, end_)
-    elseif mode == 'v' or mode == 'V' then
-        local range = range_from_selection(0, mode)
-        params = vim.lsp.util.make_given_range_params(range.start, range['end'])
-    else
-        params = vim.lsp.util.make_range_params()
-    end
-    params.context = context
-    vim.print(params)
-    -- code_action_request(params)
-    local bufnr = vim.api.nvim_get_current_buf()
-    local method = 'textDocument/codeAction'
-    vim.lsp.buf_request_all(bufnr, method, params, function(results)
-        vim.print(results)
-        -- on_code_action_results(
-        --     results,
-        --     { bufnr = bufnr, method = method, params = params }
-        -- )
-    end)
-end, {
-    desc = 'Custom: lsp test',
-})
-
 local code_action_marks = {}
 
 vim.api.nvim_create_user_command('MCAMark', function(args)
@@ -290,4 +247,96 @@ end, {
         return marks
     end,
     range = true,
+})
+------------------------
+---
+
+local function build_client_request_future(client)
+    local async_lib = require('plenary.async_lib.async')
+    return async_lib.wrap(function(bufnr, method, params, callback)
+        local proxied_callback = function(err, result, context, config)
+            result = {
+                err = err,
+                result = result,
+                context = context,
+                config = config,
+            }
+            callback(result)
+        end
+        client.request(method, params, proxied_callback, bufnr)
+    end, 4)
+end
+
+local function is_lsp_request_supported(method, client, bufnr)
+    local reg = client.dynamic_capabilities:get(method, { bufnr = bufnr })
+
+    return vim.tbl_get(reg or {}, 'registerOptions', 'resolveProvider')
+        or client.supports_method(method)
+end
+vim.api.nvim_create_user_command('TestLSP', function(args)
+    local client_id = tonumber(vim.split(args.args, ':')[1])
+    if client_id == nil then error('Selected lsp client does not exist') end
+    local client = vim.lsp.get_client_by_id(client_id)
+    local bufnr = vim.api.nvim_get_current_buf()
+    local params = require('vim.lsp.util').make_position_params()
+
+    local async_lib = require('plenary.async_lib.async')
+    local ms = require('vim.lsp.protocol').Methods
+
+    local client_request = build_client_request_future(client)
+
+    local request_order = {}
+    local requests = {}
+
+    local methods = {
+        ms.textDocument_definition,
+        ms.textDocument_declaration,
+        ms.textDocument_implementation,
+        ms.textDocument_typeDefinition,
+    }
+    for _, method in ipairs(methods) do
+        if is_lsp_request_supported(method, client, bufnr) then
+            table.insert(requests, client_request(bufnr, method, params))
+            table.insert(request_order, method)
+        end
+    end
+
+    local method = ms.textDocument_references
+    if is_lsp_request_supported(method, client, bufnr) then
+        local reference_params = vim.tbl_deep_extend('force', params, {
+            context = {
+                includeDeclaration = true,
+            },
+        })
+        table.insert(requests, client_request(bufnr, method, reference_params))
+        table.insert(request_order, method)
+    end
+
+    local all_requests = async_lib.join(requests)
+    async_lib.run(all_requests, function(result)
+        local code_info = {}
+        code_info[ms.textDocument_definition] = nil
+        code_info[ms.textDocument_references] = nil
+        code_info[ms.textDocument_declaration] = nil
+        code_info[ms.textDocument_implementation] = nil
+        code_info[ms.textDocument_typeDefinition] = nil
+
+        for i, method_name in ipairs(request_order) do
+            code_info[method_name] = result[i][1].result
+        end
+        vim.print(code_info)
+    end)
+end, {
+    desc = 'Testing async lsp calls',
+    nargs = 1,
+    complete = function()
+        local clients = vim.lsp.get_clients({
+            bufnr = 0,
+        })
+        local client_selection = {}
+        for _, client in ipairs(clients) do
+            table.insert(client_selection, client.id .. ':' .. client.name)
+        end
+        return client_selection
+    end,
 })
