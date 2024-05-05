@@ -527,6 +527,88 @@ vim.api.nvim_create_user_command(
     }
 )
 
+---Add items to the quickfix list based on the treesitter query defined inside
+---the opened treesitter query editor window. (Use :QueryEdit to open the query
+---edit window and :InspectTree to see what the treesitter tree looks like).
+---If no parameters supplied then all capture groups will be added to the QF list.
+---Otherwise you can restrict QF list to only include capture groups you need by
+---supplying the list of capture groups as command paramters
+vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
+    local capture_names_set = Set:new(params.fargs)
+    local query_bufnr = nil
+    local tabnr = vim.api.nvim_tabpage_get_number(0)
+    for _, winnr in ipairs(vim.api.nvim_tabpage_list_wins(tabnr)) do
+        query_bufnr = vim.api.nvim_win_get_buf(winnr)
+        local buf_name = vim.api.nvim_buf_get_name(query_bufnr)
+        if string.match(buf_name, '.*[\\/]query_editor%.scm') ~= nil then
+            break
+        end
+    end
+
+    if query_bufnr == nil then error('No query editor open in tab') end
+
+    local base_bufnr = vim.api.nvim_win_get_buf(0)
+    local base_buf_name = vim.api.nvim_buf_get_name(base_bufnr)
+
+    local lang = vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+    local parser = vim.treesitter.get_parser(base_bufnr, lang)
+    local query_content = table.concat(
+        vim.api.nvim_buf_get_lines(query_bufnr, 0, -1, false),
+        '\n'
+    )
+
+    local ok_query, query =
+        pcall(vim.treesitter.query.parse, lang, query_content)
+    if not ok_query then return end
+
+    local items = {}
+    for id, node in query:iter_captures(parser:trees()[1]:root(), base_bufnr) do
+        local capture_name = query.captures[id]
+
+        if
+            capture_names_set.size == 0 or capture_names_set:has(capture_name)
+        then
+            local lnum, col, end_lnum, end_col = node:range()
+            local item = {
+                filename = base_buf_name,
+                lnum = lnum + 1,
+                end_lnum = end_lnum + 1,
+                col = col + 1,
+                end_col = end_col + 1,
+                text = capture_name,
+            }
+            table.insert(items, item)
+        end
+    end
+    vim.fn.setqflist({}, ' ', { items = items })
+end, {
+    nargs = '*',
+})
+--[[
+(class_declaration 
+  ; name: (identifier) @classname
+  ; (.eq? @classname "Program")
+  body: (declaration_list
+            (method_declaration
+                ; (modifier) @modifier
+                ; (.eq? @modifier "public")
+
+                name: (identifier) @name
+                ; parameters: (parameter_list) @parameters
+                ; body: (block) @body
+              )
+          ) 
+)
+]]
+
+vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
+    local items = vim.fn.getqflist()
+    items = vim.tbl_filter(function(item) return item.valid == 1 end, items)
+    vim.fn.setqflist({}, ' ', { items = items })
+    vim.cmd('open')
+end, {
+    desc = 'Remove invalid quickfix items',
+})
 -------------------------------------------------------------------------------
 ---Task runner commands
 
@@ -771,14 +853,7 @@ end, {
     range = true,
 })
 
-vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
-    local items = vim.fn.getqflist()
-    items = vim.tbl_filter(function(item) return item.valid == 1 end, items)
-    vim.fn.setqflist({}, ' ', { items = items })
-    vim.cmd('open')
-end, {
-    desc = 'Remove invalid quickfix items',
-})
+-------------------------------------------------------------------------------
 
 vim.api.nvim_create_user_command('ConvertLineEndings', function(params)
     vim.print(params)
