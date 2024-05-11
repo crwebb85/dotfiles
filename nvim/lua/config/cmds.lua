@@ -461,7 +461,7 @@ vim.cmd([[
 
 vim.api.nvim_create_user_command(
     'QFRemoveDuplicateFiles',
-    function(_) vim.fn['FilterQFListToUniqueFiles']() end,
+    function(_) vim.fn['RemoveDuplicateQFListFiles']() end,
     {
         desc = 'Removes duplicate files from Quick Fix List',
     }
