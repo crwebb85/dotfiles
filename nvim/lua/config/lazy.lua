@@ -186,6 +186,13 @@ require('lazy').setup({
         },
     },
 
+    -- Adds commands for handling git conflicts
+    {
+        'akinsho/git-conflict.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        config = true,
+    },
     ---------------------------------------------------------------------------
     -- Navigation
 
