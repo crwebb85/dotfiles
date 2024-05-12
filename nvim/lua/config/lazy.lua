@@ -2068,6 +2068,7 @@ require('lazy').setup({
                     title = 'Remove unnecessary usings',
                 },
             },
+            lsp_timeout_ms = 3000,
         },
         config = true,
         -- dev = true,
