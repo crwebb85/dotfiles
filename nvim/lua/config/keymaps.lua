@@ -215,3 +215,16 @@ vim.keymap.set(
 vim.keymap.set('v', '<leader>,', ':s/\\([^,]\\)$/\\1,/<CR>', {
     desc = 'Custom: Add a comma to end of each line in visual selection excluding lines that already have commas',
 })
+
+vim.keymap.set('n', '<A-,>', '<c-w>5<', {
+    desc = 'Custom: Decrease window width',
+})
+vim.keymap.set('n', '<A-;>', '<c-w>5>', {
+    desc = 'Custom: Increase window width',
+})
+vim.keymap.set('n', '<A-t>', '<c-w>5+', {
+    desc = 'Custom: Increase window height',
+})
+vim.keymap.set('n', '<A-s>', '<c-w>5-', {
+    desc = 'Custom: Decrease window height',
+})
