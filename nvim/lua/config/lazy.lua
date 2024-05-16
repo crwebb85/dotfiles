@@ -186,6 +186,72 @@ require('lazy').setup({
         },
     },
 
+    --- Easily get and goto git permalinks
+    {
+        'linrongbin16/gitlinker.nvim',
+        cmd = 'GitLink',
+        lazy = true,
+        opts = {},
+        keys = {
+
+            {
+                '<leader>gll',
+                '<cmd>GitLink<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Yank git permlink',
+            },
+            {
+                '<leader>glL',
+                '<cmd>GitLink!<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Open git permlink',
+            },
+            {
+                '<leader>glb',
+                '<cmd>GitLink blame<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Yank git blame link',
+            },
+            {
+                '<leader>glB',
+                '<cmd>GitLink! blame<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Open git blame link',
+            },
+            {
+                '<leader>gld',
+                '<cmd>GitLink default_branch<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Copy default branch link',
+            },
+            {
+                '<leader>glD',
+                '<cmd>GitLink! default_branch<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Open default branch link',
+            },
+            {
+                '<leader>glc',
+                '<cmd>GitLink current_branch<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Copy current branch link',
+            },
+            {
+                '<leader>glD',
+                '<cmd>GitLink! current_branch<cr>',
+                mode = { 'n', 'v' },
+                silent = true,
+                desc = 'Git: Open current branch link',
+            },
+        },
+    },
     -- Adds commands for handling git conflicts
     {
         'akinsho/git-conflict.nvim',
