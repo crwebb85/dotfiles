@@ -252,6 +252,7 @@ require('lazy').setup({
             },
         },
     },
+
     -- Adds commands for handling git conflicts
     {
         'akinsho/git-conflict.nvim',
@@ -279,7 +280,7 @@ require('lazy').setup({
             {
                 '<leader>ff',
                 function() require('telescope.builtin').find_files() end,
-                desc = 'Telescope: find files',
+                desc = 'Telescope: find files (supports line number and col `path:line:col`) ',
             },
             {
                 '<leader>fs',
@@ -340,15 +341,25 @@ require('lazy').setup({
                 function() require('telescope.builtin').spell_suggest() end,
                 desc = 'Telescope: suggest spelling (search dictionary)',
             },
+            {
+                '<leader>fm',
+                function() require('telescope.builtin').marks() end,
+                desc = 'Telescope: marks',
+            },
+            {
+                '<leader>fo',
+                function() require('telescope.builtin').oldfiles() end,
+                desc = 'Telescope: old files',
+            },
+            {
+                '<leader>fc',
+                function() require('telescope.builtin').git_status() end,
+                desc = 'Telescope: git status',
+            },
         },
         opts = {
             defaults = {
-                -- setting initial mode to 'normal'
-                -- will allow me to have the telescope prompt in normal mode
-                -- which is sometimes useful but not something I want normally enabled
-
-                -- initial_mode = 'normal',
-
+                -- path_display = { 'filename_first' },
                 dynamic_preview_title = true,
                 mappings = {
                     i = {
