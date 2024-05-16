@@ -352,6 +352,18 @@ end, {
     desc = 'Sets the formatter timeout in milliseconds',
 })
 
+vim.api.nvim_create_user_command('FormatterToggleFormatAfterSave', function()
+    local filetype = vim.bo[0].filetype
+    local is_format_after_save_enabled =
+        format_properties.is_format_after_save_enabled(filetype)
+    format_properties.set_format_after_save(
+        filetype,
+        not is_format_after_save_enabled
+    )
+end, {
+    desc = 'Toggles whether the formatter runs on save or after save',
+})
+
 vim.api.nvim_create_user_command(
     'FormatterGetDetails',
     function() vim.print(format_properties.get_buffer_formatting_details()) end,

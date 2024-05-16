@@ -2099,7 +2099,8 @@ require('lazy').setup({
                     },
                 },
                 -- enable format-on-save
-                format_on_save = require('config.formatter').construct_conform_autoformat_params,
+                format_on_save = require('config.formatter').format_on_save,
+                format_after_save = require('config.formatter').format_after_save,
             })
             -- -- Set this value to true to silence errors when formatting a block fails
             -- require('conform.formatters.injected').options.ignore_errors = false

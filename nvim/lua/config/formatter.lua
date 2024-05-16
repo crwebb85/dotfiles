@@ -77,6 +77,34 @@ function P.set_formatting_timeout(time_milliseconds)
     vim.g.formatter_timeout_milliseconds = time_milliseconds
 end
 
+---@private
+---@type {string:boolean} lookup table for filetypes to format after save asyncronously
+local format_after_save_filetypes = {}
+
+---Setter for the filetypes to format after save
+---@param filetype string
+---@param is_format_after_save_enabled boolean
+function P.set_format_after_save(filetype, is_format_after_save_enabled)
+    local old_is_format_after_save_enabled =
+        P.is_format_after_save_enabled(filetype)
+    format_after_save_filetypes[filetype] = is_format_after_save_enabled
+    if old_is_format_after_save_enabled ~= is_format_after_save_enabled then
+        vim.api.nvim_exec_autocmds('User', {
+            pattern = 'ChangedFormatSavingStrategy',
+        })
+    end
+end
+
+---Getter for the property is_format_after_save_enabled
+---@param filetype string
+---@return boolean
+function P.is_format_after_save_enabled(filetype)
+    if filetype == nil or format_after_save_filetypes[filetype] == nil then
+        return false
+    end
+    return format_after_save_filetypes[filetype]
+end
+
 ---@alias LspFormatStrategyEnum "DEFAULT" | "DISABLED" | "FALLBACK" | "ALWAYS"
 
 local LspFormatStrategyEnums = {
@@ -280,9 +308,15 @@ function M.determine_conform_lsp_fallback(bufnr)
     end
 end
 
+---@class ConformFormatOptions
+---@field lsp_fallback nil|boolean|"always" Attempt LSP formatting if no formatters are available. Defaults to false. If "always", will attempt LSP formatting even if formatters are available.
+---@field timeout_ms nil|integer Time in milliseconds to block for formatting. Defaults to 1000. No effect if async = true.
+---@field formatters nil|string[] List of formatters to run. Defaults to all formatters for the buffer filetype.
+
 ---@param bufnr? integer the buffer number. Defaults to buffer 0.
+---@return ConformFormatOptions
 function M.construct_conform_formatting_params(bufnr)
-    if bufnr == nil then bufnr = 0 end
+    if bufnr == nil then bufnr = vim.api.nvim_get_current_buf() end
     local project_disabled_formatters = P.get_project_disabled_formatters()
     local buffer_disabled_formatters = P.get_buffer_disabled_formatters(bufnr)
     if #project_disabled_formatters > 0 or #buffer_disabled_formatters > 0 then
@@ -323,9 +357,10 @@ end
 ---Used by formatter to auto format files on save
 ---If auto formatting is disabled for the project or the buffer then this function
 ---will skip formating the buffer
----@param bufnr? number the buffer number to autoformat. Defaults to buffer 0
+---@param bufnr? integer the buffer number to autoformat. Defaults to buffer 0
+---@return ConformFormatOptions?
 function M.construct_conform_autoformat_params(bufnr)
-    if bufnr == nil then bufnr = 0 end
+    if bufnr == nil then bufnr = vim.api.nvim_get_current_buf() end
     if
         P.is_project_autoformat_disabled()
         or P.is_buffer_autoformat_disabled(bufnr)
@@ -333,6 +368,41 @@ function M.construct_conform_autoformat_params(bufnr)
         return
     end
     return M.construct_conform_formatting_params(bufnr)
+end
+
+---The callback used by conform to syncronously format the file on save.
+---If formatting timesout the formatter will switch to formatting after save
+---asyncronously for that file type
+---@param bufnr integer
+---@return ConformFormatOptions? options conform will use to format on save
+---@return nil | fun(err: string): boolean err_callback used to change from formatting on save to formatting after save for the buffer file type if a timeout occured
+function M.format_on_save(bufnr)
+    local filetype = vim.bo[bufnr].filetype
+    if P.is_format_after_save_enabled(filetype) then return end
+    local function on_format(err)
+        if err and err:match('timeout$') then
+            if P.is_format_after_save_enabled(filetype) then --In case of some wierd race condition I only want one notification
+                vim.notify(
+                    'Auto-formatting on save for filetype `'
+                        .. filetype
+                        .. '` was changed to formatting after save'
+                )
+            end
+            P.set_format_after_save(filetype, true)
+        end
+    end
+
+    return M.construct_conform_autoformat_params(bufnr), on_format
+end
+
+---The callback used by conform to asyncronously format files after save
+---@param bufnr integer
+---@return ConformFormatOptions? format_opts to pass to conform
+function M.format_after_save(bufnr)
+    if not P.is_format_after_save_enabled(vim.bo[bufnr].filetype) then
+        return
+    end
+    return M.construct_conform_autoformat_params(bufnr)
 end
 
 M.properties = P

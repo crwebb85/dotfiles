@@ -354,6 +354,7 @@ local config = function()
             -- - DisabledFormatter
             -- - EnabledFormatter
             -- - ChangedLspFormatStrategy
+            -- - ChangedFormatSavingStrategy
         },
         Space,
         {
@@ -381,12 +382,24 @@ local config = function()
         Space,
         Seperator,
         hl = function()
+            local is_format_after_save_enabled =
+                require('config.formatter').properties.is_format_after_save_enabled(
+                    vim.bo[0].filetype
+                )
             if
                 require('config.formatter').properties.is_project_autoformat_disabled()
             then
-                return { fg = 'red', bold = true }
+                return {
+                    fg = 'red',
+                    bold = true,
+                    italic = is_format_after_save_enabled,
+                }
             else
-                return { fg = 'green', bold = true }
+                return {
+                    fg = 'green',
+                    bold = true,
+                    italic = is_format_after_save_enabled,
+                }
             end
         end,
     }
