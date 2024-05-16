@@ -47,7 +47,7 @@ require('lazy').setup({
                 {
                     'n',
                     'cc',
-                    ':tab Git commit | startinsert <CR>',
+                    ':tab Git commit <CR>',
                     {
                         desc = 'Diffview: Open commit message with Vim Fugitive',
                     },
