@@ -1502,6 +1502,7 @@ require('lazy').setup({
                     'yamlls', -- (yaml-language-server)
                     'jsonls', -- (json-lsp)
                     'taplo', -- LSP for toml (for pyproject.toml files)
+                    'powershell-editor-services', -- powershell
 
                     -- Formatters
                     'black', -- python formatter
@@ -1548,6 +1549,7 @@ require('lazy').setup({
                     jsonls = lsp.setup_jsonls,
                     taplo = lsp.setup_tablo,
                     omnisharp = lsp.setup_omnisharp,
+                    powershell_es = lsp.setup_powershell_es,
                 },
             })
         end,

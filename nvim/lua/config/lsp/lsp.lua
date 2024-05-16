@@ -641,5 +641,14 @@ function M.setup_omnisharp(name)
         },
     })
 end
+function M.setup_powershell_es(name)
+    lsp_server.setup(name, {
+        filetypes = { 'ps1', 'psm1', 'psd1' },
+        settings = { powershell = { codeFormatting = { Preset = 'OTBS' } } },
+        init_options = {
+            enableProfileLoading = false,
+        },
+    })
+end
 
 return M
