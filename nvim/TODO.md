@@ -11,7 +11,6 @@
 
 - figure out how to create custom keymaps that use motions for example a custom yank function that lets me also use the motion commands to select what to yank
 - add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
-- BUG: which-key gets stuck when in command-window (`q:`) [PR #503](https://github.com/folke/which-key.nvim/pull/503)
 - Review clipboard code as neovim has added more features which may make using a plugin unneeded
 - look into skeleton (file template) plugins/configuration
 - add a save and save all button to heirline so I know when I have unsaved buffers
@@ -27,16 +26,31 @@
   - winfixbuf
   - vim.ringbuf
   - builtin commenting support
-  - vim.region()
+  - getregion()
   - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
     `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
   - |vim.lsp.start()| now maps |K| to use |vim.lsp.buf.hover()| if the server
     supports it, unless |'keywordprg'| was customized before calling
     |vim.lsp.start()|.
+- try out basedpyright lsp [example](https://www.reddit.com/r/neovim/comments/1cpkeqd/comment/l3ux37y/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+- try out alternate motions
+  - [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
+  - [matze/vim-move](https://github.com/matze/vim-move)
+  - [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
+  - [chrisgrieser/nvim-various-textobjs](https://github.com/chrisgrieser/nvim-various-textobjs)
+  - [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects)
+  - [custom surrounds](https://github.com/kylechui/nvim-surround/discussions/53)
+  - https://www.reddit.com/r/neovim/comments/1ckd1rs/helpful_treesitter_node_motion/?utm_medium=android_app&utm_source=share
+- lsp diagnostics not clearing after lsp restart. Sortof a solution is `vim.diagnostics.reset()`
+  before LspRestart but it will clear all diagnostics not just the ones for the given lsp
+- investigate preformance improvements
+  - https://www.reddit.com/r/neovim/comments/1cjn94h/fully_eliminate_o_delay/
+  - https://www.reddit.com/r/neovim/comments/1cjnf0m/fully_eliminate_gds_delay/
+  - https://www.reddit.com/r/neovim/comments/1ch6yfz/smart_indent_with_treesitter_indent_fallback/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+  - formatting with omnisharp on save is really slow
+- [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
 
 ### Cool plugins:
-
-- https://github.com/iamcco/markdown-preview.nvim
 
 - https://github.com/rockerBOO/awesome-neovim
 - https://github.com/carbon-steel/detour.nvim/tree/main
