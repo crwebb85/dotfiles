@@ -25,7 +25,6 @@
 - try out new features:
   - winfixbuf
   - vim.ringbuf
-  - builtin commenting support
   - getregion()
   - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
     `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
@@ -42,7 +41,20 @@
   - [custom surrounds](https://github.com/kylechui/nvim-surround/discussions/53)
   - https://www.reddit.com/r/neovim/comments/1ckd1rs/helpful_treesitter_node_motion/?utm_medium=android_app&utm_source=share
 - lsp diagnostics not clearing after lsp restart. Sortof a solution is `vim.diagnostics.reset()`
+  I did some testing and on a single file project LspRestart was clearing the diagnostics so I think this most
+  only be happening with weird combinations or opening/closing buffers, moving files, deleting files.
+  Need to do more testing
+  I wonder if how this code works when the diagnostics is from a file that isn't open in a buffer
+  Confirmed this occurs when the buffer was either closed or never opened
+
+  https://github.com/neovim/neovim/blob/42aa69b076cb338e20b5b4656771f1873e8930d8/runtime/lua/vim/lsp.lua#L388
   before LspRestart but it will clear all diagnostics not just the ones for the given lsp
+  Hypothesis - when the lsp client gets a diagnostic from a file that hasn't been opened in a buffer. The lsp client
+  will reserve a new bufnr to use for that file if it is opened. This reserved bufnr
+  is what is used in the diagnostic_cach but it is not added client.attached_buffers since the buffer has never been opened
+  As a result it only clears the diagnostics for the attached_buffers
+
+- close all buffers unopened saved buffers maybe try [close-buffers.nvim](https://github.com/kazhala/close-buffers.nvim)
 - investigate preformance improvements
   - https://www.reddit.com/r/neovim/comments/1cjn94h/fully_eliminate_o_delay/
   - https://www.reddit.com/r/neovim/comments/1cjnf0m/fully_eliminate_gds_delay/
