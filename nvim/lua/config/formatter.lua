@@ -4,6 +4,53 @@ local M = {}
 
 local P = {}
 
+--List of User commands patterns
+--
+-- FormatterChange.DisabledFormatters.Buffer
+-- FormatterChange.DisabledFormatters.Project
+--
+-- FormatterChange.AutoFormat.Project
+-- FormatterChange.AutoFormat.Buffer
+--
+-- FormatterChange.SavingFormatStrategy.Project
+--
+-- FormatterChange.LspFormatStrategy.Project
+-- FormatterChange.LspFormatStrategy.Buffer
+--
+-- FormatterChange.Lsp.Buffer
+--
+-- FormatterChange.FileType.Buffer
+
+--Need to proxy the LspAttach and LspDetach user events so that my statusline
+--component can pattern match on the User pattern (I was having preformance
+--issues without a good pattern)
+vim.api.nvim_create_autocmd({ 'LspAttach', 'LspDetach' }, {
+    group = vim.api.nvim_create_augroup(
+        'trigger_formatter_update_user_command',
+        { clear = true }
+    ),
+    callback = function(_)
+        vim.api.nvim_exec_autocmds(
+            'User',
+            { pattern = 'FormatterChange.Lsp.Buffer' }
+        )
+    end,
+})
+--Need to proxy the FileType event as user event so that my statusline component can pattern
+--match on the User pattern (I was having preformance issues without a good pattern)
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+    group = vim.api.nvim_create_augroup(
+        'trigger_formatter_update_user_command',
+        { clear = true }
+    ),
+    callback = function(_)
+        vim.api.nvim_exec_autocmds(
+            'User',
+            { pattern = 'FormatterChange.FileType.Buffer' }
+        )
+    end,
+})
+
 ---Gets the buffer property disabled_formatters
 ---@param bufnr? number the buffer number
 ---@return string[]
@@ -19,6 +66,13 @@ end
 function P.set_buffer_disabled_formatters(formatters, bufnr)
     if bufnr == nil then bufnr = 0 end
     vim.b[bufnr].disabled_formatters = formatters
+
+    -- Im not bothering to check if the new value has actually changed before
+    -- trigering the user autocmd
+    vim.api.nvim_exec_autocmds(
+        'User',
+        { pattern = 'FormatterChange.DisabledFormatters.Buffer' }
+    )
 end
 
 ---Gets the project property disabled_formatters
@@ -32,6 +86,12 @@ end
 ---@param formatters string[]
 function P.set_project_disabled_formatters(formatters)
     vim.g.disabled_formatters = formatters
+    -- Im not bothering to check if the new value has actually changed before
+    -- trigering the user autocmd
+    vim.api.nvim_exec_autocmds(
+        'User',
+        { pattern = 'FormatterChange.DisabledFormatters.Project' }
+    )
 end
 
 ---Getter for the project property is_project_autoformat_disabled
@@ -45,7 +105,14 @@ end
 ---Used to disable/enable autoformatting project wide
 ---@param is_autoformat_disabled boolean
 function P.set_project_autoformat_disabled(is_autoformat_disabled)
+    local old_is_autoformat_disabled = P.is_project_autoformat_disabled()
     vim.g.is_project_autoformat_disabled = is_autoformat_disabled
+    if old_is_autoformat_disabled ~= P.is_project_autoformat_disabled() then
+        vim.api.nvim_exec_autocmds(
+            'User',
+            { pattern = 'FormatterChange.AutoFormat.Project' }
+        )
+    end
 end
 
 ---Getter for the buffer property is_buffer_autoformat_disabled
@@ -62,7 +129,15 @@ end
 ---@param bufnr? number
 function P.set_buffer_autoformat_disabled(is_autoformat_disabled, bufnr)
     if bufnr == nil then bufnr = 0 end
+    local old_is_autoformat_disabled = P.is_buffer_autoformat_disabled(bufnr)
     vim.b[bufnr].is_buffer_autoformat_disabled = is_autoformat_disabled
+
+    if old_is_autoformat_disabled ~= P.is_buffer_autoformat_disabled(bufnr) then
+        vim.api.nvim_exec_autocmds(
+            'User',
+            { pattern = 'FormatterChange.AutoFormat.Buffer' }
+        )
+    end
 end
 
 ---Sets the formatting timeout
@@ -89,9 +164,12 @@ function P.set_format_after_save(filetype, is_format_after_save_enabled)
         P.is_format_after_save_enabled(filetype)
     format_after_save_filetypes[filetype] = is_format_after_save_enabled
     if old_is_format_after_save_enabled ~= is_format_after_save_enabled then
-        vim.api.nvim_exec_autocmds('User', {
-            pattern = 'ChangedFormatSavingStrategy',
-        })
+        vim.api.nvim_exec_autocmds(
+            'User',
+            -- this change effects all buffers of the filetype so we will scope
+            -- pattern to Project
+            { pattern = 'FormatterChange.SavingFormatStrategy.Project' }
+        )
     end
 end
 
@@ -124,11 +202,20 @@ function P.set_filetype_lsp_format_strategy(filetype, lsp_format_strategy)
     if vim.g.lsp_format_strategy_for_filetype == nil then
         lsp_format_strategy_for_filetype = {}
     end
+    local old_format_strategy = P.get_filetype_lsp_format_strategy(filetype)
     -- vim.print(filetype, lsp_format_strategy)
     lsp_format_strategy_for_filetype[filetype] = lsp_format_strategy
     -- vim.print(lsp_format_strategy_for_filetype)
     vim.g.lsp_format_strategy_for_filetype = lsp_format_strategy_for_filetype
     -- vim.print(vim.g.lsp_format_strategy_for_filetype)
+    if old_format_strategy ~= P.get_filetype_lsp_format_strategy(filetype) then
+        vim.api.nvim_exec_autocmds(
+            'User',
+            -- this change effects all buffers of the filetype so we will scope
+            -- pattern to Project
+            { pattern = 'FormatterChange.LspFormatStrategy.Project' }
+        )
+    end
 end
 
 ---Gets the lsp format strategy for the filetype
@@ -154,7 +241,14 @@ end
 ---@param bufnr? number the buffer number. Defaults to buffer 0.
 function P.set_buffer_lsp_format_strategy(lsp_format_strategy, bufnr)
     if bufnr == nil then bufnr = 0 end
+    local old_format_strategy = P.get_buffer_lsp_format_strategy(bufnr)
     vim.b[bufnr].buffer_lsp_format_strategy = lsp_format_strategy
+    if old_format_strategy ~= P.get_buffer_lsp_format_strategy(bufnr) then
+        vim.api.nvim_exec_autocmds(
+            'User',
+            { pattern = 'FormatterChange.LspFormatStrategy.Buffer' }
+        )
+    end
 end
 
 ---Gets the lsp format strategy for the buffer

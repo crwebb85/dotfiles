@@ -179,22 +179,22 @@ local function get_buffer_formatter_names()
     return formatter_names
 end
 
-vim.api.nvim_create_user_command('FormatterToggleBufferAutoFormat', function()
-    format_properties.set_buffer_autoformat_disabled(
-        not format_properties.is_buffer_autoformat_disabled()
-    )
-    if format_properties.is_buffer_autoformat_disabled() then
-        vim.api.nvim_exec_autocmds('User', { pattern = 'DisabledFormatter' })
-    else
-        vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
-    end
-end, {
-    desc = 'Toggle autoformat-on-save.',
-})
+vim.api.nvim_create_user_command(
+    'FormatterToggleBufferAutoFormat',
+    function()
+        format_properties.set_buffer_autoformat_disabled(
+            not format_properties.is_buffer_autoformat_disabled()
+        )
+    end,
+    {
+        desc = 'Toggle autoformat-on-save.',
+    }
+)
 
 vim.api.nvim_create_user_command(
     'FormatterDisableBufferFormatters',
     function(args)
+        local bufnr = vim.api.nvim_get_current_buf()
         local formatters_to_disable = args.fargs
 
         if #formatters_to_disable == 0 then
@@ -212,12 +212,9 @@ vim.api.nvim_create_user_command(
         local new_disabled_formatters = new_disabled_formatters_set:to_array()
         vim.print('Disabled buffer formatters:', new_disabled_formatters)
         format_properties.set_buffer_disabled_formatters(
-            new_disabled_formatters
+            new_disabled_formatters,
+            bufnr
         )
-
-        vim.api.nvim_exec_autocmds('User', {
-            pattern = 'DisabledFormatter',
-        })
     end,
     {
         complete = get_buffer_formatter_names,
@@ -229,6 +226,7 @@ vim.api.nvim_create_user_command(
 vim.api.nvim_create_user_command(
     'FormatterEnableBufferFormatters',
     function(args)
+        local bufnr = vim.api.nvim_get_current_buf()
         local formatters_to_enable = args.fargs
         if #formatters_to_enable == 0 then
             vim.print('No formatters listed to enable')
@@ -243,10 +241,9 @@ vim.api.nvim_create_user_command(
             :to_array()
         vim.print('Buffer formatters still disabled:', new_disabled_formatters)
         format_properties.set_buffer_disabled_formatters(
-            new_disabled_formatters
+            new_disabled_formatters,
+            bufnr
         )
-
-        vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
     end,
     {
         complete = function()
@@ -258,14 +255,8 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command('FormatterToggleProjectAutoFormat', function()
-    format_properties.set_project_autoformat_disabled(
-        not format_properties.is_project_autoformat_disabled()
-    )
-    if format_properties.is_project_autoformat_disabled() then
-        vim.api.nvim_exec_autocmds('User', { pattern = 'DisabledFormatter' })
-    else
-        vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
-    end
+    local old_value = format_properties.is_project_autoformat_disabled()
+    format_properties.set_project_autoformat_disabled(not old_value)
 end, {
     desc = 'Toggle autoformat on save project wide.',
 })
@@ -291,8 +282,6 @@ vim.api.nvim_create_user_command(
         format_properties.set_project_disabled_formatters(
             new_disabled_formatters
         )
-
-        vim.api.nvim_exec_autocmds('User', { pattern = 'DisabledFormatter' })
     end,
     {
         complete = get_buffer_formatter_names,
@@ -322,8 +311,6 @@ vim.api.nvim_create_user_command(
         format_properties.set_project_disabled_formatters(
             new_disabled_formatters
         )
-
-        vim.api.nvim_exec_autocmds('User', { pattern = 'EnabledFormatter' })
     end,
     {
         complete = function()
@@ -374,14 +361,10 @@ vim.api.nvim_create_user_command(
     'FormatterSetBufferLspFormatStrategy',
     function(args)
         local strategy_name = args.fargs[1]
-        -- vim.print(strategy_name)
+        local bufnr = vim.api.nvim_get_current_buf()
         local strategy = format_properties.LspFormatStrategyEnums[strategy_name]
         if strategy == nil then error('Invalid LSP format strategy') end
-        format_properties.set_buffer_lsp_format_strategy(strategy)
-
-        vim.api.nvim_exec_autocmds('User', {
-            pattern = 'ChangedLspFormatStrategy',
-        })
+        format_properties.set_buffer_lsp_format_strategy(strategy, bufnr)
     end,
     {
         complete = function()
@@ -407,9 +390,6 @@ vim.api.nvim_create_user_command(
         local filetype = vim.bo.filetype
         if filetype == nil then error('The buffer has no file type') end
         format_properties.set_filetype_lsp_format_strategy(filetype, strategy)
-        vim.api.nvim_exec_autocmds('User', {
-            pattern = 'ChangedLspFormatStrategy',
-        })
     end,
     {
         complete = function()

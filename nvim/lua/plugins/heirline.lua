@@ -260,17 +260,8 @@ local config = function()
 
     local formatter_component_block = {
         update = {
-            'LspAttach',
-            'LspDetach',
-            'BufEnter',
-            'FileType',
             'User',
-            -- I only need this to update for the following User commands but
-            -- there isn't a good way limit the pattern to them while still updating
-            -- when the other autocmd types trigger.
-            -- - DisabledFormatter
-            -- - EnabledFormatter
-            -- - ChangedLspFormatStrategy
+            pattern = { 'FormatterChange.*', 'MyHeirlineProxiedBufEnter' },
         },
         init = function(self)
             -- vim.print(self)
@@ -333,6 +324,20 @@ local config = function()
         provider = function(self) return self.child:eval() end,
     }
 
+    ---Need to proxy the BufEnter event as a User event so that I can match the
+    ---pattern of user commands in my formatter block
+    vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+        group = vim.api.nvim_create_augroup(
+            'MyHeirlineProxiedBufEnter',
+            { clear = true }
+        ),
+        callback = function(_)
+            vim.api.nvim_exec_autocmds('User', {
+                pattern = 'MyHeirlineProxiedBufEnter',
+            })
+        end,
+    })
+
     ---@type StatusLine
     local FormatterActive = {
         condition = function(_)
@@ -343,18 +348,8 @@ local config = function()
             return #buffer_formatter_details > 0 or #lsp_formatters > 0
         end,
         update = {
-            'LspAttach',
-            'LspDetach',
-            'BufEnter',
-            'FileType',
             'User',
-            -- I only need this to update for the following User commands but
-            -- there isn't a good way limit the pattern to them while still updating
-            -- when the other autocmd types trigger.
-            -- - DisabledFormatter
-            -- - EnabledFormatter
-            -- - ChangedLspFormatStrategy
-            -- - ChangedFormatSavingStrategy
+            pattern = { 'FormatterChange.*', 'MyHeirlineProxiedBufEnter' },
         },
         Space,
         {
