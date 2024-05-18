@@ -868,7 +868,7 @@ end, {
 -------------------------------------------------------------------------------
 
 vim.api.nvim_create_user_command('ConvertLineEndings', function(params)
-    vim.print(params)
+    -- vim.print(params)
     local line_ending = params.args
     if line_ending == 'lf' then
         vim.cmd([[
