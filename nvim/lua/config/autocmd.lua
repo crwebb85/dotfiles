@@ -116,6 +116,31 @@ vim.api.nvim_create_autocmd('FileType', {
     end,
 })
 
+--Fix specifix buffers to certain buffers so that I don't accidently leave
+--them
+-- TOOD figure out how to handle if all the remaining windows are fixed
+-- vim.api.nvim_create_autocmd('FileType', {
+--     group = vim.api.nvim_create_augroup('sticky_buffers', { clear = true }),
+--     pattern = {
+--         'lspinfo',
+--         'git',
+--         'spectre_panel',
+--         'checkhealth',
+--         'neotest-output',
+--         'neotest-summary',
+--         'neotest-output-panel',
+--         'qf',
+--         'terminal',
+--         'toggleterm',
+--         'dapui_watches',
+--         'dapui_stacks',
+--         'dapui_breakpoints',
+--         'dapui_scopes',
+--         'dapui_console',
+--     },
+--     callback = function(_) vim.cmd([[setlocal winfixbuf]]) end,
+-- })
+
 -- Close man pages with <q>
 vim.api.nvim_create_autocmd('FileType', {
     pattern = 'man',
