@@ -886,6 +886,7 @@ require('lazy').setup({
                     'python',
                     'toml',
                     'regex',
+                    'c_sharp',
                 },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
