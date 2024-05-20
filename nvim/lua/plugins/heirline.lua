@@ -243,12 +243,12 @@ local config = function()
         {
             provider = function()
                 local names = {}
-                for _, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+                for i, server in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
                     local name = server.name
                     if server.name == 'yamlls' then
                         name = 'yamlls(' .. get_yaml_schema_name() .. ')'
                     end
-                    table.insert(names, name)
+                    table.insert(names, tostring(i) .. ':' .. name)
                 end
                 return ' [' .. table.concat(names, ' ') .. ']'
             end,
