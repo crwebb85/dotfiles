@@ -44,7 +44,7 @@ end
 function M.deleteView(viewNumber)
     local path = M.getBufferViewPath(viewNumber)
     vim.fn.delete(path)
-    print('Deleted: ' .. path)
+    vim.notify('Deleted: ' .. path)
 end
 
 function M.openView(viewNumber)
@@ -54,7 +54,7 @@ end
 
 function M.printViewPath(viewNumber)
     local path = M.getBufferViewPath(viewNumber)
-    print(path)
+    vim.notify(path)
 end
 
 function M.resetView(viewNumber)
@@ -67,19 +67,28 @@ function M.resetView(viewNumber)
     print('Close and reopen nvim for to finish reseting the view file')
 end
 
-function M.saveView()
+---saves the view
+---@param viewNumber any
+function M.saveView(viewNumber)
     -- view files are about 500 bytes
-    local viewFileNumber = M.getBufferViewFileNumber()
-    vim.cmd('silent! mkview!' .. viewFileNumber)
+    if viewNumber == nil then viewNumber = M.getBufferViewFileNumber() end
+    vim.cmd('silent! mkview!' .. viewNumber)
 end
 
-function M.loadView()
-    local viewFileNumber = M.getBufferViewFileNumber()
-    vim.cmd('silent! loadview ' .. viewFileNumber)
+---loads the view
+---@param viewNumber? integer
+function M.loadView(viewNumber)
+    if viewNumber == nil then viewNumber = M.getBufferViewFileNumber() end
+    vim.cmd('silent! loadview ' .. viewNumber)
 end
 
 -------------------------------------------------------------------------------
 --- Autocmds
+
+local fold_excluded_filetypes = {
+    gitcommit = true,
+    oil = true,
+}
 
 local remember_folds_group = 'remember_folds'
 vim.api.nvim_create_augroup(remember_folds_group, { clear = true })
@@ -96,22 +105,23 @@ vim.api.nvim_create_autocmd(
         -- nested is needed by bufwrite* (if triggered via other autocmd)
         nested = true,
         callback = function(args)
-            if
-                vim.api.nvim_get_option_value('buftype', { buf = args.buf })
-                    ~= ''
-                --I am checking by proxy if the buffer is a not a file so there will be false positives
-                --But this saves me from setting up folding on every buffer
-                or vim.api.nvim_get_option_value(
-                        'filetype',
-                        { buf = args.buf }
-                    )
-                    == 'gitcommit'
-                -- I don't want my cursor position remembered for gitcommit buffers
-            then
+            if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
                 return
             end
 
-            M.saveView()
+            local buftype =
+                vim.api.nvim_get_option_value('buftype', { buf = args.buf })
+            local filetype =
+                vim.api.nvim_get_option_value('filetype', { buf = args.buf })
+
+            if buftype ~= '' or fold_excluded_filetypes[filetype] ~= nil then
+                return
+            end
+
+            local viewNumber = M.getBufferViewFileNumber()
+            --I can't use vim.schedule here because it results in a race condition where it uses
+            --saves it for the next buffer I navigate to
+            M.saveView(viewNumber)
         end,
     }
 )
@@ -125,15 +135,12 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
         -- vim.print(args)
         -- vim.print(vim.api.nvim_get_option_value('buftype', { buf = args.buf }))
 
-        if
+        local buftype =
             vim.api.nvim_get_option_value('buftype', { buf = args.buf })
-                ~= ''
-            --I am checking by proxy if the buffer is a not a file so there will be false false positives
-            --But this saves me from setting up folding on every buffer
-            or vim.api.nvim_get_option_value('filetype', { buf = args.buf })
-                == 'gitcommit'
-            -- I don't want my cursor position remembered for gitcommit buffers
-        then
+        local filetype =
+            vim.api.nvim_get_option_value('filetype', { buf = args.buf })
+
+        if buftype ~= '' or fold_excluded_filetypes[filetype] ~= nil then
             return
         end
 
@@ -151,7 +158,18 @@ vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
                 {}
             )
         end
-        M.loadView()
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            --Open folds when entering a file while recording or executing a macro
+            vim.cmd([[silent! :%foldopen!]])
+        else
+            --Shedule loading the view so that it doesn't block opening the buffer
+            --This does result in some flicker on the first open of a buffer but Im
+            --okay with that
+            vim.schedule(function()
+                local viewNumber = M.getBufferViewFileNumber()
+                M.loadView(viewNumber)
+            end)
+        end
     end,
 })
 
