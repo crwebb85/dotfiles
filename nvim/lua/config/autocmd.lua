@@ -17,7 +17,7 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
     callback = function()
         vim.keymap.set(
             't',
-            '<esc>',
+            '<leader><esc>',
             [[<C-\><C-n>]],
             { buffer = 0, desc = 'Terminal: Esc to terminal normal mode' }
         )

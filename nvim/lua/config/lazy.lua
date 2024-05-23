@@ -258,7 +258,40 @@ require('lazy').setup({
         'akinsho/git-conflict.nvim',
         lazy = true,
         event = 'VeryLazy',
-        config = true,
+        config = function(_, opts)
+            local git_conflict = require('git-conflict')
+            git_conflict.setup(opts)
+            vim.api.nvim_create_autocmd('User', {
+                pattern = 'GitConflictDetected',
+                callback = function()
+                    vim.notify(
+                        'Git conflict detected in ' .. vim.fn.expand('<afile>')
+                    )
+                end,
+            })
+        end,
+    },
+
+    -- LazyGit Integration (I use for partial staging)
+    {
+        'kdheepak/lazygit.nvim',
+        cmd = {
+            'LazyGit',
+            'LazyGitConfig',
+            'LazyGitCurrentFile',
+            'LazyGitFilter',
+            'LazyGitFilterCurrentFile',
+        },
+        lazy = true,
+        -- optional for floating window border decoration
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+        },
+        -- setting the keybinding for LazyGit with 'keys' is recommended in
+        -- order to load the plugin when the command is run for the first time
+        keys = {
+            { '<leader>gs', '<cmd>LazyGit<cr>', desc = 'LazyGit' },
+        },
     },
     ---------------------------------------------------------------------------
     -- Navigation
