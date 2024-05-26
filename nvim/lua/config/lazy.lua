@@ -2251,24 +2251,7 @@ require('lazy').setup({
         lazy = true,
         config = true,
     },
-
-    ---------------------------------------------------------------------------
-    --- Task Runner
-
-    { -- The task runner we use
-        'stevearc/overseer.nvim',
-        lazy = true,
-        event = 'VeryLazy',
-        opts = {
-            task_list = {
-                direction = 'bottom',
-                min_height = 25,
-                max_height = 25,
-                default_detail = 1,
-            },
-        },
-    },
-
+    -- Code Action Macros
     {
         'crwebb85/mark-code-action.nvim',
         lazy = true,
@@ -2292,6 +2275,24 @@ require('lazy').setup({
         config = true,
         -- dev = true,
     },
+
+    ---------------------------------------------------------------------------
+    --- Task Runner
+
+    { -- The task runner we use
+        'stevearc/overseer.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        opts = {
+            task_list = {
+                direction = 'bottom',
+                min_height = 25,
+                max_height = 25,
+                default_detail = 1,
+            },
+        },
+    },
+
     ---------------------------------------------------------------------------
     -- Import plugins defined in the plugins folder
     { import = 'plugins' },
