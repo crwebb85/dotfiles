@@ -345,6 +345,67 @@ require('lazy').setup({
                 '<leader>ff',
                 function() require('telescope.builtin').find_files() end,
                 desc = 'Telescope: find files (supports line number and col `path:line:col`) ',
+                mode = { 'n' },
+            },
+            {
+                '<leader>ff',
+                function()
+                    local opts = {}
+                    --
+                    local start_pos = vim.fn.getpos('v')
+                    -- vim.print(start_pos)
+                    local end_pos = vim.fn.getpos('.')
+                    -- vim.print(end_pos)
+                    local text_lines = vim.fn.getregion(start_pos, end_pos)
+                    for index, text_line in ipairs(text_lines) do
+                        text_lines[index] = vim.fn.trim(text_line)
+                    end
+
+                    local text = vim.fn.join(text_lines, '')
+
+                    local root_dir = vim.fn.getcwd()
+                    vim.print(root_dir)
+                    if root_dir ~= nil then
+                        --escape special regex characters
+                        local root_dir_regex = root_dir
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%(', '%%%(')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%)', '%%%)')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%.', '%%%.')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%%', '%%%%')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%+', '%%%+')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%-', '%%%-')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%*', '%%%*')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%?', '%%%?')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%[', '%%%[')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%^', '%%%^')
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '%$', '%%%$')
+
+                        --replace path seperators with a char-set
+                        root_dir_regex =
+                            string.gsub(root_dir_regex, '[\\/]+', '[\\/]+')
+
+                        text = string.gsub(text, root_dir_regex, '')
+                    end
+
+                    -- remove leading slashes and backslashes
+                    text = vim.fn.substitute(text, '^[\\/]*', '', '')
+
+                    opts.default_text = text
+                    require('telescope.builtin').find_files(opts)
+                end,
+                desc = 'Telescope: find files (supports line number and col `path:line:col`) ',
+                mode = { 'v' },
             },
             {
                 '<leader>fs',
