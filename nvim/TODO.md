@@ -46,6 +46,11 @@
   Need to do more testing
   I wonder if how this code works when the diagnostics is from a file that isn't open in a buffer
   Confirmed this occurs when the buffer was either closed or never opened
+- Use toggle term on_stderr callback to store the last error to use in my StackTrace cmd
+- Use counts on telescope pickers to where each count corresponds to a subfolder in the project to narrow the search scope
+- Use counts on harpoon for multiple lists
+- Use expand("<cfile>") on telescope find file in normal mode
+- Use counts with gf to open file in the winnr
 
   https://github.com/neovim/neovim/blob/42aa69b076cb338e20b5b4656771f1873e8930d8/runtime/lua/vim/lsp.lua#L388
   before LspRestart but it will clear all diagnostics not just the ones for the given lsp
