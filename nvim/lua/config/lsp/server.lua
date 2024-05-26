@@ -8,6 +8,58 @@ local state = {
     capabilities = nil,
 }
 
+--From https://github.com/hrsh7th/cmp-nvim-lsp/blob/39e2eda76828d88b773cc27a3f61d2ad782c922d/lua/cmp_nvim_lsp/init.lua#L37
+local cmp_default_capabilities = {
+    textDocument = {
+        completion = {
+            dynamicRegistration = false,
+            completionItem = {
+                snippetSupport = true,
+                commitCharactersSupport = true,
+                deprecatedSupport = true,
+                preselectSupport = true,
+                tagSupport = {
+                    valueSet = {
+                        1, -- Deprecated
+                    },
+                },
+                insertReplaceSupport = true,
+                resolveSupport = {
+                    properties = {
+                        'documentation',
+                        'detail',
+                        'additionalTextEdits',
+                        'sortText',
+                        'filterText',
+                        'insertText',
+                        'textEdit',
+                        'insertTextFormat',
+                        'insertTextMode',
+                    },
+                },
+                insertTextModeSupport = {
+                    valueSet = {
+                        1, -- asIs
+                        2, -- adjustIndentation
+                    },
+                },
+                labelDetailsSupport = true,
+            },
+            contextSupport = true,
+            insertTextMode = 1,
+            completionList = {
+                itemDefaults = {
+                    'commitCharacters',
+                    'editRange',
+                    'insertTextFormat',
+                    'insertTextMode',
+                    'data',
+                },
+            },
+        },
+    },
+}
+
 function M.get_capabilities() return state.capabilities end
 
 local function set_capabilities(current)
@@ -16,9 +68,6 @@ local function set_capabilities(current)
             require('lspconfig.util').default_config.capabilities
         -- if I ever stop using lspconfig the alternative is
         -- local base_capabilities = vim.lsp.protocol.make_client_capabilities()
-
-        local cmp_default_capabilities =
-            require('cmp_nvim_lsp').default_capabilities()
 
         state.capabilities = vim.tbl_deep_extend(
             'force',
