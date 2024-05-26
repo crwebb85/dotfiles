@@ -814,77 +814,77 @@ require('lazy').setup({
         },
         config = function(_, opts) require('toggleterm').setup(opts) end,
     },
-    -- Diagnostic info
-    {
-        'folke/trouble.nvim',
-        dependencies = { 'nvim-tree/nvim-web-devicons' },
-        lazy = true,
-        config = true,
-        cmd = { 'Trouble', 'TroubleToggle' },
-        keys = {
-            {
-                '<leader>xx',
-                function() require('trouble').toggle() end,
-                desc = 'Trouble: Toggle UI',
-            },
-            {
-                '<leader>xw',
-                function() require('trouble').toggle('workspace_diagnostics') end,
-                desc = 'Trouble: Toggle workspace diagnostics',
-            },
-            {
-                '<leader>xd',
-                function() require('trouble').toggle('document_diagnostics') end,
-                desc = 'Trouble: Toggle document diagnostics',
-            },
-            {
-                '<leader>xq',
-                function() require('trouble').toggle('quickfix') end,
-                desc = 'Trouble: Toggle quickfix list (Using Troubles UI)',
-            },
-            {
-                '<leader>xl',
-                function() require('trouble').toggle('loclist') end,
-                desc = 'Trouble: Toggle loclist',
-            },
-            {
-                '<leader>xr',
-                function() require('trouble').toggle('lsp_references') end,
-                desc = 'Trouble: Toggle lsp references',
-            },
-            {
-                '<leader>xn',
-                function()
-                    require('trouble').next({ skip_groups = true, jump = true })
-                end,
-                desc = 'Trouble: jump to the next item, skipping the groups',
-            },
-            {
-                '<leader>xp',
-                function()
-                    require('trouble').previous({
-                        skip_groups = true,
-                        jump = true,
-                    })
-                end,
-                desc = 'Trouble: jump to the previous item, skipping the groups',
-            },
-            {
-                '<leader>xf',
-                function()
-                    require('trouble').first({ skip_groups = true, jump = true })
-                end,
-                desc = 'Trouble: jump to the first item, skipping the groups',
-            },
-            {
-                '<leader>xl',
-                function()
-                    require('trouble').last({ skip_groups = true, jump = true })
-                end,
-                desc = 'Trouble: jump to the last item, skipping the groups',
-            },
-        },
-    },
+    -- -- Diagnostic info
+    -- {
+    --     'folke/trouble.nvim',
+    --     dependencies = { 'nvim-tree/nvim-web-devicons' },
+    --     lazy = true,
+    --     config = true,
+    --     cmd = { 'Trouble', 'TroubleToggle' },
+    --     keys = {
+    --         {
+    --             '<leader>xx',
+    --             function() require('trouble').toggle() end,
+    --             desc = 'Trouble: Toggle UI',
+    --         },
+    --         {
+    --             '<leader>xw',
+    --             function() require('trouble').toggle('workspace_diagnostics') end,
+    --             desc = 'Trouble: Toggle workspace diagnostics',
+    --         },
+    --         {
+    --             '<leader>xd',
+    --             function() require('trouble').toggle('document_diagnostics') end,
+    --             desc = 'Trouble: Toggle document diagnostics',
+    --         },
+    --         {
+    --             '<leader>xq',
+    --             function() require('trouble').toggle('quickfix') end,
+    --             desc = 'Trouble: Toggle quickfix list (Using Troubles UI)',
+    --         },
+    --         {
+    --             '<leader>xl',
+    --             function() require('trouble').toggle('loclist') end,
+    --             desc = 'Trouble: Toggle loclist',
+    --         },
+    --         {
+    --             '<leader>xr',
+    --             function() require('trouble').toggle('lsp_references') end,
+    --             desc = 'Trouble: Toggle lsp references',
+    --         },
+    --         {
+    --             '<leader>xn',
+    --             function()
+    --                 require('trouble').next({ skip_groups = true, jump = true })
+    --             end,
+    --             desc = 'Trouble: jump to the next item, skipping the groups',
+    --         },
+    --         {
+    --             '<leader>xp',
+    --             function()
+    --                 require('trouble').previous({
+    --                     skip_groups = true,
+    --                     jump = true,
+    --                 })
+    --             end,
+    --             desc = 'Trouble: jump to the previous item, skipping the groups',
+    --         },
+    --         {
+    --             '<leader>xf',
+    --             function()
+    --                 require('trouble').first({ skip_groups = true, jump = true })
+    --             end,
+    --             desc = 'Trouble: jump to the first item, skipping the groups',
+    --         },
+    --         {
+    --             '<leader>xl',
+    --             function()
+    --                 require('trouble').last({ skip_groups = true, jump = true })
+    --             end,
+    --             desc = 'Trouble: jump to the last item, skipping the groups',
+    --         },
+    --     },
+    -- },
     -- Query ollama
     -- {
     --     'nomnivore/ollama.nvim',
@@ -1797,11 +1797,11 @@ require('lazy').setup({
             { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
             { 'hrsh7th/cmp-path' }, -- Completion for file paths
             { 'hrsh7th/cmp-cmdline' },
-            {
-                'hrsh7th/cmp-nvim-lua', -- Completion for lua api
-                lazy = true,
-                ft = 'lua',
-            },
+            -- {
+            --     'hrsh7th/cmp-nvim-lua', -- Completion for lua api
+            --     lazy = true,
+            --     ft = 'lua',
+            -- },
             { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capabilities to that cmp adds to neovim
             { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
             { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
