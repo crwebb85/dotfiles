@@ -838,7 +838,6 @@ require('lazy').setup({
                     'yss' .. char .. target,
                 }
             end
-            vim.print(mappings)
             require('which-key').register(mappings)
         end,
     },
