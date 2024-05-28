@@ -408,7 +408,7 @@ end
 ---@field formatters nil|string[] List of formatters to run. Defaults to all formatters for the buffer filetype.
 
 ---@param bufnr? integer the buffer number. Defaults to buffer 0.
----@return ConformFormatOptions
+---@return conform.FormatOpts
 function M.construct_conform_formatting_params(bufnr)
     if bufnr == nil then bufnr = vim.api.nvim_get_current_buf() end
     local project_disabled_formatters = P.get_project_disabled_formatters()
@@ -452,7 +452,7 @@ end
 ---If auto formatting is disabled for the project or the buffer then this function
 ---will skip formating the buffer
 ---@param bufnr? integer the buffer number to autoformat. Defaults to buffer 0
----@return ConformFormatOptions?
+---@return conform.FormatOpts?
 function M.construct_conform_autoformat_params(bufnr)
     if bufnr == nil then bufnr = vim.api.nvim_get_current_buf() end
     if
@@ -468,7 +468,7 @@ end
 ---If formatting timesout the formatter will switch to formatting after save
 ---asyncronously for that file type
 ---@param bufnr integer
----@return ConformFormatOptions? options conform will use to format on save
+---@return conform.FormatOpts? options conform will use to format on save
 ---@return nil | fun(err: string): boolean err_callback used to change from formatting on save to formatting after save for the buffer file type if a timeout occured
 function M.format_on_save(bufnr)
     local filetype = vim.bo[bufnr].filetype
@@ -491,7 +491,7 @@ end
 
 ---The callback used by conform to asyncronously format files after save
 ---@param bufnr integer
----@return ConformFormatOptions? format_opts to pass to conform
+---@return conform.FormatOpts? format_opts to pass to conform
 function M.format_after_save(bufnr)
     if not P.is_format_after_save_enabled(vim.bo[bufnr].filetype) then
         return
