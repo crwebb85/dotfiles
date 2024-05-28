@@ -1,3 +1,6 @@
+local state = {
+    is_folding_enable = true,
+}
 local M = {}
 
 function M.getBufferViewPath(viewNumber)
@@ -90,111 +93,150 @@ local fold_excluded_filetypes = {
     oil = true,
 }
 
-local remember_folds_group = 'remember_folds'
-vim.api.nvim_create_augroup(remember_folds_group, { clear = true })
+function M.setup_folding(is_folding_enable)
+    state.is_folding_enable = is_folding_enable
 
--- Save fold informatin in view file
-vim.api.nvim_create_autocmd(
-    -- bufleave but not bufwinleave captures closing 2nd tab
-    -- BufHidden for compatibility with `set hidden`
-    { 'BufWinLeave', 'BufLeave', 'BufWritePost', 'BufHidden', 'QuitPre' },
-    {
-        desc = 'Saves view file (saves information like open/closed folds)',
-        group = remember_folds_group,
-        pattern = '?*',
-        -- nested is needed by bufwrite* (if triggered via other autocmd)
-        nested = true,
-        callback = function(args)
-            if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
-                return
-            end
+    local remember_folds_group_name = 'remember_folds'
+    local remember_folds_group =
+        vim.api.nvim_create_augroup(remember_folds_group_name, { clear = true })
+    if state.is_folding_enable then
+        -- Apply folds to folder based on view file
+        vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
+            desc = 'Loads the view file for the buffer (reloads open/closed folds)',
+            group = remember_folds_group,
+            pattern = '?*',
+            callback = function(args)
+                -- vim.print(args)
+                -- vim.print(vim.api.nvim_get_option_value('buftype', { buf = args.buf }))
 
-            local buftype =
-                vim.api.nvim_get_option_value('buftype', { buf = args.buf })
-            local filetype =
-                vim.api.nvim_get_option_value('filetype', { buf = args.buf })
+                local buftype =
+                    vim.api.nvim_get_option_value('buftype', { buf = args.buf })
+                local filetype = vim.api.nvim_get_option_value(
+                    'filetype',
+                    { buf = args.buf }
+                )
 
-            if buftype ~= '' or fold_excluded_filetypes[filetype] ~= nil then
-                return
-            end
+                if
+                    buftype ~= ''
+                    or fold_excluded_filetypes[filetype] ~= nil
+                then
+                    return
+                end
 
-            local viewNumber = M.getBufferViewFileNumber()
-            --I can't use vim.schedule here because it results in a race condition where it uses
-            --saves it for the next buffer I navigate to
-            M.saveView(viewNumber)
-        end,
-    }
-)
+                if
+                    not vim.api.nvim_get_option_value('diff', {})
+                    and vim.api.nvim_get_option_value('foldmethod', {}) == 'diff'
+                    and vim.api.nvim_get_option_value('foldexpr', {})
+                        == 'v:lua.vim.treesitter.foldexpr()'
+                then
+                    -- Reset Folding back to using tresitter after no longer using diff mode
+                    vim.api.nvim_set_option_value('foldmethod', 'expr', {})
+                    vim.api.nvim_set_option_value(
+                        'foldexpr',
+                        'v:lua.vim.treesitter.foldexpr()',
+                        {}
+                    )
+                end
+                if
+                    vim.fn.reg_executing() ~= ''
+                    or vim.fn.reg_recording() ~= ''
+                then
+                    --Open folds when entering a file while recording or executing a macro
+                    vim.cmd([[silent! :%foldopen!]])
+                else
+                    local viewNumber = M.getBufferViewFileNumber()
+                    --unfortunately scheduling loading the view with vim.schedule
+                    --did not work well and resulted in moving my cursor to undesired
+                    --locations when switching buffers
+                    M.loadView(viewNumber)
+                end
+            end,
+        })
+        -- Save fold informatin in view file
+        vim.api.nvim_create_autocmd(
+            -- bufleave but not bufwinleave captures closing 2nd tab
+            -- BufHidden for compatibility with `set hidden`
+            {
+                'BufWinLeave',
+                'BufLeave',
+                'BufWritePost',
+                'BufHidden',
+                'QuitPre',
+            },
+            {
+                desc = 'Saves view file (saves information like open/closed folds)',
+                group = remember_folds_group,
+                pattern = '?*',
+                -- nested is needed by bufwrite* (if triggered via other autocmd)
+                nested = true,
+                callback = function(args)
+                    if
+                        vim.fn.reg_executing() ~= ''
+                        or vim.fn.reg_recording() ~= ''
+                    then
+                        return
+                    end
 
--- Apply folds to folder based on view file
-vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
-    desc = 'Loads the view file for the buffer (reloads open/closed folds)',
-    group = remember_folds_group,
-    pattern = '?*',
-    callback = function(args)
-        -- vim.print(args)
-        -- vim.print(vim.api.nvim_get_option_value('buftype', { buf = args.buf }))
+                    local buftype = vim.api.nvim_get_option_value(
+                        'buftype',
+                        { buf = args.buf }
+                    )
+                    local filetype = vim.api.nvim_get_option_value(
+                        'filetype',
+                        { buf = args.buf }
+                    )
 
-        local buftype =
-            vim.api.nvim_get_option_value('buftype', { buf = args.buf })
-        local filetype =
-            vim.api.nvim_get_option_value('filetype', { buf = args.buf })
+                    if
+                        buftype ~= ''
+                        or fold_excluded_filetypes[filetype] ~= nil
+                    then
+                        return
+                    end
 
-        if buftype ~= '' or fold_excluded_filetypes[filetype] ~= nil then
-            return
-        end
-
-        if
-            not vim.api.nvim_get_option_value('diff', {})
-            and vim.api.nvim_get_option_value('foldmethod', {}) == 'diff'
-            and vim.api.nvim_get_option_value('foldexpr', {})
-                == 'v:lua.vim.treesitter.foldexpr()'
-        then
-            -- Reset Folding back to using tresitter after no longer using diff mode
-            vim.api.nvim_set_option_value('foldmethod', 'expr', {})
-            vim.api.nvim_set_option_value(
-                'foldexpr',
-                'v:lua.vim.treesitter.foldexpr()',
-                {}
-            )
-        end
-        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
-            --Open folds when entering a file while recording or executing a macro
-            vim.cmd([[silent! :%foldopen!]])
-        else
-            --Shedule loading the view so that it doesn't block opening the buffer
-            --This does result in some flicker on the first open of a buffer but Im
-            --okay with that
-            vim.schedule(function()
-                local viewNumber = M.getBufferViewFileNumber()
-                M.loadView(viewNumber)
-            end)
-        end
-    end,
-})
-
+                    local viewNumber = M.getBufferViewFileNumber()
+                    --I can't use vim.schedule here because it results in a race condition where it uses
+                    --saves it for the next buffer I navigate to
+                    M.saveView(viewNumber)
+                end,
+            }
+        )
+    else
+        vim.opt.foldenable = false
+    end
+end
 -------------------------------------------------------------------------------
 --- User commands
 
 vim.api.nvim_create_user_command(
     'ViewOpen',
     function(opts) M.openView(tonumber(opts.args)) end,
-    { nargs = '?' }
+    { nargs = '?', desc = 'Opens the view file for the buffer.' }
 )
 vim.api.nvim_create_user_command(
     'ViewPrintPath',
     function(opts) M.printViewPath(tonumber(opts.args)) end,
-    { nargs = '?' }
+    { nargs = '?', desc = 'Prints the path to the view file' }
 )
 vim.api.nvim_create_user_command(
     'ViewReset',
     function(opts) M.resetView(tonumber(opts.args)) end,
-    { nargs = '?' }
+    { nargs = '?', desc = 'Resets the view file' }
 )
 vim.api.nvim_create_user_command(
     'ViewDelete',
     function(opts) M.deleteView(tonumber(opts.args)) end,
-    { nargs = '?' }
+    { nargs = '?', desc = 'Deletes the view file for the buffer' }
 )
+vim.api.nvim_create_user_command(
+    'ViewToggle',
+    function(_) M.setup_folding(not state.is_folding_enable) end,
+    {
+        desc = 'Toggles on and off the autocmds that save and load the view files',
+    }
+)
+
+-------------------------------------------------------------------------------
+--- Setup folding
+M.setup_folding(true)
 
 return M
