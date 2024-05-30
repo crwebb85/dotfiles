@@ -26,6 +26,7 @@ local config = function()
     local filename_foreground_color = colors.magenta2
     local file_flags_foreground_color = colors.green2
     local filetype_foreground_color = colors.magenta
+    local buftype_foreground_color = colors.green2
 
     local winbar_inactive = {
         buftype = { 'nofile', 'prompt', 'quickfix', 'terminal' },
@@ -619,6 +620,12 @@ local config = function()
         hl = { fg = filetype_foreground_color, bold = true },
     }
 
+    ---@type StatusLine
+    local BufType = {
+        provider = function() return vim.bo.buftype end,
+        hl = { fg = buftype_foreground_color, bold = true },
+    }
+
     local FileEncoding = {
         provider = function()
             local enc = (vim.bo.fenc ~= '' and vim.bo.fenc) or vim.o.enc -- :h 'enc'
@@ -639,6 +646,8 @@ local config = function()
         {
             WinBarTitleBlock,
             Align,
+            BufType,
+            Space,
             FileType,
             Space,
             FileEncoding,

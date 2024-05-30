@@ -61,6 +61,11 @@ vim.opt.foldcolumn = '1'
 vim.opt.foldmethod = 'expr'
 -- TODO fallback to different folding expr when treesitter folding is not available
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+-- Removing the below options prevent the cwd directory being stored in the view file which
+-- as a results prevents it from changing on loading the view
+vim.opt.viewoptions:remove('curdir')
+-- Folds nested beyond foldlevelstart will start out closed
+vim.opt.foldlevelstart = 3
 
 -------------------------------------------------------------------------------
 --- Completion menu

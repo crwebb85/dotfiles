@@ -101,7 +101,12 @@ function M.setup_folding(is_folding_enable)
         vim.api.nvim_create_augroup(remember_folds_group_name, { clear = true })
     if state.is_folding_enable then
         -- Apply folds to folder based on view file
-        vim.api.nvim_create_autocmd({ 'BufWinEnter', 'BufWritePost' }, {
+        -- (Note) I think BufWritePost and the nested autocmd was causing performance issues.
+        -- I am going to try without it
+        vim.api.nvim_create_autocmd({
+            'BufWinEnter',
+            -- 'BufWritePost'
+        }, {
             desc = 'Loads the view file for the buffer (reloads open/closed folds)',
             group = remember_folds_group,
             pattern = '?*',
@@ -109,34 +114,25 @@ function M.setup_folding(is_folding_enable)
                 -- vim.print(args)
                 -- vim.print(vim.api.nvim_get_option_value('buftype', { buf = args.buf }))
 
-                local buftype =
-                    vim.api.nvim_get_option_value('buftype', { buf = args.buf })
-                local filetype = vim.api.nvim_get_option_value(
-                    'filetype',
-                    { buf = args.buf }
-                )
-
                 if
-                    buftype ~= ''
-                    or fold_excluded_filetypes[filetype] ~= nil
+                    vim.bo[args.buf].buftype ~= ''
+                    or fold_excluded_filetypes[vim.bo[args.buf].filetype]
+                        ~= nil
                 then
                     return
                 end
 
+                --TODO may want to break the fold method reseting into a seperate the below into its own autocmd for
                 if
-                    not vim.api.nvim_get_option_value('diff', {})
-                    and vim.api.nvim_get_option_value('foldmethod', {}) == 'diff'
-                    and vim.api.nvim_get_option_value('foldexpr', {})
-                        == 'v:lua.vim.treesitter.foldexpr()'
+                    not vim.wo.diff
+                    and vim.wo.foldmethod == 'diff'
+                    and vim.wo.foldexpr == 'v:lua.vim.treesitter.foldexpr()'
                 then
                     -- Reset Folding back to using tresitter after no longer using diff mode
-                    vim.api.nvim_set_option_value('foldmethod', 'expr', {})
-                    vim.api.nvim_set_option_value(
-                        'foldexpr',
-                        'v:lua.vim.treesitter.foldexpr()',
-                        {}
-                    )
+                    vim.wo.foldmethod = 'expr'
+                    vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
                 end
+
                 if
                     vim.fn.reg_executing() ~= ''
                     or vim.fn.reg_recording() ~= ''
@@ -153,13 +149,15 @@ function M.setup_folding(is_folding_enable)
             end,
         })
         -- Save fold informatin in view file
+        -- (Note) I think BufWritePost and the nested autocmd was causing performance issues.
+        -- I am going to try without it
         vim.api.nvim_create_autocmd(
             -- bufleave but not bufwinleave captures closing 2nd tab
             -- BufHidden for compatibility with `set hidden`
             {
                 'BufWinLeave',
                 'BufLeave',
-                'BufWritePost',
+                -- 'BufWritePost',
                 'BufHidden',
                 'QuitPre',
             },
@@ -168,7 +166,7 @@ function M.setup_folding(is_folding_enable)
                 group = remember_folds_group,
                 pattern = '?*',
                 -- nested is needed by bufwrite* (if triggered via other autocmd)
-                nested = true,
+                -- nested = true,
                 callback = function(args)
                     if
                         vim.fn.reg_executing() ~= ''
@@ -177,18 +175,10 @@ function M.setup_folding(is_folding_enable)
                         return
                     end
 
-                    local buftype = vim.api.nvim_get_option_value(
-                        'buftype',
-                        { buf = args.buf }
-                    )
-                    local filetype = vim.api.nvim_get_option_value(
-                        'filetype',
-                        { buf = args.buf }
-                    )
-
                     if
-                        buftype ~= ''
-                        or fold_excluded_filetypes[filetype] ~= nil
+                        vim.bo[args.buf].buftype ~= ''
+                        or fold_excluded_filetypes[vim.bo[args.buf].filetype]
+                            ~= nil
                     then
                         return
                     end
@@ -200,8 +190,8 @@ function M.setup_folding(is_folding_enable)
                 end,
             }
         )
-    else
-        vim.opt.foldenable = false
+        -- else
+        --     vim.opt.foldenable = false
     end
 end
 -------------------------------------------------------------------------------
