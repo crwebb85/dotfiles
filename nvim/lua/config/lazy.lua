@@ -659,6 +659,7 @@ require('lazy').setup({
                 },
                 ['yP'] = {
                     -- from https://www.reddit.com/r/neovim/comments/1czp9zr/comment/l5ke7fv/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+                    desc = 'Copy relative filepath to system clipboard',
                     callback = function()
                         local entry = require('oil').get_cursor_entry()
                         local dir = require('oil').get_current_dir()
@@ -666,6 +667,32 @@ require('lazy').setup({
 
                         local relpath = vim.fn.fnamemodify(dir, ':.')
                         vim.fn.setreg('+', relpath .. entry.name)
+                    end,
+                },
+                ['<C-q>'] = {
+                    desc = 'Append file to quick fix list',
+                    callback = function()
+                        local entry = require('oil').get_cursor_entry()
+
+                        local dir = require('oil').get_current_dir()
+
+                        if not entry or entry.type ~= 'file' or not dir then
+                            return
+                        end
+
+                        local file_path = dir .. entry.name
+                        local items = vim.fn.getqflist()
+                        table.insert(items, {
+                            text = file_path,
+                            filename = file_path,
+                            row = 0,
+                            col = 0,
+                        })
+
+                        vim.fn.setqflist({}, ' ', {
+                            title = 'Oil Appended Files',
+                            items = items,
+                        })
                     end,
                 },
             },
