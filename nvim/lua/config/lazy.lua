@@ -649,6 +649,14 @@ require('lazy').setup({
                     desc = 'Open image preview',
                     mode = 'n',
                 },
+                ['yp'] = {
+                    -- from https://www.reddit.com/r/neovim/comments/1czp9zr/comment/l5hv900/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+                    desc = 'Copy filepath to system clipboard',
+                    callback = function()
+                        require('oil.actions').copy_entry_path.callback()
+                        vim.fn.setreg('+', vim.fn.getreg(vim.v.register))
+                    end,
+                },
             },
         },
         config = function(_, opts) require('oil').setup(opts) end,
