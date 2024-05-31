@@ -197,8 +197,11 @@ vim.keymap.set(
 vim.keymap.set(
     'n',
     '<leader>;',
-    [[A;<Esc>]],
-    { desc = 'Custom: Add semicolon to end of line' }
+    -- [[A;<Esc>]],
+    [[mmA;<Esc>`m]],
+    {
+        desc = 'Custom: Add semicolon to end of line (uses register m to return cursor back to original position)',
+    }
 )
 
 vim.keymap.set('v', '<leader>;', ':s/\\([^;]\\)$/\\1;/<CR>', {
@@ -208,8 +211,11 @@ vim.keymap.set('v', '<leader>;', ':s/\\([^;]\\)$/\\1;/<CR>', {
 vim.keymap.set(
     'n',
     '<leader>,',
-    [[A,<Esc>]],
-    { desc = 'Custom: Add comma to end of line' }
+    -- [[A,<Esc>]],
+    [[mmA,<Esc>`m]],
+    {
+        desc = 'Custom: Add comma to end of line (uses register m to return cursor back to original position)',
+    }
 )
 
 vim.keymap.set('v', '<leader>,', ':s/\\([^,]\\)$/\\1,/<CR>', {
