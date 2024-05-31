@@ -114,25 +114,6 @@ local function default_keymaps(bufnr, client)
         buffer = bufnr,
         desc = 'LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
     })
-    vim.keymap.set(
-        'n',
-        'gR',
-        function() require('trouble').toggle('lsp_references') end,
-        {
-            buffer = bufnr,
-            desc = 'LSP: Lists all the references to the symbol under the cursor in the the trouble quickfix window.',
-        }
-    )
-    vim.keymap.set(
-        'n',
-        '<leader>vrr',
-        function() vim.lsp.buf.references() end,
-        {
-            buffer = bufnr,
-            -- remap = false,
-            desc = 'LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
-        }
-    )
     vim.keymap.set('n', 'gs', function() vim.lsp.buf.signature_help() end, {
         buffer = bufnr,
         desc = 'LSP: Displays signature information about the symbol under the cursor in a floating window.',
@@ -140,11 +121,6 @@ local function default_keymaps(bufnr, client)
     vim.keymap.set('n', '<F2>', function() vim.lsp.buf.rename() end, {
         buffer = bufnr,
         desc = 'LSP: Renames all references to the symbol under the cursor.',
-    })
-    vim.keymap.set('n', '<leader>vrn', function() vim.lsp.buf.rename() end, {
-        buffer = bufnr,
-        -- remap = false,
-        desc = 'LSP: Rename symbol',
     })
     vim.keymap.set('n', '<F4>', function() vim.lsp.buf.code_action() end, {
         buffer = bufnr,
