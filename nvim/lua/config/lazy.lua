@@ -657,6 +657,17 @@ require('lazy').setup({
                         vim.fn.setreg('+', vim.fn.getreg(vim.v.register))
                     end,
                 },
+                ['yP'] = {
+                    -- from https://www.reddit.com/r/neovim/comments/1czp9zr/comment/l5ke7fv/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+                    callback = function()
+                        local entry = require('oil').get_cursor_entry()
+                        local dir = require('oil').get_current_dir()
+                        if not entry or not dir then return end
+
+                        local relpath = vim.fn.fnamemodify(dir, ':.')
+                        vim.fn.setreg('+', relpath .. entry.name)
+                    end,
+                },
             },
         },
         config = function(_, opts) require('oil').setup(opts) end,
