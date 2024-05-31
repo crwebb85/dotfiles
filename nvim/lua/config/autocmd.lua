@@ -169,6 +169,24 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
 })
 
 -------------------------------------------------------------------------------
+-- Highlight cursor line briefly when neovim regains focus.  This helps to
+-- reorient the user and tell them where they are in the buffer.
+-- Stolen from https://www.reddit.com/r/neovim/comments/1cytkbq/comment/l5gg32x/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+-- which was stolen from https://developer.ibm.com/tutorials/l-vim-script-5
+vim.api.nvim_create_autocmd('FocusGained', {
+    pattern = '*',
+    callback = function(_)
+        vim.opt.cursorline = true
+        vim.cmd('redraw')
+        vim.defer_fn(function() vim.opt.cursorline = false end, 600)
+    end,
+    group = vim.api.nvim_create_augroup(
+        'draw_temp_cursor_line',
+        { clear = true }
+    ),
+})
+
+-------------------------------------------------------------------------------
 --- Autosave
 -- vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'VimLeavePre' }, {
 --     pattern = '*',
