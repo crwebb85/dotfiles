@@ -1812,35 +1812,35 @@ require('lazy').setup({
     -- },
 
     -- Configure Lua LSP to know about neovim plugins when in neovim config (neodev is in end of life)
-    -- {
-    --     'folke/neodev.nvim',
-    --     lazy = true, -- Will lazy load before lspconfig since I marked it as a dependency
-    --     config = function()
-    --         require('neodev').setup({
-    --             setup_jsonls = false, -- I will do this manually in my lspconfig setup
-    --             -- -- Workaround to get correctly configure lua_ls for neovim config
-    --             -- -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
-    --             -- override = function(_, library)
-    --             --     library.enabled = true
-    --             --     library.plugins = true
-    --             -- end,
-    --         })
-    --     end,
-    -- },
     {
-        'folke/lazydev.nvim',
-        ft = 'lua', -- only load on lua files
-        opts = {
-            library = {
-                -- Library items can be absolute paths
-                -- "~/projects/my-awesome-lib",
-                -- Or relative, which means they will be resolved as a plugin
-                -- "LazyVim",
-                -- When relative, you can also provide a path to the library in the plugin dir
-                -- 'luvit-meta/library', -- see below
-            },
-        },
+        'folke/neodev.nvim',
+        lazy = true, -- Will lazy load before lspconfig since I marked it as a dependency
+        config = function()
+            require('neodev').setup({
+                setup_jsonls = false, -- I will do this manually in my lspconfig setup
+                -- -- Workaround to get correctly configure lua_ls for neovim config
+                -- -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
+                -- override = function(_, library)
+                --     library.enabled = true
+                --     library.plugins = true
+                -- end,
+            })
+        end,
     },
+    -- {
+    --     'folke/lazydev.nvim',
+    --     ft = 'lua', -- only load on lua files
+    --     opts = {
+    --         library = {
+    --             -- Library items can be absolute paths
+    --             -- "~/projects/my-awesome-lib",
+    --             -- Or relative, which means they will be resolved as a plugin
+    --             -- "LazyVim",
+    --             -- When relative, you can also provide a path to the library in the plugin dir
+    --             -- 'luvit-meta/library', -- see below
+    --         },
+    --     },
+    -- },
     -- Helps configure which json and yaml schemas to use for the corresponding lsp
     -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
     -- Catalog of kubernetes schemas: https://github.com/datreeio/CRDs-catalog/tree/main
@@ -1952,6 +1952,8 @@ require('lazy').setup({
         lazy = true,
         dependencies = {
             {
+                -- neodev must load before lspconfig to load in the lua_ls LSP settings
+                'folke/neodev.nvim',
                 -- cmp-nvim-lsp provides a list of lsp capabilities to that cmp adds to neovim
                 -- I must have cmp-nvim-lsp load before nvim-lspconfig for
                 -- lua snips to show up in cmp
@@ -2000,10 +2002,10 @@ require('lazy').setup({
                     { name = 'luasnip' },
                     { name = 'buffer', keyword_length = 5 },
                     { name = 'path' },
-                    {
-                        name = 'lazydev',
-                        group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-                    },
+                    -- {
+                    --     name = 'lazydev',
+                    -- group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+                    -- },
                 }),
                 snippet = {
                     expand = function(args)
@@ -2478,5 +2480,7 @@ require('lazy').setup({
 }, {
     dev = {
         -- Directory where you store your local plugin projects
+        path = 'C:\\Users\\crweb\\Documents\\projects\\',
     },
 })
+local applesauce = 2
