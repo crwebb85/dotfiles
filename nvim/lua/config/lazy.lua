@@ -481,6 +481,11 @@ require('lazy').setup({
                 function() require('telescope.builtin').git_status() end,
                 desc = 'Telescope: git status',
             },
+            {
+                '<leader>fa',
+                function() require('telescope.builtin').autocommands() end,
+                desc = 'Telescope: autocmds',
+            },
         },
         opts = {
             defaults = {
@@ -2451,7 +2456,7 @@ require('lazy').setup({
                     title = 'Remove unnecessary usings',
                 },
             },
-            lsp_timeout_ms = 3000,
+            lsp_timeout_ms = 10000,
         },
         config = true,
         -- dev = true,
@@ -2483,4 +2488,3 @@ require('lazy').setup({
         path = 'C:\\Users\\crweb\\Documents\\projects\\',
     },
 })
-local applesauce = 2

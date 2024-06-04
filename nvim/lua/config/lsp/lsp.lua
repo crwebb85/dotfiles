@@ -119,8 +119,11 @@ local function default_keymaps(bufnr, client)
         desc = 'LSP: Displays signature information about the symbol under the cursor in a floating window.',
     })
     vim.keymap.set('n', '<F2>', function()
-        -- vim.lsp.buf.rename()
-        require('mark-code-action.renamer').rename()
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.renamer').rename()
+        else
+            vim.lsp.buf.rename()
+        end
     end, {
         buffer = bufnr,
         desc = 'LSP: Renames all references to the symbol under the cursor.',
