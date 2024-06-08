@@ -203,30 +203,30 @@ local function default_keymaps(bufnr, client)
         buffer = bufnr,
         desc = 'LSP Diagnostic: Show diagnostics in a floating window.',
     })
-    vim.keymap.set(
-        'n',
-        '[d',
-        require('config.utils').dot_repeat(
-            function() vim.diagnostic.goto_prev() end
-        ),
-        {
-            buffer = bufnr,
-            expr = true,
-            desc = 'LSP Diagnostic: Move to the previous diagnostic in the current buffer. (Dot repeatable)',
-        }
-    )
-    vim.keymap.set(
-        'n',
-        ']d',
-        require('config.utils').dot_repeat(
-            function() vim.diagnostic.goto_next() end
-        ),
-        {
-            buffer = bufnr,
-            expr = true,
-            desc = 'LSP Diagnostic: Move to the next diagnostic. (Dot repeatable)',
-        }
-    )
+    -- vim.keymap.set(
+    --     'n',
+    --     '[d',
+    --     require('config.utils').dot_repeat(
+    --         function() vim.diagnostic.goto_prev() end
+    --     ),
+    --     {
+    --         buffer = bufnr,
+    --         expr = true,
+    --         desc = 'LSP Diagnostic: Move to the previous diagnostic in the current buffer. (Dot repeatable)',
+    --     }
+    -- )
+    -- vim.keymap.set(
+    --     'n',
+    --     ']d',
+    --     require('config.utils').dot_repeat(
+    --         function() vim.diagnostic.goto_next() end
+    --     ),
+    --     {
+    --         buffer = bufnr,
+    --         expr = true,
+    --         desc = 'LSP Diagnostic: Move to the next diagnostic. (Dot repeatable)',
+    --     }
+    -- )
 
     vim.keymap.set(
         'n',
