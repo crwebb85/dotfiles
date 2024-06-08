@@ -90,7 +90,13 @@ vim.api.nvim_create_user_command('LspViewConfigSource', inspect_config_source, {
 ---@param bufnr any
 ---@param client any
 local function default_keymaps(bufnr, client)
-    vim.keymap.set('n', 'K', function() vim.lsp.buf.hover() end, {
+    vim.keymap.set('n', 'K', function()
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.hover').hover()
+        else
+            vim.lsp.buf.hover()
+        end
+    end, {
         buffer = bufnr,
         desc = [[LSP: Displays hover information about the symbol under the cursor in a floating window. Calling the function twice will jump into the floating window.]],
     })
