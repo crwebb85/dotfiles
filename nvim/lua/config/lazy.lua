@@ -2488,3 +2488,4 @@ require('lazy').setup({
         path = 'C:\\Users\\crweb\\Documents\\projects\\',
     },
 })
+vim.cmd.packadd('cfilter')

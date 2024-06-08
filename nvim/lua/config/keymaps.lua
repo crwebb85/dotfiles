@@ -102,18 +102,18 @@ vim.keymap.set(
     '<cmd>cprev<CR>zz',
     { desc = 'Custom - Quick Fix List: cprev quick fix navigation' }
 )
-vim.keymap.set(
-    'n',
-    '<C-l>',
-    '<cmd>lnext<CR>zz',
-    { desc = 'Custom - Location List: lnext location list navigation' }
-)
-vim.keymap.set(
-    'n',
-    '<C-h>',
-    '<cmd>lprev<CR>zz',
-    { desc = 'Custom - Location List: lprev location list navigation' }
-)
+-- vim.keymap.set(
+--     'n',
+--     '<C-l>',
+--     '<cmd>lnext<CR>zz',
+--     { desc = 'Custom - Location List: lnext location list navigation' }
+-- )
+-- vim.keymap.set(
+--     'n',
+--     '<C-h>',
+--     '<cmd>lprev<CR>zz',
+--     { desc = 'Custom - Location List: lprev location list navigation' }
+-- )
 
 -- Find and replace word cursor is on
 vim.keymap.set(
