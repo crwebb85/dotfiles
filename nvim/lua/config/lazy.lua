@@ -1001,6 +1001,12 @@ require('lazy').setup({
         end,
         config = true,
     },
+    {
+        'tris203/precognition.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        opts = {},
+    },
     -- Adds motions to wrap text in quotes/brackets/tags/etc
     -- using the same motions I use to yank text
     {
