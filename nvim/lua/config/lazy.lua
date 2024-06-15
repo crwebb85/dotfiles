@@ -505,8 +505,22 @@ require('lazy').setup({
                             )
                             vim.api.nvim_feedkeys(escape_key, 'm', false) -- Set mode to normal mode
                         end,
-                        ['<C-b>'] = function(args)
-                            require('telescope.actions').delete_buffer(args)
+                        ['<C-b>'] = function(prompt_bufnr)
+                            --Using my bufdelete (modified version of famiu/bufdelete.nvim)
+                            --instead of require('telescope.actions').delete_buffer since this
+                            --version will preserve window layout and give me a prompt to save buffers
+                            local current_picker = require(
+                                'telescope.actions.state'
+                            ).get_current_picker(
+                                prompt_bufnr
+                            )
+                            current_picker:delete_selection(function(selection)
+                                local ok, result = pcall(
+                                    require('config.bufdelete').bufdelete,
+                                    selection.bufnr
+                                )
+                                return ok and result[selection.bufnr] == true
+                            end)
                         end,
                     },
                     n = {
