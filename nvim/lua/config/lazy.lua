@@ -803,6 +803,58 @@ require('lazy').setup({
                     backward = vim.diagnostic.goto_prev,
                     forward = vim.diagnostic.goto_next,
                 })
+                :function_pair({
+                    key = 'dh',
+                    backward = function()
+                        vim.diagnostic.goto_prev({
+                            severity = vim.diagnostic.severity.HINT,
+                        })
+                    end,
+                    forward = function()
+                        vim.diagnostic.goto_next({
+                            severity = vim.diagnostic.severity.HINT,
+                        })
+                    end,
+                })
+                :function_pair({
+                    key = 'de',
+                    backward = function()
+                        vim.diagnostic.goto_prev({
+                            severity = vim.diagnostic.severity.ERROR,
+                        })
+                    end,
+                    forward = function()
+                        vim.diagnostic.goto_next({
+                            severity = vim.diagnostic.severity.ERROR,
+                        })
+                    end,
+                })
+                :function_pair({
+                    key = 'di',
+                    backward = function()
+                        vim.diagnostic.goto_prev({
+                            severity = vim.diagnostic.severity.INFO,
+                        })
+                    end,
+                    forward = function()
+                        vim.diagnostic.goto_next({
+                            severity = vim.diagnostic.severity.INFO,
+                        })
+                    end,
+                })
+                :function_pair({
+                    key = 'dw',
+                    backward = function()
+                        vim.diagnostic.goto_prev({
+                            severity = vim.diagnostic.severity.WARN,
+                        })
+                    end,
+                    forward = function()
+                        vim.diagnostic.goto_next({
+                            severity = vim.diagnostic.severity.WARN,
+                        })
+                    end,
+                })
                 :unified_function({
                     key = 'f',
                     desc = 'jump to the {previous|next} file in the directory tree',
@@ -1005,7 +1057,9 @@ require('lazy').setup({
         'tris203/precognition.nvim',
         lazy = true,
         event = 'VeryLazy',
-        opts = {},
+        opts = {
+            startVisible = false,
+        },
     },
     -- Adds motions to wrap text in quotes/brackets/tags/etc
     -- using the same motions I use to yank text
