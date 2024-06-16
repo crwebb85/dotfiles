@@ -935,6 +935,7 @@ require('lazy').setup({
                                     cmd = 'cnewer'
                                 end
                             end
+                            ---@diagnostic disable-next-line: param-type-mismatch
                             local ok, err = pcall(vim.cmd, {
                                 cmd = cmd,
                                 count = vim.v.count1,
@@ -2451,7 +2452,6 @@ require('lazy').setup({
                         menu = {
                             buffer = '[buf]',
                             nvim_lsp = '[LSP]',
-                            nvim_lua = '[API]',
                             path = '[path]',
                             luasnip = '[snip]',
                             git = '[git]',
@@ -2481,6 +2481,10 @@ require('lazy').setup({
                     ['<CR>'] = cmp.mapping({
                         i = function(fallback)
                             if cmp.visible() and cmp.get_active_entry() then
+                                ---setting the undolevels creates a new undo break
+                                ---so by setting it to itself I can create an undo break
+                                ---without side effects just before a comfirming a completion
+                                vim.cmd([[let &g:undolevels = &g:undolevels]])
                                 cmp.confirm({
                                     behavior = cmp.ConfirmBehavior.Insert,
                                     select = false,
