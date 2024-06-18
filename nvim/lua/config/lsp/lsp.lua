@@ -110,7 +110,7 @@ local function default_keymaps(bufnr, client)
     })
     vim.keymap.set('n', 'gi', function() vim.lsp.buf.implementation() end, {
         buffer = bufnr,
-        desc = 'Lists all the implementations for the symbol under the cursor in the quickfix window.',
+        desc = 'LSP: Lists all the implementations for the symbol under the cursor in the quickfix window.',
     })
     vim.keymap.set('n', 'go', function() vim.lsp.buf.type_definition() end, {
         buffer = bufnr,

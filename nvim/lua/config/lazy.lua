@@ -703,12 +703,12 @@ require('lazy').setup({
                             )
                         end
                     end,
-                    desc = 'Open image preview',
+                    desc = 'Oil: Open image preview',
                     mode = 'n',
                 },
                 ['yp'] = {
                     -- from https://www.reddit.com/r/neovim/comments/1czp9zr/comment/l5hv900/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-                    desc = 'Copy filepath to system clipboard',
+                    desc = 'Oil: Copy filepath to system clipboard',
                     callback = function()
                         require('oil.actions').copy_entry_path.callback()
                         vim.fn.setreg('+', vim.fn.getreg(vim.v.register))
@@ -716,7 +716,7 @@ require('lazy').setup({
                 },
                 ['yP'] = {
                     -- from https://www.reddit.com/r/neovim/comments/1czp9zr/comment/l5ke7fv/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-                    desc = 'Copy relative filepath to system clipboard',
+                    desc = 'Oil: Copy relative filepath to system clipboard',
                     callback = function()
                         local entry = require('oil').get_cursor_entry()
                         local dir = require('oil').get_current_dir()
@@ -727,7 +727,7 @@ require('lazy').setup({
                     end,
                 },
                 ['<C-q>'] = {
-                    desc = 'Append file to quick fix list',
+                    desc = 'Oil: Append file to quick fix list',
                     callback = function()
                         local entry = require('oil').get_cursor_entry()
 
