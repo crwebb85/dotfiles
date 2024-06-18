@@ -1146,6 +1146,13 @@ require('lazy').setup({
             vim.o.timeout = true
             vim.o.timeoutlen = 300
         end,
+        opts = {
+            operators = {
+                gc = 'Comment: line comment',
+                gb = 'Comment: block comment',
+                ys = 'Surround: Add a surrounding pair',
+            },
+        },
         config = true,
     },
     {
