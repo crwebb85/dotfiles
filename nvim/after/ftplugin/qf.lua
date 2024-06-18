@@ -5,7 +5,7 @@ local qf_bufnr = vim.api.nvim_get_current_buf()
 local qf_win_id = vim.fn.win_getid()
 local qf_is_loc = vim.fn.getwininfo(qf_win_id)[1].loclist == 1
 
-vim.opt_local.spell = false
+vim.wo.spell = false
 
 -- local quickfix_preview_namespace = 0
 local quickfix_preview_namespace =

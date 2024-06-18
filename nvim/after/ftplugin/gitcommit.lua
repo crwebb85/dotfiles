@@ -1,5 +1,6 @@
 -- TODO try something like https://github.com/oschrenk/dotfiles/blob/8694fd3c81a951ec9e7563515c6400745c52be3d/home/private_dot_config/nvim/ftplugin/gitcommit.vim#L1C1-L18C13
-vim.opt_local.spell = true
+
+vim.wo.spell = true
 vim.cmd([[startinsert!]]) --Start in insert mode
 --[[  
 
