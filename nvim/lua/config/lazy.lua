@@ -252,26 +252,6 @@ require('lazy').setup({
                 function() require('gitsigns').preview_hunk() end,
                 desc = 'Gitsigns: Preview hunk',
             },
-            {
-                ']h',
-                require('config.utils').dot_repeat(function()
-                    if vim.wo.diff then return ']h' end
-                    vim.schedule(function() require('gitsigns').next_hunk() end)
-                    return '<Ignore>'
-                end),
-                desc = 'Gitsigns: Go to next hunk (dot repeatable)',
-                expr = true,
-            },
-            {
-                '[h',
-                require('config.utils').dot_repeat(function()
-                    if vim.wo.diff then return '[h' end
-                    vim.schedule(function() require('gitsigns').prev_hunk() end)
-                    return '<Ignore>'
-                end),
-                desc = 'Gitsigns: Go to previous hunk (dot repeatable)',
-                expr = true,
-            },
         },
     },
 
@@ -795,71 +775,99 @@ require('lazy').setup({
                     key = 'a',
                     backward = 'previous',
                     forward = 'next',
+                    desc = 'Custom: Run the "{previous|next}" command',
                 })
                 :command_pair({
                     key = 'A',
                     backward = 'first',
                     forward = 'last',
+                    desc = 'Custom: Run the "{first|last}" command',
                 })
                 :command_pair({
                     key = 'b',
                     backward = 'bprevious',
                     forward = 'bnext',
+                    desc = 'Custom: Run the "{bprevious|bnext}" command',
                 })
                 :command_pair({
                     key = 'B',
                     backward = 'bfirst',
                     forward = 'blast',
+                    desc = 'Custom: Run the "{bfirst|blast}" command',
                 })
                 :command_pair({
                     key = 'l',
                     backward = 'lprevious',
                     forward = 'lnext',
+                    desc = 'Custom: Run the "{lprevious|lnext}" command',
                 })
                 :command_pair({
                     key = 'L',
                     backward = 'lfirst',
                     forward = 'llast',
+                    desc = 'Custom: Run the "{lfirst|llast}" command',
                 })
                 :command_pair({
                     key = '<C-l>',
                     backward = 'lpfile',
                     forward = 'lnfile',
+                    desc = 'Custom: Run the "{lpfile|lnfile}" command',
                 })
                 :command_pair({
                     key = 'q',
                     backward = 'cprevious',
                     forward = 'cnext',
+                    desc = 'Custom: Run the "{cprevious|cnext}" command',
                 })
                 :command_pair({
                     key = 'Q',
                     backward = 'cfirst',
                     forward = 'clast',
+                    desc = 'Custom: Run the "{cfirst|clast}" command',
                 })
                 :command_pair({
                     key = '<C-q>',
                     backward = 'cpfile',
                     forward = 'cnfile',
+                    desc = 'Custom: Run the "{cpfile|cnfile}" command',
                 })
                 :command_pair({
                     key = 't',
                     backward = 'tprevious',
                     forward = 'tnext',
+                    desc = 'Custom: Run the "{tprevious|tnext}" command',
                 })
                 :command_pair({
                     key = 'T',
                     backward = 'tfirst',
                     forward = 'tlast',
+                    desc = 'Custom: Run the "{tfirst|tlast}" command',
                 })
                 :command_pair({
                     key = '<C-t>',
                     backward = 'ptprevious',
                     forward = 'ptnext',
+                    desc = 'Custom: Run the "{ptprevious|ptnext}" command',
                 })
                 :function_pair({
-                    key = 'd',
+                    key = 'h',
+                    backward = function()
+                        vim.schedule(
+                            function() require('gitsigns').previous_hunk() end
+                        )
+                    end,
+                    forward = function()
+                        vim.schedule(
+                            function() require('gitsigns').next_hunk() end
+                        )
+                    end,
+                    desc = 'Gitsigns: jump to the {previous|next} git hunk',
+                })
+                :function_pair({
+                    key = 'dd',
                     backward = vim.diagnostic.goto_prev,
                     forward = vim.diagnostic.goto_next,
+                    desc = 'Custom: jump to the {previous|next} diagnostic',
                 })
                 :function_pair({
                     key = 'dh',
@@ -873,6 +881,7 @@ require('lazy').setup({
                             severity = vim.diagnostic.severity.HINT,
                         })
                     end,
+                    desc = 'Custom: jump to the {previous|next} diagnostic hint',
                 })
                 :function_pair({
                     key = 'de',
@@ -886,6 +895,7 @@ require('lazy').setup({
                             severity = vim.diagnostic.severity.ERROR,
                         })
                     end,
+                    desc = 'Custom: jump to the {previous|next} diagnostic error',
                 })
                 :function_pair({
                     key = 'di',
@@ -899,6 +909,7 @@ require('lazy').setup({
                             severity = vim.diagnostic.severity.INFO,
                         })
                     end,
+                    desc = 'Custom: jump to the {previous|next} diagnostic info',
                 })
                 :function_pair({
                     key = 'dw',
@@ -912,10 +923,11 @@ require('lazy').setup({
                             severity = vim.diagnostic.severity.WARN,
                         })
                     end,
+                    desc = 'Custom: jump to the {previous|next} diagnostic error',
                 })
                 :unified_function({
                     key = 'f',
-                    desc = 'jump to the {previous|next} file in the directory tree',
+                    desc = 'Custom: jump to the {previous|next} file in the directory tree',
                     fun = function(direction)
                         local win_info = vim.fn.getwininfo(
                             vim.api.nvim_get_current_win()
@@ -959,10 +971,10 @@ require('lazy').setup({
                 })
                 :jump_in_buf({
                     key = 'n',
-                    desc = 'jump to the {previous|next} SCM conflict marker or diff/path hunk',
+                    desc = 'Custom: jump to the {previous|next} SCM conflict marker or diff/path hunk',
                     extreme = {
                         key = 'N',
-                        desc = 'jump to the {first|last} SCM conflict marker or diff/path hunk',
+                        desc = 'Custom: jump to the {first|last} SCM conflict marker or diff/path hunk',
                     },
                     fun = require('impairative.helpers').conflict_marker_locations,
                 })
@@ -976,7 +988,7 @@ require('lazy').setup({
                     key = '',
                     backward = myoperations.repeat_backward_callback,
                     forward = myoperations.repeat_forward_callback,
-                    desc = 'Repeat {forward|backward}',
+                    desc = 'Custom: Repeat my last {forward|backward} keymap for navigating lists',
                 })
             impairative
                 .operations({
@@ -985,7 +997,7 @@ require('lazy').setup({
                 })
                 :unified_function({
                     key = '<Space>',
-                    desc = 'add blank line(s) {above|below} the current line',
+                    desc = 'Custom: add blank line(s) {above|below} the current line',
                     fun = function(direction)
                         local line_number = vim.api.nvim_win_get_cursor(0)[1]
                         if direction == 'backward' then
@@ -1004,7 +1016,7 @@ require('lazy').setup({
                 :range_manipulation({
                     key = 'e',
                     line_key = true,
-                    desc = 'exchange the line(s) with [count] lines {above|below} it',
+                    desc = 'Custom: exchange the line(s) with [count] lines {above|below} it',
                     fun = function(args)
                         local target
                         if args.direction == 'backward' then
@@ -1022,36 +1034,36 @@ require('lazy').setup({
                 :text_manipulation({
                     key = 'u',
                     line_key = true,
-                    desc = '{encode|decode} URL',
+                    desc = 'Custom: {encode|decode} URL',
                     backward = require('impairative.helpers').encode_url,
                     forward = require('impairative.helpers').decode_url,
                 })
                 :text_manipulation({
                     key = 'x',
                     line_key = true,
-                    desc = '{encode|decode} XML',
+                    desc = 'Custom: {encode|decode} XML',
                     backward = require('impairative.helpers').encode_xml,
                     forward = require('impairative.helpers').decode_xml,
                 })
                 :text_manipulation({
                     key = 'y',
                     line_key = true,
-                    desc = '{escape|unescape} strings (C escape rules)',
+                    desc = 'Custom: {escape|unescape} strings (C escape rules)',
                     backward = require('impairative.helpers').encode_string,
                     forward = require('impairative.helpers').decode_string,
                 })
                 :text_manipulation({
                     key = 'C',
                     line_key = true,
-                    desc = '{escape|unescape} strings (C escape rules)',
+                    desc = 'Custom: {escape|unescape} strings (C escape rules)',
                     backward = require('impairative.helpers').encode_string,
                     forward = require('impairative.helpers').decode_string,
                 })
                 :function_pair({
-                    key = 'ts',
+                    key = 'j',
+                    desc = 'Custom: {Join|Split} treesiter nodes',
                     backward = function() require('treesj').join() end,
                     forward = function() require('treesj').split() end,
-                    desc = 'Repeat {forward|backward}',
                 })
         end,
     },
