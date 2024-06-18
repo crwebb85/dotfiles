@@ -110,7 +110,7 @@ require('lazy').setup({
         'tpope/vim-fugitive',
         version = '*',
         lazy = true,
-        event = 'VeryLazy',
+        cmd = { 'Git' },
     },
     -- Adds git diffview
     {
@@ -219,7 +219,7 @@ require('lazy').setup({
     {
         'lewis6991/gitsigns.nvim',
         lazy = true,
-        event = 'VeryLazy',
+        event = 'BufReadPre',
         opts = {
             -- Disable trouble plugin for :Gitsigns setqflist and :Gitsigns setloclist
             trouble = false,
@@ -763,7 +763,7 @@ require('lazy').setup({
         branch = 'add-callbacks',
         -- dev = true,
         lazy = true,
-        event = 'VeryLazy',
+        event = 'BufReadPre',
         config = function(_, _)
             local impairative = require('impairative')
             local myoperations = impairative
@@ -1151,7 +1151,7 @@ require('lazy').setup({
     {
         'tris203/precognition.nvim',
         lazy = true,
-        event = 'VeryLazy',
+        cmd = { 'Precognition' },
         opts = {
             startVisible = false,
         },
@@ -1161,124 +1161,124 @@ require('lazy').setup({
     {
         'kylechui/nvim-surround',
         lazy = true,
-        event = 'VeryLazy',
+        event = 'BufReadPre',
         config = function(_, opts)
             require('nvim-surround').setup(opts)
-            -- Based on https://www.reddit.com/r/neovim/comments/1d0ynca/whichkey_mappings_for_nvimsurround/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-            -- Add surround keymaps to whichkey
-            local root_key = 'S'
-            local grammar_targets = {
-                ['['] = '',
-                [']'] = '',
-                ['('] = '',
-                [')'] = '',
-                ['{'] = '',
-                ['}'] = '',
-                ['<'] = '',
-                ['>'] = '',
-                ['`'] = '',
-                ["'"] = '',
-                ['"'] = '',
-            }
-            local abbreviated_targets = {
-                ['b'] = ' [bracket]',
-            }
-            local keywords_targets = {
-                ['w'] = ' [word]',
-                ['W'] = ' [WORD]',
-                ['f'] = ' [function]',
-                ['q'] = ' [quote]',
-            }
-
-            local all_targets = {}
-            all_targets = vim.tbl_extend(
-                'error',
-                all_targets,
-                grammar_targets,
-                abbreviated_targets,
-                keywords_targets
-            )
-
-            local abbreviated_and_grammar_targets = {}
-            abbreviated_and_grammar_targets = vim.tbl_extend(
-                'error',
-                abbreviated_and_grammar_targets,
-                grammar_targets,
-                abbreviated_targets
-            )
-
-            local mappings = {
-                ['<leader>'] = {
-                    [root_key] = { name = '+[surround]' },
-                },
-            }
-
-            -- around mappings
-            mappings['<leader>'][root_key]['a'] = { name = '+[around]' }
-            for char, desc in pairs(all_targets) do
-                mappings['<leader>'][root_key]['a'][char] = { name = desc }
-                for ichar, target in pairs(abbreviated_and_grammar_targets) do
-                    mappings['<leader>'][root_key]['a'][char][ichar] = {
-                        '<CMD>call feedkeys("ysa\\'
-                            .. char
-                            .. '\\'
-                            .. ichar
-                            .. '")<CR>',
-                        'ysa' .. char .. ichar .. target,
-                    }
-                end
-            end
-
-            -- inner mappings
-            mappings['<leader>'][root_key]['i'] = { name = '+[inner]' }
-            for char, desc in pairs(all_targets) do
-                mappings['<leader>'][root_key]['i'][char] = { name = desc }
-                for ichar, target in pairs(all_targets) do
-                    mappings['<leader>'][root_key]['i'][char][ichar] = {
-                        '<CMD>call feedkeys("ysi\\'
-                            .. char
-                            .. '\\'
-                            .. ichar
-                            .. '")<CR>',
-                        'ysi' .. char .. ichar .. target,
-                    }
-                end
-            end
-
-            -- change mappings
-            mappings['<leader>'][root_key]['c'] = { name = '+[change]' }
-            for char, desc in pairs(all_targets) do
-                mappings['<leader>'][root_key]['c'][char] = { name = desc }
-                for ichar, target in pairs(all_targets) do
-                    mappings['<leader>'][root_key]['c'][char][ichar] = {
-                        '<CMD>call feedkeys("cs\\'
-                            .. char
-                            .. '\\'
-                            .. ichar
-                            .. '")<CR>',
-                        'cs' .. char .. ichar .. target,
-                    }
-                end
-            end
-
-            -- delete mappings
-            mappings['<leader>'][root_key]['d'] = { name = '+[delete]' }
-            for char, target in pairs(all_targets) do
-                mappings['<leader>'][root_key]['d'][char] = {
-                    '<CMD>call feedkeys("ds\\' .. char .. '")<CR>',
-                    'ds' .. char .. target,
-                }
-            end
-
-            -- line mappings
-            mappings['<leader>'][root_key]['s'] = { name = '+[line]' }
-            for char, target in pairs(all_targets) do
-                mappings['<leader>'][root_key]['s'][char] = {
-                    '<CMD>call feedkeys("yss\\' .. char .. '")<CR>',
-                    'yss' .. char .. target,
-                }
-            end
-            require('which-key').register(mappings)
+            -- -- Based on https://www.reddit.com/r/neovim/comments/1d0ynca/whichkey_mappings_for_nvimsurround/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+            -- -- Add surround keymaps to whichkey
+            -- local root_key = 'S'
+            -- local grammar_targets = {
+            --     ['['] = '',
+            --     [']'] = '',
+            --     ['('] = '',
+            --     [')'] = '',
+            --     ['{'] = '',
+            --     ['}'] = '',
+            --     ['<'] = '',
+            --     ['>'] = '',
+            --     ['`'] = '',
+            --     ["'"] = '',
+            --     ['"'] = '',
+            -- }
+            -- local abbreviated_targets = {
+            --     ['b'] = ' [bracket]',
+            -- }
+            -- local keywords_targets = {
+            --     ['w'] = ' [word]',
+            --     ['W'] = ' [WORD]',
+            --     ['f'] = ' [function]',
+            --     ['q'] = ' [quote]',
+            -- }
+            --
+            -- local all_targets = {}
+            -- all_targets = vim.tbl_extend(
+            --     'error',
+            --     all_targets,
+            --     grammar_targets,
+            --     abbreviated_targets,
+            --     keywords_targets
+            -- )
+            --
+            -- local abbreviated_and_grammar_targets = {}
+            -- abbreviated_and_grammar_targets = vim.tbl_extend(
+            --     'error',
+            --     abbreviated_and_grammar_targets,
+            --     grammar_targets,
+            --     abbreviated_targets
+            -- )
+            --
+            -- local mappings = {
+            --     ['<leader>'] = {
+            --         [root_key] = { name = '+[surround]' },
+            --     },
+            -- }
+            --
+            -- -- around mappings
+            -- mappings['<leader>'][root_key]['a'] = { name = '+[around]' }
+            -- for char, desc in pairs(all_targets) do
+            --     mappings['<leader>'][root_key]['a'][char] = { name = desc }
+            --     for ichar, target in pairs(abbreviated_and_grammar_targets) do
+            --         mappings['<leader>'][root_key]['a'][char][ichar] = {
+            --             '<CMD>call feedkeys("ysa\\'
+            --                 .. char
+            --                 .. '\\'
+            --                 .. ichar
+            --                 .. '")<CR>',
+            --             'ysa' .. char .. ichar .. target,
+            --         }
+            --     end
+            -- end
+            --
+            -- -- inner mappings
+            -- mappings['<leader>'][root_key]['i'] = { name = '+[inner]' }
+            -- for char, desc in pairs(all_targets) do
+            --     mappings['<leader>'][root_key]['i'][char] = { name = desc }
+            --     for ichar, target in pairs(all_targets) do
+            --         mappings['<leader>'][root_key]['i'][char][ichar] = {
+            --             '<CMD>call feedkeys("ysi\\'
+            --                 .. char
+            --                 .. '\\'
+            --                 .. ichar
+            --                 .. '")<CR>',
+            --             'ysi' .. char .. ichar .. target,
+            --         }
+            --     end
+            -- end
+            --
+            -- -- change mappings
+            -- mappings['<leader>'][root_key]['c'] = { name = '+[change]' }
+            -- for char, desc in pairs(all_targets) do
+            --     mappings['<leader>'][root_key]['c'][char] = { name = desc }
+            --     for ichar, target in pairs(all_targets) do
+            --         mappings['<leader>'][root_key]['c'][char][ichar] = {
+            --             '<CMD>call feedkeys("cs\\'
+            --                 .. char
+            --                 .. '\\'
+            --                 .. ichar
+            --                 .. '")<CR>',
+            --             'cs' .. char .. ichar .. target,
+            --         }
+            --     end
+            -- end
+            --
+            -- -- delete mappings
+            -- mappings['<leader>'][root_key]['d'] = { name = '+[delete]' }
+            -- for char, target in pairs(all_targets) do
+            --     mappings['<leader>'][root_key]['d'][char] = {
+            --         '<CMD>call feedkeys("ds\\' .. char .. '")<CR>',
+            --         'ds' .. char .. target,
+            --     }
+            -- end
+            --
+            -- -- line mappings
+            -- mappings['<leader>'][root_key]['s'] = { name = '+[line]' }
+            -- for char, target in pairs(all_targets) do
+            --     mappings['<leader>'][root_key]['s'][char] = {
+            --         '<CMD>call feedkeys("yss\\' .. char .. '")<CR>',
+            --         'yss' .. char .. target,
+            --     }
+            -- end
+            -- require('which-key').register(mappings)
         end,
     },
 
@@ -1340,7 +1340,7 @@ require('lazy').setup({
             'nvim-lua/plenary.nvim',
         },
         lazy = true,
-        event = 'VeryLazy',
+        cmd = { 'Spectre' },
         opts = {},
         config = true,
         keys = {
@@ -1382,7 +1382,6 @@ require('lazy').setup({
             'MarkdownPreview',
             'MarkdownPreviewStop',
         },
-        ft = { 'markdown' },
         build = function() vim.fn['mkdp#util#install']() end,
         lazy = true,
     },
@@ -1559,6 +1558,7 @@ require('lazy').setup({
     -- Clipboard support (copy from vim to the outside world)
     {
         'ojroques/nvim-osc52',
+        event = 'BufReadPre',
     },
 
     {
@@ -1731,7 +1731,7 @@ require('lazy').setup({
             },
         },
         lazy = true,
-        event = 'VeryLazy',
+        cmd = 'Neotest',
         keys = {
             {
                 '<leader>tr',
@@ -2885,7 +2885,7 @@ require('lazy').setup({
     {
         'crwebb85/mark-code-action.nvim',
         lazy = true,
-        event = 'VeryLazy',
+        event = 'BufReadPre',
         opts = {
 
             marks = {
@@ -2912,7 +2912,21 @@ require('lazy').setup({
     { -- The task runner we use
         'stevearc/overseer.nvim',
         lazy = true,
-        event = 'VeryLazy',
+        cmd = {
+            'OverseerOpen',
+            'OverseerClose',
+            'OverseerToggle',
+            'OverseerSaveBundle',
+            'OverseerLoadBundle',
+            'OverseerDeleteBundle',
+            'OverseerRunCmd',
+            'OverseerRun',
+            'OverseerInfo',
+            'OverseerBuild',
+            'OverseerQuickAction',
+            'OverseerTaskAction',
+            'OverseerClearCache',
+        },
         opts = {
             task_list = {
                 direction = 'bottom',
