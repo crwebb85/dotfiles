@@ -15,7 +15,7 @@ function M.getBufferViewPath(viewNumber)
     path = vim.fn.substitute(path, '/', '=+', 'g') or ''
     path = path .. '='
     -- view directory
-    path = vim.opt.viewdir:get() .. path
+    path = vim.go.viewdir .. path
     if type(viewNumber) == 'number' and 0 < viewNumber and viewNumber <= 9 then
         path = path .. viewNumber .. '.vim'
     end

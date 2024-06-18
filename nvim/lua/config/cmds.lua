@@ -21,14 +21,14 @@ vim.api.nvim_create_user_command(
 -- Create a new scratch buffer to the right
 vim.api.nvim_create_user_command('Scratch', function()
     local old_splitright_value = vim.go.splitright
-    vim.opt.splitright = true
+    vim.go.splitright = true
     vim.cmd([[
             execute 'vsplit | enew'
             setlocal buftype=nofile
             setlocal bufhidden=hide
             setlocal noswapfile
         ]])
-    vim.opt.splitright = old_splitright_value
+    vim.go.splitright = old_splitright_value
 end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
 
 -- Create a new scratch buffer to the left that will push my working window
@@ -37,7 +37,7 @@ end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
 vim.api.nvim_create_user_command('CenterWindow', function()
     --TODO maybe add a toggle
     local old_splitright_value = vim.go.splitright
-    vim.opt.splitright = false
+    vim.go.splitright = false
     local leftpad_size = 36
     local main_win = vim.api.nvim_get_current_win()
     local leftpad_buf_name = 'leftpad'
@@ -55,7 +55,7 @@ vim.api.nvim_create_user_command('CenterWindow', function()
     vim.bo[leftpad_bufnr].swapfile = false
     vim.api.nvim_set_current_win(main_win)
 
-    vim.opt.splitright = old_splitright_value
+    vim.go.splitright = old_splitright_value
 end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
 
 -------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ end, {
 
 vim.api.nvim_create_user_command('Messages', function()
     local old_splitright_value = vim.go.splitright
-    vim.opt.splitright = true
+    vim.go.splitright = true
     vim.cmd([[
 		    " open new tab, set options to prevent save prompt when closing
             execute 'vsplit | enew'
@@ -97,7 +97,7 @@ vim.api.nvim_create_user_command('Messages', function()
             setlocal noswapfile 
             execute ":put =execute(':messages')"
 	    ]])
-    vim.opt.splitright = old_splitright_value
+    vim.go.splitright = old_splitright_value
 
     vim.print('Refresh message buffer with "<leader>R"')
     vim.keymap.set(
@@ -133,7 +133,7 @@ vim.api.nvim_create_user_command('CompareClipboard', function()
 end, { nargs = 0, desc = 'Compares buffer file with clipboard contents' })
 
 vim.api.nvim_create_user_command('CompareClipboardSelection', function()
-    local file_type = vim.opt_local.filetype
+    local file_type = vim.bo.filetype
     local selection_text = require('utils.misc').get_visual_selection(0)
     vim.cmd([[
 		" open new tab, set options to prevent save prompt when closing
@@ -142,7 +142,7 @@ vim.api.nvim_create_user_command('CompareClipboardSelection', function()
         setlocal bufhidden=hide
         setlocal noswapfile
     ]])
-    vim.opt_local.filetype = file_type -- setfile type of first buffer
+    vim.bo.filetype = file_type -- setfile type of first buffer
     vim.api.nvim_buf_set_lines(0, 0, 1, true, selection_text)
 
     vim.cmd([[
@@ -154,7 +154,7 @@ vim.api.nvim_create_user_command('CompareClipboardSelection', function()
          
 	]])
 
-    vim.opt_local.filetype = file_type -- set filetype of second buffer
+    vim.bo.filetype = file_type -- set filetype of second buffer
 
     vim.cmd([[
 		normal! VP

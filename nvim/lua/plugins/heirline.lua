@@ -680,7 +680,7 @@ local config = function()
             end,
         },
     })
-    vim.opt.winbar = "%{%v:lua.require'heirline'.eval_winbar()%}"
+    vim.o.winbar = "%{%v:lua.require'heirline'.eval_winbar()%}"
 end
 
 return {

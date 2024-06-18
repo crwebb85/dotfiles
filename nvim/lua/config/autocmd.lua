@@ -176,9 +176,9 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
 vim.api.nvim_create_autocmd('FocusGained', {
     pattern = '*',
     callback = function(_)
-        vim.opt.cursorline = true
+        vim.wo.cursorline = true
         vim.cmd('redraw')
-        vim.defer_fn(function() vim.opt.cursorline = false end, 600)
+        vim.defer_fn(function() vim.wo.cursorline = true end, 600)
     end,
     group = vim.api.nvim_create_augroup(
         'draw_temp_cursor_line',
