@@ -2265,35 +2265,35 @@ require('lazy').setup({
     -- },
 
     -- Configure Lua LSP to know about neovim plugins when in neovim config (neodev is in end of life)
-    {
-        'folke/neodev.nvim',
-        lazy = true, -- Will lazy load before lspconfig since I marked it as a dependency
-        config = function()
-            require('neodev').setup({
-                setup_jsonls = false, -- I will do this manually in my lspconfig setup
-                -- -- Workaround to get correctly configure lua_ls for neovim config
-                -- -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
-                -- override = function(_, library)
-                --     library.enabled = true
-                --     library.plugins = true
-                -- end,
-            })
-        end,
-    },
     -- {
-    --     'folke/lazydev.nvim',
-    --     ft = 'lua', -- only load on lua files
-    --     opts = {
-    --         library = {
-    --             -- Library items can be absolute paths
-    --             -- "~/projects/my-awesome-lib",
-    --             -- Or relative, which means they will be resolved as a plugin
-    --             -- "LazyVim",
-    --             -- When relative, you can also provide a path to the library in the plugin dir
-    --             -- 'luvit-meta/library', -- see below
-    --         },
-    --     },
+    --     'folke/neodev.nvim',
+    --     lazy = true, -- Will lazy load before lspconfig since I marked it as a dependency
+    --     config = function()
+    --         require('neodev').setup({
+    --             setup_jsonls = false, -- I will do this manually in my lspconfig setup
+    --             -- -- Workaround to get correctly configure lua_ls for neovim config
+    --             -- -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
+    --             -- override = function(_, library)
+    --             --     library.enabled = true
+    --             --     library.plugins = true
+    --             -- end,
+    --         })
+    --     end,
     -- },
+    {
+        'folke/lazydev.nvim',
+        ft = 'lua', -- only load on lua files
+        opts = {
+            library = {
+                { path = 'wezterm-types', mods = { 'wezterm' } },
+                -- See the configuration section for more details
+                -- Load luvit types when the `vim.uv` word is found
+                { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+            },
+        },
+    },
+    { 'Bilal2453/luvit-meta', lazy = true }, -- optional `vim.uv` lua typings
+    { 'justinsgithub/wezterm-types', lazy = true }, -- optional wezterm lua types
     -- Helps configure which json and yaml schemas to use for the corresponding lsp
     -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
     -- Catalog of kubernetes schemas: https://github.com/datreeio/CRDs-catalog/tree/main
