@@ -2820,6 +2820,12 @@ require('lazy').setup({
         end,
     },
 
+    -- LSP client extensions
+    {
+        'Hoffs/omnisharp-extended-lsp.nvim',
+        lazy = true,
+    },
+
     -- Formatting client: conform.nvim
     -- - configured to use black & isort in python
     -- - use the taplo-LSP for formatting in toml

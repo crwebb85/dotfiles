@@ -100,7 +100,14 @@ local function default_keymaps(bufnr, client)
         buffer = bufnr,
         desc = [[LSP: Displays hover information about the symbol under the cursor in a floating window. Calling the function twice will jump into the floating window.]],
     })
-    vim.keymap.set('n', 'gd', function() vim.lsp.buf.definition() end, {
+    vim.keymap.set('n', 'gd', function()
+        if vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_definition()
+        else
+            vim.lsp.buf.definition()
+        end
+    end, {
         buffer = bufnr,
         desc = 'LSP: Jumps to the definition of the symbol under the cursor.',
     })
@@ -108,15 +115,36 @@ local function default_keymaps(bufnr, client)
         buffer = bufnr,
         desc = 'LSP: Jumps to the declaration of the symbol under the cursor.',
     })
-    vim.keymap.set('n', 'gi', function() vim.lsp.buf.implementation() end, {
+    vim.keymap.set('n', 'gi', function()
+        if vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_implementation()
+        else
+            vim.lsp.buf.implementation()
+        end
+    end, {
         buffer = bufnr,
         desc = 'LSP: Lists all the implementations for the symbol under the cursor in the quickfix window.',
     })
-    vim.keymap.set('n', 'go', function() vim.lsp.buf.type_definition() end, {
+    vim.keymap.set('n', 'go', function()
+        if vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_type_definition()
+        else
+            vim.lsp.buf.type_definition()
+        end
+    end, {
         buffer = bufnr,
         desc = 'LSP: Jumps to the definition of the type of the symbol under the cursor.',
     })
-    vim.keymap.set('n', 'gr', function() vim.lsp.buf.references() end, {
+    vim.keymap.set('n', 'gr', function()
+        if vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_references()
+        else
+            vim.lsp.buf.references()
+        end
+    end, {
         buffer = bufnr,
         desc = 'LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
     })
