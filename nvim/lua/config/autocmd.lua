@@ -178,7 +178,7 @@ vim.api.nvim_create_autocmd('FocusGained', {
     callback = function(_)
         vim.wo.cursorline = true
         vim.cmd('redraw')
-        vim.defer_fn(function() vim.wo.cursorline = true end, 600)
+        vim.defer_fn(function() vim.wo.cursorline = false end, 600)
     end,
     group = vim.api.nvim_create_augroup(
         'draw_temp_cursor_line',
