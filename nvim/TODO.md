@@ -86,13 +86,8 @@
 
 - `:h dap-launch.json`
 - https://editorconfig.org/ support for neovim
-- [cmp sources](https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources)
-- [nvim-dap extensions](https://github.com/mfussenegger/nvim-dap/wiki/Extensions)
-- [nvim-dap cookbook](https://github.com/mfussenegger/nvim-dap/wiki/Cookbook)
 - [lua async tutorial](https://github.com/ms-jpq/lua-async-await)
 - [git message guide](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
-- jsonc filetype (`vim.filetype.add({ pattern = { ["appsettings.*.json"] = "jsonc" }, })`)
-- `:h vim.filetyp.add()`
 - `:h skeleton` - for info about file templates
 - `:h win_gettype()`
 
@@ -108,16 +103,13 @@
 - [Quick fix list and diagnostics discussion](https://www.reddit.com/r/neovim/comments/187pdop/comment/kbgdm0y/?utm_medium=android_app&utm_source=share&context=3)
 - [Spell check](https://www.reddit.com/r/neovim/comments/18id6uu/how_to_get_riddisable_spellcheck_lines_not_from/?utm_medium=android_app&utm_source=share)
 - [Spell check discussion](https://www.reddit.com/r/neovim/comments/185wem5/comment/kb46r3g/?utm_medium=android_app&utm_source=share&context=3)
-- [Keymap remapping trick](https://www.reddit.com/r/neovim/comments/18ieoqq/comment/kdcta80/?utm_medium=android_app&utm_source=share&context=3)
 - [Setup linting video](https://www.youtube.com/watch?v=ybUE4D80XSk)
 - [Setup Linting article](https://www.josean.com/posts/neovim-linting-and-formatting)
-- [Undo in insert mode](https://vi.stackexchange.com/questions/4556/undo-in-insert-mode)
 - [Java setup discussion](https://www.reddit.com/r/neovim/comments/18hfkh2/nvimjava_brand_new_plugin_for_java_development/?utm_medium=android_app&utm_source=share)
 - [Java setup discussion](https://www.reddit.com/r/neovim/comments/18g2jgr/having_the_worst_time_trying_to_use_jdtls/)
 - [Java setup discussion](https://www.reddit.com/r/neovim/comments/18bmpfd/java_lombok_plugin/?utm_medium=android_app&utm_source=share)
 - [Java setup article](https://medium.com/@chrisatmachine/lunarvim-as-a-java-ide-da65c4a77fb4)
 - [Maven cli generate project command](https://www.reddit.com/r/neovim/comments/18kwpuv/comment/kdv5d29/?utm_source=share&utm_medium=web2x&context=3)
-- [JSON schemas](https://www.arthurkoziel.com/json-schemas-in-neovim/)
 - [Discussion of editting visual selection within temp buffer](https://www.reddit.com/r/neovim/comments/18dhi3g/looking_for_a_plugin_to_do_markdown_hoisting/?utm_source=share&utm_medium=web2x&context=3)
 - [Understanding Neovim Playlist](https://www.youtube.com/watch?v=87AXw9Quy9U&list=PLx2ksyallYzW4WNYHD9xOFrPRYGlntAft)
 - [Explanation for wierd lsp error](https://www.reddit.com/r/neovim/comments/18cb9d8/comment/kc9lre2/?utm_medium=android_app&utm_source=share&context=3)

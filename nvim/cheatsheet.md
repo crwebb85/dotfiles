@@ -210,6 +210,10 @@ I solved it by trying:
 Those commands failed for some reason but the error message told me the file path they
 were downloaded at and I manually deleted them and it fixed the problem
 
+# Articles/Posts
+
+- [Undo in insert mode](https://vi.stackexchange.com/questions/4556/undo-in-insert-mode)
+
 # Code snippets
 
 Popup window snippet (base on plenary.nvim) would need to do some work to make this work well

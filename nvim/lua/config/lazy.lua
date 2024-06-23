@@ -864,20 +864,36 @@ require('lazy').setup({
                     desc = 'Gitsigns: jump to the {previous|next} git hunk',
                 })
                 :function_pair({
-                    key = 'dd',
-                    backward = vim.diagnostic.goto_prev,
-                    forward = vim.diagnostic.goto_next,
-                    desc = 'Custom: jump to the {previous|next} diagnostic',
+                    key = 'd',
+                    backward = function()
+                        vim.diagnostic.jump({ count = -vim.v.count1 })
+                    end,
+                    forward = function()
+                        vim.diagnostic.jump({ count = vim.v.count1 })
+                    end,
+                    desc = 'Custom Remap: jump to the {previous|next} diagnostic',
+                })
+                :function_pair({
+                    key = 'D',
+                    backward = function()
+                        vim.diagnostic.jump({ count = -math.huge, wrap = false })
+                    end,
+                    forward = function()
+                        vim.diagnostic.jump({ count = math.huge, wrap = false })
+                    end,
+                    desc = 'Custom Remap: jump to the {first|next} diagnostic',
                 })
                 :function_pair({
                     key = 'dh',
                     backward = function()
-                        vim.diagnostic.goto_prev({
+                        vim.diagnostic.jump({
+                            count = -vim.v.count1,
                             severity = vim.diagnostic.severity.HINT,
                         })
                     end,
                     forward = function()
-                        vim.diagnostic.goto_next({
+                        vim.diagnostic.jump({
+                            count = vim.v.count1,
                             severity = vim.diagnostic.severity.HINT,
                         })
                     end,
@@ -886,12 +902,14 @@ require('lazy').setup({
                 :function_pair({
                     key = 'de',
                     backward = function()
-                        vim.diagnostic.goto_prev({
+                        vim.diagnostic.jump({
+                            count = -vim.v.count1,
                             severity = vim.diagnostic.severity.ERROR,
                         })
                     end,
                     forward = function()
-                        vim.diagnostic.goto_next({
+                        vim.diagnostic.jump({
+                            count = vim.v.count1,
                             severity = vim.diagnostic.severity.ERROR,
                         })
                     end,
@@ -900,12 +918,14 @@ require('lazy').setup({
                 :function_pair({
                     key = 'di',
                     backward = function()
-                        vim.diagnostic.goto_prev({
+                        vim.diagnostic.jump({
+                            count = -vim.v.count1,
                             severity = vim.diagnostic.severity.INFO,
                         })
                     end,
                     forward = function()
-                        vim.diagnostic.goto_next({
+                        vim.diagnostic.jump({
+                            count = vim.v.count1,
                             severity = vim.diagnostic.severity.INFO,
                         })
                     end,
@@ -914,12 +934,14 @@ require('lazy').setup({
                 :function_pair({
                     key = 'dw',
                     backward = function()
-                        vim.diagnostic.goto_prev({
+                        vim.diagnostic.jump({
+                            count = -vim.v.count1,
                             severity = vim.diagnostic.severity.WARN,
                         })
                     end,
                     forward = function()
-                        vim.diagnostic.goto_next({
+                        vim.diagnostic.jump({
+                            count = vim.v.count1,
                             severity = vim.diagnostic.severity.WARN,
                         })
                     end,

@@ -137,7 +137,8 @@ local function default_keymaps(bufnr, client)
         buffer = bufnr,
         desc = 'LSP: Jumps to the definition of the type of the symbol under the cursor.',
     })
-    vim.keymap.set('n', 'gr', function()
+
+    vim.keymap.set('n', 'grr', function()
         if vim.bo.filetype == 'cs' then
             --I should probably be checking for if client is omnisharp but this is good enough
             require('omnisharp_extended').lsp_references()
@@ -146,12 +147,20 @@ local function default_keymaps(bufnr, client)
         end
     end, {
         buffer = bufnr,
-        desc = 'LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
+        desc = 'Remap LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
     })
+
     vim.keymap.set('n', 'gs', function() vim.lsp.buf.signature_help() end, {
         buffer = bufnr,
         desc = 'LSP: Displays signature information about the symbol under the cursor in a floating window.',
     })
+    vim.keymap.set('i', '<C-S>', function() vim.lsp.buf.signature_help() end, {
+        --TODO think I like this better than cmp signature_help
+        buffer = bufnr,
+        desc = 'Remap LSP: Displays signature information about the symbol under the cursor in a floating window.',
+    })
+
+    --- Rename keymaps
     vim.keymap.set('n', '<F2>', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.renamer').rename()
@@ -162,36 +171,36 @@ local function default_keymaps(bufnr, client)
         buffer = bufnr,
         desc = 'LSP: Renames all references to the symbol under the cursor.',
     })
-    vim.keymap.set('n', '<F4>', function() vim.lsp.buf.code_action() end, {
+
+    vim.keymap.set('n', 'grn', function()
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.renamer').rename()
+        else
+            vim.lsp.buf.rename()
+        end
+    end, {
         buffer = bufnr,
-        desc = 'LSP: Selects a code action available at the current cursor position.',
+        desc = 'Remap LSP: Renames all references to the symbol under the cursor.',
     })
 
-    if vim.lsp.buf.range_code_action then
-        vim.keymap.set(
-            'x',
-            '<F4>',
-            function() vim.lsp.buf.range_code_action() end,
-            {
-                buffer = bufnr,
-                desc = 'LSP: Selects a code action available for the current range selection.',
-            }
-        )
-    else
-        vim.keymap.set('x', '<F4>', function() vim.lsp.buf.code_action() end, {
-            buffer = bufnr,
-            desc = 'LSP: Selects a code action available at the current cursor position.',
-        })
-    end
-
+    ---Code Action keymaps
     vim.keymap.set(
-        'n',
-        '<leader>vca',
+        { 'n', 'x' },
+        '<F4>',
         function() vim.lsp.buf.code_action() end,
         {
             buffer = bufnr,
-            -- remap = false,
             desc = 'LSP: Selects a code action available at the current cursor position.',
+        }
+    )
+
+    vim.keymap.set(
+        { 'n', 'x' },
+        'gra',
+        function() vim.lsp.buf.code_action() end,
+        {
+            buffer = bufnr,
+            desc = 'Remap LSP: Selects a code action available at the current cursor position.',
         }
     )
 
@@ -204,28 +213,6 @@ local function default_keymaps(bufnr, client)
             desc = 'LSP - Actions Preview: Code action preview menu',
         }
     )
-
-    if vim.lsp.buf.range_code_action then
-        vim.keymap.set(
-            'x',
-            '<leader>vca',
-            function() vim.lsp.buf.range_code_action() end,
-            {
-                buffer = bufnr,
-                desc = 'LSP: Selects a code action available for the current range selection.',
-            }
-        )
-    else
-        vim.keymap.set(
-            'x',
-            '<leader>vca',
-            function() vim.lsp.buf.code_action() end,
-            {
-                buffer = bufnr,
-                desc = 'LSP: Selects a code action available at the current cursor position.',
-            }
-        )
-    end
 
     vim.keymap.set('n', 'gl', function() vim.diagnostic.open_float() end, {
         buffer = bufnr,
