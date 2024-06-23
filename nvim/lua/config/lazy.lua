@@ -2444,10 +2444,179 @@ require('lazy').setup({
 
         config = function()
             local cmp = require('cmp')
-            cmp.setup({
-                -- performance = {
-                --     max_view_entries = 15,
+
+            local cmdline_mappings = {
+                ['<C-z>'] = {
+                    c = function()
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                },
+                -- ['<Tab>'] = {
+                --     c = function(_)
+                --         if cmp.visible() then
+                --             if #cmp.get_entries() == 1 then
+                --                 cmp.confirm({ select = true })
+                --             else
+                --                 cmp.select_next_item()
+                --             end
+                --         else
+                --             cmp.complete()
+                --             if #cmp.get_entries() == 1 then
+                --                 cmp.confirm({ select = true })
+                --             end
+                --         end
+                --     end,
                 -- },
+                ['<Tab>'] = {
+                    c = function()
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                },
+                ['<S-Tab>'] = {
+                    c = function()
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                },
+                ['<C-n>'] = {
+                    c = function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            fallback()
+                        end
+                    end,
+                },
+                ['<C-p>'] = {
+                    c = function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        else
+                            fallback()
+                        end
+                    end,
+                },
+                --Toggle showing completion menu
+                ['<C-e>'] = cmp.mapping({
+                    c = function()
+                        if cmp.visible() then
+                            cmp.close()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                }),
+            }
+
+            local buffer_mappings = {
+                ['<Down>'] = {
+                    i = cmp.mapping.select_next_item({
+                        behavior = 'select',
+                    }),
+                },
+                ['<Up>'] = {
+                    i = cmp.mapping.select_prev_item({
+                        behavior = 'select',
+                    }),
+                },
+                --Toggle showing completion menu
+                ['<C-e>'] = cmp.mapping({
+                    i = function()
+                        if cmp.visible() then
+                            cmp.abort()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                }),
+                -- `Enter` key to confirm completion
+                ['<CR>'] = cmp.mapping({
+                    i = function(fallback)
+                        if cmp.visible() and cmp.get_active_entry() then
+                            ---setting the undolevels creates a new undo break
+                            ---so by setting it to itself I can create an undo break
+                            ---without side effects just before a comfirming a completion.
+                            -- Use <c-u> in insert mode to undo the completion
+                            vim.cmd([[let &g:undolevels = &g:undolevels]])
+                            cmp.confirm({
+                                behavior = cmp.ConfirmBehavior.Insert,
+                                select = false,
+                            })
+                        else
+                            fallback()
+                        end
+                    end,
+                }),
+                ['<c-y>'] = cmp.mapping({
+                    i = function(fallback)
+                        if cmp.visible() and cmp.get_active_entry() then
+                            ---setting the undolevels creates a new undo break
+                            ---so by setting it to itself I can create an undo break
+                            ---without side effects just before a comfirming a completion.
+                            -- Use <c-u> in insert mode to undo the completion
+                            vim.cmd([[let &g:undolevels = &g:undolevels]])
+                            cmp.confirm({
+                                behavior = cmp.ConfirmBehavior.Replace,
+                                select = false,
+                            })
+                        else
+                            fallback()
+                        end
+                    end,
+                }),
+                ['<C-t>'] = cmp.mapping(function()
+                    if cmp.visible_docs() then
+                        cmp.close_docs()
+                    else
+                        cmp.open_docs()
+                    end
+                end, { 'i', 's' }),
+                -- Scroll up and down in the completion documentation
+                ['<C-u>'] = cmp.mapping(function(falback)
+                    if cmp.visible() then
+                        cmp.mapping.scroll_docs(-4)
+                    else
+                        falback()
+                    end
+                end, { 'i', 's' }),
+                ['<C-d>'] = cmp.mapping(function(falback)
+                    if cmp.visible() then
+                        cmp.mapping.scroll_docs(4)
+                    else
+                        falback()
+                    end
+                end, { 'i', 's' }),
+                ['<C-n>'] = cmp.mapping(function(fallback)
+                    local luasnip = require('luasnip')
+                    if luasnip.expand_or_jumpable() then
+                        luasnip.expand_or_jump()
+                    else
+                        fallback()
+                    end
+                end, { 'i', 's' }),
+
+                ['<C-p>'] = cmp.mapping(function(fallback)
+                    local luasnip = require('luasnip')
+
+                    if luasnip.jumpable(-1) then
+                        luasnip.jump(-1)
+                    else
+                        fallback()
+                    end
+                end, { 'i', 's' }),
+            }
+            cmp.setup({
                 sources = cmp.config.sources({
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lsp_signature_help' },
@@ -2455,10 +2624,6 @@ require('lazy').setup({
                     { name = 'luasnip' },
                     { name = 'buffer', keyword_length = 5 },
                     { name = 'path' },
-                    -- {
-                    --     name = 'lazydev',
-                    -- group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-                    -- },
                 }),
                 snippet = {
                     expand = function(args)
@@ -2479,131 +2644,7 @@ require('lazy').setup({
                         },
                     }),
                 },
-                mapping = {
-                    ['<Down>'] = {
-                        i = cmp.mapping.select_next_item({
-                            behavior = 'select',
-                        }),
-                    },
-                    ['<Up>'] = {
-                        i = cmp.mapping.select_prev_item({
-                            behavior = 'select',
-                        }),
-                    },
-                    ['<C-y>'] = {
-                        i = cmp.mapping.confirm({ select = false }),
-                    },
-                    ['<C-e>'] = {
-                        i = cmp.mapping.abort(),
-                    },
-                    -- `Enter` key to confirm completion
-                    ['<CR>'] = cmp.mapping({
-                        i = function(fallback)
-                            if cmp.visible() and cmp.get_active_entry() then
-                                ---setting the undolevels creates a new undo break
-                                ---so by setting it to itself I can create an undo break
-                                ---without side effects just before a comfirming a completion
-                                vim.cmd([[let &g:undolevels = &g:undolevels]])
-                                cmp.confirm({
-                                    behavior = cmp.ConfirmBehavior.Insert,
-                                    select = false,
-                                })
-                            else
-                                fallback()
-                            end
-                        end,
-                    }),
-                    ['<S-CR>'] = cmp.mapping({
-                        i = function(fallback)
-                            -- when using specific terminals you may need to update
-                            -- the settings so that they pass the correct key-codes
-                            -- for shift+enter https://stackoverflow.com/a/42461580
-                            if cmp.visible() and cmp.get_active_entry() then
-                                cmp.confirm({
-                                    behavior = cmp.ConfirmBehavior.Replace,
-                                    select = false,
-                                })
-                            else
-                                fallback()
-                            end
-                        end,
-                    }),
-
-                    -- Ctrl+Enter to trigger completion menu
-                    ['<C-CR>'] = cmp.mapping(cmp.mapping.complete(), { 'i' }),
-                    -- Complete common string
-                    ['<S-Space>'] = cmp.mapping(function(fallback)
-                        if cmp.visible() then
-                            return cmp.complete_common_string()
-                        else
-                            fallback()
-                        end
-                    end, { 'i', 's' }),
-                    ['<C-t>'] = cmp.mapping(function()
-                        if cmp.visible_docs() then
-                            cmp.close_docs()
-                        else
-                            cmp.open_docs()
-                        end
-                    end, { 'i', 's' }),
-                    -- Scroll up and down in the completion documentation
-                    ['<C-u>'] = cmp.mapping(function(falback)
-                        if cmp.visible() then
-                            cmp.mapping.scroll_docs(-4)
-                        else
-                            falback()
-                        end
-                    end, { 'i', 's' }),
-                    ['<C-d>'] = cmp.mapping(function(falback)
-                        if cmp.visible() then
-                            cmp.mapping.scroll_docs(4)
-                        else
-                            falback()
-                        end
-                    end, { 'i', 's' }),
-                    -- Navigate between snippet placeholder
-                    -- ['<Tab>'] = cmp.mapping(function(fallback)
-                    --     local luasnip = require('luasnip')
-                    --
-                    --     if cmp.visible() and cmp.get_active_entry() ~= nil then
-                    --         cmp.select_next_item()
-                    --     elseif luasnip.expand_or_jumpable() then
-                    --         luasnip.expand_or_jump()
-                    --     else
-                    --         fallback()
-                    --     end
-                    -- end, { 'i', 's' }),
-                    --
-                    -- ['<S-Tab>'] = cmp.mapping(function(fallback)
-                    --     local luasnip = require('luasnip')
-                    --
-                    --     if cmp.visible() and cmp.get_active_entry() ~= nil then
-                    --         cmp.select_prev_item()
-                    --     elseif luasnip.jumpable(-1) then
-                    --         luasnip.jump(-1)
-                    --     else
-                    --         fallback()
-                    --     end
-                    -- end, { 'i', 's' }),
-                    ['<C-n>'] = cmp.mapping(function(fallback)
-                        local luasnip = require('luasnip')
-                        if luasnip.expand_or_jumpable() then
-                            luasnip.expand_or_jump()
-                        else
-                            fallback()
-                        end
-                    end, { 'i', 's' }),
-
-                    ['<C-p>'] = cmp.mapping(function(fallback)
-                        local luasnip = require('luasnip')
-
-                        if luasnip.jumpable(-1) then
-                            luasnip.jump(-1)
-                        else
-                            fallback()
-                        end
-                    end, { 'i', 's' }),
-                },
+                mapping = buffer_mappings,
             })
 
             cmp.setup.filetype('gitcommit', {
@@ -2616,59 +2657,7 @@ require('lazy').setup({
 
             -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
             cmp.setup.cmdline({ '/', '?' }, {
-                mapping = {
-                    ['<C-z>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<Tab>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<S-Tab>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_prev_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<C-n>'] = {
-                        c = function(fallback)
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                fallback()
-                            end
-                        end,
-                    },
-                    ['<C-p>'] = {
-                        c = function(fallback)
-                            if cmp.visible() then
-                                cmp.select_prev_item()
-                            else
-                                fallback()
-                            end
-                        end,
-                    },
-                    ['<C-e>'] = {
-                        c = cmp.mapping.abort(),
-                    },
-                    ['<C-y>'] = {
-                        c = cmp.mapping.confirm({ select = false }),
-                    },
-                },
+                mapping = cmdline_mappings,
                 sources = {
                     { name = 'buffer', keyword_length = 3 },
                 },
@@ -2676,67 +2665,7 @@ require('lazy').setup({
 
             -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
             cmp.setup.cmdline(':', {
-                mapping = {
-
-                    ['<C-z>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<Tab>'] = {
-                        c = function(_)
-                            if cmp.visible() then
-                                if #cmp.get_entries() == 1 then
-                                    cmp.confirm({ select = true })
-                                else
-                                    cmp.select_next_item()
-                                end
-                            else
-                                cmp.complete()
-                                if #cmp.get_entries() == 1 then
-                                    cmp.confirm({ select = true })
-                                end
-                            end
-                        end,
-                    },
-                    ['<S-Tab>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_prev_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<C-n>'] = {
-                        c = function(fallback)
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                fallback()
-                            end
-                        end,
-                    },
-                    ['<C-p>'] = {
-                        c = function(fallback)
-                            if cmp.visible() then
-                                cmp.select_prev_item()
-                            else
-                                fallback()
-                            end
-                        end,
-                    },
-                    ['<C-e>'] = {
-                        c = cmp.mapping.abort(),
-                    },
-                    ['<C-y>'] = {
-                        c = cmp.mapping.confirm({ select = false }),
-                    },
-                },
+                mapping = cmdline_mappings,
                 sources = cmp.config.sources({
                     { name = 'path' },
                     { name = 'cmdline' },

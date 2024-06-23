@@ -4,7 +4,20 @@ using namespace System.Management.Automation.Language
 
 Import-Module PSReadLine
 
-# Set-PSReadLineOption -EditMode Vi
+Set-PSReadLineOption -EditMode Vi
+
+function OnViModeChange {
+    if ($args[0] -eq 'Command') {
+        # Set the cursor to a blinking block.
+        Write-Host -NoNewLine "`e[1 q"
+
+    } else {
+        # Set the cursor to a blinking line.
+        Write-Host -NoNewLine "`e[5 q"
+    }
+}
+Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
+
 
 if (Get-Command "zoxide.exe" -ErrorAction SilentlyContinue) {
     # Init zoxide and setup aliases
@@ -41,43 +54,35 @@ Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 # console GUI instead of Out-GridView. Details about this module can be found at
 # PowerShell Gallery: https://www.powershellgallery.com/packages/F7History.
 Set-PSReadLineKeyHandler -Key F7 `
-                         -BriefDescription History `
-                         -LongDescription 'Show command history' `
-                         -ScriptBlock {
+    -BriefDescription History `
+    -LongDescription 'Show command history' `
+    -ScriptBlock {
     $pattern = $null
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$pattern, [ref]$null)
-    if ($pattern)
-    {
+    if ($pattern) {
         $pattern = [regex]::Escape($pattern)
     }
 
     $history = [System.Collections.ArrayList]@(
         $last = ''
         $lines = ''
-        foreach ($line in [System.IO.File]::ReadLines((Get-PSReadLineOption).HistorySavePath))
-        {
-            if ($line.EndsWith('`'))
-            {
+        foreach ($line in [System.IO.File]::ReadLines((Get-PSReadLineOption).HistorySavePath)) {
+            if ($line.EndsWith('`')) {
                 $line = $line.Substring(0, $line.Length - 1)
-                $lines = if ($lines)
-                {
+                $lines = if ($lines) {
                     "$lines`n$line"
-                }
-                else
-                {
+                } else {
                     $line
                 }
                 continue
             }
 
-            if ($lines)
-            {
+            if ($lines) {
                 $line = "$lines`n$line"
                 $lines = ''
             }
 
-            if (($line -cne $last) -and (!$pattern -or ($line -match $pattern)))
-            {
+            if (($line -cne $last) -and (!$pattern -or ($line -match $pattern))) {
                 $last = $line
                 $line
             }
@@ -86,8 +91,7 @@ Set-PSReadLineKeyHandler -Key F7 `
     $history.Reverse()
 
     $command = $history | Out-GridView -Title History -PassThru
-    if ($command)
-    {
+    if ($command) {
         [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert(($command -join "`n"))
     }
@@ -96,9 +100,9 @@ Set-PSReadLineKeyHandler -Key F7 `
 # This is an example of a macro that you might use to execute a command.
 # This will add the command to history.
 Set-PSReadLineKeyHandler -Key Ctrl+b `
-                         -BriefDescription BuildCurrentDirectory `
-                         -LongDescription "Build the current directory" `
-                         -ScriptBlock {
+    -BriefDescription BuildCurrentDirectory `
+    -LongDescription "Build the current directory" `
+    -ScriptBlock {
     [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
     [Microsoft.PowerShell.PSConsoleReadLine]::Insert("msbuild")
     [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
@@ -114,9 +118,9 @@ Set-PSReadLineKeyHandler -Chord 'Ctrl+d,Ctrl+c' -Function CaptureScreen
 # but it doesn't actually execute.  It also clears the line with RevertLine so the
 # undo stack is reset - though redo will still reconstruct the command line.
 Set-PSReadLineKeyHandler -Key Alt+w `
-                         -BriefDescription SaveInHistory `
-                         -LongDescription "Save current line in history but do not execute" `
-                         -ScriptBlock {
+    -BriefDescription SaveInHistory `
+    -LongDescription "Save current line in history but do not execute" `
+    -ScriptBlock {
     param($key, $arg)
 
     $line = $null
@@ -130,9 +134,9 @@ Set-PSReadLineKeyHandler -Key Alt+w `
 # but you need parens to do that.  This binding will help by putting parens around the current selection,
 # or if nothing is selected, the whole line.
 Set-PSReadLineKeyHandler -Key 'Alt+(' `
-                         -BriefDescription ParenthesizeSelection `
-                         -LongDescription "Put parenthesis around the selection or entire line and move the cursor to after the closing parenthesis" `
-                         -ScriptBlock {
+    -BriefDescription ParenthesizeSelection `
+    -LongDescription "Put parenthesis around the selection or entire line and move the cursor to after the closing parenthesis" `
+    -ScriptBlock {
     param($key, $arg)
 
     $selectionStart = $null
@@ -142,13 +146,10 @@ Set-PSReadLineKeyHandler -Key 'Alt+(' `
     $line = $null
     $cursor = $null
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-    if ($selectionStart -ne -1)
-    {
+    if ($selectionStart -ne -1) {
         [Microsoft.PowerShell.PSConsoleReadLine]::Replace($selectionStart, $selectionLength, '(' + $line.SubString($selectionStart, $selectionLength) + ')')
         [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($selectionStart + $selectionLength + 2)
-    }
-    else
-    {
+    } else {
         [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, '(' + $line + ')')
         [Microsoft.PowerShell.PSConsoleReadLine]::EndOfLine()
     }
@@ -158,9 +159,9 @@ Set-PSReadLineKeyHandler -Key 'Alt+(' `
 # under or before the cursor.  It will cycle through single quotes, double quotes, or
 # no quotes each time it is invoked.
 Set-PSReadLineKeyHandler -Key "Alt+'" `
-                         -BriefDescription ToggleQuoteArgument `
-                         -LongDescription "Toggle quotes on the argument under the cursor" `
-                         -ScriptBlock {
+    -BriefDescription ToggleQuoteArgument `
+    -LongDescription "Toggle quotes on the argument under the cursor" `
+    -ScriptBlock {
     param($key, $arg)
 
     $ast = $null
@@ -170,20 +171,16 @@ Set-PSReadLineKeyHandler -Key "Alt+'" `
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$ast, [ref]$tokens, [ref]$errors, [ref]$cursor)
 
     $tokenToChange = $null
-    foreach ($token in $tokens)
-    {
+    foreach ($token in $tokens) {
         $extent = $token.Extent
-        if ($extent.StartOffset -le $cursor -and $extent.EndOffset -ge $cursor)
-        {
+        if ($extent.StartOffset -le $cursor -and $extent.EndOffset -ge $cursor) {
             $tokenToChange = $token
 
             # If the cursor is at the end (it's really 1 past the end) of the previous token,
             # we only want to change the previous token if there is no token under the cursor
-            if ($extent.EndOffset -eq $cursor -and $foreach.MoveNext())
-            {
+            if ($extent.EndOffset -eq $cursor -and $foreach.MoveNext()) {
                 $nextToken = $foreach.Current
-                if ($nextToken.Extent.StartOffset -eq $cursor)
-                {
+                if ($nextToken.Extent.StartOffset -eq $cursor) {
                     $tokenToChange = $nextToken
                 }
             }
@@ -191,22 +188,16 @@ Set-PSReadLineKeyHandler -Key "Alt+'" `
         }
     }
 
-    if ($tokenToChange -ne $null)
-    {
+    if ($tokenToChange -ne $null) {
         $extent = $tokenToChange.Extent
         $tokenText = $extent.Text
-        if ($tokenText[0] -eq '"' -and $tokenText[-1] -eq '"')
-        {
+        if ($tokenText[0] -eq '"' -and $tokenText[-1] -eq '"') {
             # Switch to no quotes
             $replacement = $tokenText.Substring(1, $tokenText.Length - 2)
-        }
-        elseif ($tokenText[0] -eq "'" -and $tokenText[-1] -eq "'")
-        {
+        } elseif ($tokenText[0] -eq "'" -and $tokenText[-1] -eq "'") {
             # Switch to double quotes
             $replacement = '"' + $tokenText.Substring(1, $tokenText.Length - 2) + '"'
-        }
-        else
-        {
+        } else {
             # Add single quotes
             $replacement = "'" + $tokenText + "'"
         }
@@ -220,9 +211,9 @@ Set-PSReadLineKeyHandler -Key "Alt+'" `
 
 # This example will replace any aliases on the command line with the resolved commands.
 Set-PSReadLineKeyHandler -Key "Alt+%" `
-                         -BriefDescription ExpandAliases `
-                         -LongDescription "Replace all aliases with the full command" `
-                         -ScriptBlock {
+    -BriefDescription ExpandAliases `
+    -LongDescription "Replace all aliases with the full command" `
+    -ScriptBlock {
     param($key, $arg)
 
     $ast = $null
@@ -232,16 +223,12 @@ Set-PSReadLineKeyHandler -Key "Alt+%" `
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$ast, [ref]$tokens, [ref]$errors, [ref]$cursor)
 
     $startAdjustment = 0
-    foreach ($token in $tokens)
-    {
-        if ($token.TokenFlags -band [TokenFlags]::CommandName)
-        {
+    foreach ($token in $tokens) {
+        if ($token.TokenFlags -band [TokenFlags]::CommandName) {
             $alias = $ExecutionContext.InvokeCommand.GetCommand($token.Extent.Text, 'Alias')
-            if ($alias -ne $null)
-            {
+            if ($alias -ne $null) {
                 $resolvedCommand = $alias.ResolvedCommandName
-                if ($resolvedCommand -ne $null)
-                {
+                if ($resolvedCommand -ne $null) {
                     $extent = $token.Extent
                     $length = $extent.EndOffset - $extent.StartOffset
                     [Microsoft.PowerShell.PSConsoleReadLine]::Replace(
@@ -260,9 +247,9 @@ Set-PSReadLineKeyHandler -Key "Alt+%" `
 
 # F1 for help on the command line - naturally
 Set-PSReadLineKeyHandler -Key F1 `
-                         -BriefDescription CommandHelp `
-                         -LongDescription "Open the help window for the current command" `
-                         -ScriptBlock {
+    -BriefDescription CommandHelp `
+    -LongDescription "Open the help window for the current command" `
+    -ScriptBlock {
     param($key, $arg)
 
     $ast = $null
@@ -272,25 +259,21 @@ Set-PSReadLineKeyHandler -Key F1 `
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$ast, [ref]$tokens, [ref]$errors, [ref]$cursor)
 
     $commandAst = $ast.FindAll( {
-        $node = $args[0]
-        $node -is [CommandAst] -and
+            $node = $args[0]
+            $node -is [CommandAst] -and
             $node.Extent.StartOffset -le $cursor -and
             $node.Extent.EndOffset -ge $cursor
         }, $true) | Select-Object -Last 1
 
-    if ($commandAst -ne $null)
-    {
+    if ($commandAst -ne $null) {
         $commandName = $commandAst.GetCommandName()
-        if ($commandName -ne $null)
-        {
+        if ($commandName -ne $null) {
             $command = $ExecutionContext.InvokeCommand.GetCommand($commandName, 'All')
-            if ($command -is [AliasInfo])
-            {
+            if ($command -is [AliasInfo]) {
                 $commandName = $command.ResolvedCommandName
             }
 
-            if ($commandName -ne $null)
-            {
+            if ($commandName -ne $null) {
                 Get-Help $commandName -ShowWindow
             }
         }
@@ -307,9 +290,9 @@ Set-PSReadLineKeyHandler -Key F1 `
 $global:PSReadLineMarks = @{}
 
 Set-PSReadLineKeyHandler -Key Ctrl+M `
-                         -BriefDescription MarkDirectory `
-                         -LongDescription "Mark the current directory" `
-                         -ScriptBlock {
+    -BriefDescription MarkDirectory `
+    -LongDescription "Mark the current directory" `
+    -ScriptBlock {
     param($key, $arg)
 
     $key = [Console]::ReadKey($true)
@@ -317,24 +300,23 @@ Set-PSReadLineKeyHandler -Key Ctrl+M `
 }
 
 Set-PSReadLineKeyHandler -Key Ctrl+m `
-                         -BriefDescription JumpDirectory `
-                         -LongDescription "Goto the marked directory" `
-                         -ScriptBlock {
+    -BriefDescription JumpDirectory `
+    -LongDescription "Goto the marked directory" `
+    -ScriptBlock {
     param($key, $arg)
 
     $key = [Console]::ReadKey()
     $dir = $global:PSReadLineMarks[$key.KeyChar]
-    if ($dir)
-    {
+    if ($dir) {
         cd $dir
         [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
     }
 }
 
 Set-PSReadLineKeyHandler -Key Alt+m `
-                         -BriefDescription ShowDirectoryMarks `
-                         -LongDescription "Show the currently marked directories" `
-                         -ScriptBlock {
+    -BriefDescription ShowDirectoryMarks `
+    -LongDescription "Show the currently marked directories" `
+    -ScriptBlock {
     param($key, $arg)
 
     $global:PSReadLineMarks.GetEnumerator() | % {
@@ -348,12 +330,10 @@ Set-PSReadLineKeyHandler -Key Alt+m `
 Set-PSReadLineOption -CommandValidationHandler {
     param([CommandAst]$CommandAst)
 
-    switch ($CommandAst.GetCommandName())
-    {
+    switch ($CommandAst.GetCommandName()) {
         'git' {
             $gitCmd = $CommandAst.CommandElements[1].Extent
-            switch ($gitCmd.Text)
-            {
+            switch ($gitCmd.Text) {
                 'cmt' {
                     [Microsoft.PowerShell.PSConsoleReadLine]::Replace(
                         $gitCmd.StartOffset, $gitCmd.EndOffset - $gitCmd.StartOffset, 'commit')
@@ -366,9 +346,9 @@ Set-PSReadLineOption -CommandValidationHandler {
 # `ForwardChar` accepts the entire suggestion text when the cursor is at the end of the line.
 # This custom binding makes `RightArrow` behave similarly - accepting the next word instead of the entire suggestion text.
 Set-PSReadLineKeyHandler -Key RightArrow `
-                         -BriefDescription ForwardCharAndAcceptNextSuggestionWord `
-                         -LongDescription "Move cursor one character to the right in the current editing line and accept the next word in suggestion when it's at the end of current editing line" `
-                         -ScriptBlock {
+    -BriefDescription ForwardCharAndAcceptNextSuggestionWord `
+    -LongDescription "Move cursor one character to the right in the current editing line and accept the next word in suggestion when it's at the end of current editing line" `
+    -ScriptBlock {
     param($key, $arg)
 
     $line = $null
@@ -386,9 +366,9 @@ Set-PSReadLineKeyHandler -Key RightArrow `
 # or if using a psreadline predictor. You can also use a digit argument to specify which argument you want to select, i.e. Alt+2, Alt+a selects the second argument
 # on the command line.
 Set-PSReadLineKeyHandler -Key Alt+a `
-                         -BriefDescription SelectCommandArguments `
-                         -LongDescription "Set current selection to next command argument in the command line. Use of digit argument selects argument by position" `
-                         -ScriptBlock {
+    -BriefDescription SelectCommandArguments `
+    -LongDescription "Set current selection to next command argument in the command line. Use of digit argument selects argument by position" `
+    -ScriptBlock {
     param($key, $arg)
   
     $ast = $null
@@ -396,10 +376,10 @@ Set-PSReadLineKeyHandler -Key Alt+a `
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$ast, [ref]$null, [ref]$null, [ref]$cursor)
   
     $asts = $ast.FindAll( {
-        $args[0] -is [System.Management.Automation.Language.ExpressionAst] -and
-        $args[0].Parent -is [System.Management.Automation.Language.CommandAst] -and
-        $args[0].Extent.StartOffset -ne $args[0].Parent.Extent.StartOffset
-      }, $true)
+            $args[0] -is [System.Management.Automation.Language.ExpressionAst] -and
+            $args[0].Parent -is [System.Management.Automation.Language.CommandAst] -and
+            $args[0].Extent.StartOffset -ne $args[0].Parent.Extent.StartOffset
+        }, $true)
   
     if ($asts.Count -eq 0) {
         [Microsoft.PowerShell.PSConsoleReadLine]::Ding()
@@ -410,8 +390,7 @@ Set-PSReadLineKeyHandler -Key Alt+a `
 
     if ($null -ne $arg) {
         $nextAst = $asts[$arg - 1]
-    }
-    else {
+    } else {
         foreach ($ast in $asts) {
             if ($ast.Extent.StartOffset -ge $cursor) {
                 $nextAst = $ast
@@ -429,8 +408,8 @@ Set-PSReadLineKeyHandler -Key Alt+a `
 
     if ($nextAst -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
         $nextAst.StringConstantType -ne [System.Management.Automation.Language.StringConstantType]::BareWord) {
-            $startOffsetAdjustment = 1
-            $endOffsetAdjustment = 2
+        $startOffsetAdjustment = 1
+        $endOffsetAdjustment = 2
     }
   
     [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($nextAst.Extent.StartOffset + $startOffsetAdjustment)
@@ -442,9 +421,9 @@ Set-PSReadLineKeyHandler -Key Alt+a `
 # or if using a psreadline predictor. You can also use a digit argument to specify which argument you want to select, i.e. Alt+2, Alt+A selects the second argument
 # on the command line.
 Set-PSReadLineKeyHandler -Key Alt+A `
-                         -BriefDescription SelectCommandArguments `
-                         -LongDescription "Set current selection to previous command argument in the command line. Use of digit argument selects argument by position" `
-                         -ScriptBlock {
+    -BriefDescription SelectCommandArguments `
+    -LongDescription "Set current selection to previous command argument in the command line. Use of digit argument selects argument by position" `
+    -ScriptBlock {
     param($key, $arg)
   
     $ast = $null
@@ -452,10 +431,10 @@ Set-PSReadLineKeyHandler -Key Alt+A `
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$ast, [ref]$null, [ref]$null, [ref]$cursor)
   
     $asts = $ast.FindAll( {
-        $args[0] -is [System.Management.Automation.Language.ExpressionAst] -and
-        $args[0].Parent -is [System.Management.Automation.Language.CommandAst] -and
-        $args[0].Extent.StartOffset -ne $args[0].Parent.Extent.StartOffset
-      }, $true)
+            $args[0] -is [System.Management.Automation.Language.ExpressionAst] -and
+            $args[0].Parent -is [System.Management.Automation.Language.CommandAst] -and
+            $args[0].Extent.StartOffset -ne $args[0].Parent.Extent.StartOffset
+        }, $true)
   
     if ($asts.Count -eq 0) {
         [Microsoft.PowerShell.PSConsoleReadLine]::Ding()
@@ -466,8 +445,7 @@ Set-PSReadLineKeyHandler -Key Alt+A `
 
     if ($null -ne $arg) {
         $nextAst = $asts[$arg - 1]
-    }
-    else {
+    } else {
         $nextAst = $asts[0]
         foreach ($ast in $asts) {
             if ($ast.Extent.EndOffset -ge $cursor) {
@@ -486,8 +464,8 @@ Set-PSReadLineKeyHandler -Key Alt+A `
 
     if ($nextAst -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
         $nextAst.StringConstantType -ne [System.Management.Automation.Language.StringConstantType]::BareWord) {
-            $startOffsetAdjustment = 1
-            $endOffsetAdjustment = 2
+        $startOffsetAdjustment = 1
+        $endOffsetAdjustment = 2
     }
   
     [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($nextAst.Extent.StartOffset + $startOffsetAdjustment)
@@ -497,9 +475,9 @@ Set-PSReadLineKeyHandler -Key Alt+A `
 
 # Allow you to type a Unicode code point, then pressing `Alt+x` to transform it into a Unicode char.
 Set-PSReadLineKeyHandler -Chord 'Alt+x' `
-                         -BriefDescription ToUnicodeChar `
-                         -LongDescription "Transform Unicode code point into a UTF-16 encoded string" `
-                         -ScriptBlock {
+    -BriefDescription ToUnicodeChar `
+    -LongDescription "Transform Unicode code point into a UTF-16 encoded string" `
+    -ScriptBlock {
     $buffer = $null
     $cursor = 0
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref] $buffer, [ref] $cursor)
