@@ -11,6 +11,13 @@ vim.o.scrolloff = 8
 vim.o.signcolumn = 'yes'
 vim.opt.isfname:append('@-@')
 
+--I added the cursor blink to distinguish vim normal mode and terminal normal mode
+--Note: I had tried setting the terminal cursor shape/color/blink instead but
+--I couldn't get the terminal cursor inside a terminal buffer to blink since
+--nvim isn't passing through the ansi codes.
+vim.o.guicursor =
+    'n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
+
 -------------------------------------------------------------------------------
 --- Performance
 vim.o.lazyredraw = true -- redraw only when required (will lazily redraw during macros)
