@@ -56,7 +56,7 @@ local keys = {
 
 	{ key = "F", mods = "CTRL", action = act.Search("CurrentSelectionOrEmptyString") },
 	{ key = "K", mods = "CTRL", action = act.ClearScrollback("ScrollbackOnly") },
-	{ key = "L", mods = "CTRL", action = act.ShowDebugOverlay },
+	-- { key = "L", mods = "CTRL", action = act.ShowDebugOverlay },
 	{ key = "M", mods = "CTRL", action = act.Hide },
 	{ key = "N", mods = "CTRL", action = act.SpawnWindow },
 	{ key = "P", mods = "CTRL", action = act.ActivateCommandPalette },

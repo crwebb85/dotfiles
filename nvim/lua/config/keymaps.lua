@@ -244,3 +244,841 @@ vim.keymap.set('n', '<A-t>', '<c-w>5+', {
 vim.keymap.set('n', '<A-s>', '<c-w>5-', {
     desc = 'Custom: Decrease window height',
 })
+
+---There are two ways to specify the description:
+---* A table with the backward and forward descriptions:
+---  `{ backward = 'move backward', forward = 'move forward' }`
+---* Template string:
+---  `'move {backward|forward}'`
+---@alias MyListNavigatorDesc string | {backward: string, forward: string}
+
+local function validate_navigator_desc(desc)
+    local desc_type = type(desc)
+    if desc_type == 'table' then
+        if type(desc.backward) ~= 'string' then
+            return false, '`backward` is missing or not a string'
+        end
+        if type(desc.forward) ~= 'string' then
+            return false, '`forward` is missing or not a string'
+        end
+        return true
+    elseif desc then
+        return desc_type == 'string'
+    else
+        return true
+    end
+end
+
+---@param desc MyListNavigatorDesc
+---@param i integer
+local function process_desc(desc, i)
+    if type(desc) == 'table' then
+        return desc[({ 'backward', 'forward' })[i]]
+    elseif desc then
+        vim.validate({
+            desc = { desc, 'string' },
+        })
+        return desc:gsub('{(.-)}', function(m)
+            local parts = vim.split(m, '|', { plain = true })
+            if #parts == 2 then return parts[i] end
+        end)
+    end
+end
+
+---@class MyListNavigatorKeymapOpts
+---@field key string
+---@field mode string | table | nil keymap modes (overrides the default modes if defined)
+---@field backward string|function
+---@field forward string|function
+---@field desc MyListNavigatorDesc?
+---@field opts vim.keymap.set.Opts?
+
+---@class MyListNavigatorKeymap
+---@field default MyListNavigatorKeymapOpts
+---@field extreme MyListNavigatorKeymapOpts?
+
+local M = {}
+
+---@class MyOperationsOptions
+---@field forward_key string Leader keys for turning the operation backward
+---@field backward_key string Leader keys for running the operation forward
+---@field mode string | table Default mode for all keymaps defined by operations (can be overriden by keymap)
+
+---@class MyOperations
+---@field _opts MyOperationsOptions
+---@field _repeat_backward_callback fun()
+---@field _repeat_forward_callback fun()
+---@field _repeat_extreme_backward_callback fun()
+---@field _repeat_extreme_forward_callback fun()
+---@field repeat_backward_callback fun()
+---@field repeat_forward_callback fun()
+---@field repeat_extreme_backward_callback fun()
+---@field repeat_extreme_forward_callback fun()
+local MyOperations = {
+    _repeat_backward_callback = function()
+        vim.notify('No callback set', vim.log.levels.WARN)
+    end,
+    _repeat_forward_callback = function()
+        vim.notify('No callback set', vim.log.levels.WARN)
+    end,
+    _repeat_extreme_backward_callback = function()
+        vim.notify('No callback set', vim.log.levels.WARN)
+    end,
+    _repeat_extreme_forward_callback = function()
+        vim.notify('No callback set', vim.log.levels.WARN)
+    end,
+}
+
+--- Based on https://github.com/idanarye/nvim-impairative modified to have repeat callbacks
+--- and have combined functionality into a single navigator method
+---@param args MyListNavigatorKeymap
+---@return MyOperations
+function MyOperations:navigator(args)
+    vim.validate({
+        default = { args.default, 'table', false },
+        extreme = { args.extreme, 'table', true },
+    })
+    vim.validate({
+        key = { args.default.key, 'string', false },
+        mode = { args.default.mode, { 'string', 'table' }, true },
+        backward = {
+            args.default.backward,
+            { 'string', 'function' },
+            false,
+        },
+        forward = {
+            args.default.forward,
+            { 'string', 'function' },
+            false,
+        },
+        desc = {
+            args.default.desc,
+            validate_navigator_desc,
+            'MyListNavigatorDesc',
+        },
+        opts = { args.default.opts, 't', true },
+    })
+
+    if args.extreme ~= nil then
+        vim.validate({
+            key = { args.extreme.key, 'string', false },
+            mode = { args.extreme.mode, { 'string', 'table' }, true },
+            backward = {
+                args.extreme.backward,
+                { 'string', 'function' },
+                false,
+            },
+            forward = {
+                args.extreme.forward,
+                { 'string', 'function' },
+                false,
+            },
+            desc = {
+                args.extreme.desc,
+                validate_navigator_desc,
+                'MyListNavigatorDesc',
+            },
+            opts = { args.extreme.opts, 't', true },
+        })
+    end
+    -- create a copy of the options so I can modify it
+    local default_keymap_opts =
+        vim.tbl_deep_extend('keep', {}, args.default.opts or {})
+    local function set_callbacks()
+        self._repeat_backward_callback = function()
+            if type(args.default.backward) == 'string' then
+                vim.cmd(args.default.backward)
+            else
+                args.default.backward()
+            end
+        end
+        self._repeat_forward_callback = function()
+            if type(args.default.forward) == 'string' then
+                vim.cmd(args.default.forward)
+            else
+                args.default.forward()
+            end
+        end
+        if args.extreme ~= nil then
+            self._repeat_extreme_backward_callback = function()
+                if type(args.extreme.backward) == 'string' then
+                    vim.cmd(args.extreme.backward)
+                else
+                    args.extreme.backward()
+                end
+            end
+
+            self._repeat_extreme_forward_callback = function()
+                if type(args.extreme.forward) == 'string' then
+                    vim.cmd(args.extreme.forward)
+                else
+                    args.extreme.forward()
+                end
+            end
+        else
+            self._repeat_extreme_backward_callback = function()
+                vim.notify('Not extreme enough', vim.log.levels.WARN)
+            end
+            self._repeat_extreme_forward_callback = function()
+                vim.notify('Not extreme enough', vim.log.levels.WARN)
+            end
+        end
+    end
+
+    local backward = function()
+        set_callbacks()
+        if type(args.default.backward) == 'string' then
+            local cmd = args.default.backward
+            if 0 < vim.v.count then
+                vim.cmd(vim.v.count .. cmd)
+            else
+                vim.cmd(cmd)
+            end
+        else
+            args.default.backward()
+        end
+    end
+
+    local forward = function()
+        set_callbacks()
+        if type(args.default.forward) == 'string' then
+            local cmd = args.default.forward
+            if 0 < vim.v.count then
+                vim.cmd(vim.v.count .. cmd)
+            else
+                vim.cmd(cmd)
+            end
+        else
+            args.default.forward()
+        end
+    end
+
+    local default_keymap_mode = args.default.mode or self._opts.mode
+    default_keymap_opts.desc = process_desc(args.default.desc, 1)
+    vim.keymap.set(
+        default_keymap_mode,
+        self._opts.backward_key .. args.default.key,
+        backward,
+        default_keymap_opts
+    )
+
+    default_keymap_opts.desc = process_desc(args.default.desc, 2)
+    vim.keymap.set(
+        default_keymap_mode,
+        self._opts.forward_key .. args.default.key,
+        forward,
+        default_keymap_opts
+    )
+
+    if args.extreme ~= nil then
+        local extreme_keymap_opts =
+            vim.tbl_deep_extend('keep', {}, args.extreme.opts or {})
+
+        local extreme_backward = function()
+            set_callbacks()
+            if type(args.extreme.backward) == 'string' then
+                local cmd = args.extreme.backward
+                if 0 < vim.v.count then
+                    vim.cmd(vim.v.count .. cmd)
+                else
+                    vim.cmd(cmd)
+                end
+            else
+                args.extreme.backward()
+            end
+        end
+
+        local extreme_forward = function()
+            set_callbacks()
+            if type(args.extreme.forward) == 'string' then
+                local cmd = args.extreme.forward
+                if 0 < vim.v.count then
+                    vim.cmd(vim.v.count .. cmd)
+                else
+                    vim.cmd(cmd)
+                end
+            else
+                args.extreme.forward()
+            end
+        end
+
+        local extreme_keymap_mode = args.default.mode or self._opts.mode
+        extreme_keymap_opts.desc = process_desc(args.extreme.desc, 1)
+        vim.keymap.set(
+            extreme_keymap_mode,
+            self._opts.backward_key .. args.extreme.key,
+            extreme_backward,
+            extreme_keymap_opts
+        )
+
+        extreme_keymap_opts.desc = process_desc(args.extreme.desc, 2)
+        vim.keymap.set(
+            extreme_keymap_mode,
+            self._opts.forward_key .. args.extreme.key,
+            extreme_forward,
+            extreme_keymap_opts
+        )
+    end
+    return self
+end
+
+---Create an |ImpairativeOperations| helper to define mappings with
+---@param opts MyOperationsOptions See |ImpairativeOperationsOptions|
+---@return MyOperations
+function M.operations(opts)
+    vim.validate({
+        forward_key = { opts.forward_key, 'string', false },
+        backward_key = { opts.backward_key, 'string', false },
+        mode = { opts.mode, { 'string', 'table' }, false },
+    })
+    local operations = setmetatable({
+        _opts = opts,
+
+        _repeat_backward_callback = function()
+            vim.notify('No backward callback set', vim.log.levels.WARN)
+        end,
+        _repeat_forward_callback = function()
+            vim.notify('No forward callback set', vim.log.levels.WARN)
+        end,
+    }, {
+        __index = MyOperations,
+    })
+    operations.repeat_backward_callback = function()
+        operations._repeat_backward_callback()
+    end
+    operations.repeat_forward_callback = function()
+        operations._repeat_forward_callback()
+    end
+    operations.repeat_extreme_backward_callback = function()
+        operations._repeat_extreme_backward_callback()
+    end
+    operations.repeat_extreme_forward_callback = function()
+        operations._repeat_extreme_forward_callback()
+    end
+    return operations
+end
+
+local myoperations = M.operations({
+
+    backward_key = '[',
+    forward_key = ']',
+    mode = { 'n' },
+})
+    :navigator({
+        --visual mode: can navigate to a new buffer but visual mode is probably otherwise useful
+        default = {
+            key = 'q',
+            mode = { 'n', 'x' },
+            backward = 'cprevious',
+            forward = 'cnext',
+            desc = 'Custom: Run the "{cprevious|cnext}" command',
+            opts = {},
+        },
+        extreme = {
+            key = 'Q',
+            mode = { 'n', 'x' },
+            backward = 'cfirst',
+            forward = 'clast',
+            desc = 'Custom: Run the "{cfirst|clast}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        default = {
+            key = '<C-q>',
+            backward = 'cpfile',
+            forward = 'cnfile',
+            desc = 'Custom: Run the "{cpfile|cnfile}" command',
+            opts = {},
+        },
+        extreme = {
+            key = '<leader><C-q>',
+            backward = 'cfirst',
+            forward = 'clast',
+            desc = 'Custom: Run the "{cfirst|clast}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: can navigate to a new buffer but visual mode is probably otherwise useful
+        default = {
+            key = 'l',
+            mode = { 'n', 'x' },
+            backward = 'lprevious',
+            forward = 'lnext',
+            desc = 'Custom: Run the "{lprevious|lnext}" command',
+            opts = {},
+        },
+        extreme = {
+            key = 'L',
+            mode = { 'n', 'x' },
+            backward = 'lfirst',
+            forward = 'llast',
+            desc = 'Custom: Run the "{lfirst|llast}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        -- no visual mode: map will navigate to a new buffer so visual mode is not useful
+        default = {
+            key = '<C-l>',
+            backward = 'lpfile',
+            forward = 'lnfile',
+            desc = 'Custom: Run the "{lpfile|lnfile}" command',
+            opts = {},
+        },
+        extreme = {
+            key = '<leader><C-l>',
+            backward = 'lfirst',
+            forward = 'llast',
+            desc = 'Custom: Run the "{lfirst|llast}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        -- no visual mode: map will navigate to a new buffer so visual mode is not useful
+        default = {
+            key = 'b',
+            backward = 'bprevious',
+            forward = 'bnext',
+            desc = 'Custom: Run the "{bprevious|bnext}" command',
+            opts = {},
+        },
+        extreme = {
+            key = 'B',
+            backward = 'bfirst',
+            forward = 'blast',
+            desc = 'Custom: Run the "{bfirst|blast}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        -- no visual mode: map will navigate to a new buffer so visual mode is not useful
+        default = {
+            key = 'a',
+            backward = 'previous',
+            forward = 'next',
+            desc = 'Custom: Run the "{previous|next}" command',
+            opts = {},
+        },
+        extreme = {
+            key = 'A',
+            backward = 'first',
+            forward = 'last',
+            desc = 'Custom: Run the "{first|last}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        --no visual mode: I believe this can navigate to other buffers so visual mode would not be useful
+        default = {
+            key = 't',
+            backward = 'tprevious',
+            forward = 'tnext',
+            desc = 'Custom: Run the "{tprevious|tnext}" command',
+            opts = {},
+        },
+        extreme = {
+            key = 'T',
+            backward = 'tfirst',
+            forward = 'tlast',
+            desc = 'Custom: Run the "{tfirst|tlast}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        --no visual mode: I believe this can navigate to other buffers so visual mode would not be useful
+        default = {
+            key = '<C-t>',
+            backward = 'ptprevious',
+            forward = 'ptnext',
+            desc = 'Custom: Run the "{ptprevious|ptnext}" command',
+            opts = {},
+        },
+        extreme = {
+            key = '<leader><C-t>',
+            backward = 'ptfirst',
+            forward = 'ptlast',
+            desc = 'Custom: Run the "{ptfirst|ptlast}" command',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'h',
+            mode = { 'n', 'x' },
+            backward = function()
+                local target = 'all'
+                if vim.wo.diff == true then target = 'unstaged' end
+                require('gitsigns.actions').nav_hunk(
+                    'prev',
+                    { target = target, count = -vim.v.count1 }
+                )
+            end,
+            forward = function()
+                local target = 'all'
+                if vim.wo.diff == true then target = 'unstaged' end
+                require('gitsigns.actions').nav_hunk(
+                    'next',
+                    { target = target, count = vim.v.count1 }
+                )
+            end,
+            desc = 'Gitsigns: smart jump to the {previous|next} git hunk (based on if in diff mode)',
+            opts = {},
+        },
+        extreme = {
+            key = 'H',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'first',
+                    { target = 'unstaged', count = -math.huge }
+                )
+            end,
+            forward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'last',
+                    { target = 'unstaged', count = math.huge }
+                )
+            end,
+            desc = 'Gitsigns: smart jump to the {first|last} git hunk (based on if in diff mode)',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'hu',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'prev',
+                    { target = 'unstaged', count = -vim.v.count1 }
+                )
+            end,
+            forward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'next',
+                    { target = 'unstaged', count = vim.v.count1 }
+                )
+            end,
+            desc = 'Gitsigns: jump to the {previous|next} unstaged git hunk',
+            opts = {},
+        },
+        extreme = {
+            key = 'Hu',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'first',
+                    { target = 'unstaged', count = -math.huge }
+                )
+            end,
+            forward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'last',
+                    { target = 'unstaged', count = math.huge }
+                )
+            end,
+            desc = 'Gitsigns: jump to the {first|last} unstaged git hunk',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'hs',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'prev',
+                    { target = 'staged', count = -vim.v.count1 }
+                )
+            end,
+            forward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'next',
+                    { target = 'staged', count = vim.v.count1 }
+                )
+            end,
+            desc = 'Gitsigns: jump to the {previous|next} staged git hunk',
+            opts = {},
+        },
+        extreme = {
+            key = 'Hs',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'first',
+                    { target = 'staged', count = -math.huge }
+                )
+            end,
+            forward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'last',
+                    { target = 'staged', count = math.huge }
+                )
+            end,
+            desc = 'Gitsigns: jump to the {first|last} staged git hunk',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'ha',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'prev',
+                    { target = 'all', count = -vim.v.count1 }
+                )
+            end,
+            forward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'next',
+                    { target = 'all', count = vim.v.count1 }
+                )
+            end,
+            desc = 'Gitsigns: jump to the {previous|next} git hunk (staged or unstaged)',
+            opts = {},
+        },
+        extreme = {
+            key = 'Ha',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'first',
+                    { target = 'all', count = -math.huge }
+                )
+            end,
+            forward = function()
+                require('gitsigns.actions').nav_hunk(
+                    'last',
+                    { target = 'all', count = math.huge }
+                )
+            end,
+            desc = 'Gitsigns: jump to the {first|last} git hunk (staged or unstaged)',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'd',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({ count = -vim.v.count1 })
+            end,
+            forward = function() vim.diagnostic.jump({ count = vim.v.count1 }) end,
+            desc = 'Custom Remap: jump to the {previous|next} diagnostic',
+            opts = {},
+        },
+        extreme = {
+            key = 'D',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({ count = -math.huge, wrap = false })
+            end,
+            forward = function()
+                vim.diagnostic.jump({ count = math.huge, wrap = false })
+            end,
+            desc = 'Custom Remap: jump to the {first|last} diagnostic',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'dh',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -vim.v.count1,
+                    severity = vim.diagnostic.severity.HINT,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = vim.v.count1,
+                    severity = vim.diagnostic.severity.HINT,
+                })
+            end,
+            desc = 'Custom: jump to the {previous|next} diagnostic hint',
+            opts = {},
+        },
+        extreme = {
+            key = 'Dh',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -math.huge,
+                    severity = vim.diagnostic.severity.HINT,
+                    wrap = false,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = math.huge,
+                    severity = vim.diagnostic.severity.HINT,
+                    wrap = false,
+                })
+            end,
+            desc = 'Custom Remap: jump to the {first|last} diagnostic hint',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'de',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -vim.v.count1,
+                    severity = vim.diagnostic.severity.ERROR,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = vim.v.count1,
+                    severity = vim.diagnostic.severity.ERROR,
+                })
+            end,
+            desc = 'Custom: jump to the {previous|next} diagnostic error',
+            opts = {},
+        },
+        extreme = {
+            key = 'De',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -math.huge,
+                    severity = vim.diagnostic.severity.ERROR,
+                    wrap = false,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = math.huge,
+                    severity = vim.diagnostic.severity.ERROR,
+                    wrap = false,
+                })
+            end,
+            desc = 'Custom Remap: jump to the {first|last} diagnostic error',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'di',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -vim.v.count1,
+                    severity = vim.diagnostic.severity.INFO,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = vim.v.count1,
+                    severity = vim.diagnostic.severity.INFO,
+                })
+            end,
+            desc = 'Custom: jump to the {previous|next} diagnostic info',
+            opts = {},
+        },
+        extreme = {
+            key = 'Di',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -math.huge,
+                    severity = vim.diagnostic.severity.INFO,
+                    wrap = false,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = math.huge,
+                    severity = vim.diagnostic.severity.INFO,
+                    wrap = false,
+                })
+            end,
+            desc = 'Custom Remap: jump to the {first|last} diagnostic info',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'dw',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -vim.v.count1,
+                    severity = vim.diagnostic.severity.WARN,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = vim.v.count1,
+                    severity = vim.diagnostic.severity.WARN,
+                })
+            end,
+            desc = 'Custom: jump to the {previous|next} diagnostic warn',
+            opts = {},
+        },
+        extreme = {
+            key = 'Dw',
+            mode = { 'n', 'x' },
+            backward = function()
+                vim.diagnostic.jump({
+                    count = -math.huge,
+                    severity = vim.diagnostic.severity.WARN,
+                    wrap = false,
+                })
+            end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = math.huge,
+                    severity = vim.diagnostic.severity.WARN,
+                    wrap = false,
+                })
+            end,
+            desc = 'Custom Remap: jump to the {first|last} diagnostic warning',
+            opts = {},
+        },
+    })
+
+M.operations({
+    backward_key = '<C-h>',
+    forward_key = '<C-l>',
+    mode = { 'n' },
+}):navigator({
+    default = {
+        key = '',
+        backward = function() myoperations.repeat_backward_callback() end,
+        forward = function() myoperations.repeat_forward_callback() end,
+        desc = 'Custom: Repeat my last {backward|forward} keymap for navigating lists',
+        opts = {},
+    },
+})
+
+M.operations({
+    backward_key = '<leader><C-h>',
+    forward_key = '<leader><C-l>',
+    mode = { 'n' },
+}):navigator({
+    default = {
+        key = '',
+        backward = function() myoperations.repeat_extreme_backward_callback() end,
+        forward = function() myoperations.repeat_extreme_forward_callback() end,
+        desc = 'Custom: Run the extreme "{backward|forward}" command',
+        opts = {},
+    },
+})
+
+return M
