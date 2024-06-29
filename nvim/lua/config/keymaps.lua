@@ -869,9 +869,17 @@ local myoperations = M.operations({
             key = 'd',
             mode = { 'n', 'x' },
             backward = function()
-                vim.diagnostic.jump({ count = -vim.v.count1 })
+                vim.diagnostic.jump({
+                    count = -vim.v.count1,
+                    float = true,
+                })
             end,
-            forward = function() vim.diagnostic.jump({ count = vim.v.count1 }) end,
+            forward = function()
+                vim.diagnostic.jump({
+                    count = vim.v.count1,
+                    float = true,
+                })
+            end,
             desc = 'Custom Remap: jump to the {previous|next} diagnostic',
             opts = {},
         },
@@ -879,10 +887,18 @@ local myoperations = M.operations({
             key = 'D',
             mode = { 'n', 'x' },
             backward = function()
-                vim.diagnostic.jump({ count = -math.huge, wrap = false })
+                vim.diagnostic.jump({
+                    count = -math.huge,
+                    wrap = false,
+                    float = true,
+                })
             end,
             forward = function()
-                vim.diagnostic.jump({ count = math.huge, wrap = false })
+                vim.diagnostic.jump({
+                    count = math.huge,
+                    wrap = false,
+                    float = true,
+                })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic',
             opts = {},
@@ -897,12 +913,14 @@ local myoperations = M.operations({
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.HINT,
+                    float = true,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.HINT,
+                    float = true,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic hint',
@@ -916,6 +934,7 @@ local myoperations = M.operations({
                     count = -math.huge,
                     severity = vim.diagnostic.severity.HINT,
                     wrap = false,
+                    float = true,
                 })
             end,
             forward = function()
@@ -923,6 +942,7 @@ local myoperations = M.operations({
                     count = math.huge,
                     severity = vim.diagnostic.severity.HINT,
                     wrap = false,
+                    float = true,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic hint',
@@ -938,12 +958,14 @@ local myoperations = M.operations({
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.ERROR,
+                    float = true,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.ERROR,
+                    float = true,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic error',
@@ -957,6 +979,7 @@ local myoperations = M.operations({
                     count = -math.huge,
                     severity = vim.diagnostic.severity.ERROR,
                     wrap = false,
+                    float = true,
                 })
             end,
             forward = function()
@@ -964,6 +987,7 @@ local myoperations = M.operations({
                     count = math.huge,
                     severity = vim.diagnostic.severity.ERROR,
                     wrap = false,
+                    float = true,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic error',
@@ -979,12 +1003,14 @@ local myoperations = M.operations({
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.INFO,
+                    float = true,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.INFO,
+                    float = true,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic info',
@@ -998,6 +1024,7 @@ local myoperations = M.operations({
                     count = -math.huge,
                     severity = vim.diagnostic.severity.INFO,
                     wrap = false,
+                    float = true,
                 })
             end,
             forward = function()
@@ -1005,6 +1032,7 @@ local myoperations = M.operations({
                     count = math.huge,
                     severity = vim.diagnostic.severity.INFO,
                     wrap = false,
+                    float = true,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic info',
@@ -1020,12 +1048,14 @@ local myoperations = M.operations({
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.WARN,
+                    float = true,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.WARN,
+                    float = true,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic warn',
@@ -1039,6 +1069,7 @@ local myoperations = M.operations({
                     count = -math.huge,
                     severity = vim.diagnostic.severity.WARN,
                     wrap = false,
+                    float = true,
                 })
             end,
             forward = function()
@@ -1046,6 +1077,7 @@ local myoperations = M.operations({
                     count = math.huge,
                     severity = vim.diagnostic.severity.WARN,
                     wrap = false,
+                    float = true,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic warning',
