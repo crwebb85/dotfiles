@@ -765,58 +765,58 @@ require('lazy').setup({
         config = function(_, opts) require('oil').setup(opts) end,
     },
 
-    {
-        -- 'idanarye/nvim-impairative',
-        'crwebb85/nvim-impairative',
-        branch = 'add-callbacks',
-        -- dev = true,
-        lazy = true,
-        event = 'BufReadPre',
-        config = function(_, _)
-            local impairative = require('impairative')
-            impairative
-                .operations({
-                    backward = '[',
-                    forward = ']',
-                })
-                :unified_function({
-                    key = '<Space>',
-                    desc = 'Custom: add blank line(s) {above|below} the current line',
-                    fun = function(direction)
-                        local line_number = vim.api.nvim_win_get_cursor(0)[1]
-                        if direction == 'backward' then
-                            line_number = line_number - 1
-                        end
-                        local lines = vim.fn['repeat']({ '' }, vim.v.count1)
-                        vim.api.nvim_buf_set_lines(
-                            0,
-                            line_number,
-                            line_number,
-                            true,
-                            lines
-                        )
-                    end,
-                })
-                :range_manipulation({
-                    key = 'e',
-                    line_key = true,
-                    desc = 'Custom: exchange the line(s) with [count] lines {above|below} it',
-                    fun = function(args)
-                        local target
-                        if args.direction == 'backward' then
-                            target = args.start_line - args.count1 - 1
-                        else
-                            target = args.end_line + args.count1
-                        end
-                        vim.cmd({
-                            cmd = 'move',
-                            range = { args.start_line, args.end_line },
-                            args = { target },
-                        })
-                    end,
-                })
-        end,
-    },
+    -- {
+    --     -- 'idanarye/nvim-impairative',
+    --     'crwebb85/nvim-impairative',
+    --     branch = 'add-callbacks',
+    --     -- dev = true,
+    --     lazy = true,
+    --     event = 'BufReadPre',
+    --     config = function(_, _)
+    --         local impairative = require('impairative')
+    --         impairative
+    --             .operations({
+    --                 backward = '[',
+    --                 forward = ']',
+    --             })
+    --             :unified_function({
+    --                 key = '<Space>',
+    --                 desc = 'Custom: add blank line(s) {above|below} the current line',
+    --                 fun = function(direction)
+    --                     local line_number = vim.api.nvim_win_get_cursor(0)[1]
+    --                     if direction == 'backward' then
+    --                         line_number = line_number - 1
+    --                     end
+    --                     local lines = vim.fn['repeat']({ '' }, vim.v.count1)
+    --                     vim.api.nvim_buf_set_lines(
+    --                         0,
+    --                         line_number,
+    --                         line_number,
+    --                         true,
+    --                         lines
+    --                     )
+    --                 end,
+    --             })
+    --             :range_manipulation({
+    --                 key = 'e',
+    --                 line_key = true,
+    --                 desc = 'Custom: exchange the line(s) with [count] lines {above|below} it',
+    --                 fun = function(args)
+    --                     local target
+    --                     if args.direction == 'backward' then
+    --                         target = args.start_line - args.count1 - 1
+    --                     else
+    --                         target = args.end_line + args.count1
+    --                     end
+    --                     vim.cmd({
+    --                         cmd = 'move',
+    --                         range = { args.start_line, args.end_line },
+    --                         args = { target },
+    --                     })
+    --                 end,
+    --             })
+    --     end,
+    -- },
 
     ---------------------------------------------------------------------------
     -- Utils
