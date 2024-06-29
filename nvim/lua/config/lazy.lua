@@ -1078,10 +1078,22 @@ require('lazy').setup({
         lazy = true,
         keys = {
             {
-                '<leader>tj',
+                '<leader>vtt',
                 function() require('treesj').toggle() end,
                 mode = { 'n' },
                 desc = 'treesj: Toggle splitting and joining treesitter node',
+            },
+            {
+                '<leader>vtj',
+                function() require('treesj').join() end,
+                mode = { 'n' },
+                desc = 'treesj: Joining treesitter node',
+            },
+            {
+                '<leader>vts',
+                function() require('treesj').split() end,
+                mode = { 'n' },
+                desc = 'treesj: Split treesitter node',
             },
         },
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
