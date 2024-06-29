@@ -815,63 +815,11 @@ require('lazy').setup({
                         })
                     end,
                 })
-                :text_manipulation({
-                    key = 'u',
-                    line_key = true,
-                    desc = 'Custom: {encode|decode} URL',
-                    backward = require('impairative.helpers').encode_url,
-                    forward = require('impairative.helpers').decode_url,
-                })
-                :text_manipulation({
-                    key = 'x',
-                    line_key = true,
-                    desc = 'Custom: {encode|decode} XML',
-                    backward = require('impairative.helpers').encode_xml,
-                    forward = require('impairative.helpers').decode_xml,
-                })
-                :text_manipulation({
-                    key = 'y',
-                    line_key = true,
-                    desc = 'Custom: {escape|unescape} strings (C escape rules)',
-                    backward = require('impairative.helpers').encode_string,
-                    forward = require('impairative.helpers').decode_string,
-                })
-                :text_manipulation({
-                    key = 'C',
-                    line_key = true,
-                    desc = 'Custom: {escape|unescape} strings (C escape rules)',
-                    backward = require('impairative.helpers').encode_string,
-                    forward = require('impairative.helpers').decode_string,
-                })
-                :function_pair({
-                    key = 'j',
-                    desc = 'Custom: {Join|Split} treesiter nodes',
-                    backward = function() require('treesj').join() end,
-                    forward = function() require('treesj').split() end,
-                })
         end,
     },
 
     ---------------------------------------------------------------------------
     -- Utils
-
-    -- Big file/Macro speed increases
-    -- Removed faster.nvim because I couldn't disable macro functionality.
-    -- Not sure if I had a typo but I'm going to try bigfile.nvim instead
-    -- {
-    --     'pteroctopus/faster.nvim',
-    --     lazy = true,
-    --     event = 'VeryLazy',
-    --     opts = {
-    --         behaviours = {
-    --
-    --             fastmacro = {
-    --                 on = false,
-    --             },
-    --         },
-    --     },
-    --     config = function(_, opts) require('faster').setup(opts) end,
-    -- },
 
     --Big file speed increases (by disabling features)
     {
@@ -933,7 +881,6 @@ require('lazy').setup({
         opts = {
             operators = {
                 gc = 'Comment: line comment',
-                gb = 'Comment: block comment',
                 ys = 'Surround: Add a surrounding pair',
             },
         },
@@ -953,124 +900,7 @@ require('lazy').setup({
         'kylechui/nvim-surround',
         lazy = true,
         event = 'BufReadPre',
-        config = function(_, opts)
-            require('nvim-surround').setup(opts)
-            -- -- Based on https://www.reddit.com/r/neovim/comments/1d0ynca/whichkey_mappings_for_nvimsurround/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-            -- -- Add surround keymaps to whichkey
-            -- local root_key = 'S'
-            -- local grammar_targets = {
-            --     ['['] = '',
-            --     [']'] = '',
-            --     ['('] = '',
-            --     [')'] = '',
-            --     ['{'] = '',
-            --     ['}'] = '',
-            --     ['<'] = '',
-            --     ['>'] = '',
-            --     ['`'] = '',
-            --     ["'"] = '',
-            --     ['"'] = '',
-            -- }
-            -- local abbreviated_targets = {
-            --     ['b'] = ' [bracket]',
-            -- }
-            -- local keywords_targets = {
-            --     ['w'] = ' [word]',
-            --     ['W'] = ' [WORD]',
-            --     ['f'] = ' [function]',
-            --     ['q'] = ' [quote]',
-            -- }
-            --
-            -- local all_targets = {}
-            -- all_targets = vim.tbl_extend(
-            --     'error',
-            --     all_targets,
-            --     grammar_targets,
-            --     abbreviated_targets,
-            --     keywords_targets
-            -- )
-            --
-            -- local abbreviated_and_grammar_targets = {}
-            -- abbreviated_and_grammar_targets = vim.tbl_extend(
-            --     'error',
-            --     abbreviated_and_grammar_targets,
-            --     grammar_targets,
-            --     abbreviated_targets
-            -- )
-            --
-            -- local mappings = {
-            --     ['<leader>'] = {
-            --         [root_key] = { name = '+[surround]' },
-            --     },
-            -- }
-            --
-            -- -- around mappings
-            -- mappings['<leader>'][root_key]['a'] = { name = '+[around]' }
-            -- for char, desc in pairs(all_targets) do
-            --     mappings['<leader>'][root_key]['a'][char] = { name = desc }
-            --     for ichar, target in pairs(abbreviated_and_grammar_targets) do
-            --         mappings['<leader>'][root_key]['a'][char][ichar] = {
-            --             '<CMD>call feedkeys("ysa\\'
-            --                 .. char
-            --                 .. '\\'
-            --                 .. ichar
-            --                 .. '")<CR>',
-            --             'ysa' .. char .. ichar .. target,
-            --         }
-            --     end
-            -- end
-            --
-            -- -- inner mappings
-            -- mappings['<leader>'][root_key]['i'] = { name = '+[inner]' }
-            -- for char, desc in pairs(all_targets) do
-            --     mappings['<leader>'][root_key]['i'][char] = { name = desc }
-            --     for ichar, target in pairs(all_targets) do
-            --         mappings['<leader>'][root_key]['i'][char][ichar] = {
-            --             '<CMD>call feedkeys("ysi\\'
-            --                 .. char
-            --                 .. '\\'
-            --                 .. ichar
-            --                 .. '")<CR>',
-            --             'ysi' .. char .. ichar .. target,
-            --         }
-            --     end
-            -- end
-            --
-            -- -- change mappings
-            -- mappings['<leader>'][root_key]['c'] = { name = '+[change]' }
-            -- for char, desc in pairs(all_targets) do
-            --     mappings['<leader>'][root_key]['c'][char] = { name = desc }
-            --     for ichar, target in pairs(all_targets) do
-            --         mappings['<leader>'][root_key]['c'][char][ichar] = {
-            --             '<CMD>call feedkeys("cs\\'
-            --                 .. char
-            --                 .. '\\'
-            --                 .. ichar
-            --                 .. '")<CR>',
-            --             'cs' .. char .. ichar .. target,
-            --         }
-            --     end
-            -- end
-            --
-            -- -- delete mappings
-            -- mappings['<leader>'][root_key]['d'] = { name = '+[delete]' }
-            -- for char, target in pairs(all_targets) do
-            --     mappings['<leader>'][root_key]['d'][char] = {
-            --         '<CMD>call feedkeys("ds\\' .. char .. '")<CR>',
-            --         'ds' .. char .. target,
-            --     }
-            -- end
-            --
-            -- -- line mappings
-            -- mappings['<leader>'][root_key]['s'] = { name = '+[line]' }
-            -- for char, target in pairs(all_targets) do
-            --     mappings['<leader>'][root_key]['s'][char] = {
-            --         '<CMD>call feedkeys("yss\\' .. char .. '")<CR>',
-            --         'yss' .. char .. target,
-            --     }
-            -- end
-            -- require('which-key').register(mappings)
-        end,
+        config = true,
     },
 
     {
@@ -1133,6 +963,238 @@ require('lazy').setup({
                 },
             }
             require('treesj').setup(opts)
+        end,
+    },
+    {
+        'nvim-treesitter/nvim-treesitter-textobjects',
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        lazy = true,
+        event = 'BufReadPre',
+        config = function(_, _)
+            local opts = {
+                textobjects = {
+                    select = {
+                        enable = true,
+
+                        -- Automatically jump forward to textobj, similar to targets.vim
+                        lookahead = true,
+
+                        keymaps = {
+                            -- You can also use captures from other query groups like `locals.scm`
+                            -- ['as'] = {
+                            --     query = '@scope',
+                            --     query_group = 'locals',
+                            --     desc = 'Select language scope',
+                            -- },
+
+                            ['a='] = {
+                                query = '@assignment.outer',
+                                desc = 'Select outer part of an assignment',
+                            },
+                            ['i='] = {
+                                query = '@assignment.inner',
+                                desc = 'Select inner part of an assignment',
+                            },
+                            ['il='] = {
+                                query = '@assignment.lhs',
+                                desc = 'Select left hand side of an assignment',
+                            },
+                            ['ir='] = {
+                                query = '@assignment.rhs',
+                                desc = 'Select right hand side of an assignment',
+                            },
+
+                            ['aa'] = {
+                                query = '@parameter.outer',
+                                desc = 'Select outer part of a parameter/argument',
+                            },
+                            ['ia'] = {
+                                query = '@parameter.inner',
+                                desc = 'Select inner part of a parameter/argument',
+                            },
+
+                            ['ai'] = {
+                                query = '@conditional.outer',
+                                desc = 'Select outer part of a conditional',
+                            },
+                            ['ii'] = {
+                                query = '@conditional.inner',
+                                desc = 'Select inner part of a conditional',
+                            },
+
+                            ['ao'] = {
+                                query = '@loop.outer',
+                                desc = 'Select outer part of a loop',
+                            },
+                            ['io'] = {
+                                query = '@loop.inner',
+                                desc = 'Select inner part of a loop',
+                            },
+
+                            ['af'] = {
+                                query = '@call.outer',
+                                desc = 'Select outer part of a function call',
+                            },
+                            ['if'] = {
+                                query = '@call.inner',
+                                desc = 'Select inner part of a function call',
+                            },
+
+                            ['am'] = {
+                                query = '@function.outer',
+                                desc = 'Select outer part of a method/function definition',
+                            },
+                            ['im'] = {
+                                query = '@function.inner',
+                                desc = 'Select inner part of a method/function definition',
+                            },
+
+                            ['ac'] = {
+                                query = '@class.outer',
+                                desc = 'Select outer part of a class',
+                            },
+                            ['ic'] = {
+                                query = '@class.inner',
+                                desc = 'Select inner part of a class',
+                            },
+                        },
+                        -- You can choose the select mode (default is charwise 'v')
+                        --
+                        -- Can also be a function which gets passed a table with the keys
+                        -- * query_string: eg '@function.inner'
+                        -- * method: eg 'v' or 'o'
+                        -- and should return the mode ('v', 'V', or '<c-v>') or a table
+                        -- mapping query_strings to modes.
+                        selection_modes = {
+                            -- ['@parameter.outer'] = 'v', -- charwise
+                            -- ['@function.outer'] = 'V', -- linewise
+                            -- ['@class.outer'] = '<c-v>', -- blockwise
+                        },
+                        -- If you set this to `true` (default is `false`) then any textobject is
+                        -- extended to include preceding or succeeding whitespace. Succeeding
+                        -- whitespace has priority in order to act similarly to eg the built-in
+                        -- `ap`.
+                        --
+                        -- Can also be a function which gets passed a table with the keys
+                        -- * query_string: eg '@function.inner'
+                        -- * selection_mode: eg 'v'
+                        -- and should return true or false
+                        -- include_surrounding_whitespace = true,
+                    },
+                    swap = {
+                        enable = true,
+                        swap_next = {
+                            ['<leader>vna'] = '@parameter.inner',
+                            ['<leader>vn:'] = '@property.outer', -- swap object property with next
+                            ['<leader>vnm'] = '@function.outer', -- swap function with next
+                        },
+                        swap_previous = {
+                            ['<leader>vpa'] = '@parameter.inner',
+                            ['<leader>vp:'] = '@property.outer', -- swap object property with next
+                            ['<leader>vpm'] = '@function.outer', -- swap function with previous
+                        },
+                    },
+                    move = {
+                        enable = true,
+                        set_jumps = true, -- whether to set jumps in the jumplist
+
+                        --[[                          ]]
+                        goto_next_start = {
+                            [']f'] = {
+                                query = '@call.outer',
+                                desc = 'Next function call start',
+                            },
+                            [']m'] = {
+                                query = '@function.outer',
+                                desc = 'Remap: Next method/function def start',
+                            },
+                            [']c'] = {
+                                query = '@class.outer',
+                                desc = 'Next class start',
+                            },
+                            [']i'] = {
+                                query = '@conditional.outer',
+                                desc = 'Next conditional start',
+                            },
+                            [']o'] = {
+                                query = '@loop.outer',
+                                desc = 'Next loop start',
+                            },
+                            [']va'] = '@parameter.inner',
+                        },
+                        goto_next_end = {
+                            [']F'] = {
+                                query = '@call.outer',
+                                desc = 'Next function call end',
+                            },
+                            [']M'] = {
+                                query = '@function.outer',
+                                desc = 'Remap: Next method/function def end',
+                            },
+                            [']C'] = {
+                                query = '@class.outer',
+                                desc = 'Next class end',
+                            },
+                            [']I'] = {
+                                query = '@conditional.outer',
+                                desc = 'Next conditional end',
+                            },
+                            [']O'] = {
+                                query = '@loop.outer',
+                                desc = 'Next loop end',
+                            },
+                            [']vA'] = '@parameter.inner',
+                        },
+                        goto_previous_start = {
+                            ['[f'] = {
+                                query = '@call.outer',
+                                desc = 'Prev function call start',
+                            },
+                            ['[m'] = {
+                                query = '@function.outer',
+                                desc = 'Prev method/function def start',
+                            },
+                            ['[c'] = {
+                                query = '@class.outer',
+                                desc = 'Prev class start',
+                            },
+                            ['[i'] = {
+                                query = '@conditional.outer',
+                                desc = 'Prev conditional start',
+                            },
+                            ['[o'] = {
+                                query = '@loop.outer',
+                                desc = 'Prev loop start',
+                            },
+                            ['[va'] = '@parameter.inner',
+                        },
+                        goto_previous_end = {
+                            ['[F'] = {
+                                query = '@call.outer',
+                                desc = 'Prev function call end',
+                            },
+                            ['[M'] = {
+                                query = '@function.outer',
+                                desc = 'Prev method/function def end',
+                            },
+                            ['[C'] = {
+                                query = '@class.outer',
+                                desc = 'Prev class end',
+                            },
+                            ['[I'] = {
+                                query = '@conditional.outer',
+                                desc = 'Prev conditional end',
+                            },
+                            ['[O'] = {
+                                query = '@loop.outer',
+                                desc = 'Prev loop end',
+                            },
+                            ['[vA'] = '@parameter.inner',
+                        },
+                    },
+                },
+            }
+            require('nvim-treesitter.configs').setup(opts)
         end,
     },
 

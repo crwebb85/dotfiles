@@ -123,30 +123,30 @@ vim.keymap.set(
     { desc = 'Custom: Find and replace the word the cursor is on' }
 )
 
--- Make file executeable
-vim.keymap.set(
-    'n',
-    '<leader>x',
-    '<cmd>!chmod +x %<CR>',
-    { silent = true, desc = 'Custom: Make file executeable' }
-)
-
--- Diffing https://www.naseraleisa.com/posts/diff#file-1
--- Compare buffer to clipboard
-vim.keymap.set(
-    'n',
-    '<leader>vcc',
-    '<cmd>CompareClipboard<cr>',
-    { desc = 'Custom: Compare Clipboard', silent = true }
-)
-
--- Compare Clipboard to selected text
-vim.keymap.set(
-    'v',
-    '<leader>vcc',
-    '<esc><cmd>CompareClipboardSelection<cr>',
-    { desc = 'Custom: Compare Clipboard Selection' }
-)
+-- -- Make file executeable
+-- vim.keymap.set(
+--     'n',
+--     '<leader>x',
+--     '<cmd>!chmod +x %<CR>',
+--     { silent = true, desc = 'Custom: Make file executeable' }
+-- )
+--
+-- -- Diffing https://www.naseraleisa.com/posts/diff#file-1
+-- -- Compare buffer to clipboard
+-- vim.keymap.set(
+--     'n',
+--     '<leader>vcc',
+--     '<cmd>CompareClipboard<cr>',
+--     { desc = 'Custom: Compare Clipboard', silent = true }
+-- )
+--
+-- -- Compare Clipboard to selected text
+-- vim.keymap.set(
+--     'v',
+--     '<leader>vcc',
+--     '<esc><cmd>CompareClipboardSelection<cr>',
+--     { desc = 'Custom: Compare Clipboard Selection' }
+-- )
 
 -- Reverse letters https://vim.fandom.com/wiki/Reverse_letters
 vim.keymap.set(
@@ -155,44 +155,6 @@ vim.keymap.set(
     [[c<C-O>:set ri<CR><C-R>"<Esc>:set nori<CR>]],
     { desc = 'Custom: Reverse characters in text selection' }
 )
-
--- vim.keymap.set(
---     { 'i', 'n' },
---     '<A-r>',
---     function()
---         if
---             not vim.api.nvim_get_option_value('number', {})
---             and not vim.api.nvim_get_option_value('relativenumber', {})
---         then
---             vim.cmd([[
---                 setlocal number!
---                 echo "nu:1/rnu:0"
---             ]])
---         elseif
---             vim.api.nvim_get_option_value('number', {})
---             and not vim.api.nvim_get_option_value('relativenumber', {})
---         then
---             vim.cmd([[
---                 setlocal relativenumber!
---                 echo "nu:1/rnu:1"
---             ]])
---         elseif
---             vim.api.nvim_get_option_value('number', {})
---             and vim.api.nvim_get_option_value('relativenumber', {})
---         then
---             vim.cmd([[
---                 setlocal number!
---                 echo "nu:0/rnu:1"
---             ]])
---         else
---             vim.cmd([[
---                 setlocal relativenumber!
---                 echo "nu:0/rnu:0"
---             ]])
---         end
---     end,
---     { desc = 'Custom: Cycle line numbers/relative line numbers for the buffer' }
--- )
 
 vim.keymap.set(
     'n',
@@ -243,6 +205,20 @@ vim.keymap.set('n', '<A-t>', '<c-w>5+', {
 })
 vim.keymap.set('n', '<A-s>', '<c-w>5-', {
     desc = 'Custom: Decrease window height',
+})
+
+local function add_lines(direction)
+    local line_number = vim.api.nvim_win_get_cursor(0)[1]
+    if direction == 'below' then line_number = line_number - 1 end
+    local lines = vim.fn['repeat']({ '' }, vim.v.count1)
+    vim.api.nvim_buf_set_lines(0, line_number, line_number, true, lines)
+end
+
+vim.keymap.set('n', '<leader>voj', function() add_lines('below') end, {
+    desc = 'Custom: add blank line(s) below the current line',
+})
+vim.keymap.set('n', '<leader>vok', function() add_lines('above') end, {
+    desc = 'Custom: add blank line(s) above the current line',
 })
 
 ---There are two ways to specify the description:
