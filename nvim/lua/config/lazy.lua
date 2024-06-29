@@ -105,13 +105,29 @@ end
 
 require('lazy').setup({
     ---------------------------------------------------------------------------
+    -- Colorscheme
+    {
+        'folke/tokyonight.nvim',
+        lazy = false,
+        priority = 1000,
+        config = function()
+            require('tokyonight.colors').setup()
+            local color = 'tokyonight'
+            vim.cmd.colorscheme(color)
+        end,
+    },
+
+    ---------------------------------------------------------------------------
     -- Git integration
+
+    -- Adds Git commands
     {
         'tpope/vim-fugitive',
         version = '*',
         lazy = true,
         cmd = { 'Git' },
     },
+
     -- Adds git diffview
     {
         'sindrets/diffview.nvim',
@@ -213,9 +229,11 @@ require('lazy').setup({
             },
         },
     },
+
     -- Adds an API wrapper around git which I use in my heirline setup
     -- Adds Git blame
     -- Adds sidebar showing lines changed
+    -- Add hunk navigation
     {
         'lewis6991/gitsigns.nvim',
         lazy = true,
@@ -341,29 +359,8 @@ require('lazy').setup({
         end,
     },
 
-    -- LazyGit Integration (I use for partial staging)
-    -- {
-    --     'kdheepak/lazygit.nvim',
-    --     cmd = {
-    --         'LazyGit',
-    --         'LazyGitConfig',
-    --         'LazyGitCurrentFile',
-    --         'LazyGitFilter',
-    --         'LazyGitFilterCurrentFile',
-    --     },
-    --     lazy = true,
-    --     -- optional for floating window border decoration
-    --     dependencies = {
-    --         'nvim-lua/plenary.nvim',
-    --     },
-    --     -- setting the keybinding for LazyGit with 'keys' is recommended in
-    --     -- order to load the plugin when the command is run for the first time
-    --     keys = {
-    --         -- { '<leader>gs', '<cmd>LazyGit<cr>', desc = 'LazyGit' },
-    --     },
-    -- },
     ---------------------------------------------------------------------------
-    -- Navigation
+    -- File Navigation
 
     -- Fuzzy finder (for many things not just file finder)
     {
@@ -765,59 +762,47 @@ require('lazy').setup({
         config = function(_, opts) require('oil').setup(opts) end,
     },
 
-    -- {
-    --     -- 'idanarye/nvim-impairative',
-    --     'crwebb85/nvim-impairative',
-    --     branch = 'add-callbacks',
-    --     -- dev = true,
-    --     lazy = true,
-    --     event = 'BufReadPre',
-    --     config = function(_, _)
-    --         local impairative = require('impairative')
-    --         impairative
-    --             .operations({
-    --                 backward = '[',
-    --                 forward = ']',
-    --             })
-    --             :unified_function({
-    --                 key = '<Space>',
-    --                 desc = 'Custom: add blank line(s) {above|below} the current line',
-    --                 fun = function(direction)
-    --                     local line_number = vim.api.nvim_win_get_cursor(0)[1]
-    --                     if direction == 'backward' then
-    --                         line_number = line_number - 1
-    --                     end
-    --                     local lines = vim.fn['repeat']({ '' }, vim.v.count1)
-    --                     vim.api.nvim_buf_set_lines(
-    --                         0,
-    --                         line_number,
-    --                         line_number,
-    --                         true,
-    --                         lines
-    --                     )
-    --                 end,
-    --             })
-    --             :range_manipulation({
-    --                 key = 'e',
-    --                 line_key = true,
-    --                 desc = 'Custom: exchange the line(s) with [count] lines {above|below} it',
-    --                 fun = function(args)
-    --                     local target
-    --                     if args.direction == 'backward' then
-    --                         target = args.start_line - args.count1 - 1
-    --                     else
-    --                         target = args.end_line + args.count1
-    --                     end
-    --                     vim.cmd({
-    --                         cmd = 'move',
-    --                         range = { args.start_line, args.end_line },
-    --                         args = { target },
-    --                     })
-    --                 end,
-    --             })
-    --     end,
-    -- },
-
+    -- File search and replace
+    {
+        'nvim-pack/nvim-spectre',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+        },
+        lazy = true,
+        cmd = { 'Spectre' },
+        opts = {},
+        config = true,
+        keys = {
+            {
+                '<leader>st',
+                function() require('spectre').toggle() end,
+                mode = { 'n' },
+                desc = 'Spectre: Toggle Spectre',
+            },
+            {
+                '<leader>sw',
+                function()
+                    require('spectre').open_visual({ select_word = true })
+                end,
+                mode = { 'n' },
+                desc = 'Spectre: Search current word',
+            },
+            {
+                '<leader>sw',
+                function() require('spectre').open_visual() end,
+                mode = { 'v' },
+                desc = 'Spectre: Search current word',
+            },
+            {
+                '<leader>sp',
+                function()
+                    require('spectre').open_file_search({ select_word = true })
+                end,
+                mode = { 'n' },
+                desc = 'Spectre: Search on current file',
+            },
+        },
+    },
     ---------------------------------------------------------------------------
     -- Utils
 
@@ -842,6 +827,93 @@ require('lazy').setup({
         'nvim-lua/plenary.nvim',
         lazy = true,
     },
+
+    -- Keymap suggestions
+    {
+        'folke/which-key.nvim',
+        lazy = true,
+        event = 'VeryLazy',
+        init = function()
+            vim.o.timeout = true
+            vim.o.timeoutlen = 300
+        end,
+        opts = {
+            operators = {
+                gc = 'Comment: line comment',
+                ys = 'Surround: Add a surrounding pair',
+            },
+        },
+        config = true,
+    },
+
+    -- Adds markdown preview (opens in browser)
+    {
+        'iamcco/markdown-preview.nvim',
+        cmd = {
+            'MarkdownPreviewToggle',
+            'MarkdownPreview',
+            'MarkdownPreviewStop',
+        },
+        build = function() vim.fn['mkdp#util#install']() end,
+        lazy = true,
+    },
+
+    -- Open terminal within neovim
+    {
+        'akinsho/toggleterm.nvim',
+        lazy = true,
+        cmd = { 'ToggleTerm' },
+        keys = {
+            {
+                '<leader>tt',
+                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
+                desc = 'Toggleterm: Toggle',
+            },
+            {
+
+                [[<C-\>]],
+                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
+                desc = 'ToggleTerm: Toggle',
+                mode = { 'n', 'i' },
+            },
+            {
+                '<leader>gs',
+                function() M.lazytoggle() end,
+                desc = 'LazyGit',
+            },
+        },
+        config = function(_, opts) require('toggleterm').setup(opts) end,
+    },
+
+    ---------------------------------------------------------------------------
+    -- Clipboard support (copy from vim to the outside world)
+    {
+        'ojroques/nvim-osc52',
+        event = 'BufReadPre',
+    },
+
+    ---------------------------------------------------------------------------
+    -- Undotree the solution to screw ups
+    {
+        'mbbill/undotree',
+        lazy = true,
+        cmd = { 'UndotreeToggle', 'UndotreeShow' },
+        keys = {
+            {
+                '<leader>u',
+                vim.cmd.UndotreeToggle,
+                desc = 'Undotree: Toggle Undotree',
+            },
+        },
+        config = function(_, _)
+            if require('utils.platform').is.win then
+                vim.g.undotree_DiffCommand = 'FC'
+            end
+        end,
+    },
+
+    ---------------------------------------------------------------------------
+    --- Buffer operations
 
     -- Comment toggling
     {
@@ -869,31 +941,7 @@ require('lazy').setup({
         opts = {},
         config = true,
     },
-    -- Keymap suggestions
-    {
-        'folke/which-key.nvim',
-        lazy = true,
-        event = 'VeryLazy',
-        init = function()
-            vim.o.timeout = true
-            vim.o.timeoutlen = 300
-        end,
-        opts = {
-            operators = {
-                gc = 'Comment: line comment',
-                ys = 'Surround: Add a surrounding pair',
-            },
-        },
-        config = true,
-    },
-    -- {
-    --     'tris203/precognition.nvim',
-    --     lazy = true,
-    --     cmd = { 'Precognition' },
-    --     opts = {
-    --         startVisible = false,
-    --     },
-    -- },
+
     -- Adds motions to wrap text in quotes/brackets/tags/etc
     -- using the same motions I use to yank text
     {
@@ -903,6 +951,7 @@ require('lazy').setup({
         config = true,
     },
 
+    --tressiter split and join nodes
     {
         'Wansmer/treesj',
         lazy = true,
@@ -1198,58 +1247,6 @@ require('lazy').setup({
         end,
     },
 
-    -- File search and replace
-    {
-        'nvim-pack/nvim-spectre',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-        },
-        lazy = true,
-        cmd = { 'Spectre' },
-        opts = {},
-        config = true,
-        keys = {
-            {
-                '<leader>st',
-                function() require('spectre').toggle() end,
-                mode = { 'n' },
-                desc = 'Spectre: Toggle Spectre',
-            },
-            {
-                '<leader>sw',
-                function()
-                    require('spectre').open_visual({ select_word = true })
-                end,
-                mode = { 'n' },
-                desc = 'Spectre: Search current word',
-            },
-            {
-                '<leader>sw',
-                function() require('spectre').open_visual() end,
-                mode = { 'v' },
-                desc = 'Spectre: Search current word',
-            },
-            {
-                '<leader>sp',
-                function()
-                    require('spectre').open_file_search({ select_word = true })
-                end,
-                mode = { 'n' },
-                desc = 'Spectre: Search on current file',
-            },
-        },
-    },
-    -- Adds markdown preview (opens in browser)
-    {
-        'iamcco/markdown-preview.nvim',
-        cmd = {
-            'MarkdownPreviewToggle',
-            'MarkdownPreview',
-            'MarkdownPreviewStop',
-        },
-        build = function() vim.fn['mkdp#util#install']() end,
-        lazy = true,
-    },
     -- Adds refactor commands
     {
         'ThePrimeagen/refactoring.nvim',
@@ -1260,201 +1257,6 @@ require('lazy').setup({
             'nvim-treesitter/nvim-treesitter',
         },
         cmd = { 'Refactor' },
-    },
-    -- Open terminal within neovim
-    {
-        'akinsho/toggleterm.nvim',
-        lazy = true,
-        cmd = { 'ToggleTerm' },
-        keys = {
-            {
-                '<leader>tt',
-                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-                desc = 'Toggleterm: Toggle',
-            },
-            {
-
-                [[<C-\>]],
-                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-                desc = 'ToggleTerm: Toggle',
-                mode = { 'n', 'i' },
-            },
-            {
-                '<leader>gs',
-                function() M.lazytoggle() end,
-                desc = 'LazyGit',
-            },
-        },
-        config = function(_, opts) require('toggleterm').setup(opts) end,
-    },
-    -- -- Diagnostic info
-    -- {
-    --     'folke/trouble.nvim',
-    --     dependencies = { 'nvim-tree/nvim-web-devicons' },
-    --     lazy = true,
-    --     config = true,
-    --     cmd = { 'Trouble', 'TroubleToggle' },
-    --     keys = {
-    --         {
-    --             '<leader>xx',
-    --             function() require('trouble').toggle() end,
-    --             desc = 'Trouble: Toggle UI',
-    --         },
-    --         {
-    --             '<leader>xw',
-    --             function() require('trouble').toggle('workspace_diagnostics') end,
-    --             desc = 'Trouble: Toggle workspace diagnostics',
-    --         },
-    --         {
-    --             '<leader>xd',
-    --             function() require('trouble').toggle('document_diagnostics') end,
-    --             desc = 'Trouble: Toggle document diagnostics',
-    --         },
-    --         {
-    --             '<leader>xq',
-    --             function() require('trouble').toggle('quickfix') end,
-    --             desc = 'Trouble: Toggle quickfix list (Using Troubles UI)',
-    --         },
-    --         {
-    --             '<leader>xl',
-    --             function() require('trouble').toggle('loclist') end,
-    --             desc = 'Trouble: Toggle loclist',
-    --         },
-    --         {
-    --             '<leader>xr',
-    --             function() require('trouble').toggle('lsp_references') end,
-    --             desc = 'Trouble: Toggle lsp references',
-    --         },
-    --         {
-    --             '<leader>xn',
-    --             function()
-    --                 require('trouble').next({ skip_groups = true, jump = true })
-    --             end,
-    --             desc = 'Trouble: jump to the next item, skipping the groups',
-    --         },
-    --         {
-    --             '<leader>xp',
-    --             function()
-    --                 require('trouble').previous({
-    --                     skip_groups = true,
-    --                     jump = true,
-    --                 })
-    --             end,
-    --             desc = 'Trouble: jump to the previous item, skipping the groups',
-    --         },
-    --         {
-    --             '<leader>xf',
-    --             function()
-    --                 require('trouble').first({ skip_groups = true, jump = true })
-    --             end,
-    --             desc = 'Trouble: jump to the first item, skipping the groups',
-    --         },
-    --         {
-    --             '<leader>xl',
-    --             function()
-    --                 require('trouble').last({ skip_groups = true, jump = true })
-    --             end,
-    --             desc = 'Trouble: jump to the last item, skipping the groups',
-    --         },
-    --     },
-    -- },
-    -- Query ollama
-    -- {
-    --     'nomnivore/ollama.nvim',
-    --     dependencies = {
-    --         'nvim-lua/plenary.nvim',
-    --     },
-    --     lazy = true,
-    --     config = true,
-    --     -- All the user commands added by the plugin
-    --     cmd = { 'Ollama', 'OllamaModel', 'OllamaServe', 'OllamaServeStop' },
-    --
-    --     -- Sample keybind for prompting. Note that the <c-u> is important for selections to work properly.
-    --     keys = {
-    --         {
-    --             '<leader>oo',
-    --             ":<c-u>lua require('ollama').prompt()<cr>",
-    --             desc = 'Ollama: Open prompt',
-    --             mode = { 'n', 'v' },
-    --         },
-    --     },
-    -- },
-    -- {
-    --     'stevearc/stickybuf.nvim',
-    --     lazy = true,
-    --     event = 'VeryLazy',
-    --     config = function()
-    --         require('stickybuf').setup({
-    --             -- This function is run on BufEnter to determine pinning should be activated
-    --             get_auto_pin = function(bufnr)
-    --                 --[[
-    --                 TODO play around with either this libray or create my own autocmds
-    --                 to handle auto closing popup windows figure out how to handle diffview
-    --                 --]]
-    --                 -- local buftype = vim.bo[bufnr].buftype
-    --                 -- local filetype = vim.bo[bufnr].filetype
-    --                 -- local bufname = vim.api.nvim_buf_get_name(bufnr)
-    --                 -- if vim.startswith(bufname, 'diffview:') then
-    --                 --     return bufnr
-    --                 -- end
-    --                 -- if buftype == 'nofile' then
-    --                 --     local filetypes_of_buffers_to_close_set =
-    --                 --         require('config.utils').set({
-    --                 --             'lazy',
-    --                 --             'mason',
-    --                 --             'lspinfo',
-    --                 --         })
-    --                 --     if
-    --                 --         filetypes_of_buffers_to_close_set[filetype] ~= nil
-    --                 --     then
-    --                 --         return filetype
-    --                 --     end
-    --                 -- end
-    --                 -- You can return "bufnr", "buftype", "filetype", or a custom function to set how the window will be pinned.
-    --                 -- You can instead return an table that will be passed in as "opts" to `stickybuf.pin`.
-    --                 -- The function below encompasses the default logic. Inspect the source to see what it does.
-    --                 return require('stickybuf').should_auto_pin(bufnr)
-    --             end,
-    --         })
-    --     end,
-    -- },
-
-    ---------------------------------------------------------------------------
-    -- Clipboard support (copy from vim to the outside world)
-    {
-        'ojroques/nvim-osc52',
-        event = 'BufReadPre',
-    },
-
-    {
-        'folke/tokyonight.nvim',
-        lazy = false,
-        priority = 1000,
-        config = function()
-            require('tokyonight.colors').setup()
-            local color = 'tokyonight'
-            vim.cmd.colorscheme(color)
-        end,
-    },
-
-    ---------------------------------------------------------------------------
-    -- Undotree the solution to screw ups
-    {
-        'mbbill/undotree',
-        lazy = true,
-        cmd = { 'UndotreeToggle', 'UndotreeShow' },
-        keys = {
-            {
-                '<leader>u',
-                vim.cmd.UndotreeToggle,
-                desc = 'Undotree: Toggle Undotree',
-            },
-        },
-        config = function(_, _)
-            if require('utils.platform').is.win then
-                vim.g.undotree_DiffCommand = 'FC'
-            end
-        end,
     },
 
     ---------------------------------------------------------------------------
@@ -1520,62 +1322,62 @@ require('lazy').setup({
     },
 
     -----------------------------------------------------------------------------
-    -- PYTHON REPL
-    -- A basic REPL that opens up as a horizontal split
-    -- - use `<leader>i` to toggle the REPL
-    -- - use `<leader>I` to restart the REPL
-    -- - `+` serves as the "send to REPL" operator. That means we can use `++`
-    -- to send the current line to the REPL, and `+j` to send the current and the
-    -- following line to the REPL, like we would do with other vim operators.
-    {
-        'Vigemus/iron.nvim',
-        keys = {
-            { '<leader>i', vim.cmd.IronRepl, desc = 'Iron: Toggle REPL' },
-            { '<leader>I', vim.cmd.IronRestart, desc = 'Iron: Restart REPL' },
-
-            -- these keymaps need no right-hand-side, since that is defined by the
-            -- plugin config further below
-            { '+', mode = { 'n', 'x' }, desc = 'Iron: Send-to-REPL Operator' },
-            { '++', desc = 'Iron: Send Line to REPL' },
-        },
-
-        -- since irons's setup call is `require("iron.core").setup`, instead of
-        -- `require("iron").setup` like other plugins would do, we need to tell
-        -- lazy.nvim which module to via the `main` key
-        main = 'iron.core',
-
-        opts = {
-            keymaps = {
-                send_line = '++',
-                visual_send = '+',
-                send_motion = '+',
-            },
-            config = {
-                -- this defined how the repl is opened. Here we set the REPL window
-                -- to open in a horizontal split to a bottom, with a height of 10
-                -- cells.
-                repl_open_cmd = 'horizontal bot 10 split',
-
-                -- This defines which binary to use for the REPL. If `ipython` is
-                -- available, it will use `ipython`, otherwise it will use `python3`.
-                -- since the python repl does not play well with indents, it's
-                -- preferable to use `ipython` or `bypython` here.
-                -- (see: https://github.com/Vigemus/iron.nvim/issues/348)
-                repl_definition = {
-                    python = {
-                        command = function()
-                            local ipythonAvailable = vim.fn.executable(
-                                'ipython'
-                            ) == 1
-                            local binary = ipythonAvailable and 'ipython'
-                                or 'python3'
-                            return { binary }
-                        end,
-                    },
-                },
-            },
-        },
-    },
+    -- -- PYTHON REPL
+    -- -- A basic REPL that opens up as a horizontal split
+    -- -- - use `<leader>i` to toggle the REPL
+    -- -- - use `<leader>I` to restart the REPL
+    -- -- - `+` serves as the "send to REPL" operator. That means we can use `++`
+    -- -- to send the current line to the REPL, and `+j` to send the current and the
+    -- -- following line to the REPL, like we would do with other vim operators.
+    -- {
+    --     'Vigemus/iron.nvim',
+    --     keys = {
+    --         { '<leader>i', vim.cmd.IronRepl, desc = 'Iron: Toggle REPL' },
+    --         { '<leader>I', vim.cmd.IronRestart, desc = 'Iron: Restart REPL' },
+    --
+    --         -- these keymaps need no right-hand-side, since that is defined by the
+    --         -- plugin config further below
+    --         { '+', mode = { 'n', 'x' }, desc = 'Iron: Send-to-REPL Operator' },
+    --         { '++', desc = 'Iron: Send Line to REPL' },
+    --     },
+    --
+    --     -- since irons's setup call is `require("iron.core").setup`, instead of
+    --     -- `require("iron").setup` like other plugins would do, we need to tell
+    --     -- lazy.nvim which module to via the `main` key
+    --     main = 'iron.core',
+    --
+    --     opts = {
+    --         keymaps = {
+    --             send_line = '++',
+    --             visual_send = '+',
+    --             send_motion = '+',
+    --         },
+    --         config = {
+    --             -- this defined how the repl is opened. Here we set the REPL window
+    --             -- to open in a horizontal split to a bottom, with a height of 10
+    --             -- cells.
+    --             repl_open_cmd = 'horizontal bot 10 split',
+    --
+    --             -- This defines which binary to use for the REPL. If `ipython` is
+    --             -- available, it will use `ipython`, otherwise it will use `python3`.
+    --             -- since the python repl does not play well with indents, it's
+    --             -- preferable to use `ipython` or `bypython` here.
+    --             -- (see: https://github.com/Vigemus/iron.nvim/issues/348)
+    --             repl_definition = {
+    --                 python = {
+    --                     command = function()
+    --                         local ipythonAvailable = vim.fn.executable(
+    --                             'ipython'
+    --                         ) == 1
+    --                         local binary = ipythonAvailable and 'ipython'
+    --                             or 'python3'
+    --                         return { binary }
+    --                     end,
+    --                 },
+    --             },
+    --         },
+    --     },
+    -- },
 
     ---------------------------------------------------------------------------
     -- Testing
@@ -2087,12 +1889,6 @@ require('lazy').setup({
             listener.after.event_initialized['dapui_config'] = function()
                 require('dapui').open()
             end
-            -- listener.before.event_terminated['dapui_config'] = function()
-            --     require('dapui').close()
-            -- end
-            -- listener.before.event_exited['dapui_config'] = function()
-            --     require('dapui').close()
-            -- end
         end,
     },
 
@@ -2115,29 +1911,6 @@ require('lazy').setup({
     ---------------------------------------------------------------------------
     --- LSP's and more
 
-    -- -- Adds workspace configuration file support
-    -- {
-    --     'folke/neoconf.nvim',
-    --     lazy = false,
-    --     config = true,
-    -- },
-
-    -- Configure Lua LSP to know about neovim plugins when in neovim config (neodev is in end of life)
-    -- {
-    --     'folke/neodev.nvim',
-    --     lazy = true, -- Will lazy load before lspconfig since I marked it as a dependency
-    --     config = function()
-    --         require('neodev').setup({
-    --             setup_jsonls = false, -- I will do this manually in my lspconfig setup
-    --             -- -- Workaround to get correctly configure lua_ls for neovim config
-    --             -- -- https://github.com/folke/neodev.nvim/issues/158#issuecomment-1672421325
-    --             -- override = function(_, library)
-    --             --     library.enabled = true
-    --             --     library.plugins = true
-    --             -- end,
-    --         })
-    --     end,
-    -- },
     {
         'folke/lazydev.nvim',
         ft = 'lua', -- only load on lua files
@@ -2313,22 +2086,6 @@ require('lazy').setup({
                         end
                     end,
                 },
-                -- ['<Tab>'] = {
-                --     c = function(_)
-                --         if cmp.visible() then
-                --             if #cmp.get_entries() == 1 then
-                --                 cmp.confirm({ select = true })
-                --             else
-                --                 cmp.select_next_item()
-                --             end
-                --         else
-                --             cmp.complete()
-                --             if #cmp.get_entries() == 1 then
-                --                 cmp.confirm({ select = true })
-                --             end
-                --         end
-                --     end,
-                -- },
                 ['<Tab>'] = {
                     c = function()
                         if cmp.visible() then
@@ -2613,6 +2370,40 @@ require('lazy').setup({
         lazy = true,
     },
 
+    -- Code Action preview
+    {
+        'aznhe21/actions-preview.nvim',
+        lazy = true,
+        config = true,
+    },
+    -- Code Action Macros
+    {
+        'crwebb85/mark-code-action.nvim',
+        lazy = true,
+        event = 'BufReadPre',
+        opts = {
+
+            marks = {
+                DisableDiagnostic = {
+                    client_name = 'lua_ls',
+                    kind = 'quickfix',
+                    title = 'Disable diagnostics on this line (undefined-field).',
+                },
+                CleanImports = {
+                    client_name = 'omnisharp',
+                    kind = 'quickfix',
+                    title = 'Remove unnecessary usings',
+                },
+            },
+            lsp_timeout_ms = 10000,
+        },
+        config = true,
+        -- dev = true,
+    },
+
+    ---------------------------------------------------------------------------
+    --- Formatter
+
     -- Formatting client: conform.nvim
     -- - configured to use black & isort in python
     -- - use the taplo-LSP for formatting in toml
@@ -2674,36 +2465,6 @@ require('lazy').setup({
             -- -- Set this value to true to silence errors when formatting a block fails
             -- require('conform.formatters.injected').options.ignore_errors = false
         end,
-    },
-    -- Code Action preview
-    {
-        'aznhe21/actions-preview.nvim',
-        lazy = true,
-        config = true,
-    },
-    -- Code Action Macros
-    {
-        'crwebb85/mark-code-action.nvim',
-        lazy = true,
-        event = 'BufReadPre',
-        opts = {
-
-            marks = {
-                DisableDiagnostic = {
-                    client_name = 'lua_ls',
-                    kind = 'quickfix',
-                    title = 'Disable diagnostics on this line (undefined-field).',
-                },
-                CleanImports = {
-                    client_name = 'omnisharp',
-                    kind = 'quickfix',
-                    title = 'Remove unnecessary usings',
-                },
-            },
-            lsp_timeout_ms = 10000,
-        },
-        config = true,
-        -- dev = true,
     },
 
     ---------------------------------------------------------------------------
