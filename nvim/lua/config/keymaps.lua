@@ -156,43 +156,43 @@ vim.keymap.set(
     { desc = 'Custom: Reverse characters in text selection' }
 )
 
-vim.keymap.set(
-    { 'i', 'n' },
-    '<A-r>',
-    function()
-        if
-            not vim.api.nvim_get_option_value('number', {})
-            and not vim.api.nvim_get_option_value('relativenumber', {})
-        then
-            vim.cmd([[
-                setlocal number!
-                echo "nu:1/rnu:0"
-            ]])
-        elseif
-            vim.api.nvim_get_option_value('number', {})
-            and not vim.api.nvim_get_option_value('relativenumber', {})
-        then
-            vim.cmd([[
-                setlocal relativenumber!
-                echo "nu:1/rnu:1"
-            ]])
-        elseif
-            vim.api.nvim_get_option_value('number', {})
-            and vim.api.nvim_get_option_value('relativenumber', {})
-        then
-            vim.cmd([[
-                setlocal number!
-                echo "nu:0/rnu:1"
-            ]])
-        else
-            vim.cmd([[
-                setlocal relativenumber!
-                echo "nu:0/rnu:0"
-            ]])
-        end
-    end,
-    { desc = 'Custom: Cycle line numbers/relative line numbers for the buffer' }
-)
+-- vim.keymap.set(
+--     { 'i', 'n' },
+--     '<A-r>',
+--     function()
+--         if
+--             not vim.api.nvim_get_option_value('number', {})
+--             and not vim.api.nvim_get_option_value('relativenumber', {})
+--         then
+--             vim.cmd([[
+--                 setlocal number!
+--                 echo "nu:1/rnu:0"
+--             ]])
+--         elseif
+--             vim.api.nvim_get_option_value('number', {})
+--             and not vim.api.nvim_get_option_value('relativenumber', {})
+--         then
+--             vim.cmd([[
+--                 setlocal relativenumber!
+--                 echo "nu:1/rnu:1"
+--             ]])
+--         elseif
+--             vim.api.nvim_get_option_value('number', {})
+--             and vim.api.nvim_get_option_value('relativenumber', {})
+--         then
+--             vim.cmd([[
+--                 setlocal number!
+--                 echo "nu:0/rnu:1"
+--             ]])
+--         else
+--             vim.cmd([[
+--                 setlocal relativenumber!
+--                 echo "nu:0/rnu:0"
+--             ]])
+--         end
+--     end,
+--     { desc = 'Custom: Cycle line numbers/relative line numbers for the buffer' }
+-- )
 
 vim.keymap.set(
     'n',

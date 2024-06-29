@@ -187,6 +187,49 @@ vim.api.nvim_create_autocmd('FocusGained', {
 })
 
 -------------------------------------------------------------------------------
+-- Change line numbers based on the mode
+--
+
+local change_relative_line_number_group =
+    vim.api.nvim_create_augroup('change_relative_line_number', { clear = true })
+vim.api.nvim_create_autocmd('ModeChanged', {
+    callback = function(args)
+        local modes = vim.split(args.match, ':')
+        -- vim.print(modes)
+        local prev_mode = modes[1]
+        local new_mode = modes[2]
+        if new_mode == 'c' then
+            vim.wo.number = true
+            vim.wo.relativenumber = false
+            vim.wo.cursorline = true
+            vim.cmd('redraw')
+        elseif prev_mode == 'c' then
+            vim.wo.number = true
+            vim.wo.relativenumber = true
+            vim.wo.cursorline = false
+
+            vim.cmd('redraw')
+        end
+    end,
+    group = change_relative_line_number_group,
+})
+
+vim.api.nvim_create_autocmd({ 'WinEnter' }, {
+    callback = function(_)
+        vim.wo.number = true
+        vim.wo.relativenumber = true
+    end,
+    group = change_relative_line_number_group,
+})
+vim.api.nvim_create_autocmd({ 'WinLeave' }, {
+    callback = function(_)
+        vim.wo.number = true
+        vim.wo.relativenumber = false
+    end,
+    group = change_relative_line_number_group,
+})
+
+-------------------------------------------------------------------------------
 --- Autosave
 -- vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'VimLeavePre' }, {
 --     pattern = '*',
