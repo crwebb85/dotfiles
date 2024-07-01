@@ -1,3 +1,29 @@
+--Granular undo while in insert mode
+vim.keymap.set(
+    'i',
+    ',',
+    ',<C-g>U',
+    { desc = 'Creates an undo point when the character is typed' }
+)
+vim.keymap.set(
+    'i',
+    '.',
+    '.<C-g>U',
+    { desc = 'Creates an undo point when the character is typed' }
+)
+vim.keymap.set(
+    'i',
+    '!',
+    '!<C-g>U',
+    { desc = 'Creates an undo point when the character is typed' }
+)
+vim.keymap.set(
+    'i',
+    '?',
+    '?<C-g>U',
+    { desc = 'Creates an undo point when the character is typed' }
+)
+
 -- Clipboard --
 -- Now the '+' register will copy to system clipboard using OSC52
 vim.keymap.set(
