@@ -686,6 +686,8 @@ require('lazy').setup({
         opts = {
             default_file_explorer = true,
             delete_to_trash = true,
+            -- watch the filesystem for changes and reload oil
+            watch_for_changes = true,
             view_options = {
                 show_hidden = true,
                 is_always_hidden = function(name, _)
