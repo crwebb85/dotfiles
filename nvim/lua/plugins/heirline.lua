@@ -273,9 +273,7 @@ local config = function()
             for i, formatter_details in pairs(formatter_details_list) do
                 ---@type StatusLine
                 local formatter_component = {
-                    provider = require('config.utils').trim(
-                        formatter_details.name
-                    ),
+                    provider = vim.fn.trim(formatter_details.name),
                 }
                 if not formatter_details.available then
                     formatter_component.hl = { fg = 'red', bold = true }
@@ -311,7 +309,7 @@ local config = function()
                 for i, lsp_name in pairs(lsp_formatters) do
                     ---@type StatusLine
                     local formatter_component = {
-                        provider = require('config.utils').trim(lsp_name),
+                        provider = vim.fn.trim(lsp_name),
                     }
                     table.insert(children, formatter_component)
                     if i < #lsp_formatters then

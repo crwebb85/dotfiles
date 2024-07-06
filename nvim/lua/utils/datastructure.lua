@@ -1,6 +1,18 @@
 -- Based on set implementation from https://www.lua.org/pil/13.1.html and https://github.com/EvandroLG/set-lua/tree/master
 local M = {}
 
+--- From https://www.lua.org/pil/11.5.html
+--- A simple set implementation with no meta table magic
+---@param list string[]
+---@return table<string, boolean>
+function M.dumb_set(list)
+    local set = {}
+    for _, l in ipairs(list) do
+        set[l] = true
+    end
+    return set
+end
+
 ---@class Set
 ---@field new fun(self, list:table):Set Constructs a new set that lets you store unique values of any type
 ---@field to_array fun(self): table Converts the set to an array

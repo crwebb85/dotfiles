@@ -1,5 +1,44 @@
 local M = {}
 
+-------------------------------------------------------------------------------
+---Visual selection helpers
+
+---TODO replace with :h getregion which is in newer versions of neovim
+---Get the text in the visual selection
+---@param bufnr number of the buffer with text selected
+---@return string[]
+function M.get_visual_selection(bufnr)
+    local start_pos = vim.api.nvim_buf_get_mark(0, '<')
+    local start_row = start_pos[1]
+    local start_col = start_pos[2]
+
+    local end_pos = vim.api.nvim_buf_get_mark(0, '>')
+    local end_row = end_pos[1]
+    local end_col = end_pos[2]
+    -- vim.print(start_pos)
+    -- vim.print(end_pos)
+
+    ---@type string[]
+    local text = {}
+
+    if end_col == 2147483647 then
+        text = vim.api.nvim_buf_get_lines(bufnr, start_row - 1, end_row, true)
+    else
+        text = vim.api.nvim_buf_get_text(
+            bufnr,
+            start_row - 1,
+            start_col,
+            end_row - 1,
+            end_col + 1,
+            {}
+        )
+    end
+    return text
+end
+
+-------------------------------------------------------------------------------
+---Dot repeat
+
 --Returns a dot repeatable version of a function to be used in keymaps
 --that pressing `.` will repeat the action.
 --Example: `vim.keymap.set('n', 'ct', dot_repeat(function() print(os.clock()) end), { expr = true })`

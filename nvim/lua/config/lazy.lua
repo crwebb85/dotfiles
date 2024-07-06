@@ -152,7 +152,7 @@ require('lazy').setup({
                 function()
                     vim.cmd(
                         'DiffviewOpen '
-                            .. require('config.utils').get_default_branch_name()
+                            .. require('utils.misc').get_default_branch_name()
                     )
                 end,
                 desc = 'Diffview: Diff against master',
@@ -164,7 +164,7 @@ require('lazy').setup({
                 function()
                     vim.cmd(
                         'DiffviewOpen HEAD..origin/'
-                            .. require('config.utils').get_default_branch_name()
+                            .. require('utils.misc').get_default_branch_name()
                     )
                 end,
                 desc = 'Diffview: Diff against origin/master',
