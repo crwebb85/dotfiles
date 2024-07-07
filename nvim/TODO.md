@@ -42,6 +42,15 @@
   - https://www.reddit.com/r/neovim/comments/1ch6yfz/smart_indent_with_treesitter_indent_fallback/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
   - formatting with omnisharp on save is really slow
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
+- comments navigation/textobjects
+  - igc
+    - operate over text inside comment when single line comment
+    - operate over text inside block comment
+    - operate over text inside comment forcing block select for line comments when multiple lines
+  - agc
+    - operate over text around comment when single line comment
+    - operate over text around comment when multiple single line comment
+    - operate over text around comment block comments
 
 ### Cool plugins:
 

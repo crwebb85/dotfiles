@@ -428,4 +428,95 @@ function M.flip_flop_comment()
     vim.api.nvim_buf_set_mark(0, '<', vmark_start[1], vmark_start[2], {})
     vim.api.nvim_buf_set_mark(0, '>', vmark_end[1], vmark_end[2], {})
 end
+
+--- Select contiguous commented lines at cursor
+--- based on https://github.com/neovim/neovim/blob/3c53e8f78511d6db9a6c804e5a479ba38c33102d/runtime/lua/vim/_comment.lua#L233-L256
+---  https://thevaluable.dev/vim-create-text-objects/
+---  https://neovim.discourse.group/t/lua-function-to-perform-visual-line-selection/4425
+---  https://vi.stackexchange.com/a/43692
+---  https://www.reddit.com/r/neovim/comments/18w9rwv/comment/kfwknp3/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+function M.around_comment_lines_textobject()
+    local U = require('Comment.utils')
+    local lnum_cur = vim.fn.line('.')
+    local cnum_cur = vim.fn.col('.')
+
+    local range =
+        { srow = lnum_cur, scol = cnum_cur, erow = lnum_cur, ecol = cnum_cur }
+    local ctx = {
+        ctype = U.ctype.linewise,
+        range = range,
+    }
+    local cstr = require('Comment.ft').calculate(ctx) or vim.bo.commentstring
+
+    local ll, rr = U.unwrap_cstr(cstr)
+    local padding = true
+    local comment_check = U.is_commented(ll, rr, padding)
+
+    if not comment_check(vim.fn.getline(lnum_cur)) then return end
+
+    -- Compute commented range
+    local lnum_from = lnum_cur
+    while (lnum_from >= 2) and comment_check(vim.fn.getline(lnum_from - 1)) do
+        lnum_from = lnum_from - 1
+    end
+
+    local lnum_to = lnum_cur
+    local n_lines = vim.api.nvim_buf_line_count(0)
+    while
+        (lnum_to <= n_lines - 1) and comment_check(vim.fn.getline(lnum_to + 1))
+    do
+        lnum_to = lnum_to + 1
+    end
+
+    vim.cmd([[normal! :noh]]) -- enter normal mode (no idea why this makes it work)
+    vim.cmd([[normal ]] .. lnum_from .. [[G^v]] .. lnum_to .. [[Gg_]])
+end
+
+function M.select_indent(around)
+    local start_indent = vim.fn.indent(vim.fn.line('.'))
+    local blank_line_pattern = '^%s*$'
+
+    if string.match(vim.fn.getline('.'), blank_line_pattern) then return end
+
+    if vim.v.count > 0 then
+        start_indent = start_indent - vim.o.shiftwidth * (vim.v.count - 1)
+        if start_indent < 0 then start_indent = 0 end
+    end
+
+    local prev_line = vim.fn.line('.') - 1
+    local prev_blank_line = function(line)
+        return string.match(vim.fn.getline(line), blank_line_pattern)
+    end
+    while
+        prev_line > 0
+        and (
+            prev_blank_line(prev_line)
+            or vim.fn.indent(prev_line) >= start_indent
+        )
+    do
+        vim.cmd('-')
+        prev_line = vim.fn.line('.') - 1
+    end
+    if around then vim.cmd('-') end
+
+    vim.cmd('normal! 0V')
+
+    local next_line = vim.fn.line('.') + 1
+    local next_blank_line = function(line)
+        return string.match(vim.fn.getline(line), blank_line_pattern)
+    end
+    local last_line = vim.fn.line('$')
+    while
+        next_line <= last_line
+        and (
+            next_blank_line(next_line)
+            or vim.fn.indent(next_line) >= start_indent
+        )
+    do
+        vim.cmd('+')
+        next_line = vim.fn.line('.') + 1
+    end
+    if around then vim.cmd('+') end
+end
+
 return M

@@ -810,3 +810,24 @@ maputils
             opts = {},
         },
     })
+
+vim.keymap.set(
+    { 'o', 'x' },
+    'agc',
+    function() require('utils.mapping').around_comment_lines_textobject() end,
+    { desc = 'Comment textobject' }
+)
+
+vim.keymap.set(
+    { 'o', 'x' },
+    'igi',
+    ":<c-u>lua require('utils.mapping').select_indent()<cr>",
+    { desc = 'Select inner indent textobject', silent = true }
+)
+
+vim.keymap.set(
+    { 'o', 'x' },
+    'agi',
+    ":<c-u>lua require('utils.mapping').select_indent(true)<cr>",
+    { desc = 'Select around indent textobject', silent = true }
+)
