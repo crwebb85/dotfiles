@@ -1838,9 +1838,35 @@ require('lazy').setup({
                 desc = 'Debug: Toggle debugger UI',
             },
         },
+        opts = {
+            controls = {
+                icons = {
+                    pause = '',
+                    play = '',
+                    step_into = '',
+                    step_over = '',
+                    step_out = '',
+                    step_back = '',
+                    run_last = '',
+                    terminate = '',
+                    disconnect = '',
+                },
+                -- icons = {
+                --     pause = '||',
+                --     play = '|>',
+                --     step_into = 'v',
+                --     step_over = '>',
+                --     step_out = '^',
+                --     step_back = '<',
+                --     run_last = 'rl',
+                --     terminate = '|=|',
+                --     disconnect = 'x',
+                -- },
+            },
+        },
         -- automatically open/close the DAP UI when starting/stopping the debugger
-        config = function()
-            require('dapui').setup()
+        config = function(_, opts)
+            require('dapui').setup(opts)
             local listener = require('dap').listeners
             listener.after.event_initialized['dapui_config'] = function()
                 require('dapui').open()
