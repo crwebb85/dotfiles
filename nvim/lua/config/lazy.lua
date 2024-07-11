@@ -1980,8 +1980,6 @@ require('lazy').setup({
         lazy = true,
         dependencies = {
             {
-                -- neodev must load before lspconfig to load in the lua_ls LSP settings
-                'folke/neodev.nvim',
                 -- cmp-nvim-lsp provides a list of lsp capabilities to that cmp adds to neovim
                 -- I must have cmp-nvim-lsp load before nvim-lspconfig for
                 -- lua snips to show up in cmp
