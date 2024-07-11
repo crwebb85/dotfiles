@@ -376,7 +376,8 @@ end
 
 ---Determines the lsp_fallback value to use for Conform plugin's lsp_fallback option
 ---based on my formatting properties. Prioritizes the buffer settings over filetype settings
----@param bufnr any
+---TODO determine if I want to make any changes because of the new lsp format strategies added by conform
+---@param bufnr uinteger?
 ---@return boolean | "always"
 function M.determine_conform_lsp_fallback(bufnr)
     local lsp_format_strategy = P.get_buffer_lsp_format_strategy(bufnr)
