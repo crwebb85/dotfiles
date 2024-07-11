@@ -750,6 +750,18 @@ require('lazy').setup({
     ---------------------------------------------------------------------------
     -- Utils
 
+    {
+        'echasnovski/mini.icons',
+        dependencies = { 'echasnovski/mini.icons' },
+        lazy = true,
+        event = 'VeryLazy',
+        opts = {
+            style = 'glyph',
+            -- style = 'ascii',
+        },
+        config = true,
+    },
+
     --Big file speed increases (by disabling features)
     {
         'LunarVim/bigfile.nvim',
