@@ -43,6 +43,8 @@
   - formatting with omnisharp on save is really slow
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
 - comments navigation/textobjects
+  - gc
+    - operate exactly over the range of text that the gc operator would have commented
   - igc
     - operate over text inside comment when single line comment
     - operate over text inside block comment

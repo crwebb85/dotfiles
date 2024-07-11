@@ -1,5 +1,5 @@
-require('config.lazy')
 require('config.keymaps')
+require('config.lazy')
 require('config.clipboard')
 require('config.set')
 require('config.autocmd')

@@ -429,6 +429,21 @@ function M.flip_flop_comment()
     vim.api.nvim_buf_set_mark(0, '>', vmark_end[1], vmark_end[2], {})
 end
 
+local function get_treesitter_comment_node_at_cursor()
+    local node = vim.treesitter.get_node({ ignore_injections = false })
+
+    if node == nil then return nil end
+
+    if node:type():lower() == 'comment' then return node end
+
+    local parent_node = node:parent()
+    if parent_node ~= nil and parent_node:type():lower() == 'comment' then
+        return parent_node
+    end
+
+    return nil
+end
+
 --- Select contiguous commented lines at cursor
 --- based on https://github.com/neovim/neovim/blob/3c53e8f78511d6db9a6c804e5a479ba38c33102d/runtime/lua/vim/_comment.lua#L233-L256
 ---  https://thevaluable.dev/vim-create-text-objects/
@@ -440,11 +455,14 @@ function M.around_comment_lines_textobject()
     local lnum_cur = vim.fn.line('.')
     local cnum_cur = vim.fn.col('.')
 
-    local range =
-        { srow = lnum_cur, scol = cnum_cur, erow = lnum_cur, ecol = cnum_cur }
     local ctx = {
         ctype = U.ctype.linewise,
-        range = range,
+        range = {
+            srow = lnum_cur,
+            scol = cnum_cur,
+            erow = lnum_cur,
+            ecol = cnum_cur,
+        },
     }
     local cstr = require('Comment.ft').calculate(ctx) or vim.bo.commentstring
 
@@ -452,7 +470,34 @@ function M.around_comment_lines_textobject()
     local padding = true
     local comment_check = U.is_commented(ll, rr, padding)
 
-    if not comment_check(vim.fn.getline(lnum_cur)) then return end
+    local is_plugin_linewise_comment = comment_check(vim.fn.getline(lnum_cur))
+    local comment_node = get_treesitter_comment_node_at_cursor()
+
+    if not is_plugin_linewise_comment and comment_node ~= nil then
+        -- I am unsure if the "<count>|" keymap goes to the byte or column. I am assuming column for now
+        -- but if I am wrong I will need to change the parameters to the treesitter range method to get
+        -- back the byte number
+        local lnum_from, cnum_from, lnum_to, cnum_to = comment_node:range()
+        lnum_from = lnum_from + 1 -- change from 0 base indexing to 1 based indexing
+        lnum_to = lnum_to + 1 -- change from 0 base indexing to 1 based indexing
+        cnum_from = cnum_from + 1
+
+        vim.cmd([[normal! :noh]]) -- enter normal mode (no idea why this makes it work)
+        vim.cmd(
+            [[normal ]]
+                .. lnum_from
+                .. [[G]]
+                .. cnum_from
+                .. [[|v]]
+                .. lnum_to
+                .. [[G]]
+                .. cnum_to
+                .. [[|]]
+        )
+        return
+    elseif not is_plugin_linewise_comment and comment_node == nil then
+        return
+    end
 
     -- Compute commented range
     local lnum_from = lnum_cur
@@ -470,6 +515,50 @@ function M.around_comment_lines_textobject()
 
     vim.cmd([[normal! :noh]]) -- enter normal mode (no idea why this makes it work)
     vim.cmd([[normal ]] .. lnum_from .. [[G^v]] .. lnum_to .. [[Gg_]])
+end
+
+---Select the comment lines that would have been created by the gc operator
+---Equivalent to the default gc text object but uses numToStr/Comment.nvim
+function M.comment_lines_textobject()
+    local U = require('Comment.utils')
+    local lnum_cur = vim.fn.line('.')
+    local cnum_cur = vim.fn.col('.')
+
+    local ctx = {
+        ctype = U.ctype.linewise,
+        range = {
+            srow = lnum_cur,
+            scol = cnum_cur,
+            erow = lnum_cur,
+            ecol = cnum_cur,
+        },
+    }
+    local cstr = require('Comment.ft').calculate(ctx) or vim.bo.commentstring
+
+    local ll, rr = U.unwrap_cstr(cstr)
+    local padding = true
+    local comment_check = U.is_commented(ll, rr, padding)
+
+    local is_plugin_linewise_comment = comment_check(vim.fn.getline(lnum_cur))
+
+    if not is_plugin_linewise_comment then return end
+
+    -- Compute commented range
+    local lnum_from = lnum_cur
+    while (lnum_from >= 2) and comment_check(vim.fn.getline(lnum_from - 1)) do
+        lnum_from = lnum_from - 1
+    end
+
+    local lnum_to = lnum_cur
+    local n_lines = vim.api.nvim_buf_line_count(0)
+    while
+        (lnum_to <= n_lines - 1) and comment_check(vim.fn.getline(lnum_to + 1))
+    do
+        lnum_to = lnum_to + 1
+    end
+
+    vim.cmd([[normal! ]] .. lnum_from .. [[G^v]] .. lnum_to .. [[Gg_]])
+    -- vim.cmd([[normal! ]] .. lnum_from .. [[GV]] .. lnum_to .. [[G]])
 end
 
 function M.select_indent(around)

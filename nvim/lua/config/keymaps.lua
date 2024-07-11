@@ -1,3 +1,11 @@
+vim.g.mapleader = ' '
+
+vim.keymap.del({ 'n' }, '[d')
+vim.keymap.del({ 'n' }, ']d')
+
+vim.keymap.del({ 'n' }, '[D')
+vim.keymap.del({ 'n' }, ']D')
+
 local maputils = require('utils.mapping')
 
 --Granular undo while in insert mode
@@ -811,11 +819,24 @@ maputils
         },
     })
 
+vim.keymap.del({ 'o', 'n', 'x' }, 'gc')
+
+vim.keymap.set(
+    { 'o' },
+    'gc',
+    function() require('utils.mapping').comment_lines_textobject() end,
+    { desc = 'Comment textobject identical to gc operator' }
+    --note: vgc does not select the commented lines. It really does a block
+    --comment arround the character (which in my opinion pretty useless so I might
+    --try to fix that) this is because it isn't using the textobject gc it is using
+    --the gc visual mapping defined in numToStr/Comment.nvim
+)
+
 vim.keymap.set(
     { 'o', 'x' },
     'agc',
     function() require('utils.mapping').around_comment_lines_textobject() end,
-    { desc = 'Comment textobject' }
+    { desc = 'Comment textobject with treesitter fallback' }
 )
 
 vim.keymap.set(

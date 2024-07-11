@@ -122,7 +122,7 @@ require('lazy').setup({
                 desc = 'Diffview: Toggle',
             },
             {
-                '<leader>gh',
+                '<leader>ghh',
                 '<cmd>DiffviewFileHistory<cr>',
                 desc = 'Diffview: Open Git Repo history',
             },
@@ -2357,7 +2357,8 @@ require('lazy').setup({
         event = 'BufWritePre', -- load the plugin before saving
         keys = {
             {
-                '<leader>f',
+                -- '<leader>f',
+                'grf',
                 function()
                     local params =
                         require('config.formatter').construct_conform_formatting_params()
