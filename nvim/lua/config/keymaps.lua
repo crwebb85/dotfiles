@@ -379,7 +379,7 @@ local myoperations = maputils
                 if vim.wo.diff == true then target = 'unstaged' end
                 require('gitsigns.actions').nav_hunk(
                     'prev',
-                    { target = target, count = -vim.v.count1 }
+                    { target = target, count = vim.v.count1 }
                 )
             end,
             forward = function()
@@ -397,15 +397,19 @@ local myoperations = maputils
             key = 'H',
             mode = { 'n', 'x' },
             backward = function()
+                local target = 'all'
+                if vim.wo.diff == true then target = 'unstaged' end
                 require('gitsigns.actions').nav_hunk(
                     'first',
-                    { target = 'unstaged', count = -math.huge }
+                    { target = target, count = math.huge }
                 )
             end,
             forward = function()
+                local target = 'all'
+                if vim.wo.diff == true then target = 'unstaged' end
                 require('gitsigns.actions').nav_hunk(
                     'last',
-                    { target = 'unstaged', count = math.huge }
+                    { target = target, count = math.huge }
                 )
             end,
             desc = 'Gitsigns: smart jump to the {first|last} git hunk (based on if in diff mode)',
@@ -420,7 +424,7 @@ local myoperations = maputils
             backward = function()
                 require('gitsigns.actions').nav_hunk(
                     'prev',
-                    { target = 'unstaged', count = -vim.v.count1 }
+                    { target = 'unstaged', count = vim.v.count1 }
                 )
             end,
             forward = function()
@@ -438,7 +442,7 @@ local myoperations = maputils
             backward = function()
                 require('gitsigns.actions').nav_hunk(
                     'first',
-                    { target = 'unstaged', count = -math.huge }
+                    { target = 'unstaged', count = math.huge }
                 )
             end,
             forward = function()
@@ -459,7 +463,7 @@ local myoperations = maputils
             backward = function()
                 require('gitsigns.actions').nav_hunk(
                     'prev',
-                    { target = 'staged', count = -vim.v.count1 }
+                    { target = 'staged', count = vim.v.count1 }
                 )
             end,
             forward = function()
@@ -477,7 +481,7 @@ local myoperations = maputils
             backward = function()
                 require('gitsigns.actions').nav_hunk(
                     'first',
-                    { target = 'staged', count = -math.huge }
+                    { target = 'staged', count = math.huge }
                 )
             end,
             forward = function()
@@ -498,7 +502,7 @@ local myoperations = maputils
             backward = function()
                 require('gitsigns.actions').nav_hunk(
                     'prev',
-                    { target = 'all', count = -vim.v.count1 }
+                    { target = 'all', count = vim.v.count1 }
                 )
             end,
             forward = function()
@@ -516,7 +520,7 @@ local myoperations = maputils
             backward = function()
                 require('gitsigns.actions').nav_hunk(
                     'first',
-                    { target = 'all', count = -math.huge }
+                    { target = 'all', count = math.huge }
                 )
             end,
             forward = function()
