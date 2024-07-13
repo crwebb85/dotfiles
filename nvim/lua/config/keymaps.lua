@@ -370,40 +370,6 @@ local myoperations = maputils
         },
     })
     :navigator({
-        --no visual mode: I believe this can navigate to other buffers so visual mode would not be useful
-        default = {
-            key = 't',
-            backward = 'tprevious',
-            forward = 'tnext',
-            desc = 'Custom: Run the "{tprevious|tnext}" command',
-            opts = {},
-        },
-        extreme = {
-            key = 'T',
-            backward = 'tfirst',
-            forward = 'tlast',
-            desc = 'Custom: Run the "{tfirst|tlast}" command',
-            opts = {},
-        },
-    })
-    :navigator({
-        --no visual mode: I believe this can navigate to other buffers so visual mode would not be useful
-        default = {
-            key = '<C-t>',
-            backward = 'ptprevious',
-            forward = 'ptnext',
-            desc = 'Custom: Run the "{ptprevious|ptnext}" command',
-            opts = {},
-        },
-        extreme = {
-            key = '<leader><C-t>',
-            backward = 'ptfirst',
-            forward = 'ptlast',
-            desc = 'Custom: Run the "{ptfirst|ptlast}" command',
-            opts = {},
-        },
-    })
-    :navigator({
         --visual mode: stays within buffer so visual mode would be useful
         default = {
             key = 'h',
