@@ -309,6 +309,7 @@ require('lazy').setup({
         'nvim-telescope/telescope.nvim',
         dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
+            'nvim-tree/nvim-web-devicons',
             {
                 'crwebb85/telescope-media-files.nvim',
                 -- dev = true,
@@ -622,9 +623,7 @@ require('lazy').setup({
                 desc = 'Oil: Open parent directory',
             },
         },
-        dependencies = {
-            'nvim-tree/nvim-web-devicons',
-        },
+        dependencies = { 'echasnovski/mini.icons' },
         opts = {
             default_file_explorer = true,
             delete_to_trash = true,
@@ -752,7 +751,6 @@ require('lazy').setup({
 
     {
         'echasnovski/mini.icons',
-        dependencies = { 'echasnovski/mini.icons' },
         lazy = true,
         event = 'VeryLazy',
         opts = {

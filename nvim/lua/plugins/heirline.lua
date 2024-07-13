@@ -506,13 +506,27 @@ local config = function()
     local FileIcon = {
         init = function(self)
             local filename = self.filename
-            local extension = vim.fn.fnamemodify(filename, ':e')
-            self.icon, self.icon_color =
-                require('nvim-web-devicons').get_icon_color(
-                    filename,
-                    extension,
-                    { default = true }
-                )
+            -- local get_hex = function(hl)
+            --     if hl == nil then return nil end
+            --     return string.format(
+            --         '#%06x',
+            --         vim.api.nvim_get_hl(0, { name = hl }).fg or 7176326
+            --     )
+            -- end
+            -- local hl = nil
+            -- self.icon, hl = require('mini.icons').get('file', filename)
+            -- self.icon_color = get_hex(hl)
+            self.icon, self.icon_hl_group =
+                require('mini.icons').get('file', filename)
+            self.icon_hl = vim.api.nvim_get_hl(0, { name = self.icon_hl_group })
+
+            -- local extension = vim.fn.fnamemodify(filename, ':e')
+            -- self.icon, self.icon_color =
+            --     require('nvim-web-devicons').get_icon_color(
+            --         filename,
+            --         extension,
+            --         { default = true }
+            --     )
         end,
         provider = function(self)
             if self.filename == '' then
@@ -521,7 +535,8 @@ local config = function()
                 return self.icon and (self.icon .. ' ')
             end
         end,
-        hl = function(self) return { fg = self.icon_color } end,
+        -- hl = function(self) return { fg = self.icon_color } end,
+        hl = function(self) return self.icon_hl or {} end,
     }
 
     local FileName = {
@@ -685,5 +700,4 @@ return {
     'rebelot/heirline.nvim',
     config = config,
     event = 'BufReadPre',
-    dependencies = 'nvim-tree/nvim-web-devicons',
 }
