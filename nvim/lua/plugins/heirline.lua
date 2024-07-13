@@ -267,55 +267,31 @@ local config = function()
         init = function(self)
             -- vim.print(self)
             local children = {}
-            local formatter_details_list =
-                require('config.formatter').get_buffer_formatter_details()
-            local is_formatter_available = false
-            for i, formatter_details in pairs(formatter_details_list) do
-                ---@type StatusLine
-                local formatter_component = {
-                    provider = vim.fn.trim(formatter_details.name),
-                }
-                if not formatter_details.available then
-                    formatter_component.hl = { fg = 'red', bold = true }
-                elseif formatter_details.project_disabled then
-                    formatter_component.hl = { fg = 'orange', bold = true }
-                elseif formatter_details.buffer_disabled then
-                    formatter_component.hl = { fg = 'yellow', bold = true }
-                else
-                    is_formatter_available = true
-                end
-                table.insert(children, formatter_component)
-                if i < #formatter_details_list then
-                    table.insert(children, Space)
-                end
-            end
-            local conform_params =
-                require('config.formatter').construct_conform_formatting_params()
-            -- vim.print(
-            --     require('config.formatter').get_buffer_formatter_details()
-            -- )
-            if
-                conform_params.lsp_fallback == 'always'
-                or (
-                    conform_params.lsp_fallback == true
-                    and is_formatter_available == false
-                )
-            then
-                local lsp_formatters =
-                    require('config.formatter').get_buffer_lsp_formatters()
-                if #lsp_formatters > 0 and #formatter_details_list > 0 then
-                    table.insert(children, Space)
-                end
-                for i, lsp_name in pairs(lsp_formatters) do
+            local formatters =
+                require('config.formatter').get_buffer_lsp_and_formatter_details()
+
+            for i, formatter in pairs(formatters) do
+                if formatter.client_id == nil then
                     ---@type StatusLine
                     local formatter_component = {
-                        provider = vim.fn.trim(lsp_name),
+                        provider = vim.fn.trim(formatter.name),
+                    }
+                    if not formatter.available then
+                        formatter_component.hl = { fg = 'red', bold = true }
+                    elseif formatter.project_disabled then
+                        formatter_component.hl = { fg = 'orange', bold = true }
+                    elseif formatter.buffer_disabled then
+                        formatter_component.hl = { fg = 'yellow', bold = true }
+                    end
+                    table.insert(children, formatter_component)
+                else
+                    ---@type StatusLine
+                    local formatter_component = {
+                        provider = vim.fn.trim(formatter.name),
                     }
                     table.insert(children, formatter_component)
-                    if i < #lsp_formatters then
-                        table.insert(children, Space)
-                    end
                 end
+                if i < #formatters then table.insert(children, Space) end
             end
 
             self.child = self:new(children, 1)

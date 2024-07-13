@@ -183,13 +183,14 @@ function P.is_format_after_save_enabled(filetype)
     return format_after_save_filetypes[filetype]
 end
 
----@alias LspFormatStrategyEnum "DEFAULT" | "DISABLED" | "FALLBACK" | "ALWAYS"
+---@alias LspFormatStrategyEnum "NEVER" | "FALLBACK" | "PREFER" | "FIRST" | "LAST"
 
 local LspFormatStrategyEnums = {
-    DEFAULT = 'DEFAULT',
-    DISABLED = 'DISABLED',
+    NEVER = 'NEVER',
     FALLBACK = 'FALLBACK',
-    ALWAYS = 'ALWAYS',
+    PREFER = 'PREFER',
+    FIRST = 'FIRST',
+    LAST = 'LAST',
 }
 P.LspFormatStrategyEnums = LspFormatStrategyEnums
 
@@ -223,10 +224,12 @@ end
 ---@return LspFormatStrategyEnum lsp_format_strategy for the filetype. Defaults to the enum "DEFAULT"
 function P.get_filetype_lsp_format_strategy(filetype)
     if vim.g.lsp_format_strategy_for_filetype == nil then
-        return LspFormatStrategyEnums.DEFAULT
+        return LspFormatStrategyEnums.FALLBACK
     end
     local lsp_format_strategy = vim.g.lsp_format_strategy_for_filetype[filetype]
-    if lsp_format_strategy == nil then return LspFormatStrategyEnums.DEFAULT end
+    if lsp_format_strategy == nil then
+        return LspFormatStrategyEnums.FALLBACK
+    end
     return lsp_format_strategy
 end
 
@@ -257,7 +260,7 @@ end
 function P.get_buffer_lsp_format_strategy(bufnr)
     if bufnr == nil then bufnr = 0 end
     if vim.b[bufnr].buffer_lsp_format_strategy == nil then
-        return LspFormatStrategyEnums.DEFAULT
+        return LspFormatStrategyEnums.FALLBACK
     end
     return vim.b[bufnr].buffer_lsp_format_strategy
 end
@@ -274,7 +277,7 @@ end
 
 function P.get_buffer_formatting_details(bufnr)
     if bufnr == nil then bufnr = 0 end
-    local lsp_format_strategy_for_filetype = LspFormatStrategyEnums.DEFAULT
+    local lsp_format_strategy_for_filetype = LspFormatStrategyEnums.FALLBACK
     local filetype = vim.bo[bufnr].filetype
     -- vim.print(filetype)
     if filetype ~= nil then
@@ -291,7 +294,7 @@ function P.get_buffer_formatting_details(bufnr)
         buffer_conform_lsp_fallback_value = M.determine_conform_lsp_fallback(
             bufnr
         ),
-        lsp_fromat_for_filetype_map = P.get_filetype_lsp_format_strategy_map(),
+        lsp_format_for_filetype_map = P.get_filetype_lsp_format_strategy_map(),
         buffer_formatters = M.get_buffer_formatter_details(bufnr),
     }
 end
@@ -303,6 +306,57 @@ end
 ---@field buffer_disabled boolean
 ---@field project_disabled boolean
 ---@field is_lsp boolean
+
+---@class (exact) LspFormatterDetails
+---@field name string
+---@field client_id integer
+
+---@param bufnr integer?
+---@return (FormatterDetails | LspFormatterDetails)[]
+function M.get_buffer_lsp_and_formatter_details(bufnr)
+    if bufnr == nil then bufnr = 0 end
+
+    ---@type (FormatterDetails | LspFormatterDetails)[]
+    local all_formatters = {}
+
+    local formatters = M.get_buffer_formatter_details(bufnr)
+    local lsp_formatters = M.get_buffer_lsp_formatters(bufnr)
+    local lsp_format_strategy = P.get_buffer_lsp_format_strategy(bufnr)
+
+    if #lsp_formatters == 0 or lsp_format_strategy == 'NEVER' then
+        return formatters
+    end
+
+    if lsp_format_strategy == 'FALLBACK' and #formatters > 0 then
+        return formatters
+    elseif lsp_format_strategy == 'FALLBACK' then
+        return lsp_formatters
+    end
+
+    if lsp_format_strategy == 'PREFER' and #lsp_formatters > 0 then
+        return lsp_formatters
+    elseif lsp_format_strategy == 'PREFER' then
+        return formatters
+    end
+
+    if lsp_format_strategy == 'FIRST' then
+        for _, lsp_formatter in ipairs(lsp_formatters) do
+            table.insert(all_formatters, lsp_formatter)
+        end
+        for _, formatter in ipairs(formatters) do
+            table.insert(all_formatters, formatter)
+        end
+    elseif lsp_format_strategy == 'LAST' then
+        for _, formatter in ipairs(formatters) do
+            table.insert(all_formatters, formatter)
+        end
+        for _, lsp_formatter in ipairs(lsp_formatters) do
+            table.insert(all_formatters, lsp_formatter)
+        end
+    end
+
+    return all_formatters
+end
 
 ---@param bufnr? integer the buffer number. Defaults to buffer 0.
 ---@return FormatterDetails[]
@@ -361,14 +415,18 @@ function M.get_buffer_formatter_details(bufnr)
 end
 
 ---@param bufnr? integer the buffer number. Defaults to buffer 0.
----@return string[] lsp_formatter_names that can be used for the buffer
+---@return LspFormatterDetails[] lsp_formatter_details that can be used for the buffer
 function M.get_buffer_lsp_formatters(bufnr)
     ---@type string[]
     local lsp_formatters = {}
     if bufnr == nil then bufnr = 0 end
     for _, lsp_client in pairs(vim.lsp.get_clients({ bufnr = bufnr })) do
         if lsp_client.supports_method('textDocument/formatting') then
-            table.insert(lsp_formatters, lsp_client.name)
+            local lsp_formatter_details = {
+                name = lsp_client.name,
+                client_id = lsp_client.id,
+            }
+            table.insert(lsp_formatters, lsp_formatter_details)
         end
     end
     return lsp_formatters
@@ -378,35 +436,30 @@ end
 ---based on my formatting properties. Prioritizes the buffer settings over filetype settings
 ---TODO determine if I want to make any changes because of the new lsp format strategies added by conform
 ---@param bufnr uinteger?
----@return boolean | "always"
+---@return conform.LspFormatOpts
 function M.determine_conform_lsp_fallback(bufnr)
     local lsp_format_strategy = P.get_buffer_lsp_format_strategy(bufnr)
-    if lsp_format_strategy == LspFormatStrategyEnums.DEFAULT then
+    if lsp_format_strategy == LspFormatStrategyEnums.FALLBACK then
         local filetype = vim.bo[bufnr].filetype
         if filetype == nil then
-            lsp_format_strategy = LspFormatStrategyEnums.DEFAULT
+            lsp_format_strategy = LspFormatStrategyEnums.FALLBACK
         else
             lsp_format_strategy = P.get_filetype_lsp_format_strategy(filetype)
         end
     end
 
-    if lsp_format_strategy == LspFormatStrategyEnums.DEFAULT then
-        return true
-    elseif lsp_format_strategy == LspFormatStrategyEnums.FALLBACK then
-        return true
-    elseif lsp_format_strategy == LspFormatStrategyEnums.DISABLED then
-        return false
-    elseif lsp_format_strategy == LspFormatStrategyEnums.ALWAYS then
-        return 'always'
+    if lsp_format_strategy == LspFormatStrategyEnums.FALLBACK then
+        return 'fallback'
+    elseif lsp_format_strategy == LspFormatStrategyEnums.NEVER then
+        return 'never'
+    elseif lsp_format_strategy == LspFormatStrategyEnums.FIRST then
+        return 'first'
+    elseif lsp_format_strategy == LspFormatStrategyEnums.LAST then
+        return 'last'
     else
-        return true
+        return 'fallback'
     end
 end
-
----@class ConformFormatOptions
----@field lsp_fallback nil|boolean|"always" Attempt LSP formatting if no formatters are available. Defaults to false. If "always", will attempt LSP formatting even if formatters are available.
----@field timeout_ms nil|integer Time in milliseconds to block for formatting. Defaults to 1000. No effect if async = true.
----@field formatters nil|string[] List of formatters to run. Defaults to all formatters for the buffer filetype.
 
 ---@param bufnr? integer the buffer number. Defaults to buffer 0.
 ---@return conform.FormatOpts
@@ -415,15 +468,6 @@ function M.construct_conform_formatting_params(bufnr)
     local project_disabled_formatters = P.get_project_disabled_formatters()
     local buffer_disabled_formatters = P.get_buffer_disabled_formatters(bufnr)
     if #project_disabled_formatters > 0 or #buffer_disabled_formatters > 0 then
-        -- if #project_disabled_formatters > 0 then
-        --     vim.print('Project disabled formatters:')
-        --     vim.print(project_disabled_formatters)
-        -- end
-        -- if #buffer_disabled_formatters > 0 then
-        --     vim.print('Buffer disabled formatters:')
-        --     vim.print(buffer_disabled_formatters)
-        -- end
-
         local buffer_formatters = M.get_buffer_formatter_details(bufnr)
 
         local formatter_names = {}
@@ -435,17 +479,16 @@ function M.construct_conform_formatting_params(bufnr)
                 table.insert(formatter_names, formatter_info.name)
             end
         end
-        -- vim.print('Formatting with the formatters:', formatter_names)
 
         return {
             timeout_ms = P.get_formatting_timeout(),
             formatters = formatter_names,
-            lsp_fallback = M.determine_conform_lsp_fallback(bufnr),
+            lsp_format = M.determine_conform_lsp_fallback(bufnr),
         }
     end
     return {
         timeout_ms = P.get_formatting_timeout(),
-        lsp_fallback = M.determine_conform_lsp_fallback(bufnr),
+        lsp_format = M.determine_conform_lsp_fallback(bufnr),
     }
 end
 
