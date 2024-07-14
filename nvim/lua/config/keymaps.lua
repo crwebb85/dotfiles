@@ -372,7 +372,7 @@ local myoperations = maputils
     :navigator({
         --visual mode: stays within buffer so visual mode would be useful
         default = {
-            key = 'h',
+            key = 'hh',
             mode = { 'n', 'x' },
             backward = function()
                 local target = 'all'
@@ -394,7 +394,7 @@ local myoperations = maputils
             opts = {},
         },
         extreme = {
-            key = 'H',
+            key = 'HH',
             mode = { 'n', 'x' },
             backward = function()
                 local target = 'all'
@@ -536,7 +536,7 @@ local myoperations = maputils
     :navigator({
         --visual mode: stays within buffer so visual mode would be useful
         default = {
-            key = 'd',
+            key = 'dd',
             mode = { 'n', 'x' },
             backward = function()
                 vim.diagnostic.jump({
@@ -550,11 +550,11 @@ local myoperations = maputils
                     float = true,
                 })
             end,
-            desc = 'Custom Remap: jump to the {previous|next} diagnostic',
+            desc = 'Custom: Jump to the {previous|next} diagnostic',
             opts = {},
         },
         extreme = {
-            key = 'D',
+            key = 'DD',
             mode = { 'n', 'x' },
             backward = function()
                 vim.diagnostic.jump({
@@ -570,7 +570,7 @@ local myoperations = maputils
                     float = true,
                 })
             end,
-            desc = 'Custom Remap: jump to the {first|last} diagnostic',
+            desc = 'Custom: Jump to the {first|last} diagnostic',
             opts = {},
         },
     })
