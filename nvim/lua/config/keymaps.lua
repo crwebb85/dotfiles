@@ -37,15 +37,9 @@ vim.keymap.set(
 -- Clipboard --
 -- Now the '+' register will copy to system clipboard using OSC52
 vim.keymap.set(
-    { 'n', 'v' },
+    { 'v', 'n' },
     '<leader>y',
     [["+y]],
-    { desc = 'Custom Clipboard: Copy to system clipboard' }
-)
-vim.keymap.set(
-    'n',
-    '<leader>Y',
-    [["+Y]],
     { desc = 'Custom Clipboard: Copy to system clipboard' }
 )
 
