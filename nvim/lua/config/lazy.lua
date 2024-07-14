@@ -792,10 +792,17 @@ require('lazy').setup({
             vim.o.timeoutlen = 300
         end,
         opts = {
-            operators = {
-                gc = 'Comment: line comment',
-                ys = 'Surround: Add a surrounding pair',
-            },
+            -- https://github.com/folke/which-key.nvim/issues/648#issuecomment-2226881346
+            -- delay >= vim.o.timeoutlen for conflicting keymaps to work
+            -- By work I mean
+            -- keymap <leader>f should activate if <leader>f is quickly pressed
+            -- but keymap <leader>ff should activate if the keys are pressed a bit slower
+            -- I may need to adjust these numbers so the delays feel right but that is how to make it work
+            delay = vim.o.timeoutlen,
+            -- operators = {
+            --     gc = 'Comment: line comment',
+            --     ys = 'Surround: Add a surrounding pair',
+            -- },
         },
         config = true,
     },
