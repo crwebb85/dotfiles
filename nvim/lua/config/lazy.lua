@@ -1745,77 +1745,77 @@ require('lazy').setup({
         end,
         keys = {
             {
-                '<leader>dc',
+                '<leader><leader>dc',
                 function() require('dap').continue() end,
                 desc = 'Debug: Start/Continue Debugger',
             },
             {
-                '<leader>db',
+                '<leader><leader>db',
                 function() require('dap').toggle_breakpoint() end,
                 desc = 'Debug: Add Breakpoint',
             },
             {
-                '<leader>dt',
+                '<leader><leader>dt',
                 function() require('dap').terminate() end,
                 desc = 'Debug: Terminate Debugger',
             },
             {
-                '<leader>dC',
+                '<leader><leader>dC',
                 function() require('dap').run_to_cursor() end,
                 desc = 'Debug: Run to Cursor',
             },
             {
-                '<leader>dg',
+                '<leader><leader>dg',
                 function() require('dap').goto_() end,
                 desc = 'Debug: Go to line (no execute)',
             },
             {
-                '<leader>di',
+                '<leader><leader>di',
                 function() require('dap').step_into() end,
                 desc = 'Debug: Step Into',
             },
             {
-                '<leader>dj',
+                '<leader><leader>dj',
                 function() require('dap').down() end,
                 desc = 'Debug: Down',
             },
             {
-                '<leader>dk',
+                '<leader><leader>dk',
                 function() require('dap').up() end,
                 desc = 'Debug: Up',
             },
             {
-                '<leader>dl',
+                '<leader><leader>dl',
                 function() require('dap').run_last() end,
                 desc = 'Debug: Run Last',
             },
             {
-                '<leader>do',
+                '<leader><leader>do',
                 function() require('dap').step_out() end,
                 desc = 'Debug: Step Out',
             },
             {
-                '<leader>dO',
+                '<leader><leader>dO',
                 function() require('dap').step_over() end,
                 desc = 'Debug: Step Over',
             },
             {
-                '<leader>dp',
+                '<leader><leader>dp',
                 function() require('dap').pause() end,
                 desc = 'Debug: Pause',
             },
             {
-                '<leader>dr',
+                '<leader><leader>dr',
                 function() require('dap').repl.toggle() end,
                 desc = 'Debug: Toggle REPL',
             },
             {
-                '<leader>ds',
+                '<leader><leader>ds',
                 function() require('dap').session() end,
                 desc = 'Debug: Session',
             },
             {
-                '<leader>dw',
+                '<leader><leader>dw',
                 function() require('dap.ui.widgets').hover() end,
                 desc = 'Debug: Widgets',
             },
@@ -1831,7 +1831,7 @@ require('lazy').setup({
         dependencies = 'mfussenegger/nvim-dap',
         keys = {
             {
-                '<leader>du',
+                '<leader><leader>du',
                 function() require('dapui').toggle() end,
                 desc = 'Debug: Toggle debugger UI',
             },
