@@ -37,6 +37,7 @@ vim.keymap.set(
 -- Clipboard --
 -- Now the '+' register will copy to system clipboard using OSC52
 vim.keymap.set(
+    --I think this is a case where I want 'v' and not 'x' mode
     { 'v', 'n' },
     '<leader>y',
     [["+y]],
@@ -54,7 +55,8 @@ vim.keymap.set(
 
 -- Delete to the void register
 vim.keymap.set(
-    { 'n', 'v' },
+    --I think this is a case where I want 'v' and not 'x' mode
+    { 'v', 'n' },
     '<leader>d',
     [["_d]],
     { desc = 'Custom Clipboard: Delete to the void register' }
