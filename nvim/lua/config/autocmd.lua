@@ -23,6 +23,14 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
         )
         vim.keymap.set(
             't',
+            '<leader>',
+            [[<leader>]],
+            --Note I only need this keymap so that typing space by itself still works and doesn't
+            --permanently prompt me for the <esc> key because of the above keymap <leader><esc>
+            { buffer = 0, desc = 'Terminal: enter leader key' }
+        )
+        vim.keymap.set(
+            't',
             '<C-h>',
             [[<Cmd>wincmd h<CR>]],
             { buffer = 0, desc = 'Terminal: Move to left window' }

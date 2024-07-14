@@ -798,11 +798,9 @@ require('lazy').setup({
             -- keymap <leader>f should activate if <leader>f is quickly pressed
             -- but keymap <leader>ff should activate if the keys are pressed a bit slower
             -- I may need to adjust these numbers so the delays feel right but that is how to make it work
+            -- with that said descriptions aren't necessary correct and it still
+            -- doesn't behave exactly like it used to
             delay = vim.o.timeoutlen,
-            -- operators = {
-            --     gc = 'Comment: line comment',
-            --     ys = 'Surround: Add a surrounding pair',
-            -- },
         },
         config = true,
     },
