@@ -198,13 +198,11 @@ vim.api.nvim_create_autocmd('ModeChanged', {
         -- vim.print(modes)
         local prev_mode = modes[1]
         local new_mode = modes[2]
-        if new_mode == 'c' then
-            vim.wo.number = true
+        if new_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = false
             vim.wo.cursorline = true
             vim.cmd('redraw')
-        elseif prev_mode == 'c' then
-            vim.wo.number = true
+        elseif prev_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = true
             vim.wo.cursorline = false
 
@@ -216,15 +214,13 @@ vim.api.nvim_create_autocmd('ModeChanged', {
 
 vim.api.nvim_create_autocmd({ 'WinEnter' }, {
     callback = function(_)
-        vim.wo.number = true
-        vim.wo.relativenumber = true
+        if vim.wo.number == true then vim.wo.relativenumber = true end
     end,
     group = change_relative_line_number_group,
 })
 vim.api.nvim_create_autocmd({ 'WinLeave' }, {
     callback = function(_)
-        vim.wo.number = true
-        vim.wo.relativenumber = false
+        if vim.wo.number == true then vim.wo.relativenumber = false end
     end,
     group = change_relative_line_number_group,
 })
