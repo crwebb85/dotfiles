@@ -807,6 +807,97 @@ require('lazy').setup({
             }
             opts = vim.tbl_deep_extend('keep', opts, default_opts)
             require('which-key').setup(opts)
+
+            local wk = require('which-key')
+            -- Note don't forget to update this if I change the mapping namespaces
+            wk.add({
+                { '[', mode = { 'x' }, group = 'Prev node mappings' },
+                { ']', mode = { 'x' }, group = 'Next node mappings' },
+                { '[gc', mode = { 'x', 'n' }, group = 'Prev comment mappings' },
+                { ']gc', mode = { 'x', 'n' }, group = 'Next comment mappings' },
+                { '[h', mode = { 'x', 'n' }, group = 'Prev git hunk mappings' },
+                { ']h', mode = { 'x', 'n' }, group = 'Next git hunk mappings' },
+                {
+                    '[d',
+                    mode = { 'x', 'n' },
+                    group = 'Prev diagnostics mappings',
+                },
+                {
+                    '[D',
+                    mode = { 'x', 'n' },
+                    group = 'Prev diagnostics extreme mappings',
+                },
+                {
+                    ']D',
+                    mode = { 'x', 'n' },
+                    group = 'Next diagnostics extreme mappings',
+                },
+                {
+                    '<leader><leader>d',
+                    mode = { 'n' },
+                    group = 'Debugger mappings',
+                },
+                {
+                    '<leader>f',
+                    mode = { 'n' },
+                    group = 'Telescope mappings',
+                },
+                {
+                    '<leader>g',
+                    mode = { 'n' },
+                    group = 'Git mappings',
+                },
+                {
+                    '<leader>gh',
+                    mode = { 'n' },
+                    group = 'Git history mappings',
+                },
+                {
+                    '<leader>gl',
+                    mode = { 'n' },
+                    group = 'Git repo link mappings',
+                },
+                {
+                    '<leader>gv',
+                    mode = { 'n' },
+                    group = 'Git signs/blame mappings',
+                },
+                {
+                    '<leader>s',
+                    mode = { 'n' },
+                    group = 'Search (Spectre) mappings',
+                },
+                {
+                    '<leader>t',
+                    mode = { 'n' },
+                    group = 'Neotest mappings',
+                },
+                {
+                    '<leader>vn',
+                    mode = { 'n' },
+                    group = 'Swap next treesitter node mappings',
+                },
+                {
+                    '<leader>vp',
+                    mode = { 'n' },
+                    group = 'Swap previous treesitter node mappings',
+                },
+                {
+                    '<leader>vo',
+                    mode = { 'n' },
+                    group = 'Add lines above/below mappings',
+                },
+                {
+                    '<leader>vt',
+                    mode = { 'n' },
+                    group = 'Treesj mappings',
+                },
+                {
+                    '<leader>v',
+                    mode = { 'n' },
+                    group = 'Misc mappings',
+                },
+            })
         end,
     },
 
@@ -1070,6 +1161,16 @@ require('lazy').setup({
                                 query = '@class.inner',
                                 desc = 'Select inner part of a class',
                             },
+                            ['a<leader>c'] = {
+                                -- I plan to replace this with a smarter version of the keymap
+                                query = '@comment.outer',
+                                desc = 'Select outer part of a comment',
+                            },
+                            ['i<leader>c'] = {
+                                -- I plan to replace this with a smarter version of the keymap
+                                query = '@comment.inner',
+                                desc = 'Select inner part of a comment',
+                            },
                         },
                         -- You can choose the select mode (default is charwise 'v')
                         --
@@ -1133,7 +1234,18 @@ require('lazy').setup({
                                 query = '@loop.outer',
                                 desc = 'Next loop start',
                             },
-                            [']va'] = '@parameter.inner',
+                            [']va'] = {
+                                query = '@parameter.inner',
+                                desc = 'Next parameter inner start',
+                            },
+                            [']gci'] = {
+                                query = '@comment.inner',
+                                desc = 'Next comment inner start',
+                            },
+                            [']gca'] = {
+                                query = '@comment.outer',
+                                desc = 'Next comment outer start',
+                            },
                         },
                         goto_next_end = {
                             [']F'] = {
@@ -1156,7 +1268,18 @@ require('lazy').setup({
                                 query = '@loop.outer',
                                 desc = 'Next loop end',
                             },
-                            [']vA'] = '@parameter.inner',
+                            [']vA'] = {
+                                query = '@parameter.inner',
+                                desc = 'Next parameter inner end',
+                            },
+                            [']gcI'] = {
+                                query = '@parameter.inner',
+                                desc = 'Next comment inner end',
+                            },
+                            [']gcA'] = {
+                                query = '@comment.outer',
+                                desc = 'Next comment outer end',
+                            },
                         },
                         goto_previous_start = {
                             ['[f'] = {
@@ -1179,7 +1302,18 @@ require('lazy').setup({
                                 query = '@loop.outer',
                                 desc = 'Prev loop start',
                             },
-                            ['[va'] = '@parameter.inner',
+                            ['[va'] = {
+                                query = '@parameter.inner',
+                                desc = 'Next parameter inner start',
+                            },
+                            ['[gci'] = {
+                                query = '@parameter.inner',
+                                desc = 'Next comment inner start',
+                            },
+                            ['[gca'] = {
+                                query = '@comment.outer',
+                                desc = 'Next comment outer start',
+                            },
                         },
                         goto_previous_end = {
                             ['[F'] = {
@@ -1202,7 +1336,18 @@ require('lazy').setup({
                                 query = '@loop.outer',
                                 desc = 'Prev loop end',
                             },
-                            ['[vA'] = '@parameter.inner',
+                            ['[vA'] = {
+                                query = '@parameter.inner',
+                                desc = 'Next parameter inner end',
+                            },
+                            ['[gcI'] = {
+                                query = '@parameter.inner',
+                                desc = 'Next comment inner end',
+                            },
+                            ['[gcA'] = {
+                                query = '@comment.outer',
+                                desc = 'Next comment outer end',
+                            },
                         },
                     },
                 },

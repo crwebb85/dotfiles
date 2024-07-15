@@ -1,16 +1,14 @@
 ### TODO:
 
-- telescope spell_suggest currently overrides my paste register with my misspelling. I don't want it to do this.
-- add a way to read programming docs from neovim https://www.brow.sh/ and https://github.com/lalitmee/browse.nvim
 - Review clipboard code as neovim has added more features which may make using a plugin unneeded
 - look into skeleton (file template) plugins/configuration
 - add a save and save all button to heirline so I know when I have unsaved buffers
 - Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
 - Lightbulb still doesn't get removed in some case like when opening help docs with telescope
 - Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
-- When lazy.nvim installs a new pluggin for the first time on startup my line numbers stop working until I close and reopen
-- keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
+- Add a heirline component for harpoon
 - show workspace diagnostic counts in heirline
+- keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
 - make quickfix/loc list editable
 - try out new features:
   - winfixbuf
@@ -18,9 +16,6 @@
   - getregion()
   - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
     `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
-  - |vim.lsp.start()| now maps |K| to use |vim.lsp.buf.hover()| if the server
-    supports it, unless |'keywordprg'| was customized before calling
-    |vim.lsp.start()|.
 - try out basedpyright lsp [example](https://www.reddit.com/r/neovim/comments/1cpkeqd/comment/l3ux37y/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 - try out alternate motions
   - [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
@@ -84,7 +79,6 @@
 - https://github.com/MunifTanjim/nui.nvim#popup
 - https://github.com/nvim-java/nvim-java
 - https://github.com/kamalsacranie/nvim-mapper
-
 - https://github.com/ronakg/quickr-preview.vim/tree/master
 - https://github.com/NicholasMata/nvim-dap-cs
 
@@ -158,23 +152,6 @@
   - I found the some plugins don't support windows like [3rd/image.nvim](https://github.com/3rd/image.nvim)
   - The author of molten also uses his own fork of image.nvim [benlubas/image.nvim](https://github.com/benlubas/image.nvim)
 - [Jupyter notebook discussion](https://www.reddit.com/r/neovim/comments/185uv3f/announcing_jupytextnvim/?utm_medium=android_app&utm_source=share)
-
-### dotfiles to look into:
-
-- https://github.com/NormTurtle/Windots/blob/main/vi/init.lua
-- https://www.reddit.com/r/neovim/comments/18ecn8o/share_noplugin_configs/?utm_medium=android_app&utm_source=share
-- https://github.com/boydaihungst/.config/tree/master/lvim
-- https://github.com/steveclarke/dotfiles
-- https://github.com/albingroen/quick.nvim/blob/main/init.lua
-- https://github.com/swaykh/dotfiles
-- https://github.com/joao-lobao/nvim/tree/master/after/plugin/lsp
-- https://github.com/gonstoll/dotfiles/tree/master/nvim/ftplugin
-- https://github.com/pwnwriter/pwnvim/tree/main
-- https://github.com/mrquantumcodes/nvim
-- https://github.com/tjdevries/config_manager/tree/master/xdg_config/nvim/lua/tj
-- [Dap config](https://github.com/NormalNvim/NormalNvim/blob/2b1f6c8201daed5fb1f0740bc5c5452bff4a9093/lua/plugins/4-dev.lua#L537)
-- [Java Config](https://github.com/igorlfs/dotfiles/blob/main/nvim/.config/nvim/ftplugin/java.lua)
-- https://github.com/linrongbin16/lin.nvim/blob/main/lua/plugins/init.lua
 
 ### Interesting Distros
 
