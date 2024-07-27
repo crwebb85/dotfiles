@@ -46,6 +46,10 @@ M.lazytoggle = function()
 end
 
 require('lazy').setup({
+
+    -- {
+    --     'stevearc/profile.nvim',
+    -- },
     ---------------------------------------------------------------------------
     -- Colorscheme
     {
@@ -79,11 +83,17 @@ require('lazy').setup({
             local diffview_keymaps = {
                 {
                     'n',
-                    '<leader>ggo',
+                    '<leader>ggT',
                     actions.goto_file_tab,
                     {
                         desc = 'Diffview: Open the file in a new tabpage',
                     },
+                },
+                {
+                    'n',
+                    '<leader>ggs',
+                    actions.toggle_stage_entry,
+                    { desc = 'Stage / unstage the selected entry' },
                 },
                 {
                     'n',
@@ -104,6 +114,7 @@ require('lazy').setup({
             require('diffview').setup({
                 keymaps = {
                     view = diffview_keymaps,
+                    --TODO deal with my keymap conflict of <leader>e between diffview and harpoon
                     file_panel = diffview_keymaps,
                     file_history_panel = diffview_keymaps,
                 },
@@ -464,6 +475,30 @@ require('lazy').setup({
                 function() require('telescope.builtin').autocommands() end,
                 desc = 'Telescope: autocmds',
             },
+            {
+                '<leader>fe',
+                function()
+                    local conf = require('telescope.config').values
+                    local harpoon = require('harpoon')
+
+                    local file_paths = {}
+                    for _, item in ipairs(harpoon:list().items) do
+                        table.insert(file_paths, item.value)
+                    end
+
+                    require('telescope.pickers')
+                        .new({}, {
+                            prompt_title = 'Harpoon',
+                            finder = require('telescope.finders').new_table({
+                                results = file_paths,
+                            }),
+                            previewer = conf.file_previewer({}),
+                            sorter = conf.generic_sorter({}),
+                        })
+                        :find()
+                end,
+                desc = 'Telescope: harpoon',
+            },
         },
         opts = {
             defaults = {
@@ -543,18 +578,41 @@ require('lazy').setup({
 
     -- Harpoon (fast file navigation between pinned files)
     {
-        'theprimeagen/harpoon',
+        'ThePrimeagen/harpoon',
+        branch = 'harpoon2',
+        dependencies = { 'nvim-lua/plenary.nvim' },
         lazy = true,
-        config = true,
         keys = {
+
+            {
+                '<leader>ea',
+                function() require('harpoon'):list():add() end,
+                desc = 'Harpoon: Add file',
+            },
+            {
+                '<leader>et',
+                function()
+                    local harpoon = require('harpoon')
+                    harpoon.ui:toggle_quick_menu(harpoon:list())
+                end,
+                desc = 'Harpoon: Toggle quick menu',
+            },
+            {
+                '<leader>eo',
+                function() require('harpoon'):list():select(vim.v.count1) end,
+                desc = 'Harpoon: Go to file using count1',
+            },
             {
                 '<leader>a',
-                function() require('harpoon.mark').add_file() end,
+                function() require('harpoon'):list():add() end,
                 desc = 'Harpoon: Add file',
             },
             {
                 '<C-e>',
-                function() require('harpoon.ui').toggle_quick_menu() end,
+                function()
+                    local harpoon = require('harpoon')
+                    harpoon.ui:toggle_quick_menu(harpoon:list())
+                end,
                 desc = 'Harpoon: Toggle quick menu',
             },
             -- Protip: To reorder the entries in harpoon quick menu use `Vd` to cut the line and `P` to paste where you want it
@@ -562,55 +620,59 @@ require('lazy').setup({
             -- Harpoon quick navigation
             {
                 '<leader>1',
-                function() require('harpoon.ui').nav_file(1) end,
+                function() require('harpoon'):list():select(1) end,
                 desc = 'Harpoon: Go to file 1',
             },
             {
                 '<leader>2',
-                function() require('harpoon.ui').nav_file(2) end,
+                function() require('harpoon'):list():select(2) end,
                 desc = 'Harpoon: Go to file 2',
             },
             {
                 '<leader>3',
-                function() require('harpoon.ui').nav_file(3) end,
+                function() require('harpoon'):list():select(3) end,
                 desc = 'Harpoon: Go to file 3',
             },
             {
                 '<leader>4',
-                function() require('harpoon.ui').nav_file(4) end,
+                function() require('harpoon'):list():select(4) end,
                 desc = 'Harpoon: Go to file 4',
             },
             {
                 '<leader>5',
-                function() require('harpoon.ui').nav_file(5) end,
+                function() require('harpoon'):list():select(5) end,
                 desc = 'Harpoon: Go to file 5',
             },
             {
                 '<leader>6',
-                function() require('harpoon.ui').nav_file(6) end,
+                function() require('harpoon'):list():select(6) end,
                 desc = 'Harpoon: Go to file 6',
             },
             {
                 '<leader>7',
-                function() require('harpoon.ui').nav_file(7) end,
+                function() require('harpoon'):list():select(7) end,
                 desc = 'Harpoon: Go to file 7',
             },
             {
                 '<leader>8',
-                function() require('harpoon.ui').nav_file(8) end,
+                function() require('harpoon'):list():select(8) end,
                 desc = 'Harpoon: Go to file 8',
             },
             {
                 '<leader>9',
-                function() require('harpoon.ui').nav_file(9) end,
+                function() require('harpoon'):list():select(9) end,
                 desc = 'Harpoon: Go to file 9',
             },
             {
                 '<leader>0',
-                function() require('harpoon.ui').nav_file(0) end,
-                desc = 'Harpoon: Go to file 0',
+                function() require('harpoon'):list():select(10) end,
+                desc = 'Harpoon: Go to file 10',
             },
         },
+        config = function(_, opts)
+            local harpoon = require('harpoon')
+            harpoon:setup(opts)
+        end,
     },
 
     {
@@ -661,6 +723,7 @@ require('lazy').setup({
                         require('oil.actions').copy_entry_path.callback()
                         vim.fn.setreg('+', vim.fn.getreg(vim.v.register))
                     end,
+                    mode = 'n',
                 },
                 ['yP'] = {
                     -- from https://www.reddit.com/r/neovim/comments/1czp9zr/comment/l5ke7fv/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
@@ -673,6 +736,7 @@ require('lazy').setup({
                         local relpath = vim.fn.fnamemodify(dir, ':.')
                         vim.fn.setreg('+', relpath .. entry.name)
                     end,
+                    mode = 'n',
                 },
                 ['<C-q>'] = {
                     desc = 'Oil: Append file to quick fix list',
