@@ -2581,16 +2581,20 @@ require('lazy').setup({
         ft = 'python',
         dependencies = {
             'neovim/nvim-lspconfig',
+            'mfussenegger/nvim-dap',
+            'mfussenegger/nvim-dap-python', --optional
             'nvim-telescope/telescope.nvim',
-            'mfussenegger/nvim-dap-python',
         },
-        config = function(_, _)
-            require('venv-selector').setup({
-                dap_enabled = true, -- makes the debugger work with venv
-                name = { 'venv', '.venv' },
-            })
-            require('venv-selector').retrieve_from_cache()
-        end,
+        branch = 'regexp', -- This is the regexp branch, use this for the new version
+        config = function() require('venv-selector').setup() end,
+        --My old setup but haven't retested since upgrading to this newer version
+        -- config = function(_, _)
+        --     require('venv-selector').setup({
+        --         dap_enabled = true, -- makes the debugger work with venv
+        --         name = { 'venv', '.venv' },
+        --     })
+        --     require('venv-selector').retrieve_from_cache()
+        -- end,
     },
 
     -- LSP client extensions
