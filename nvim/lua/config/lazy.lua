@@ -47,9 +47,41 @@ end
 
 require('lazy').setup({
 
-    -- {
-    --     'stevearc/profile.nvim',
-    -- },
+    {
+        'stevearc/profile.nvim',
+        lazy = true,
+        keys = {
+            {
+                '<f6>',
+                function()
+                    local prof = require('profile')
+                    if prof.is_recording() then
+                        prof.stop()
+                        vim.ui.input({
+                            prompt = 'Save profile to:',
+                            completion = 'file',
+                            default = 'profile.json',
+                        }, function(filename)
+                            if filename then
+                                prof.export(filename)
+                                vim.notify(string.format('Wrote %s', filename))
+                            end
+                        end)
+                    else
+                        prof.start('*')
+                    end
+                end,
+                desc = 'Profile.nvim: Start/Stop profiling',
+                -- To create a flame graph from the profile.json file
+                -- first convert it to the proper format for FlameGraph
+                -- with the command `python ./cli-tools/stackcollapse-chrome-tracing/stackcollapse-chrome-tracing.py profile.json > profile.log`
+                -- where stackcollapse-chrome-tracing.py is a python file in my config repo
+                --
+                -- Then use flamegraph <path to build folder>/inferno-flamegraph.exe profile.log > flame.svg
+                -- Note: I had to build flamegraph from source from the repo https://github.com/jonhoo/inferno
+            },
+        },
+    },
     ---------------------------------------------------------------------------
     -- Colorscheme
     {
