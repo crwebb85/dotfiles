@@ -2710,7 +2710,8 @@ require('lazy').setup({
                     -- formats treesitter-injected code. In effect, hits will make
                     -- conform.nvim format any python codeblocks inside a markdown file.
                     markdown = { { 'prettierd', 'prettier' }, 'injected' },
-                    xml = { 'xmlformat' },
+                    -- xml = { 'xmlformat' },
+                    xml = { 'prettierxml' },
                     graphql = { { 'prettierd', 'prettier' } },
                     sh = { 'shfmt' },
                 },
@@ -2718,6 +2719,31 @@ require('lazy').setup({
                     xmlformat = {
                         command = 'xmlformat',
                         args = { '--selfclose', '-' },
+                    },
+                    prettierxml = {
+                        command = 'npm',
+                        args = {
+                            '--silent',
+                            'run',
+                            'format',
+                            '--stdin-filepath',
+                            '$FILENAME',
+                        },
+                        cwd = function(_, _)
+                            local config_env = os.getenv('XDG_CONFIG_HOME')
+                            if config_env == nil then
+                                error(
+                                    'cannot find XDG_CONFIG_HOME environment variable'
+                                )
+                            end
+                            local config_path = vim.fn.expand(config_env)
+
+                            return require('utils.path').concat({
+                                config_path,
+                                'cli-tools',
+                                'prettier',
+                            })
+                        end,
                     },
                 },
                 -- enable format-on-save

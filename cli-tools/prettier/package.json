@@ -1,0 +1,12 @@
+{
+  "name": "prettier",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "format": "prettier --plugin=@prettier/plugin-xml --xml-whitespace-sensitivity ignore"
+  },
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.4.1",
+    "prettier": "^3.3.3"
+  }
+}
