@@ -754,7 +754,7 @@ require('lazy').setup({
             view_options = {
                 show_hidden = true,
                 is_always_hidden = function(name, _)
-                    return name == '...' or name == '.git'
+                    return name == '...' or name == '..' or name == '.git'
                 end,
             },
             keymaps = {
