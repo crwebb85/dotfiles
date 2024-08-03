@@ -709,7 +709,7 @@ require('lazy').setup({
 
     {
         'stevearc/oil.nvim',
-        lazy = true,
+        cmd = { 'Oil' },
         keys = {
             {
                 '<leader>ol',
@@ -717,6 +717,34 @@ require('lazy').setup({
                 desc = 'Oil: Open parent directory',
             },
         },
+        init = function(_)
+            --From https://www.reddit.com/r/neovim/comments/1egmpag/comment/lg2epw8/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+
+            local group_id = vim.api.nvim_create_augroup(
+                'oil_open_on_start',
+                { clear = true }
+            )
+            vim.api.nvim_create_autocmd('BufEnter', {
+                group = group_id,
+                desc = 'OIl replacement for Netrw',
+                pattern = '*',
+                once = true,
+                callback = function()
+                    vim.schedule(function()
+                        local buffer_name = vim.api.nvim_buf_get_name(0)
+                        if vim.fn.isdirectory(buffer_name) == 0 then return end
+
+                        -- Ensure no buffers remain with the directory name
+                        vim.api.nvim_set_option_value(
+                            'bufhidden',
+                            'wipe',
+                            { buf = 0 }
+                        )
+                        require('oil').open(vim.fn.expand('%:p:h'))
+                    end)
+                end,
+            })
+        end,
         dependencies = { 'echasnovski/mini.icons' },
         opts = {
             default_file_explorer = true,
@@ -2736,6 +2764,14 @@ require('lazy').setup({
     -- Import plugins defined in the plugins folder
     { import = 'plugins' },
 }, {
+    performance = {
+        rtp = {
+            disabled_plugins = {
+                'netrwPlugin',
+                -- etc.
+            },
+        },
+    },
     dev = {
         -- Directory where you store your local plugin projects
         path = 'C:\\Users\\crweb\\Documents\\projects\\',
