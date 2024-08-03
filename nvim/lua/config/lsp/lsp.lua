@@ -207,7 +207,7 @@ local function default_keymaps(bufnr, client)
     vim.keymap.set(
         { 'v', 'n' },
         '<F3>',
-        function() require('actions-preview').code_actions() end,
+        function() require('tiny-code-action').code_action() end,
         {
             buffer = bufnr,
             desc = 'LSP - Actions Preview: Code action preview menu',

@@ -2632,10 +2632,20 @@ require('lazy').setup({
     },
 
     -- Code Action preview
+    -- {
+    --     'aznhe21/actions-preview.nvim',
+    --     lazy = true,
+    --     config = true,
+    -- },
     {
-        'aznhe21/actions-preview.nvim',
+        'rachartier/tiny-code-action.nvim',
         lazy = true,
-        config = true,
+        dependencies = {
+            { 'nvim-lua/plenary.nvim' },
+            { 'nvim-telescope/telescope.nvim' },
+        },
+        -- event = 'LspAttach',
+        config = function() require('tiny-code-action').setup() end,
     },
     -- Code Action Macros
     {
