@@ -578,7 +578,7 @@ vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
     local items = vim.fn.getqflist()
     items = vim.tbl_filter(function(item) return item.valid == 1 end, items)
     vim.fn.setqflist({}, ' ', { items = items })
-    vim.cmd('open')
+    vim.cmd('copen')
 end, {
     desc = 'Remove invalid quickfix items',
 })
