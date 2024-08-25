@@ -2691,6 +2691,7 @@ require('lazy').setup({
                         require('config.formatter').construct_conform_formatting_params()
                     require('conform').format(params)
                 end,
+                mode = { 'n', 'x' },
                 desc = 'Conform: Format buffer',
             },
         },
@@ -2700,30 +2701,25 @@ require('lazy').setup({
         config = function(_, _)
             require('conform').setup({
                 formatters_by_ft = {
-                    lua = { 'stylua' },
-                    -- first use isort and then black
-                    python = { 'isort', 'black' },
-                    typescript = { { 'prettierd', 'prettier' } },
-                    javascript = { { 'prettierd', 'prettier' } },
-                    typescriptreact = { { 'prettierd', 'prettier' } },
-                    javascriptreact = { { 'prettierd', 'prettier' } },
-                    css = { { 'prettierd', 'prettier' } },
-                    yaml = { { 'prettierd', 'prettier' } },
-                    json = { { 'prettierd', 'prettier' } },
-                    jsonc = { { 'prettierd', 'prettier' } },
-                    json5 = { { 'prettierd', 'prettier' } },
-                    ansible = { { 'prettierd', 'prettier' } },
+                    lua = require('config.formatter').get_buffer_enabled_formatter_list,
+                    python = require('config.formatter').get_buffer_enabled_formatter_list,
+                    typescript = require('config.formatter').get_buffer_enabled_formatter_list,
+                    javascript = require('config.formatter').get_buffer_enabled_formatter_list,
+                    typescriptreact = require('config.formatter').get_buffer_enabled_formatter_list,
+                    javascriptreact = require('config.formatter').get_buffer_enabled_formatter_list,
+                    css = require('config.formatter').get_buffer_enabled_formatter_list,
+                    yaml = require('config.formatter').get_buffer_enabled_formatter_list,
+                    json = require('config.formatter').get_buffer_enabled_formatter_list,
+                    jsonc = require('config.formatter').get_buffer_enabled_formatter_list,
+                    json5 = require('config.formatter').get_buffer_enabled_formatter_list,
+                    ansible = require('config.formatter').get_buffer_enabled_formatter_list,
                     --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
                     -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
-                    ['yaml.ansible'] = { { 'prettierd', 'prettier' } },
-                    -- "inject" is a "special" formatter from conform.nvim, which
-                    -- formats treesitter-injected code. In effect, hits will make
-                    -- conform.nvim format any python codeblocks inside a markdown file.
-                    markdown = { { 'prettierd', 'prettier' }, 'injected' },
-                    -- xml = { 'xmlformat' },
-                    xml = { 'prettierxml' },
-                    graphql = { { 'prettierd', 'prettier' } },
-                    sh = { 'shfmt' },
+                    ['yaml.ansible'] = require('config.formatter').get_buffer_enabled_formatter_list,
+                    markdown = require('config.formatter').get_buffer_enabled_formatter_list,
+                    xml = require('config.formatter').get_buffer_enabled_formatter_list,
+                    graphql = require('config.formatter').get_buffer_enabled_formatter_list,
+                    sh = require('config.formatter').get_buffer_enabled_formatter_list,
                 },
                 formatters = {
                     xmlformat = {

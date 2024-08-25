@@ -26,7 +26,7 @@ end
 ---@field every fun(self, callback: (fun(value:any):boolean)): boolean Returns true if all items pass the test provided by the callback function
 ---@field union fun(self, set:Set): Set Returns a new Set that contains all items from the original Set and all items from the specified Sets
 ---@field union_in_place fun(self, set:Set) Unions the set in place
----@field intesection fun(self, set:Set): Set Returns a new Set that contains all elements that are common between the two sets
+---@field intersection fun(self, set:Set): Set Returns a new Set that contains all elements that are common between the two sets
 ---@field difference fun(self, set:Set): Set Returns a new Set that contains the items that only exist in the original Set
 ---@field symmetric_difference fun(self, set:Set): Set Returns a symetric difference of two Sets
 ---@field is_superset fun(self, subset: Set): boolean Returns true if set has all items present in the subset

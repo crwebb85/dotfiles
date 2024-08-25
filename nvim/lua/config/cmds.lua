@@ -1,5 +1,6 @@
 local Set = require('utils.datastructure').Set
 local format_properties = require('config.formatter').properties
+local M = {}
 
 -------------------------------------------------------------------------------
 -- Scratch
@@ -9,9 +10,9 @@ vim.api.nvim_create_user_command(
     function()
         vim.cmd([[
 		    " open new tab, set options to prevent save prompt when closing
-		    execute 'tabnew' 
-            setlocal buftype=nofile 
-            setlocal bufhidden=hide 
+		    execute 'tabnew'
+            setlocal buftype=nofile
+            setlocal bufhidden=hide
             setlocal noswapfile
 	    ]])
     end,
@@ -64,10 +65,10 @@ end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
 vim.api.nvim_create_user_command('MessagesTab', function()
     vim.cmd([[
 		    " open new tab, set options to prevent save prompt when closing
-		    execute 'tabnew' 
-            setlocal buftype=nofile 
+		    execute 'tabnew'
+            setlocal buftype=nofile
 			setlocal bufhidden=delete
-            setlocal noswapfile 
+            setlocal noswapfile
             execute ":put =execute(':messages')"
 	    ]])
 
@@ -92,9 +93,9 @@ vim.api.nvim_create_user_command('Messages', function()
     vim.cmd([[
 		    " open new tab, set options to prevent save prompt when closing
             execute 'vsplit | enew'
-            setlocal buftype=nofile 
+            setlocal buftype=nofile
 			setlocal bufhidden=delete
-            setlocal noswapfile 
+            setlocal noswapfile
             execute ":put =execute(':messages')"
 	    ]])
     vim.go.splitright = old_splitright_value
@@ -119,7 +120,7 @@ vim.api.nvim_create_user_command('CompareClipboard', function()
     local ftype = vim.api.nvim_eval('&filetype') -- original filetype
     vim.cmd([[
 		tabnew %
-	    
+	
         "create scratch buffer that will contain contents of buffer
         execute 'vsplit | enew'
         setlocal buftype=nofile
@@ -151,7 +152,7 @@ vim.api.nvim_create_user_command('CompareClipboardSelection', function()
         setlocal buftype=nofile
         setlocal bufhidden=hide
         setlocal noswapfile
-         
+
 	]])
 
     vim.bo.filetype = file_type -- set filetype of second buffer
@@ -169,18 +170,15 @@ end, {
 -------------------------------------------------------------------------------
 --Formatting
 
-local function get_buffer_formatter_names()
-    local buffer_formatters =
-        require('config.formatter').get_buffer_formatter_details(0)
-    local formatter_names = {}
-    for _, formatter_info in pairs(buffer_formatters) do
-        table.insert(formatter_names, formatter_info.name)
-    end
-    return formatter_names
-end
+vim.api.nvim_create_user_command('FormatterAutoFormatProjectToggle', function()
+    local old_value = format_properties.is_project_autoformat_disabled()
+    format_properties.set_project_autoformat_disabled(not old_value)
+end, {
+    desc = 'Toggle autoformat on save project wide.',
+})
 
 vim.api.nvim_create_user_command(
-    'FormatterToggleBufferAutoFormat',
+    'FormatterAutoFormatBufferToggle',
     function()
         format_properties.set_buffer_autoformat_disabled(
             not format_properties.is_buffer_autoformat_disabled()
@@ -191,137 +189,7 @@ vim.api.nvim_create_user_command(
     }
 )
 
-vim.api.nvim_create_user_command(
-    'FormatterDisableBufferFormatters',
-    function(args)
-        local bufnr = vim.api.nvim_get_current_buf()
-        local formatters_to_disable = args.fargs
-
-        if #formatters_to_disable == 0 then
-            vim.print('No formatters listed to disable')
-            return
-        end
-
-        local disabled_formatters_set =
-            Set:new(format_properties.get_buffer_disabled_formatters())
-        local formatters_to_disable_set = Set:new(formatters_to_disable)
-        local valid_formatters_set = Set:new(get_buffer_formatter_names())
-        local new_disabled_formatters_set = disabled_formatters_set:union(
-            (valid_formatters_set:intersection(formatters_to_disable_set))
-        )
-        local new_disabled_formatters = new_disabled_formatters_set:to_array()
-        vim.print('Disabled buffer formatters:', new_disabled_formatters)
-        format_properties.set_buffer_disabled_formatters(
-            new_disabled_formatters,
-            bufnr
-        )
-    end,
-    {
-        complete = get_buffer_formatter_names,
-        nargs = '+', --Any number of arguments greater than zero
-        desc = 'Disables formatters for the buffer.',
-    }
-)
-
-vim.api.nvim_create_user_command(
-    'FormatterEnableBufferFormatters',
-    function(args)
-        local bufnr = vim.api.nvim_get_current_buf()
-        local formatters_to_enable = args.fargs
-        if #formatters_to_enable == 0 then
-            vim.print('No formatters listed to enable')
-            return
-        end
-
-        local formatters_to_enable_set = Set:new(formatters_to_enable)
-        local disabled_formatters_set =
-            Set:new(format_properties.get_buffer_disabled_formatters())
-        local new_disabled_formatters = disabled_formatters_set
-            :difference(formatters_to_enable_set)
-            :to_array()
-        vim.print('Buffer formatters still disabled:', new_disabled_formatters)
-        format_properties.set_buffer_disabled_formatters(
-            new_disabled_formatters,
-            bufnr
-        )
-    end,
-    {
-        complete = function()
-            return format_properties.get_buffer_disabled_formatters()
-        end,
-        nargs = '+', -- any number of arguments greater than zero
-        desc = 'Enable formatters for the buffer.',
-    }
-)
-
-vim.api.nvim_create_user_command('FormatterToggleProjectAutoFormat', function()
-    local old_value = format_properties.is_project_autoformat_disabled()
-    format_properties.set_project_autoformat_disabled(not old_value)
-end, {
-    desc = 'Toggle autoformat on save project wide.',
-})
-
-vim.api.nvim_create_user_command(
-    'FormatterDisableProjectFormatters',
-    function(args)
-        local formatters_to_disable = args.fargs
-        if #formatters_to_disable == 0 then
-            vim.print('No formatters listed to disable')
-            return
-        end
-
-        local disabled_formatters_set =
-            Set:new(format_properties.get_project_disabled_formatters())
-        local formatters_to_disable_set = Set:new(formatters_to_disable)
-        local valid_formatters_set = Set:new(get_buffer_formatter_names())
-        local new_disabled_formatters_set = disabled_formatters_set:union(
-            (valid_formatters_set:intersection(formatters_to_disable_set))
-        )
-        local new_disabled_formatters = new_disabled_formatters_set:to_array()
-        vim.print('Project disabled formatters:', new_disabled_formatters)
-        format_properties.set_project_disabled_formatters(
-            new_disabled_formatters
-        )
-    end,
-    {
-        complete = get_buffer_formatter_names,
-        nargs = '+', --Any number of arguments greater than zero
-        desc = 'Disabled formatters by name project wide.',
-    }
-)
-
-vim.api.nvim_create_user_command(
-    'FormatterEnableProjectFormatters',
-    function(args)
-        local formatters_to_enable = args.fargs
-        if #formatters_to_enable == 0 then
-            vim.print('No formatters listed to enable')
-            return
-        end
-        local formatters_to_enable_set = Set:new(formatters_to_enable)
-        local disabled_formatters_set =
-            Set:new(format_properties.get_project_disabled_formatters())
-        local new_disabled_formatters = disabled_formatters_set
-            :difference(formatters_to_enable_set)
-            :to_array()
-        vim.print(
-            'Remaining project disabled formatters:',
-            new_disabled_formatters
-        )
-        format_properties.set_project_disabled_formatters(
-            new_disabled_formatters
-        )
-    end,
-    {
-        complete = function()
-            return format_properties.get_project_disabled_formatters()
-        end,
-        nargs = '+', --Any number of arguments greater than zero
-        desc = 'Enable formatters project wide',
-    }
-)
-
-vim.api.nvim_create_user_command('FormatterSetTimeout', function(args)
+vim.api.nvim_create_user_command('FormatterTimeout', function(args)
     local timeout = tonumber(args.fargs[1])
     if timeout == nil then error('Invalid timeout') end
     if timeout < 500 then
@@ -339,7 +207,7 @@ end, {
     desc = 'Sets the formatter timeout in milliseconds',
 })
 
-vim.api.nvim_create_user_command('FormatterToggleFormatAfterSave', function()
+vim.api.nvim_create_user_command('FormatterAfterSaveToggle', function()
     local filetype = vim.bo[0].filetype
     local is_format_after_save_enabled =
         format_properties.is_format_after_save_enabled(filetype)
@@ -352,13 +220,126 @@ end, {
 })
 
 vim.api.nvim_create_user_command(
-    'FormatterGetDetails',
-    function() vim.print(format_properties.get_buffer_formatting_details()) end,
+    'FormatterDetails',
+    function()
+        vim.print(require('config.formatter').get_buffer_formatting_details())
+    end,
     { desc = 'Prints the formatting details for the buffer' }
 )
+-------------------------------------------------------------------------------
+---Formatter disable/enables
+
+local function get_project_formatter_names()
+    local filetype = vim.bo.filetype
+    return format_properties.get_project_formatters(filetype)
+end
+
+vim.api.nvim_create_user_command('FormatterProjectToggle', function(args)
+    ---@type string[]
+    local formatters_to_toggle = args.fargs
+    if #formatters_to_toggle == 0 then
+        vim.print('No formatters listed to toggle')
+        return
+    end
+    --remove duplicates
+    local formatters_to_toggle_set = Set:new(formatters_to_toggle)
+    local valid_formatters_set = Set:new(get_project_formatter_names())
+    local invalid_formatters_set =
+        formatters_to_toggle_set:difference(valid_formatters_set)
+    if invalid_formatters_set.size >= 0 then
+        vim.print(
+            'Ignoring invalid formatters: '
+                .. invalid_formatters_set:to_string()
+        )
+    end
+
+    local sanitized_formatters_to_toggle_set =
+        formatters_to_toggle_set:intersection(valid_formatters_set)
+
+    local disabled_formatters =
+        format_properties.get_project_disabled_formatters_set()
+
+    sanitized_formatters_to_toggle_set:each(function(formatter)
+        if disabled_formatters[formatter] then
+            disabled_formatters[formatter] = nil
+        else
+            disabled_formatters[formatter] = true
+        end
+    end)
+
+    ---@type string[]
+    local new_disabled_formatters_list = {}
+    for formatter, disabled in pairs(disabled_formatters) do
+        if disabled then
+            table.insert(new_disabled_formatters_list, formatter)
+        end
+    end
+
+    vim.print('Project disabled formatters:', new_disabled_formatters_list)
+    format_properties.set_project_disabled_formatters(
+        new_disabled_formatters_list
+    )
+end, {
+    complete = get_project_formatter_names,
+    nargs = '+', --Any number of arguments greater than zero
+    desc = 'Disabled formatters by name project wide.',
+})
+
+vim.api.nvim_create_user_command('FormatterBufferToggle', function(args)
+    local bufnr = vim.api.nvim_get_current_buf()
+    ---@type string[]
+    local formatters_to_toggle = args.fargs
+    if #formatters_to_toggle == 0 then
+        vim.print('No formatters listed to toggle')
+        return
+    end
+    --remove duplicates
+    local formatters_to_toggle_set = Set:new(formatters_to_toggle)
+    local valid_formatters_set = Set:new(get_project_formatter_names())
+    local invalid_formatters_set =
+        formatters_to_toggle_set:difference(valid_formatters_set)
+    if invalid_formatters_set.size >= 0 then
+        vim.print(
+            'Ignoring invalid formatters: '
+                .. invalid_formatters_set:to_string()
+        )
+    end
+
+    local sanitized_formatters_to_toggle_set =
+        formatters_to_toggle_set:intersection(valid_formatters_set)
+
+    local disabled_formatters =
+        format_properties.get_buffer_disabled_formatters_set(bufnr)
+
+    sanitized_formatters_to_toggle_set:each(function(formatter)
+        if disabled_formatters[formatter] then
+            disabled_formatters[formatter] = nil
+        else
+            disabled_formatters[formatter] = true
+        end
+    end)
+
+    ---@type string[]
+    local new_disabled_formatters_list = {}
+    for formatter, disabled in pairs(disabled_formatters) do
+        if disabled then
+            table.insert(new_disabled_formatters_list, formatter)
+        end
+    end
+
+    vim.print('Buffer disabled formatters:', new_disabled_formatters_list)
+    format_properties.set_buffer_disabled_formatters(
+        new_disabled_formatters_list,
+        bufnr
+    )
+end, {
+    complete = get_project_formatter_names,
+    nargs = '+', --Any number of arguments greater than zero
+    desc = 'Disabled formatters by name project wide.',
+})
 
 vim.api.nvim_create_user_command(
-    'FormatterSetBufferLspFormatStrategy',
+    'FormatterBufferLspFormatStrategy',
     function(args)
         local strategy_name = args.fargs[1]
         local bufnr = vim.api.nvim_get_current_buf()
@@ -377,7 +358,7 @@ vim.api.nvim_create_user_command(
             return strategies
         end,
         nargs = 1,
-        desc = 'Sets the formatter timeout in milliseconds',
+        desc = 'Sets the lsp format strategy for the buffer',
     }
 )
 
@@ -402,7 +383,7 @@ vim.api.nvim_create_user_command(
             return strategies
         end,
         nargs = 1,
-        desc = 'Sets the formatter timeout in milliseconds',
+        desc = 'Sets the formatter filetype lsp format strategy',
     }
 )
 
@@ -577,7 +558,7 @@ end, {
     nargs = '*',
 })
 --[[
-(class_declaration 
+(class_declaration
   ; name: (identifier) @classname
   ; (.eq? @classname "Program")
   body: (declaration_list
@@ -589,7 +570,7 @@ end, {
                 ; parameters: (parameter_list) @parameters
                 ; body: (block) @body
               )
-          ) 
+          )
 )
 ]]
 
@@ -802,7 +783,7 @@ vim.api.nvim_create_user_command('Stacktrace', function(params)
         'stacktrace_quickfix_item_hl_group',
         '[^%s].\\+:\\d\\+:\\(\\d\\+:\\)\\= .\\+'
         --matches text like the following lines
-        --[[ 
+        --[[
             .\hello-world.go:6: undefined: mt
             adfas .\hello-world.go:3:8: "fmt" imported and not used
             .\hello-world.go:6:2: undefined: mt
@@ -899,3 +880,4 @@ vim.api.nvim_create_user_command(
         complete = 'buffer',
     }
 )
+return M

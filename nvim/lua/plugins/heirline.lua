@@ -267,33 +267,88 @@ local config = function()
         init = function(self)
             -- vim.print(self)
             local children = {}
+            local bufnr = vim.api.nvim_get_current_buf()
+            local filetype = vim.bo[bufnr].filetype
             local formatters =
-                require('config.formatter').get_buffer_lsp_and_formatter_details()
+                require('config.formatter').properties.get_project_formatters(
+                    filetype
+                )
 
-            for i, formatter in pairs(formatters) do
-                if formatter.client_id == nil then
+            local project_disabled_formatters =
+                require('config.formatter').properties.get_project_disabled_formatters_set()
+            local buffer_disabled_formatters =
+                require('config.formatter').properties.get_buffer_disabled_formatters_set(
+                    bufnr
+                )
+            local lsp_format_strategy =
+                require('config.formatter').determine_conform_lsp_fallback(
+                    bufnr
+                )
+
+            local is_any_formatter_enabled = false
+            if lsp_format_strategy ~= 'prefer' then
+                for i, formatter in pairs(formatters) do
                     ---@type StatusLine
                     local formatter_component = {
-                        provider = vim.fn.trim(formatter.name),
+                        provider = vim.fn.trim(formatter),
                     }
-                    if not formatter.available then
+                    if
+                        not require('conform').get_formatter_info(formatter).available
+                    then
+                        formatter_component.hl =
+                            { fg = 'red', bold = true, strikethrough = true }
+                    elseif project_disabled_formatters[formatter] then
                         formatter_component.hl = { fg = 'red', bold = true }
-                    elseif formatter.project_disabled then
+                    elseif buffer_disabled_formatters[formatter] then
                         formatter_component.hl = { fg = 'orange', bold = true }
-                    elseif formatter.buffer_disabled then
-                        formatter_component.hl = { fg = 'yellow', bold = true }
+                    else
+                        is_any_formatter_enabled = true
                     end
                     table.insert(children, formatter_component)
-                else
-                    ---@type StatusLine
-                    local formatter_component = {
-                        provider = vim.fn.trim(formatter.name),
-                    }
-                    table.insert(children, formatter_component)
+                    if i < #formatters then table.insert(children, Space) end
                 end
-                if i < #formatters then table.insert(children, Space) end
             end
 
+            if
+                lsp_format_strategy == 'last'
+                or lsp_format_strategy == 'prefer'
+                or (
+                    lsp_format_strategy == 'fallback'
+                    and not is_any_formatter_enabled
+                )
+            then
+                if #children > 0 then table.insert(children, Space) end
+                -- add lsp formatters to the end of the list
+                local lsp_formatters =
+                    require('config.formatter').get_buffer_lsp_formatters(bufnr)
+                for i, lsp_formatter in ipairs(lsp_formatters) do
+                    ---@type StatusLine
+                    local formatter_component = {
+                        provider = vim.fn.trim(lsp_formatter.name),
+                    }
+                    table.insert(children, formatter_component)
+                    if i < #formatters then table.insert(children, Space) end
+                end
+            elseif lsp_format_strategy == 'first' then
+                -- add lsp formatters to the begining of the list
+                local alt_children = {}
+                local lsp_formatters =
+                    require('config.formatter').get_buffer_lsp_formatters(bufnr)
+                for i, lsp_formatter in ipairs(lsp_formatters) do
+                    ---@type StatusLine
+                    local formatter_component = {
+                        provider = vim.fn.trim(lsp_formatter),
+                    }
+                    table.insert(alt_children, formatter_component)
+                    if i < #formatters then
+                        table.insert(alt_children, Space)
+                    end
+                end
+                for _, child in ipairs(children) do
+                    table.insert(alt_children, child)
+                end
+                children = alt_children
+            end
             self.child = self:new(children, 1)
         end,
         provider = function(self) return self.child:eval() end,
@@ -317,7 +372,7 @@ local config = function()
     local FormatterActive = {
         condition = function(_)
             local buffer_formatter_details =
-                require('config.formatter').get_buffer_formatter_details()
+                require('config.formatter').get_buffer_enabled_formatter_list()
             local lsp_formatters =
                 require('config.formatter').get_buffer_lsp_formatters()
             return #buffer_formatter_details > 0 or #lsp_formatters > 0
@@ -328,9 +383,9 @@ local config = function()
         },
         Space,
         {
-            provider = ' ',
-        },
-        {
+            {
+                provider = ' ',
+            },
             {
                 provider = '[',
             },
@@ -339,39 +394,37 @@ local config = function()
             {
                 provider = ']',
             },
+
             hl = function()
+                local is_format_after_save_enabled =
+                    require('config.formatter').properties.is_format_after_save_enabled(
+                        vim.bo.filetype
+                    )
                 if
+                    require('config.formatter').properties.is_project_autoformat_disabled()
+                then
+                    return {
+                        fg = 'red',
+                        bold = true,
+                        italic = is_format_after_save_enabled,
+                    }
+                elseif
                     require('config.formatter').properties.is_buffer_autoformat_disabled(
-                        0 --TODO determine if this works correctly when not my active buffer
+                        vim.api.nvim_get_current_buf()
                     )
                 then
-                    return { fg = 'red', bold = true }
+                    return { fg = 'orange', bold = true }
+                else
+                    return {
+                        fg = 'green',
+                        bold = true,
+                        italic = is_format_after_save_enabled,
+                    }
                 end
             end,
         },
         Space,
         Seperator,
-        hl = function()
-            local is_format_after_save_enabled =
-                require('config.formatter').properties.is_format_after_save_enabled(
-                    vim.bo[0].filetype
-                )
-            if
-                require('config.formatter').properties.is_project_autoformat_disabled()
-            then
-                return {
-                    fg = 'red',
-                    bold = true,
-                    italic = is_format_after_save_enabled,
-                }
-            else
-                return {
-                    fg = 'green',
-                    bold = true,
-                    italic = is_format_after_save_enabled,
-                }
-            end
-        end,
     }
 
     local MacroRecording = {
