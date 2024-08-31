@@ -892,14 +892,6 @@ require('lazy').setup({
         config = true,
     },
 
-    --Global notes
-    {
-        'backdround/global-note.nvim',
-        lazy = true,
-        cmd = { 'GlobalNote' },
-        config = true,
-    },
-
     -- A util library
     {
         'nvim-lua/plenary.nvim',

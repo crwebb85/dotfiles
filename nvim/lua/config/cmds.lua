@@ -1,5 +1,6 @@
 local Set = require('utils.datastructure').Set
 local format_properties = require('config.formatter').properties
+local Path = require('utils.path')
 local M = {}
 
 -------------------------------------------------------------------------------
@@ -31,6 +32,47 @@ vim.api.nvim_create_user_command('Scratch', function()
         ]])
     vim.go.splitright = old_splitright_value
 end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
+
+vim.api.nvim_create_user_command('GlobalNote', function()
+    local data_dir = vim.fn.stdpath('data')
+    if type(data_dir) ~= 'string' then error('Invalid data directory') end
+    local directory = vim.fs.joinpath(data_dir, 'global-note')
+    local filepath = vim.fs.joinpath(directory, 'global.md')
+    Path.ensure_directory_exists(directory)
+    Path.ensure_file_exists(filepath)
+
+    local buffer_id = vim.fn.bufadd(filepath)
+    if buffer_id == nil then
+        error(
+            "Unreachable: The file should exist, but it doesn't: " .. filepath
+        )
+    end
+
+    vim.api.nvim_open_win(buffer_id, true, {
+        split = 'right',
+    })
+end, { nargs = 0, desc = 'Creates the global note in split to the right' })
+
+vim.api.nvim_create_user_command('GlobalNoteTab', function()
+    local data_dir = vim.fn.stdpath('data')
+    if type(data_dir) ~= 'string' then error('Invalid data directory') end
+    local directory = vim.fs.joinpath(data_dir, 'global-note')
+    local filepath = vim.fs.joinpath(directory, 'global.md')
+    Path.ensure_directory_exists(directory)
+    Path.ensure_file_exists(filepath)
+
+    local buffer_id = vim.fn.bufadd(filepath)
+    if buffer_id == nil then
+        error(
+            "Unreachable: The file should exist, but it doesn't: " .. filepath
+        )
+    end
+
+    vim.cmd([[
+		execute 'tabnew'
+	]])
+    vim.api.nvim_set_current_buf(buffer_id)
+end, { nargs = 0, desc = 'Creates the global note in a new tab' })
 
 -- Create a new scratch buffer to the left that will push my working window
 -- closer to the center so that I am not hurting my neck
