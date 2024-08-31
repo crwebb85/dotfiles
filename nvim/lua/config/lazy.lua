@@ -1320,144 +1320,145 @@ require('lazy').setup({
                     move = {
                         enable = true,
                         set_jumps = true, -- whether to set jumps in the jumplist
+                        --I setup the move keymaps up manually in my keymaps.lua file
 
                         --[[                          ]]
-                        goto_next_start = {
-                            [']f'] = {
-                                query = '@call.outer',
-                                desc = 'Next function call start',
-                            },
-                            [']m'] = {
-                                query = '@function.outer',
-                                desc = 'Remap: Next method/function def start',
-                            },
-                            [']c'] = {
-                                query = '@class.outer',
-                                desc = 'Next class start',
-                            },
-                            [']i'] = {
-                                query = '@conditional.outer',
-                                desc = 'Next conditional start',
-                            },
-                            [']o'] = {
-                                query = '@loop.outer',
-                                desc = 'Next loop start',
-                            },
-                            [']va'] = {
-                                query = '@parameter.inner',
-                                desc = 'Next parameter inner start',
-                            },
-                            [']gci'] = {
-                                query = '@comment.inner',
-                                desc = 'Next comment inner start',
-                            },
-                            [']gca'] = {
-                                query = '@comment.outer',
-                                desc = 'Next comment outer start',
-                            },
-                        },
-                        goto_next_end = {
-                            [']F'] = {
-                                query = '@call.outer',
-                                desc = 'Next function call end',
-                            },
-                            [']M'] = {
-                                query = '@function.outer',
-                                desc = 'Remap: Next method/function def end',
-                            },
-                            [']C'] = {
-                                query = '@class.outer',
-                                desc = 'Next class end',
-                            },
-                            [']I'] = {
-                                query = '@conditional.outer',
-                                desc = 'Next conditional end',
-                            },
-                            [']O'] = {
-                                query = '@loop.outer',
-                                desc = 'Next loop end',
-                            },
-                            [']vA'] = {
-                                query = '@parameter.inner',
-                                desc = 'Next parameter inner end',
-                            },
-                            [']gcI'] = {
-                                query = '@parameter.inner',
-                                desc = 'Next comment inner end',
-                            },
-                            [']gcA'] = {
-                                query = '@comment.outer',
-                                desc = 'Next comment outer end',
-                            },
-                        },
-                        goto_previous_start = {
-                            ['[f'] = {
-                                query = '@call.outer',
-                                desc = 'Prev function call start',
-                            },
-                            ['[m'] = {
-                                query = '@function.outer',
-                                desc = 'Prev method/function def start',
-                            },
-                            ['[c'] = {
-                                query = '@class.outer',
-                                desc = 'Prev class start',
-                            },
-                            ['[i'] = {
-                                query = '@conditional.outer',
-                                desc = 'Prev conditional start',
-                            },
-                            ['[o'] = {
-                                query = '@loop.outer',
-                                desc = 'Prev loop start',
-                            },
-                            ['[va'] = {
-                                query = '@parameter.inner',
-                                desc = 'Next parameter inner start',
-                            },
-                            ['[gci'] = {
-                                query = '@parameter.inner',
-                                desc = 'Next comment inner start',
-                            },
-                            ['[gca'] = {
-                                query = '@comment.outer',
-                                desc = 'Next comment outer start',
-                            },
-                        },
-                        goto_previous_end = {
-                            ['[F'] = {
-                                query = '@call.outer',
-                                desc = 'Prev function call end',
-                            },
-                            ['[M'] = {
-                                query = '@function.outer',
-                                desc = 'Prev method/function def end',
-                            },
-                            ['[C'] = {
-                                query = '@class.outer',
-                                desc = 'Prev class end',
-                            },
-                            ['[I'] = {
-                                query = '@conditional.outer',
-                                desc = 'Prev conditional end',
-                            },
-                            ['[O'] = {
-                                query = '@loop.outer',
-                                desc = 'Prev loop end',
-                            },
-                            ['[vA'] = {
-                                query = '@parameter.inner',
-                                desc = 'Next parameter inner end',
-                            },
-                            ['[gcI'] = {
-                                query = '@parameter.inner',
-                                desc = 'Next comment inner end',
-                            },
-                            ['[gcA'] = {
-                                query = '@comment.outer',
-                                desc = 'Next comment outer end',
-                            },
-                        },
+                        -- goto_next_start = {
+                        --     [']f'] = {
+                        --         query = '@call.outer',
+                        --         desc = 'Next function call start',
+                        --     },
+                        --     [']m'] = {
+                        --         query = '@function.outer',
+                        --         desc = 'Remap: Next method/function def start',
+                        --     },
+                        --     [']c'] = {
+                        --         query = '@class.outer',
+                        --         desc = 'Next class start',
+                        --     },
+                        --     [']i'] = {
+                        --         query = '@conditional.outer',
+                        --         desc = 'Next conditional start',
+                        --     },
+                        --     [']o'] = {
+                        --         query = '@loop.outer',
+                        --         desc = 'Next loop start',
+                        --     },
+                        --     [']va'] = {
+                        --         query = '@parameter.inner',
+                        --         desc = 'Next parameter inner start',
+                        --     },
+                        --     [']gci'] = {
+                        --         query = '@comment.inner',
+                        --         desc = 'Next comment inner start',
+                        --     },
+                        --     [']gca'] = {
+                        --         query = '@comment.outer',
+                        --         desc = 'Next comment outer start',
+                        --     },
+                        -- },
+                        -- goto_next_end = {
+                        --     [']F'] = {
+                        --         query = '@call.outer',
+                        --         desc = 'Next function call end',
+                        --     },
+                        --     [']M'] = {
+                        --         query = '@function.outer',
+                        --         desc = 'Remap: Next method/function def end',
+                        --     },
+                        --     [']C'] = {
+                        --         query = '@class.outer',
+                        --         desc = 'Next class end',
+                        --     },
+                        --     [']I'] = {
+                        --         query = '@conditional.outer',
+                        --         desc = 'Next conditional end',
+                        --     },
+                        --     [']O'] = {
+                        --         query = '@loop.outer',
+                        --         desc = 'Next loop end',
+                        --     },
+                        --     [']vA'] = {
+                        --         query = '@parameter.inner',
+                        --         desc = 'Next parameter inner end',
+                        --     },
+                        --     [']gcI'] = {
+                        --         query = '@parameter.inner',
+                        --         desc = 'Next comment inner end',
+                        --     },
+                        --     [']gcA'] = {
+                        --         query = '@comment.outer',
+                        --         desc = 'Next comment outer end',
+                        --     },
+                        -- },
+                        -- goto_previous_start = {
+                        --     ['[f'] = {
+                        --         query = '@call.outer',
+                        --         desc = 'Prev function call start',
+                        --     },
+                        --     ['[m'] = {
+                        --         query = '@function.outer',
+                        --         desc = 'Prev method/function def start',
+                        --     },
+                        --     ['[c'] = {
+                        --         query = '@class.outer',
+                        --         desc = 'Prev class start',
+                        --     },
+                        --     ['[i'] = {
+                        --         query = '@conditional.outer',
+                        --         desc = 'Prev conditional start',
+                        --     },
+                        --     ['[o'] = {
+                        --         query = '@loop.outer',
+                        --         desc = 'Prev loop start',
+                        --     },
+                        --     ['[va'] = {
+                        --         query = '@parameter.inner',
+                        --         desc = 'Next parameter inner start',
+                        --     },
+                        --     ['[gci'] = {
+                        --         query = '@parameter.inner',
+                        --         desc = 'Next comment inner start',
+                        --     },
+                        --     ['[gca'] = {
+                        --         query = '@comment.outer',
+                        --         desc = 'Next comment outer start',
+                        --     },
+                        -- },
+                        -- goto_previous_end = {
+                        --     ['[F'] = {
+                        --         query = '@call.outer',
+                        --         desc = 'Prev function call end',
+                        --     },
+                        --     ['[M'] = {
+                        --         query = '@function.outer',
+                        --         desc = 'Prev method/function def end',
+                        --     },
+                        --     ['[C'] = {
+                        --         query = '@class.outer',
+                        --         desc = 'Prev class end',
+                        --     },
+                        --     ['[I'] = {
+                        --         query = '@conditional.outer',
+                        --         desc = 'Prev conditional end',
+                        --     },
+                        --     ['[O'] = {
+                        --         query = '@loop.outer',
+                        --         desc = 'Prev loop end',
+                        --     },
+                        --     ['[vA'] = {
+                        --         query = '@parameter.inner',
+                        --         desc = 'Next parameter inner end',
+                        --     },
+                        --     ['[gcI'] = {
+                        --         query = '@parameter.inner',
+                        --         desc = 'Next comment inner end',
+                        --     },
+                        --     ['[gcA'] = {
+                        --         query = '@comment.outer',
+                        --         desc = 'Next comment outer end',
+                        --     },
+                        -- },
                     },
                 },
             }

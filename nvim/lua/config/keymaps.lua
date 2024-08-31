@@ -750,6 +750,318 @@ local myoperations = maputils
             opts = {},
         },
     })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'm',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@function.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@function.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom Remap: jump to the {previous|next} method start',
+            opts = {},
+        },
+        extreme = {
+            key = 'M',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@function.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@function.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom Remap: jump to the {previous|next} method end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'f',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@call.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@call.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom Remap: jump to the {previous|next} function call start',
+            opts = {},
+        },
+        extreme = {
+            key = 'F',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@call.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@call.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom Remap: jump to the {previous|next} function call end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'c',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@class.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@class.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} class start',
+            opts = {},
+        },
+        extreme = {
+            key = 'C',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@class.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@class.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} class end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'i',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@conditional.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@conditional.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} conditional start',
+            opts = {},
+        },
+        extreme = {
+            key = 'I',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@conditional.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@conditional.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} conditional end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'o',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@loop.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@loop.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} loop start',
+            opts = {},
+        },
+        extreme = {
+            key = 'O',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@loop.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@loop.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} loop end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'va',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@parameter.inner',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@parameter.inner',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} parameter inner start',
+            opts = {},
+        },
+        extreme = {
+            key = 'vA',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@parameter.inner',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@parameter.inner',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} parameter inner end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'gci',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@comment.inner',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@comment.inner',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} comment inner start',
+            opts = {},
+        },
+        extreme = {
+            key = 'gcI',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@comment.inner',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@comment.inner',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} comment inner end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'gca',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@comment.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@comment.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} comment outer start',
+            opts = {},
+        },
+        extreme = {
+            key = 'gcA',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@comment.outer',
+                    'textobjects'
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@comment.outer',
+                    'textobjects'
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} comment outer end',
+            opts = {},
+        },
+    })
 
 maputils
     .operations({
