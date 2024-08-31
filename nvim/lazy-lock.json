@@ -16,7 +16,6 @@
   "git-conflict.nvim": { "branch": "main", "commit": "45cde6f0acf26d0e4b64acfa45349dd1da01e577" },
   "gitlinker.nvim": { "branch": "master", "commit": "542f51784f20107ef9ecdadc47825204837efed5" },
   "gitsigns.nvim": { "branch": "main", "commit": "899e993850084ea33d001ec229d237bc020c19ae" },
-  "global-note.nvim": { "branch": "main", "commit": "1e0d4bba425d971ed3ce40d182c574a25507115c" },
   "harpoon": { "branch": "harpoon2", "commit": "0378a6c428a0bed6a2781d459d7943843f374bce" },
   "heirline.nvim": { "branch": "master", "commit": "0d797435e54645a5f98bad7ad6046aac1ef95c1e" },
   "lazy.nvim": { "branch": "main", "commit": "48b52b5cfcf8f88ed0aff8fde573a5cc20b1306d" },
