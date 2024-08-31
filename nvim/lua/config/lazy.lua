@@ -1057,13 +1057,6 @@ require('lazy').setup({
     },
 
     ---------------------------------------------------------------------------
-    -- Clipboard support (copy from vim to the outside world)
-    {
-        'ojroques/nvim-osc52',
-        event = 'BufReadPre',
-    },
-
-    ---------------------------------------------------------------------------
     -- Undotree the solution to screw ups
     {
         'mbbill/undotree',
