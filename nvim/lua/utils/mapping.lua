@@ -237,6 +237,8 @@ function MyOperations:navigator(args)
 
     local backward = function()
         set_callbacks()
+        local original_winnr = vim.api.nvim_get_current_win()
+        local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
         if type(args.default.backward) == 'string' then
             local cmd = args.default.backward
             if 0 < vim.v.count then
@@ -247,10 +249,22 @@ function MyOperations:navigator(args)
         else
             args.default.backward()
         end
+
+        local new_winnr = vim.api.nvim_get_current_win()
+        local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
+        if
+            original_winnr ~= new_winnr
+            or original_cursor[1] ~= new_cursor[1]
+            or original_cursor[2] ~= new_cursor[2]
+        then
+            vim.cmd('normal! zz')
+        end
     end
 
     local forward = function()
         set_callbacks()
+        local original_winnr = vim.api.nvim_get_current_win()
+        local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
         if type(args.default.forward) == 'string' then
             local cmd = args.default.forward
             if 0 < vim.v.count then
@@ -260,6 +274,16 @@ function MyOperations:navigator(args)
             end
         else
             args.default.forward()
+        end
+
+        local new_winnr = vim.api.nvim_get_current_win()
+        local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
+        if
+            original_winnr ~= new_winnr
+            or original_cursor[1] ~= new_cursor[1]
+            or original_cursor[2] ~= new_cursor[2]
+        then
+            vim.cmd('normal! zz')
         end
     end
 
@@ -286,6 +310,8 @@ function MyOperations:navigator(args)
 
         local extreme_backward = function()
             set_callbacks()
+            local original_winnr = vim.api.nvim_get_current_win()
+            local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
             if type(args.extreme.backward) == 'string' then
                 local cmd = args.extreme.backward
                 if 0 < vim.v.count then
@@ -296,10 +322,21 @@ function MyOperations:navigator(args)
             else
                 args.extreme.backward()
             end
+            local new_winnr = vim.api.nvim_get_current_win()
+            local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
+            if
+                original_winnr ~= new_winnr
+                or original_cursor[1] ~= new_cursor[1]
+                or original_cursor[2] ~= new_cursor[2]
+            then
+                vim.cmd('normal! zz')
+            end
         end
 
         local extreme_forward = function()
             set_callbacks()
+            local original_winnr = vim.api.nvim_get_current_win()
+            local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
             if type(args.extreme.forward) == 'string' then
                 local cmd = args.extreme.forward
                 if 0 < vim.v.count then
@@ -309,6 +346,15 @@ function MyOperations:navigator(args)
                 end
             else
                 args.extreme.forward()
+            end
+            local new_winnr = vim.api.nvim_get_current_win()
+            local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
+            if
+                original_winnr ~= new_winnr
+                or original_cursor[1] ~= new_cursor[1]
+                or original_cursor[2] ~= new_cursor[2]
+            then
+                vim.cmd('normal! zz')
             end
         end
 
