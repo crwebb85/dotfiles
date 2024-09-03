@@ -869,6 +869,7 @@ end, {
 })
 
 -------------------------------------------------------------------------------
+--- File cleanup
 
 vim.api.nvim_create_user_command('ConvertLineEndings', function(params)
     -- vim.print(params)
@@ -895,6 +896,21 @@ end, {
     complete = function() return { 'lf', 'crlf' } end,
 })
 
+vim.api.nvim_create_user_command(
+    'RemoveTrailingWhitespace',
+    function(_) vim.cmd([[:%s/\s\+$//e]]) end,
+    {
+        nargs = 0,
+    }
+)
+
+vim.api.nvim_create_user_command(
+    'CollapseDuplicateWhitespace',
+    function(_) vim.cmd([[:%s/\n\{3,}/\r\r/e]]) end,
+    {
+        nargs = 0,
+    }
+)
 -------------------------------------------------------------------------------
 -- Define Bdelete and Bwipeout.
 vim.api.nvim_create_user_command(
