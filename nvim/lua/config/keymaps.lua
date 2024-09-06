@@ -126,13 +126,13 @@ vim.keymap.set(
 vim.keymap.set(
     'n',
     '<C-j>',
-    function() require('utils.mapping').smart_nav(vim.v.count1 .. 'cnext') end,
+    function() require('utils.mapping').smart_nav('cnext') end,
     { desc = 'Custom - Quick Fix List: cnext quick fix navigation' }
 )
 vim.keymap.set(
     'n',
     '<C-k>',
-    function() require('utils.mapping').smart_nav(vim.v.count1 .. 'cprev') end,
+    function() require('utils.mapping').smart_nav('cprev') end,
     { desc = 'Custom - Quick Fix List: cprev quick fix navigation' }
 )
 
