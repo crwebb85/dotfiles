@@ -1,3 +1,5 @@
+local config = require('config.config')
+
 local state = {
     is_folding_enable = true,
 }
@@ -190,8 +192,8 @@ function M.setup_folding(is_folding_enable)
                 end,
             }
         )
-        -- else
-        --     vim.opt.foldenable = false
+    else
+        vim.opt.foldenable = false
     end
 end
 -------------------------------------------------------------------------------
@@ -227,6 +229,6 @@ vim.api.nvim_create_user_command(
 
 -------------------------------------------------------------------------------
 --- Setup folding
-M.setup_folding(true)
+M.setup_folding(config.foldenable)
 
 return M
