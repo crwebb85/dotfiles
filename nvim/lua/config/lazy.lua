@@ -817,6 +817,7 @@ require('lazy').setup({
                             filename = file_path,
                             row = 0,
                             col = 0,
+                            valid = 1,
                         })
 
                         vim.fn.setqflist({}, ' ', {
