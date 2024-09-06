@@ -55,6 +55,48 @@ function M.dot_repeat(
 end
 
 -------------------------------------------------------------------------------
+--- smart navigation
+
+---Runs the callback or cmd and if the cursor has changed it will vertically
+---center the window and open the folds so that you can see the cursor
+---
+---Note: I check that the cursor actually moves rather than running it zz and zO on all
+---executions since I want to be able to use this in places like my MyOperations metatable
+---below that may be used with things that don't move the cursor
+---@param nav_callback string|function
+---@param prepend_count boolean? Append vim.v.count1 to command if nav_callback is a command. Default is true
+function M.smart_nav(nav_callback, prepend_count)
+    if prepend_count == nil then prepend_count = true end
+    local original_winnr = vim.api.nvim_get_current_win()
+    local original_bufnr = vim.api.nvim_get_current_buf()
+    local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
+
+    if type(nav_callback) == 'string' then
+        if prepend_count then
+            vim.cmd(vim.v.count1 .. nav_callback)
+        else
+            vim.cmd(nav_callback)
+        end
+    else
+        nav_callback()
+    end
+
+    local new_bufnr = vim.api.nvim_get_current_buf()
+    local new_winnr = vim.api.nvim_get_current_win()
+    local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
+    if
+        original_bufnr ~= new_bufnr --need to compare bufnr not winnr
+        or original_cursor[1] ~= new_cursor[1]
+        or original_cursor[2] ~= new_cursor[2]
+    then
+        --open folds if the cursor is within a fold and the cursor has moved
+        if vim.wo.foldenable then vim.cmd('normal! zO') end
+        --center cursor vertically if the cursor has moved
+        vim.cmd('normal! zz')
+    end
+end
+
+-------------------------------------------------------------------------------
 --- Navigator keymap helpers
 
 ---There are two ways to specify the description:
@@ -237,54 +279,12 @@ function MyOperations:navigator(args)
 
     local backward = function()
         set_callbacks()
-        local original_winnr = vim.api.nvim_get_current_win()
-        local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
-        if type(args.default.backward) == 'string' then
-            local cmd = args.default.backward
-            if 0 < vim.v.count then
-                vim.cmd(vim.v.count .. cmd)
-            else
-                vim.cmd(cmd)
-            end
-        else
-            args.default.backward()
-        end
-
-        local new_winnr = vim.api.nvim_get_current_win()
-        local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
-        if
-            original_winnr ~= new_winnr
-            or original_cursor[1] ~= new_cursor[1]
-            or original_cursor[2] ~= new_cursor[2]
-        then
-            vim.cmd('normal! zz')
-        end
+        M.smart_nav(args.default.backward)
     end
 
     local forward = function()
         set_callbacks()
-        local original_winnr = vim.api.nvim_get_current_win()
-        local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
-        if type(args.default.forward) == 'string' then
-            local cmd = args.default.forward
-            if 0 < vim.v.count then
-                vim.cmd(vim.v.count .. cmd)
-            else
-                vim.cmd(cmd)
-            end
-        else
-            args.default.forward()
-        end
-
-        local new_winnr = vim.api.nvim_get_current_win()
-        local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
-        if
-            original_winnr ~= new_winnr
-            or original_cursor[1] ~= new_cursor[1]
-            or original_cursor[2] ~= new_cursor[2]
-        then
-            vim.cmd('normal! zz')
-        end
+        M.smart_nav(args.default.forward)
     end
 
     local default_keymap_mode = args.default.mode or self._opts.mode
@@ -310,52 +310,12 @@ function MyOperations:navigator(args)
 
         local extreme_backward = function()
             set_callbacks()
-            local original_winnr = vim.api.nvim_get_current_win()
-            local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
-            if type(args.extreme.backward) == 'string' then
-                local cmd = args.extreme.backward
-                if 0 < vim.v.count then
-                    vim.cmd(vim.v.count .. cmd)
-                else
-                    vim.cmd(cmd)
-                end
-            else
-                args.extreme.backward()
-            end
-            local new_winnr = vim.api.nvim_get_current_win()
-            local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
-            if
-                original_winnr ~= new_winnr
-                or original_cursor[1] ~= new_cursor[1]
-                or original_cursor[2] ~= new_cursor[2]
-            then
-                vim.cmd('normal! zz')
-            end
+            M.smart_nav(args.extreme.backward)
         end
 
         local extreme_forward = function()
             set_callbacks()
-            local original_winnr = vim.api.nvim_get_current_win()
-            local original_cursor = vim.api.nvim_win_get_cursor(original_winnr)
-            if type(args.extreme.forward) == 'string' then
-                local cmd = args.extreme.forward
-                if 0 < vim.v.count then
-                    vim.cmd(vim.v.count .. cmd)
-                else
-                    vim.cmd(cmd)
-                end
-            else
-                args.extreme.forward()
-            end
-            local new_winnr = vim.api.nvim_get_current_win()
-            local new_cursor = vim.api.nvim_win_get_cursor(new_winnr)
-            if
-                original_winnr ~= new_winnr
-                or original_cursor[1] ~= new_cursor[1]
-                or original_cursor[2] ~= new_cursor[2]
-            then
-                vim.cmd('normal! zz')
-            end
+            M.smart_nav(args.extreme.forward)
         end
 
         local extreme_keymap_mode = args.default.mode or self._opts.mode

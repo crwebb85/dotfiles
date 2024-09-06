@@ -126,27 +126,15 @@ vim.keymap.set(
 vim.keymap.set(
     'n',
     '<C-j>',
-    '<cmd>cnext<CR>zz',
+    function() require('utils.mapping').smart_nav(vim.v.count1 .. 'cnext') end,
     { desc = 'Custom - Quick Fix List: cnext quick fix navigation' }
 )
 vim.keymap.set(
     'n',
     '<C-k>',
-    '<cmd>cprev<CR>zz',
+    function() require('utils.mapping').smart_nav(vim.v.count1 .. 'cprev') end,
     { desc = 'Custom - Quick Fix List: cprev quick fix navigation' }
 )
--- vim.keymap.set(
---     'n',
---     '<C-l>',
---     '<cmd>lnext<CR>zz',
---     { desc = 'Custom - Location List: lnext location list navigation' }
--- )
--- vim.keymap.set(
---     'n',
---     '<C-h>',
---     '<cmd>lprev<CR>zz',
---     { desc = 'Custom - Location List: lprev location list navigation' }
--- )
 
 -- Find and replace word cursor is on
 vim.keymap.set(
