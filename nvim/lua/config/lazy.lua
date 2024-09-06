@@ -1,5 +1,6 @@
 vim.g.mapleader = ' '
 local shellslash_hack = require('utils.misc').shellslash_hack
+local config = require('config.config')
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
@@ -1280,6 +1281,16 @@ require('lazy').setup({
                                 query = '@comment.inner',
                                 desc = 'Select inner part of a comment',
                             },
+                            ['agt'] = {
+                                query = '@cast.outer',
+                                query_group = config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                                desc = 'Select outer part of a type cast',
+                            },
+                            ['igt'] = {
+                                query = '@cast.inner',
+                                query_group = config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                                desc = 'Select inner part of a type cast',
+                            },
                         },
                         -- You can choose the select mode (default is charwise 'v')
                         --
@@ -1537,6 +1548,23 @@ require('lazy').setup({
                     additional_vim_regex_highlighting = false,
                 },
             })
+            local query = [[
+                (cast_expression
+                  (
+                    ("(") @start 
+                    .
+                    type: (predefined_type)  @cast.inner
+                    .
+                    ")" @end
+                    (#make-range! "cast.outer" @start @end)
+                    )
+                  ) 
+            ]]
+            vim.treesitter.query.set(
+                'c_sharp',
+                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                query
+            )
         end,
     },
 

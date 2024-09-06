@@ -1,3 +1,6 @@
+local config = require('config.config')
+local maputils = require('utils.mapping')
+
 vim.g.mapleader = ' '
 
 vim.keymap.del({ 'n' }, '[d')
@@ -5,8 +8,6 @@ vim.keymap.del({ 'n' }, ']d')
 
 vim.keymap.del({ 'n' }, '[D')
 vim.keymap.del({ 'n' }, ']D')
-
-local maputils = require('utils.mapping')
 
 --Granular undo while in insert mode
 vim.keymap.set(
@@ -1059,6 +1060,45 @@ local myoperations = maputils
                 )
             end,
             desc = 'Custom: jump to the {previous|next} comment outer end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'gt',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@cast.outer',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@cast.outer',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} type cast start',
+            opts = {},
+        },
+        extreme = {
+            key = 'gT',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@cast.outer',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@cast.outer',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} type cast end',
             opts = {},
         },
     })
