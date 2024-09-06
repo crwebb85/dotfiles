@@ -1,6 +1,7 @@
 local Set = require('utils.datastructure').Set
 local format_properties = require('config.formatter').properties
 local Path = require('utils.path')
+local config = require('config.config')
 local M = {}
 
 -------------------------------------------------------------------------------
@@ -548,7 +549,7 @@ vim.api.nvim_create_user_command(
 ---If no parameters supplied then all capture groups will be added to the QF list.
 ---Otherwise you can restrict QF list to only include capture groups you need by
 ---supplying the list of capture groups as command paramters
-vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
+vim.api.nvim_create_user_command('QFRunTSQueryFromQueryEditor', function(params)
     local capture_names_set = Set:new(params.fargs)
     local query_bufnr = nil
     local tabnr = vim.api.nvim_tabpage_get_number(0)
@@ -938,4 +939,100 @@ vim.api.nvim_create_user_command(
         complete = 'buffer',
     }
 )
+
+vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
+    if #params.fargs < 2 then
+        vim.notify(
+            'Must supply at least 2 arguments. The first must be the treesitter group. Followed a capture name or list of capture names to match on.'
+        )
+        return
+    end
+    local query_group = params.fargs[1]
+
+    local capture_names_set = Set:new({})
+    for i, capture_name in ipairs(params.fargs) do
+        if i ~= 1 then
+            --we skip the first argument because it is the treesitter group not a capture name
+            capture_names_set:insert(capture_name)
+        end
+    end
+
+    local base_bufnr = vim.api.nvim_win_get_buf(0)
+    local base_buf_name = vim.api.nvim_buf_get_name(base_bufnr)
+
+    local lang = vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+    local parser = vim.treesitter.get_parser(base_bufnr, lang)
+
+    local ok_query, query = pcall(vim.treesitter.query.get, lang, query_group)
+    if not ok_query or query == nil then return end
+
+    local items = {}
+
+    for capture, captured_node, _, _ in
+        query:iter_captures(parser:trees()[1]:root(), base_bufnr)
+    do
+        local capture_name = query.captures[capture]
+        if
+            capture_names_set.size ~= 0 and capture_names_set:has(capture_name)
+        then
+            -- vim.print('captured:', capture)
+            -- vim.print('captured_name:', capture_name)
+            -- vim.print('captured_node:', captured_node)
+            local lnum, col, end_lnum, end_col = captured_node:range()
+
+            local text = vim.api.nvim_buf_get_text(
+                base_bufnr,
+                lnum,
+                col,
+                end_lnum,
+                end_col,
+                {}
+            )
+            vim.print(text)
+
+            local item = {
+                filename = base_buf_name,
+                lnum = lnum + 1,
+                end_lnum = end_lnum + 1,
+                col = col + 1,
+                end_col = end_col,
+                text = capture_name .. ': ' .. vim.trim(text[1]),
+                valid = true,
+            }
+            table.insert(items, item)
+            -- TODO remove duplicates
+        end
+    end
+    vim.fn.setqflist({}, ' ', { items = items, title = query_group })
+end, {
+    nargs = '+',
+    complete = function(_, text, _)
+        --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
+        --second argumet is the text up to the cursor
+        --third argument is the index of the cursor
+        local words = vim.split(text, '%s+')
+        -- vim.print(words)
+        if #words > 2 then
+            local base_bufnr = vim.api.nvim_win_get_buf(0)
+
+            local lang =
+                vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+            local query_group = words[2]
+            local ok_query, query =
+                pcall(vim.treesitter.query.get, lang, query_group)
+            if not ok_query or query == nil then return end
+            return query.captures
+        end
+
+        return {
+            config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+            'textobjects',
+            'folds',
+            'highlights',
+            'injections',
+            'locals',
+        }
+    end,
+})
+
 return M
