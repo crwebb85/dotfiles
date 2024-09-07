@@ -1,6 +1,5 @@
 ### TODO:
 
-- Review clipboard code as neovim has added more features which may make using a plugin unneeded
 - look into skeleton (file template) plugins/configuration
 - add a save and save all button to heirline so I know when I have unsaved buffers
 - Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
@@ -22,7 +21,6 @@
   - [matze/vim-move](https://github.com/matze/vim-move)
   - [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
   - [chrisgrieser/nvim-various-textobjs](https://github.com/chrisgrieser/nvim-various-textobjs)
-  - [nvim-treesitter/nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects)
   - [custom surrounds](https://github.com/kylechui/nvim-surround/discussions/53)
   - https://www.reddit.com/r/neovim/comments/1ckd1rs/helpful_treesitter_node_motion/?utm_medium=android_app&utm_source=share
 - Use toggle term on_stderr callback to store the last error to use in my StackTrace cmd
@@ -35,9 +33,9 @@
   - https://www.reddit.com/r/neovim/comments/1cjn94h/fully_eliminate_o_delay/
   - https://www.reddit.com/r/neovim/comments/1cjnf0m/fully_eliminate_gds_delay/
   - https://www.reddit.com/r/neovim/comments/1ch6yfz/smart_indent_with_treesitter_indent_fallback/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-  - formatting with omnisharp on save is really slow
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
 - comments navigation/textobjects
+
   - gc
     - operate exactly over the range of text that the gc operator would have commented
   - igc
@@ -48,6 +46,9 @@
     - operate over text around comment when single line comment
     - operate over text around comment when multiple single line comment
     - operate over text around comment block comments
+
+- redirect opening big files to a big file window
+- maybe change clipboard so that yanks don't get automatically saved to the clipboard
 
 ### Cool plugins:
 

@@ -264,6 +264,17 @@ local function lsp_attach(event)
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     if client == nil then return end
 
+    --Disable lsp for large files. The buffer variable is_big_file
+    --is set by a BufReadPre autocommand in y autocmd.lua file
+    vim.print(vim.b[event.buf].is_big_file)
+    if vim.b[event.buf].is_big_file == true then
+        vim.schedule(
+            function()
+                vim.lsp.buf_detach_client(event.buf, event.data.client_id)
+            end
+        )
+        return
+    end
     -- vim.print(client.server_capabilities)
 
     if

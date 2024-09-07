@@ -886,14 +886,6 @@ require('lazy').setup({
         config = true,
     },
 
-    --Big file speed increases (by disabling features)
-    {
-        'LunarVim/bigfile.nvim',
-        lazy = true,
-        event = 'VeryLazy',
-        config = true,
-    },
-
     -- A util library
     {
         'nvim-lua/plenary.nvim',
