@@ -239,7 +239,7 @@ vim.api.nvim_create_autocmd({ 'WinLeave' }, {
 ---Big File feature disabling
 ---based on https://github.com/LunarVim/bigfile.nvim/blob/33eb067e3d7029ac77e081cfe7c45361887a311a/lua/bigfile/init.lua
 
-local augroup = vim.api.nvim_create_augroup('bigfile', {})
+local big_file_augroup = vim.api.nvim_create_augroup('bigfile', {})
 
 ---@param bufnr number
 ---@return integer|nil size in MiB if buffer is valid, nil otherwise
@@ -265,7 +265,7 @@ local function pre_bufread_callback(bufnr)
     if not bigfile_detected then return end
 
     ----------
-    --   "lsp",
+    --   lsp
     --   Note: I moved the code that disables the lsp for large file to my
     --   lsp configuration
     -- vim.api.nvim_create_autocmd({ 'LspAttach' }, {
@@ -278,7 +278,7 @@ local function pre_bufread_callback(bufnr)
     -- })
 
     ----------
-    --   "treesitter",
+    --   treesitter
     --   I don't think I can can simplify this without by doing this in the treesitter
     --   config since I think other plugins can add modules
     local is_ts_configured = false
@@ -314,42 +314,118 @@ local function pre_bufread_callback(bufnr)
     vim.b[bufnr].is_big_file_treesitter_disabled = true
 
     ----------
-    --   "matchparen",
-    if vim.fn.exists(':DoMatchParen') ~= 2 then return end
-    vim.cmd('NoMatchParen')
+    --   matchparen
+    --   if the cursor is on a parenthesis, bracket, or square bracket the matchparen plugin
+    --   highlights the matching one.
+    --
+    --   The below autocmds make the compromise that matchparen will be disabled while
+    --   a bigfile is the active(the buffer displayed) buffer in any window. Once there is no active bigfile buffer
+    --   in any window matchparen will be reenabled.
+    --
+    -- Note BufWinLeave does not trigger if two windows have the same buffer open
+    -- open and one of the windows changes buffers
+
+    if vim.fn.exists(':DoMatchParen') == 2 then
+        vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+            callback = function() vim.cmd('NoMatchParen') end,
+            buffer = bufnr,
+        })
+        vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
+            callback = function()
+                --TODO actually check if there isn't a third window that is a large file before
+                --renabling matchparen (I might use a global variable to track which windows have a big file open in it)
+                vim.cmd('DoMatchParen')
+            end,
+            buffer = bufnr,
+        })
+    end
 
     ----------
-    --   "syntax",
+    --   syntax and filetype
     vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
         callback = function()
             vim.cmd('syntax clear')
-            vim.opt_local.syntax = 'OFF'
+            vim.bo.syntax = 'OFF'
+            vim.bo.filetype = ''
         end,
         buffer = bufnr,
     })
 
     ----------
-    --   "vimopts",
-    -- vim.opt_local.swapfile = false
-    -- vim.opt_local.foldmethod = "manual"
-    -- vim.opt_local.undolevels = -1
-    -- vim.opt_local.undoreload = 0
-    -- vim.opt_local.list = false
-
+    --   buffer options
     vim.bo.swapfile = false
-    vim.wo.foldmethod = 'manual'
     vim.bo.undolevels = -1
-    vim.go.undoreload = 0
-    vim.wo.list = false
-    vim.wo.spell = false
 
     ----------
-    --   "filetype",
-    vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
-        callback = function()
-            -- vim.opt_local.filetype = ''
+    --   global options
 
-            vim.bo.filetype = ''
+    -- I don't really get what undoreload does. It was set to zero by bigfile.nvim plugin
+    -- but since I don't understand what it does and it is a global property so if it changes
+    -- I won't know how that effects my config which could cause unexpected behavior.
+    -- For that reason, I will comment it out unless I still have preformance issues.
+    -- vim.go.undoreload = 0
+
+    ----------
+    --   window options
+
+    --The below explains the observations I found of what happens if you set a local window
+    --setting with this context hopefully you will be able to understand why I did the weird autocmds
+    --farther down for reseting window settings back to the default value
+    --
+    -- 1. opening buffer 1 and running `:lua vim.wo.spell = false` disables spell
+    --    for the buffer while in that window
+    -- 2. now switching to a new (never opened before) buffer in the same window
+    --    will also have spelling disabled as well
+    -- 3. switching to an existing buffer (one that has been opened before
+    --    disabling spelling) will have the spelling enabled
+    --This behavior happens for all window options.
+
+    --Okay I think this works for reseting the window settings back after leaving
+    --the big file buffer. Trying to restrict these autocmds to set the correct settings
+    --for that specific window without a bunch of memory leaks was a pain
+    --This is used to set:
+    -- vim.wo.foldmethod = 'manual'
+    -- vim.wo.list = false
+    -- vim.wo.spell = false
+    -- but change them back when leaving the big file buffer
+    -- vim.api.nvim_create_autocmd({ 'BufWinEnter' }, {
+    vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+        callback = function()
+            local old_foldmethod = vim.wo.foldmethod
+            local old_list = vim.wo.list
+            local old_spell = vim.wo.spell
+            local win_id = vim.api.nvim_get_current_win()
+            vim.wo.foldmethod = 'manual'
+            vim.wo.list = false
+            vim.wo.spell = false
+
+            --using a dynamic augroup name. I want only one of the following
+            --BufWinLeave autocmd to exist per window that the buffer is open in
+            --By using the window id I can make sure that window settings are reset
+            --for only the window that the bigfile buffer is leaving from
+            local bigfile_reset_window_settings_augroup =
+                vim.api.nvim_create_augroup(
+                    'bigfile_reset_window_settings_' .. win_id,
+                    {}
+                )
+            -- vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
+            vim.api.nvim_create_autocmd({ 'BufLeave' }, {
+                group = bigfile_reset_window_settings_augroup,
+                callback = function(event)
+                    if win_id == vim.api.nvim_get_current_win() then
+                        -- vim.print(event)
+                        vim.wo.foldmethod = old_foldmethod
+                        vim.wo.list = old_list
+                        vim.wo.spell = old_spell
+
+                        --cleanup this autocmd
+                        vim.schedule(
+                            function() vim.api.nvim_del_autocmd(event.id) end
+                        )
+                    end
+                end,
+                buffer = bufnr,
+            })
         end,
         buffer = bufnr,
     })
@@ -357,7 +433,7 @@ end
 
 vim.api.nvim_create_autocmd('BufReadPre', {
     pattern = '*',
-    group = augroup,
+    group = big_file_augroup,
     callback = function(args) pre_bufread_callback(args.buf) end,
     desc = string.format(
         'Performance rule for handling files over %sMiB',

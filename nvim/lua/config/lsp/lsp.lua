@@ -266,7 +266,6 @@ local function lsp_attach(event)
 
     --Disable lsp for large files. The buffer variable is_big_file
     --is set by a BufReadPre autocommand in y autocmd.lua file
-    vim.print(vim.b[event.buf].is_big_file)
     if vim.b[event.buf].is_big_file == true then
         vim.schedule(
             function()

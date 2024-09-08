@@ -49,6 +49,7 @@
 
 - redirect opening big files to a big file window
 - maybe change clipboard so that yanks don't get automatically saved to the clipboard
+- spelling errors highlight as red squigly line in neovim does not display when using wezterm. It does display in powershell
 
 ### Cool plugins:
 

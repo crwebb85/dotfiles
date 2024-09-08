@@ -117,7 +117,8 @@ function M.setup_folding(is_folding_enable)
                 -- vim.print(vim.api.nvim_get_option_value('buftype', { buf = args.buf }))
 
                 if
-                    vim.bo[args.buf].buftype ~= ''
+                    vim.b[args.buf].is_big_file == true
+                    or vim.bo[args.buf].buftype ~= ''
                     or fold_excluded_filetypes[vim.bo[args.buf].filetype]
                         ~= nil
                 then
@@ -178,7 +179,8 @@ function M.setup_folding(is_folding_enable)
                     end
 
                     if
-                        vim.bo[args.buf].buftype ~= ''
+                        vim.b[args.buf].is_big_file == true
+                        or vim.bo[args.buf].buftype ~= ''
                         or fold_excluded_filetypes[vim.bo[args.buf].filetype]
                             ~= nil
                     then
