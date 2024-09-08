@@ -90,7 +90,14 @@ function M.smart_nav(nav_callback, prepend_count)
         or original_cursor[2] ~= new_cursor[2]
     then
         --open folds if the cursor is within a fold and the cursor has moved
-        if vim.wo.foldenable then vim.cmd('normal! zO') end
+        local new_cursor_line_number = new_cursor[1]
+        if
+            vim.wo.foldenable
+            --need to check if the fold is closed to prevent throwing errors when trying to open a non-existent fold
+            and vim.fn.foldclosed(new_cursor_line_number) >= 0
+        then
+            vim.cmd('normal! zO')
+        end
         --center cursor vertically if the cursor has moved
         vim.cmd('normal! zz')
     end
