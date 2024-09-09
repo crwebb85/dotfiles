@@ -897,6 +897,7 @@ end, {
     complete = function() return { 'lf', 'crlf' } end,
 })
 
+-- based on https://vim.fandom.com/wiki/Remove_unwanted_empty_lines
 vim.api.nvim_create_user_command(
     'RemoveTrailingWhitespace',
     function(_) vim.cmd([[:%s/\s\+$//e]]) end,
@@ -905,6 +906,7 @@ vim.api.nvim_create_user_command(
     }
 )
 
+-- based on https://vim.fandom.com/wiki/Remove_unwanted_empty_lines
 vim.api.nvim_create_user_command(
     'CollapseDuplicateWhitespace',
     function(_) vim.cmd([[:%s/\n\{3,}/\r\r/e]]) end,

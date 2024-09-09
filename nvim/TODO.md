@@ -17,6 +17,7 @@
     `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
 - try out basedpyright lsp [example](https://www.reddit.com/r/neovim/comments/1cpkeqd/comment/l3ux37y/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 - try out alternate motions
+  - [substitute.nvim](https://github.com/gbprod/substitute.nvim)
   - [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
   - [matze/vim-move](https://github.com/matze/vim-move)
   - [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
