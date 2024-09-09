@@ -881,9 +881,11 @@ require('lazy').setup({
         event = 'VeryLazy',
         opts = {
             style = 'glyph',
-            -- style = 'ascii',
         },
-        config = true,
+        config = function(_, opts)
+            if not config.nerd_font_enabled then opts.style = 'ascii' end
+            require('mini.icons').setup(opts)
+        end,
     },
 
     -- A util library
@@ -1939,21 +1941,23 @@ require('lazy').setup({
                     terminate = '',
                     disconnect = '',
                 },
-                -- icons = {
-                --     pause = '||',
-                --     play = '|>',
-                --     step_into = 'v',
-                --     step_over = '>',
-                --     step_out = '^',
-                --     step_back = '<',
-                --     run_last = 'rl',
-                --     terminate = '|=|',
-                --     disconnect = 'x',
-                -- },
             },
         },
         -- automatically open/close the DAP UI when starting/stopping the debugger
         config = function(_, opts)
+            if not config.nerd_font_enabled then
+                opts.controls.icons = {
+                    pause = '||',
+                    play = '|>',
+                    step_into = 'v',
+                    step_over = '>',
+                    step_out = '^',
+                    step_back = '<',
+                    run_last = 'rl',
+                    terminate = '|=|',
+                    disconnect = 'x',
+                }
+            end
             require('dapui').setup(opts)
             local listener = require('dap').listeners
             listener.after.event_initialized['dapui_config'] = function()
