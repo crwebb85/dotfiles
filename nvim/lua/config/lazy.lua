@@ -2055,8 +2055,6 @@ require('lazy').setup({
                     'powershell-editor-services', -- powershell
 
                     -- Formatters
-                    'black', -- python formatter
-                    'isort', -- python organize imports
                     'stylua', -- Formatter for lua files
                     'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
                     'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
@@ -2491,8 +2489,6 @@ require('lazy').setup({
     --- Formatter
 
     -- Formatting client: conform.nvim
-    -- - configured to use black & isort in python
-    -- - use the taplo-LSP for formatting in toml
     -- - Formatting is triggered via `<leader>f`, but also automatically on save
     {
         'stevearc/conform.nvim',
