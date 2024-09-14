@@ -54,6 +54,10 @@
   of the item like how gp works. For example if ]m navigates to the begining of
   the next method then ]gm should go to the end of the next method. That way I can
   reserve capital letters for the first and last extremes
+- fix cmp completion in the terminal for arguments. For some reason when my cursor
+  moves (using the left arrow key) from the end of the current argument the suggestions
+  will have an incorrect prefix of the current argument up to the cursor
+  (or at least that was happening in the past but I can't replicate it at this moment.)
 
 ### Cool plugins:
 
