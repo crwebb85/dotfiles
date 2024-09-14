@@ -93,9 +93,19 @@ vim.keymap.set(
 
 -- Move next line to the end of the current line
 -- but without moving the cursor to the end of the line
-vim.keymap.set('n', 'J', 'mzJ`z', {
-    desc = 'Customized Remap: Move next line to end of current line without moving cursor',
-})
+vim.keymap.set(
+    'n',
+    'J',
+    function()
+        local cursor = vim.api.nvim_win_get_cursor(0)
+        vim.cmd([[norm! J]]) -- I use bang here to use the default mapping to prevent a recursive call to this function
+        vim.api.nvim_win_set_cursor(0, cursor)
+    end,
+    -- 'mzJ`z',
+    {
+        desc = 'Customized Remap: Move next line to end of current line without moving cursor',
+    }
+)
 
 -- Page down or up but keep cursor in the middle of the page
 vim.keymap.set('n', '<C-d>', '<C-d>zz', {
