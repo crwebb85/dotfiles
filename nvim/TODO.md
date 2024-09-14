@@ -48,9 +48,12 @@
     - operate over text around comment when multiple single line comment
     - operate over text around comment block comments
 
-- redirect opening big files to a big file window
 - maybe change clipboard so that yanks don't get automatically saved to the clipboard
 - spelling errors highlight as red squigly line in neovim does not display when using wezterm. It does display in powershell
+- maybe use the g prefix for my navigation keymaps to move the cursor to the end
+  of the item like how gp works. For example if ]m navigates to the begining of
+  the next method then ]gm should go to the end of the next method. That way I can
+  reserve capital letters for the first and last extremes
 
 ### Cool plugins:
 

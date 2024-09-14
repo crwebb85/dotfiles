@@ -2092,7 +2092,7 @@ require('lazy').setup({
                     lsp.default_lsp_server_setup,
                     lua_ls = lsp.setup_lua_ls,
                     pyright = lsp.setup_pyright,
-                    tsserver = lsp.setup_tsserver,
+                    ts_ls = lsp.setup_tsserver,
                     yamlls = lsp.setup_yamlls,
                     jsonls = lsp.setup_jsonls,
                     taplo = lsp.setup_tablo,
@@ -2127,11 +2127,6 @@ require('lazy').setup({
             { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
             { 'hrsh7th/cmp-path' }, -- Completion for file paths
             { 'hrsh7th/cmp-cmdline' },
-            -- {
-            --     'hrsh7th/cmp-nvim-lua', -- Completion for lua api
-            --     lazy = true,
-            --     ft = 'lua',
-            -- },
             { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capabilities to that cmp adds to neovim
             { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
             { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
