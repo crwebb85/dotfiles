@@ -1037,4 +1037,12 @@ vim.api.nvim_create_user_command(
     }
 )
 
+vim.api.nvim_create_user_command(
+    'BCloseAllInactive',
+    function(_) require('config.bufdelete').close_inactive_file_buffers() end,
+    {
+        desc = 'Close all inactive unmodified file buffer',
+    }
+)
+
 return M

@@ -5,6 +5,8 @@
 -- - Added path normalizing when search for buffer with a buffer name pattern to
 --   hackily handle paths on Windows better (may screw up regex patterns)
 -- - Added some more nil handling
+-- - added function to close all inactive unsaved buffers
+
 local M = {}
 
 --- Returns buffer name. Returns "[No Name]" if buffer is empty
@@ -311,6 +313,24 @@ function M._buf_kill_cmd(opts, wipeout)
     end
 
     buf_kill(target_buffers, nil, opts.bang, wipeout)
+end
+
+local function is_file_buffer(bufnr)
+    return vim.bo[bufnr].buftype == ''
+        and vim.fs.normalize(vim.api.nvim_buf_get_name(0)) ~= ''
+end
+
+function M.close_inactive_file_buffers()
+    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+        if
+            vim.api.nvim_buf_is_valid(bufnr)
+            and not vim.bo[bufnr].modified
+            and #vim.fn.win_findbuf(bufnr) == 0
+            and is_file_buffer(bufnr)
+        then
+            M.bufdelete(bufnr)
+        end
+    end
 end
 
 return M

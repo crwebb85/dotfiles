@@ -569,11 +569,6 @@ require('lazy').setup({
                             end)
                         end,
                     },
-                    n = {
-                        ['<C-b>'] = function(args)
-                            require('telescope.actions').delete_buffer(args)
-                        end,
-                    },
                 },
             },
             pickers = {
