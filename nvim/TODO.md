@@ -58,6 +58,8 @@
   moves (using the left arrow key) from the end of the current argument the suggestions
   will have an incorrect prefix of the current argument up to the cursor
   (or at least that was happening in the past but I can't replicate it at this moment.)
+- for my treesitter text objects I am finding how the work with spacing annoying as deleting
+  an pasting results in a lot of extra lines (maybe play around with settings to there are more intuitive options)
 
 ### Cool plugins:
 
