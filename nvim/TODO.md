@@ -29,7 +29,6 @@
 - Use counts on harpoon for multiple lists
 - Use expand("<cfile>") on telescope find file in normal mode
 - Use counts with gf to open file in the winnr
-- close all buffers unopened saved buffers maybe try [close-buffers.nvim](https://github.com/kazhala/close-buffers.nvim)
 - investigate preformance improvements
   - https://www.reddit.com/r/neovim/comments/1cjn94h/fully_eliminate_o_delay/
   - https://www.reddit.com/r/neovim/comments/1cjnf0m/fully_eliminate_gds_delay/
