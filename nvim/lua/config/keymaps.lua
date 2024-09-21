@@ -106,7 +106,7 @@ vim.keymap.set(
     'J',
     function()
         local cursor = vim.api.nvim_win_get_cursor(0)
-        vim.cmd([[norm! J]]) -- I use bang here to use the default mapping to prevent a recursive call to this function
+        vim.cmd('join' .. vim.v.count1)
         vim.api.nvim_win_set_cursor(0, cursor)
     end,
     -- 'mzJ`z',
