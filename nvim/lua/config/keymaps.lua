@@ -260,6 +260,24 @@ local myoperations = maputils
         mode = { 'n' },
     })
     :navigator({
+        default = {
+            key = 's',
+            mode = { 'n', 'x' },
+            backward = function() vim.cmd('norm!' .. vim.v.count1 .. '[s') end,
+            forward = function() vim.cmd('norm!' .. vim.v.count1 .. ']s') end,
+            desc = 'Custom Remap: jump to "{prev|next}" spelling error',
+            opts = {},
+        },
+        extreme = {
+            key = 'S',
+            mode = { 'n', 'x' },
+            backward = function() vim.cmd('norm!' .. vim.v.count1 .. '[S') end,
+            forward = function() vim.cmd('norm!' .. vim.v.count1 .. ']S') end,
+            desc = 'Custom Remap: jump to "{prev|next}" spelling error excluding rare words',
+            opts = {},
+        },
+    })
+    :navigator({
         --visual mode: can navigate to a new buffer but visual mode is probably otherwise useful
         default = {
             key = 'q',
