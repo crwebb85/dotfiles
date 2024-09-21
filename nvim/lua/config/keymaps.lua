@@ -9,6 +9,14 @@ vim.keymap.del({ 'n' }, ']d')
 vim.keymap.del({ 'n' }, '[D')
 vim.keymap.del({ 'n' }, ']D')
 
+-- Disable the "execute last macro" shortcut
+vim.keymap.set(
+    'n',
+    'Q',
+    '<nop>',
+    { desc = 'Customized Remap: Remapped to <nop> to disable this keybinging' }
+)
+
 --Granular undo while in insert mode
 vim.keymap.set(
     'i',
@@ -123,14 +131,6 @@ vim.keymap.set('n', 'n', 'nzzzv', {
 vim.keymap.set('n', 'N', 'Nzzzv', {
     desc = 'Customized Remap: Go to previous search term and move cursor to middle of the page',
 })
-
--- Disable the "execute last macro" shortcut
-vim.keymap.set(
-    'n',
-    'Q',
-    '<nop>',
-    { desc = 'Customized Remap: Remapped to <nop> to disable this keybinging' }
-)
 
 -- Quick fix navigation
 vim.keymap.set(
