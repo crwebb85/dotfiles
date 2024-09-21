@@ -79,7 +79,7 @@ vim.keymap.set('n', 'gp', '`[v`]', {
 
 -- Remap key to enter visual block mode so it doesn't interfere with pasting shortcut
 vim.keymap.set(
-    'n',
+    { 'n', 'v' },
     '<A-v>',
     '<C-V>',
     { desc = 'Custom: Enter visual block mode' }
