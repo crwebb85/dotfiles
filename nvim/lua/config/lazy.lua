@@ -940,7 +940,7 @@ require('lazy').setup({
                     group = 'Next diagnostics extreme mappings',
                 },
                 {
-                    '<leader><leader>d',
+                    '<leader>x',
                     mode = { 'n' },
                     group = 'Debugger mappings',
                 },
@@ -1832,77 +1832,77 @@ require('lazy').setup({
         end,
         keys = {
             {
-                '<leader><leader>dc',
+                '<leader>xc',
                 function() require('dap').continue() end,
                 desc = 'Debug: Start/Continue Debugger',
             },
             {
-                '<leader><leader>db',
+                '<leader>xb',
                 function() require('dap').toggle_breakpoint() end,
                 desc = 'Debug: Add Breakpoint',
             },
             {
-                '<leader><leader>dt',
+                '<leader>xt',
                 function() require('dap').terminate() end,
                 desc = 'Debug: Terminate Debugger',
             },
             {
-                '<leader><leader>dC',
+                '<leader>xC',
                 function() require('dap').run_to_cursor() end,
                 desc = 'Debug: Run to Cursor',
             },
             {
-                '<leader><leader>dg',
+                '<leader>xg',
                 function() require('dap').goto_() end,
                 desc = 'Debug: Go to line (no execute)',
             },
             {
-                '<leader><leader>di',
+                '<leader>xi',
                 function() require('dap').step_into() end,
                 desc = 'Debug: Step Into',
             },
             {
-                '<leader><leader>dj',
+                '<leader>xj',
                 function() require('dap').down() end,
                 desc = 'Debug: Down',
             },
             {
-                '<leader><leader>dk',
+                '<leader>xk',
                 function() require('dap').up() end,
                 desc = 'Debug: Up',
             },
             {
-                '<leader><leader>dl',
+                '<leader>xl',
                 function() require('dap').run_last() end,
                 desc = 'Debug: Run Last',
             },
             {
-                '<leader><leader>do',
+                '<leader>xo',
                 function() require('dap').step_out() end,
                 desc = 'Debug: Step Out',
             },
             {
-                '<leader><leader>dO',
+                '<leader>xO',
                 function() require('dap').step_over() end,
                 desc = 'Debug: Step Over',
             },
             {
-                '<leader><leader>dp',
+                '<leader>xp',
                 function() require('dap').pause() end,
                 desc = 'Debug: Pause',
             },
             {
-                '<leader><leader>dr',
+                '<leader>xr',
                 function() require('dap').repl.toggle() end,
                 desc = 'Debug: Toggle REPL',
             },
             {
-                '<leader><leader>ds',
+                '<leader>xs',
                 function() require('dap').session() end,
                 desc = 'Debug: Session',
             },
             {
-                '<leader><leader>dw',
+                '<leader>xw',
                 function() require('dap.ui.widgets').hover() end,
                 desc = 'Debug: Widgets',
             },
@@ -1918,7 +1918,7 @@ require('lazy').setup({
         dependencies = 'mfussenegger/nvim-dap',
         keys = {
             {
-                '<leader><leader>du',
+                '<leader>xu',
                 function() require('dapui').toggle() end,
                 desc = 'Debug: Toggle debugger UI',
             },
