@@ -101,7 +101,7 @@ vim.api.nvim_create_autocmd('FileType', {
         'lspinfo',
         'man',
         'notify',
-        'git',
+        -- 'git',
         'spectre_panel',
         'startuptime',
         'tsplayground',
@@ -233,6 +233,40 @@ vim.api.nvim_create_autocmd({ 'WinLeave' }, {
         if vim.wo.number == true then vim.wo.relativenumber = false end
     end,
     group = change_relative_line_number_group,
+})
+
+-------------------------------------------------------------------------------
+---Make library files readonly
+
+local READONLY_LIBRARY_DIR_PATTERN =
+    vim.glob.to_lpeg('**/{venv,node_modules}/**')
+
+local LAZY_PLUGIN_FILEPATH_PATTERN = (function()
+    local data_path = vim.fn.stdpath('data')
+    if type(data_path) == 'string' then
+        local lazy_plugin_path =
+            string.lower(vim.fs.normalize(vim.fs.joinpath(data_path, 'lazy')))
+        return vim.glob.to_lpeg(lazy_plugin_path .. '/**')
+    end
+    return nil
+end)()
+
+vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
+    callback = function(args)
+        local name =
+            string.lower(vim.fs.normalize(vim.api.nvim_buf_get_name(args.buf)))
+
+        if READONLY_LIBRARY_DIR_PATTERN:match(name) ~= nil then
+            vim.bo[args.buf].readonly = true
+            vim.bo[args.buf].modifiable = false
+        elseif
+            LAZY_PLUGIN_FILEPATH_PATTERN ~= nil
+            and LAZY_PLUGIN_FILEPATH_PATTERN:match(name) ~= nil
+        then
+            vim.bo[args.buf].readonly = true
+            vim.bo[args.buf].modifiable = false
+        end
+    end,
 })
 
 -------------------------------------------------------------------------------

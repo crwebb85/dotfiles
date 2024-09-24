@@ -59,6 +59,10 @@
   (or at least that was happening in the past but I can't replicate it at this moment.)
 - for my treesitter text objects I am finding how the work with spacing annoying as deleting
   an pasting results in a lot of extra lines (maybe play around with settings to there are more intuitive options)
+- make file buffers not in current directory slightly redder
+- modify visual and around keymaps to extend current selection (some care may be needed for how to handle whitespace)
+- make log files read only
+- make telescope picker for log file folders using a harpoon list to control the log file locations
 
 ### Cool plugins:
 

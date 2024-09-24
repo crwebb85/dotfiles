@@ -610,7 +610,7 @@ local config = function()
 
     local FileNameBlock = {
         init = function(self) self.filename = vim.api.nvim_buf_get_name(0) end,
-        unpack(FileFlags),
+        FileFlags,
         heirlineUtils.insert(FileNameModifer, FileName, Space, FileIcon),
         { provider = '%<' },
     }
