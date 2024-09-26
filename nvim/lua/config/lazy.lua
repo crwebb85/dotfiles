@@ -1004,6 +1004,12 @@ require('lazy').setup({
                     mode = { 'n' },
                     group = 'Misc mappings',
                 },
+                {
+                    '<leader>w',
+                    mode = { 'n' },
+                    group = 'Multicursor mappings',
+                },
+                --
             })
         end,
     },
@@ -1104,6 +1110,174 @@ require('lazy').setup({
         lazy = true,
         event = 'BufReadPre',
         config = true,
+    },
+
+    -- Multicursor support
+    {
+        'jake-stewart/multicursor.nvim',
+        -- branch = "1.0",
+        lazy = true,
+        event = 'BufReadPre',
+        config = function()
+            local mc = require('multicursor-nvim')
+
+            mc.setup()
+
+            -- Add cursors above/below the main cursor.
+            vim.keymap.set(
+                { 'n', 'v' },
+                '<up>',
+                function() mc.addCursor('k') end,
+                { desc = 'Custom Multicursor: Add cursor above' }
+            )
+            vim.keymap.set(
+                { 'n', 'v' },
+                '<down>',
+                function() mc.addCursor('j') end,
+                { desc = 'Custom Multicursor: Add cursor below' }
+            )
+
+            -- Add a cursor and jump to the next word under cursor.
+            vim.keymap.set(
+                { 'n', 'v' },
+                '<c-n>',
+                function() mc.addCursor('*') end,
+                {
+                    desc = 'Custom Multicursor: Add cursor and jump to next word under cursor.',
+                }
+            )
+
+            -- Jump to the next word under cursor but do not add a cursor.
+            vim.keymap.set(
+                { 'n', 'v' },
+                '<c-s>',
+                function() mc.skipCursor('*') end,
+                {
+                    desc = 'Custom Multicursor: Jump to next word under cursor but do not add a cursor.',
+                }
+            )
+
+            -- Rotate the main cursor.
+            vim.keymap.set(
+                { 'n', 'v' },
+                '<left>',
+                mc.nextCursor,
+                { desc = 'Custom Multicursor: Cycle main cursor left.' }
+            )
+            vim.keymap.set(
+                { 'n', 'v' },
+                '<right>',
+                mc.prevCursor,
+                { desc = 'Custom Multicursor: Cycle main cursor right.' }
+            )
+
+            -- Add and remove cursors with control + left click.
+            vim.keymap.set(
+                'n',
+                '<c-leftmouse>',
+                mc.handleMouse,
+                { desc = 'Custom Multicursor: Add a cursor with the mouse.' }
+            )
+
+            vim.keymap.set({ 'n', 'v' }, '<c-q>', function()
+                if mc.cursorsEnabled() then
+                    -- Stop other cursors from moving.
+                    -- This allows you to reposition the main cursor.
+                    mc.disableCursors()
+                else
+                    mc.addCursor()
+                end
+            end, {
+                desc = 'Custom Multicursor: Either disable cursors (for repositioning main cursor) or add cursor.',
+            })
+
+            vim.keymap.set('n', '<esc>', function()
+                if not mc.cursorsEnabled() then
+                    mc.enableCursors()
+                elseif mc.hasCursors() then
+                    mc.clearCursors()
+                else
+                    -- Default <esc> handler.
+                end
+            end, {
+                desc = 'Custom Multicursor: Re-enable multi cursors or clear cursors',
+            })
+
+            -- Delete the main cursor.
+            vim.keymap.set(
+                { 'n', 'v' },
+                '<leader>wx',
+                mc.deleteCursor,
+                { desc = 'Custom Multicursor: Delete the main cursor.' }
+            )
+
+            -- Align cursor columns.
+            vim.keymap.set(
+                'n',
+                '<leader>wa',
+                mc.alignCursors,
+                { desc = 'Custom Multicursor: Align cursor columns.' }
+            )
+
+            -- Split visual selections by regex.
+            vim.keymap.set(
+                'v',
+                '<leader>ws',
+                mc.splitCursors,
+                { desc = 'Custom Multicursor: Split visual slection by regex' }
+            )
+
+            -- Append/insert for each line of visual selections.
+            vim.keymap.set(
+                'v',
+                '<leader>wi', -- I don't use 'I' because it conflicts with visual block mode 'I'
+                mc.insertVisual,
+                {
+                    desc = 'Custom Multicursor: Add cursor to beginning of each line of visual selection and enter insert mode with "I"',
+                }
+            )
+            vim.keymap.set(
+                'v',
+                '<leader>wa', -- I don't use 'A' because it conflicts with visual block mode 'A'
+                mc.appendVisual,
+                {
+                    desc = 'Custom Multicursor: Add cursor to end of each line of visual selection and enter insert mode with "A"',
+                }
+            )
+
+            -- match new cursors within visual selections by regex.
+            vim.keymap.set('v', '<leader>wm', mc.matchCursors, {
+                desc = 'Custom Multicursor: Add new cursors to visual selection by regex.',
+            })
+
+            -- Rotate visual selection contents.
+            vim.keymap.set(
+                'v',
+                '<leader>wt',
+                function() mc.transposeCursors(1) end,
+                { desc = 'Custom Multicursor: Transpose cursors' }
+            )
+            vim.keymap.set(
+                'v',
+                '<leader>wT',
+                function() mc.transposeCursors(-1) end,
+                { desc = 'Custom Multicursor: Transpose cursors (reverse)' }
+            )
+
+            -- Customize how cursors look.
+            vim.api.nvim_set_hl(0, 'MultiCursorCursor', { link = 'Cursor' })
+            vim.api.nvim_set_hl(0, 'MultiCursorVisual', { link = 'Visual' })
+            vim.api.nvim_set_hl(
+                0,
+                'MultiCursorDisabledCursor',
+                { link = 'Visual' }
+            )
+            vim.api.nvim_set_hl(
+                0,
+                'MultiCursorDisabledVisual',
+                { link = 'Visual' }
+            )
+        end,
     },
 
     ---------------------------------------------------------------------------
