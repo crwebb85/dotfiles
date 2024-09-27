@@ -64,6 +64,10 @@
 - make log files read only
 - make telescope picker for log file folders using a harpoon list to control the log file locations
 
+### Vim Practice
+
+- research table based navigation using `set virtualedit=all`
+
 ### Cool plugins:
 
 - https://github.com/rockerBOO/awesome-neovim

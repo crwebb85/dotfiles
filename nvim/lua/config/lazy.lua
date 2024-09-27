@@ -697,6 +697,12 @@ require('lazy').setup({
                 desc = 'Harpoon: Go to file 10',
             },
         },
+        opts = {
+            settings = {
+                save_on_toggle = true,
+                sync_on_ui_close = true,
+            },
+        },
         config = function(_, opts)
             local harpoon = require('harpoon')
             harpoon:setup(opts)
