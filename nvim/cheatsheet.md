@@ -178,6 +178,7 @@ choco install mingw
 choco install ripgrep
 winget install hpjansson.Chafa
 choco install make
+choco install hurl
 ```
 
 Other requirements:

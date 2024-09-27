@@ -892,7 +892,28 @@ vim.api.nvim_create_user_command('Stacktrace', function(params)
     local selection_text = {}
 
     if params.range == 2 then
-        selection_text = require('utils.mapping').get_visual_selection(0)
+        local start_pos = vim.api.nvim_buf_get_mark(0, '<')
+        local start_row = start_pos[1]
+
+        local end_pos = vim.api.nvim_buf_get_mark(0, '>')
+        local end_row = end_pos[1]
+
+        if start_row ~= params.line1 or end_row ~= params.line2 then
+            --Assume that a range was selected likn 1,3Stacktrace or %Stacktrace command was typed
+            --For 1,3Stacktrace the first three lines are selected
+            --For %Stacktrace the whole buffer should be selected
+            selection_text = vim.api.nvim_buf_get_lines(
+                0,
+                params.line1 - 1,
+                params.line2,
+                true
+            )
+        else
+            --TODO handle visual block mode selection
+            --TODO there has to be a better way to determine what the range was
+            --as marks other then `<` and `>` could have been used to define the range
+            selection_text = require('utils.mapping').get_visual_selection(0)
+        end
     end
 
     local bufnr = vim.api.nvim_create_buf(false, true)
