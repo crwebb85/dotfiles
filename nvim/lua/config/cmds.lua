@@ -892,7 +892,7 @@ vim.api.nvim_create_user_command('Stacktrace', function(params)
     local selection_text = {}
 
     if params.range == 2 then
-        selection_text = require('utils.misc').get_visual_selection(0)
+        selection_text = require('utils.mapping').get_visual_selection(0)
     end
 
     local bufnr = vim.api.nvim_create_buf(false, true)
@@ -954,10 +954,10 @@ vim.api.nvim_create_user_command('Stacktrace', function(params)
         })
         vim.cmd('copen')
     end
-    vim.keymap.set('n', 'q', cancel, { buffer = bufnr })
+    -- Note: I want to be able to record macros inside this buffer so I don't remap q to cancel anymore
     vim.keymap.set({ 'n', 'i' }, '<C-c>', cancel, { buffer = bufnr })
     vim.keymap.set('n', '<CR>', confirm, { buffer = bufnr })
-    vim.keymap.set({ 'n', 'i' }, '<C-s>', confirm, { buffer = bufnr })
+    vim.keymap.set({ 'n', 'i' }, '<C-s>', confirm, { buffer = bufnr }) -- TODO: re-evaluate this keymap since it conflicts with one of my multi-cursor keymaps
 end, {
     desc = 'Parse a stacktrace using errorformat and add to quickfix',
     bang = true,
