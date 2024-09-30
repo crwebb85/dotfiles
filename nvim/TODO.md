@@ -3,10 +3,6 @@
 - look into skeleton (file template) plugins/configuration
 - add a save and save all button to heirline so I know when I have unsaved buffers
 - Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
-- Lightbulb still doesn't get removed in some case like when opening help docs with telescope
-- Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
-- Add a heirline component for harpoon
-- show workspace diagnostic counts in heirline
 - keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
 - make quickfix/loc list editable
 - try out new features:
@@ -35,7 +31,6 @@
   - https://www.reddit.com/r/neovim/comments/1ch6yfz/smart_indent_with_treesitter_indent_fallback/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
 - comments navigation/textobjects
-
   - gc
     - operate exactly over the range of text that the gc operator would have commented
   - igc
@@ -46,23 +41,68 @@
     - operate over text around comment when single line comment
     - operate over text around comment when multiple single line comment
     - operate over text around comment block comments
-
 - maybe change clipboard so that yanks don't get automatically saved to the clipboard
-- spelling errors highlight as red squigly line in neovim does not display when using wezterm. It does display in powershell
-- maybe use the g prefix for my navigation keymaps to move the cursor to the end
+- maybe use some prefix like g for my navigation keymaps to move the cursor to the end
   of the item like how gp works. For example if ]m navigates to the begining of
   the next method then ]gm should go to the end of the next method. That way I can
   reserve capital letters for the first and last extremes
+- for my treesitter text objects I am finding how they work with spacing annoying as deleting
+  an pasting results in a lot of extra lines (maybe play around with settings to there are more intuitive options)
+- make file buffers not in current directory slightly redder
+- modify visual and around keymaps to extend current selection (some care may be needed for how to handle whitespace)
+- finish lsp reference navigator
+
+### Bugs
+
+- Lightbulb still doesn't get removed in some case like when opening help docs with telescope
+- spelling errors highlight as red squigly line in neovim does not display when using wezterm. It does display in powershell
 - fix cmp completion in the terminal for arguments. For some reason when my cursor
   moves (using the left arrow key) from the end of the current argument the suggestions
   will have an incorrect prefix of the current argument up to the cursor
   (or at least that was happening in the past but I can't replicate it at this moment.)
-- for my treesitter text objects I am finding how the work with spacing annoying as deleting
-  an pasting results in a lot of extra lines (maybe play around with settings to there are more intuitive options)
-- make file buffers not in current directory slightly redder
-- modify visual and around keymaps to extend current selection (some care may be needed for how to handle whitespace)
-- make log files read only
-- make telescope picker for log file folders using a harpoon list to control the log file locations
+
+### Workflows that need improvements
+
+- [ ] Settings
+  - [ ] match tabs with what my formatters use for various file types
+- [ ] Requests
+  - [ ] Commands for interacting with hurl files (may use plugin)
+  - [ ] templates/snippets
+  - [ ] wsdl support with code completion for fields
+  - [ ] add a proxy that can log the requests as hurl files
+  - [ ] telescope navigation for hurl files
+  - [ ] add keymap to telescope navigation to create a duplicate of an existing hurl file
+  - [ ] add a keymap to oil.nvim that lets me select a hurl file via telescope to create a duplicate of
+- [ ] Log files
+  - [ ] make log files read only
+  - [ ] searching
+  - [ ] filtering
+  - [ ] live-update/pausing
+  - [ ] highlights
+  - [ ] remote/cloud logs
+  - [ ] (if my new harpoon parameterized dates is not sufficient) make telescope picker for log file folders using a harpoon list to control the log file locations
+- [ ] SQL
+  - [ ] tsql treesitter
+  - [ ] tsql formatter
+  - [ ] running sql queries
+- [ ] Markdown
+  - [ ] special treesitter keymaps/text objexts
+    - [ ] add `` i` and a` `` text objexts for inner and arround backticks (if in a markdown file use exclude the filetype when doing inner selection by using treesitter)
+  - [ ] try out https://github.com/MeanderingProgrammer/render-markdown.nvim
+  - [ ] possibly replace the markdown viewer I am using
+- [ ] Notetaking
+  - [ ] add some lsp/plugin for notetaking compatible with obsidian or other some other note taking app
+  - [ ] daily notes
+  - [ ] people references
+  - [ ] note templatesk
+- [ ] Debugging
+  - [ ] I would like a way to convert old pdb files to portable format for older build processes
+- [ ] Heirline
+  - [ ] Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
+  - [ ] Add a heirline component for harpoon
+  - [ ] show workspace diagnostic counts in heirline
+- [ ] CLI
+  - [ ] add ripgrep completion to my powershell profile https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#complete
 
 ### Vim Practice
 

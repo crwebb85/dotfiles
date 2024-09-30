@@ -504,11 +504,6 @@ require('lazy').setup({
                 desc = 'Telescope: git status',
             },
             {
-                '<leader>fa',
-                function() require('telescope.builtin').autocommands() end,
-                desc = 'Telescope: autocmds',
-            },
-            {
                 '<leader>fe',
                 function()
                     local conf = require('telescope.config').values
@@ -536,6 +531,19 @@ require('lazy').setup({
                             }),
                             previewer = conf.file_previewer({}),
                             sorter = conf.generic_sorter({}),
+                            attach_mappings = function(buffer_number)
+                                local actions = require('telescope.actions')
+                                local action_state =
+                                    require('telescope.actions.state')
+                                actions.select_default:replace(function()
+                                    actions.close(buffer_number)
+                                    vim.cmd(
+                                        'e '
+                                            .. action_state.get_selected_entry()[1]
+                                    )
+                                end)
+                                return true
+                            end,
                         })
                         :find()
                 end,
@@ -638,19 +646,6 @@ require('lazy').setup({
                 '<leader>eo',
                 function() require('harpoon'):list():select(vim.v.count1) end,
                 desc = 'Harpoon: Go to file using count1',
-            },
-            {
-                '<leader>a',
-                function() require('harpoon'):list():add() end,
-                desc = 'Harpoon: Add file',
-            },
-            {
-                '<C-e>',
-                function()
-                    local harpoon = require('harpoon')
-                    harpoon.ui:toggle_quick_menu(harpoon:list())
-                end,
-                desc = 'Harpoon: Toggle quick menu',
             },
             -- Protip: To reorder the entries in harpoon quick menu use `Vd` to cut the line and `P` to paste where you want it
 
