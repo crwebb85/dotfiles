@@ -2321,39 +2321,46 @@ require('lazy').setup({
             { 'williamboman/mason-lspconfig.nvim' },
         },
         config = function(_, _)
+            local Set = require('utils.datastructure').Set
+
+            local ensure_installed = Set:new({
+                -- LSPs
+                'pyright', -- LSP for python
+                'ruff-lsp', -- linter for python (includes flake8, pep8, etc.)
+                'marksman', -- Markdown
+                'markdown-oxide', -- Markdown notes
+                'lua-language-server', -- (lua_ls) LSP for lua files
+                'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
+                'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
+                'ansible-language-server',
+                'omnisharp', -- C#
+                'gopls', -- go lang
+                'rust-analyzer',
+                'yamlls', -- (yaml-language-server)
+                'jsonls', -- (json-lsp)
+                'taplo', -- LSP for toml (for pyproject.toml files)
+                'powershell-editor-services', -- powershell
+
+                -- Formatters
+                'stylua', -- Formatter for lua files
+                'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
+                'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
+                'xmlformatter',
+                'jq', --json formatter
+                'shfmt',
+
+                -- 'fixjson', -- json fixer, fixes invalid json like trailing commas
+
+                -- Debuggers
+                'codelldb',
+                'debugpy', -- python debugger
+                'netcoredbg',
+            })
+                :difference(Set:new(config.exclude_mason_install))
+                :to_array()
+
             require('mason-tool-installer').setup({
-                ensure_installed = {
-                    -- LSPs
-                    'pyright', -- LSP for python
-                    'ruff-lsp', -- linter for python (includes flake8, pep8, etc.)
-                    'marksman',
-                    'lua-language-server', -- (lua_ls) LSP for lua files
-                    'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
-                    'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
-                    'ansible-language-server',
-                    'omnisharp', -- C#
-                    'gopls', -- go lang
-                    'rust-analyzer',
-                    'yamlls', -- (yaml-language-server)
-                    'jsonls', -- (json-lsp)
-                    'taplo', -- LSP for toml (for pyproject.toml files)
-                    'powershell-editor-services', -- powershell
-
-                    -- Formatters
-                    'stylua', -- Formatter for lua files
-                    'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                    'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
-                    'xmlformatter',
-                    'jq', --json formatter
-                    'shfmt',
-
-                    -- 'fixjson', -- json fixer, fixes invalid json like trailing commas
-
-                    -- Debuggers
-                    'codelldb',
-                    'debugpy', -- python debugger
-                    'netcoredbg',
-                },
+                ensure_installed = ensure_installed,
             })
             require('mason-tool-installer').run_on_start() -- Fix Issue: https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/issues/37
         end,

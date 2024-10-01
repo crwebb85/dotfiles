@@ -60,6 +60,8 @@
   moves (using the left arrow key) from the end of the current argument the suggestions
   will have an incorrect prefix of the current argument up to the cursor
   (or at least that was happening in the past but I can't replicate it at this moment.)
+- `<leader>gd` does not open git diff tab if the tab is already open
+- conform throws an error when the formatter times out
 
 ### Workflows that need improvements
 
@@ -105,6 +107,9 @@
   - [ ] show workspace diagnostic counts in heirline
 - [ ] CLI
   - [ ] add ripgrep completion to my powershell profile https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#complete
+- [ ] Config
+  - [x] add list of mason items to not install automatically
+  - [ ] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
 
 ### Vim Practice
 
