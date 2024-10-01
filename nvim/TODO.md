@@ -81,6 +81,7 @@
   - [ ] highlights
   - [ ] remote/cloud logs
   - [ ] (if my new harpoon parameterized dates is not sufficient) make telescope picker for log file folders using a harpoon list to control the log file locations
+  - [ ] add StackTrace resume and StackTrace restart commands
 - [ ] SQL
   - [ ] tsql treesitter
   - [ ] tsql formatter
@@ -92,9 +93,10 @@
   - [ ] possibly replace the markdown viewer I am using
 - [ ] Notetaking
   - [ ] add some lsp/plugin for notetaking compatible with obsidian or other some other note taking app
+  - [ ] https://github.com/Feel-ix-343/markdown-oxide
   - [ ] daily notes
   - [ ] people references
-  - [ ] note templatesk
+  - [ ] note templates
 - [ ] Debugging
   - [ ] I would like a way to convert old pdb files to portable format for older build processes
 - [ ] Heirline
@@ -202,6 +204,7 @@
 - [JS Dap discussion](https://www.reddit.com/r/neovim/comments/186ntnw/does_anyone_have_a_working_dap_for_js_please/?utm_medium=android_app&utm_source=share)
 - [JS Dap discussion](https://www.reddit.com/r/neovim/comments/1861hzm/i_finally_configured_nvimdap_to_debug_nodejs_apps/?utm_medium=android_app&utm_source=share)
 - [Java discussion](https://www.reddit.com/r/neovim/comments/1862kxo/is_it_help_to_bring_more_java_devs_to_nvim/?utm_medium=android_app&utm_source=share)
+- [Cool config](https://evantravers.com/articles/2024/09/17/making-my-nvim-act-more-like-helix-with-mini-nvim/)
 
 ### Jupyter notebook support
 

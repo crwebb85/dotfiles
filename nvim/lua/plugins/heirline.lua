@@ -1,3 +1,4 @@
+local is_nerd_font_enabled = require('config.config').nerd_font_enabled
 local config = function()
     local heirline = require('heirline')
     local conditions = require('heirline.conditions')
@@ -41,14 +42,10 @@ local config = function()
     local Diagnostics = {
         condition = conditions.has_diagnostics,
         static = {
-            error_icon = 'E',
-            warn_icon = 'W',
-            info_icon = 'I',
-            hint_icon = 'H',
-            -- error_icon = vim.fn.sign_getdefined("DiagnosticSignError")[1].text,
-            -- warn_icon = vim.fn.sign_getdefined("DiagnosticSignWarn")[1].text,
-            -- info_icon = vim.fn.sign_getdefined("DiagnosticSignInfo")[1].text,
-            -- hint_icon = vim.fn.sign_getdefined("DiagnosticSignHint")[1].text,
+            info_icon = is_nerd_font_enabled and ' ' or 'I',
+            hint_icon = is_nerd_font_enabled and ' ' or 'H',
+            warn_icon = is_nerd_font_enabled and ' ' or 'W',
+            error_icon = is_nerd_font_enabled and ' ' or 'E',
         },
         init = function(self)
             local buf_sev_counts = vim.diagnostic.count(0, {})

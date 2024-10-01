@@ -104,6 +104,23 @@ vim.filetype.add({
 -- Error format for nuget restore:
 -- helloworld\helloworld.csproj : warning NU1901: Package 'my.helloworld' 1.0.0 has a known low severity vulnerability
 vim.opt.errorformat:append([[%f:\ %tarning\ %m]])
+local is_nerd_font_enabled = require('config.config').nerd_font_enabled
+vim.diagnostic.config({
+    float = { border = 'rounded' },
+    signs = {
+
+        text = {
+            [vim.diagnostic.severity.INFO] = is_nerd_font_enabled and ''
+                or 'I',
+            [vim.diagnostic.severity.HINT] = is_nerd_font_enabled and ''
+                or 'H',
+            [vim.diagnostic.severity.WARN] = is_nerd_font_enabled and ''
+                or 'W',
+            [vim.diagnostic.severity.ERROR] = is_nerd_font_enabled and ''
+                or 'E',
+        },
+    },
+})
 
 -------------------------------------------------------------------------------
 --- Terminal
