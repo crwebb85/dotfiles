@@ -251,17 +251,22 @@ local LAZY_PLUGIN_FILEPATH_PATTERN = (function()
     return nil
 end)()
 
+local NVIM_RUNTIME_FILEPATH_PATTERN = (function()
+    local nvim_runtime_filepath = string.lower(vim.fs.normalize('$VIMRUNTIME'))
+    return vim.glob.to_lpeg(nvim_runtime_filepath .. '/**')
+end)()
+
 vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
     callback = function(args)
         local name =
             string.lower(vim.fs.normalize(vim.api.nvim_buf_get_name(args.buf)))
 
-        if READONLY_LIBRARY_DIR_PATTERN:match(name) ~= nil then
-            vim.bo[args.buf].readonly = true
-            vim.bo[args.buf].modifiable = false
-        elseif
-            LAZY_PLUGIN_FILEPATH_PATTERN ~= nil
-            and LAZY_PLUGIN_FILEPATH_PATTERN:match(name) ~= nil
+        if
+            READONLY_LIBRARY_DIR_PATTERN:match(name) ~= nil
+            or (LAZY_PLUGIN_FILEPATH_PATTERN ~= nil and LAZY_PLUGIN_FILEPATH_PATTERN:match(
+                name
+            ) ~= nil)
+            or NVIM_RUNTIME_FILEPATH_PATTERN:match(name) ~= nil
         then
             vim.bo[args.buf].readonly = true
             vim.bo[args.buf].modifiable = false
