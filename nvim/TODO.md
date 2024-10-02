@@ -1,10 +1,6 @@
-### TODO:
+### Unorganized TODO:
 
 - look into skeleton (file template) plugins/configuration
-- add a save and save all button to heirline so I know when I have unsaved buffers
-- Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
-- keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
-- make quickfix/loc list editable
 - try out new features:
   - winfixbuf
   - vim.ringbuf
@@ -12,45 +8,17 @@
   - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
     `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
 - try out basedpyright lsp [example](https://www.reddit.com/r/neovim/comments/1cpkeqd/comment/l3ux37y/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
-- try out alternate motions
-  - [substitute.nvim](https://github.com/gbprod/substitute.nvim)
-  - [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
-  - [matze/vim-move](https://github.com/matze/vim-move)
-  - [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
-  - [chrisgrieser/nvim-various-textobjs](https://github.com/chrisgrieser/nvim-various-textobjs)
-  - [custom surrounds](https://github.com/kylechui/nvim-surround/discussions/53)
-  - https://www.reddit.com/r/neovim/comments/1ckd1rs/helpful_treesitter_node_motion/?utm_medium=android_app&utm_source=share
 - Use toggle term on_stderr callback to store the last error to use in my StackTrace cmd
 - Use counts on telescope pickers to where each count corresponds to a subfolder in the project to narrow the search scope
 - Use counts on harpoon for multiple lists
-- Use expand("<cfile>") on telescope find file in normal mode
 - Use counts with gf to open file in the winnr
 - investigate preformance improvements
   - https://www.reddit.com/r/neovim/comments/1cjn94h/fully_eliminate_o_delay/
   - https://www.reddit.com/r/neovim/comments/1cjnf0m/fully_eliminate_gds_delay/
   - https://www.reddit.com/r/neovim/comments/1ch6yfz/smart_indent_with_treesitter_indent_fallback/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
-- comments navigation/textobjects
-  - gc
-    - operate exactly over the range of text that the gc operator would have commented
-  - igc
-    - operate over text inside comment when single line comment
-    - operate over text inside block comment
-    - operate over text inside comment forcing block select for line comments when multiple lines
-  - agc
-    - operate over text around comment when single line comment
-    - operate over text around comment when multiple single line comment
-    - operate over text around comment block comments
 - maybe change clipboard so that yanks don't get automatically saved to the clipboard
-- maybe use some prefix like g for my navigation keymaps to move the cursor to the end
-  of the item like how gp works. For example if ]m navigates to the begining of
-  the next method then ]gm should go to the end of the next method. That way I can
-  reserve capital letters for the first and last extremes
-- for my treesitter text objects I am finding how they work with spacing annoying as deleting
-  an pasting results in a lot of extra lines (maybe play around with settings to there are more intuitive options)
 - make file buffers not in current directory slightly redder
-- modify visual and around keymaps to extend current selection (some care may be needed for how to handle whitespace)
-- finish lsp reference navigator
 
 ### Bugs
 
@@ -63,7 +31,7 @@
 - `<leader>gd` does not open git diff tab if the tab is already open
 - conform throws an error when the formatter times out
 
-### Workflows that need improvements
+### TODO and Workflows that need improvements
 
 - [ ] Settings
   - [ ] match tabs with what my formatters use for various file types
@@ -75,6 +43,7 @@
   - [ ] telescope navigation for hurl files
   - [ ] add keymap to telescope navigation to create a duplicate of an existing hurl file
   - [ ] add a keymap to oil.nvim that lets me select a hurl file via telescope to create a duplicate of
+  - [ ] add snippets using pythons faker library to generate fake data
 - [ ] Log files
   - [ ] make log files read only
   - [ ] searching
@@ -84,6 +53,9 @@
   - [ ] remote/cloud logs
   - [ ] (if my new harpoon parameterized dates is not sufficient) make telescope picker for log file folders using a harpoon list to control the log file locations
   - [ ] add StackTrace resume and StackTrace restart commands
+- [ ] QuickFix
+  - [ ] keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
+  - [ ] make quickfix/loc list editable
 - [ ] SQL
   - [ ] tsql treesitter
   - [ ] tsql formatter
@@ -99,17 +71,61 @@
   - [ ] daily notes
   - [ ] people references
   - [ ] note templates
+- [ ] Notebook support
+  - [ ] jupyter notebooks
 - [ ] Debugging
   - [ ] I would like a way to convert old pdb files to portable format for older build processes
+  - [ ] pid telescope picker for processes
 - [ ] Heirline
   - [ ] Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
   - [ ] Add a heirline component for harpoon
   - [ ] show workspace diagnostic counts in heirline
+  - [ ] add a save and save all button to heirline so I know when I have unsaved buffers
 - [ ] CLI
   - [ ] add ripgrep completion to my powershell profile https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#complete
+  - [ ] Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
 - [ ] Config
   - [x] add list of mason items to not install automatically
   - [ ] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
+- [ ] Refactor
+  - [ ] replace client.supports_method with client.server_capabilities
+  - [ ] cleanup deprecated code
+- [ ] Formatting
+  - [ ] Formatting mode to only format git changes
+  - [ ] add html formatter
+- [ ] Movement/TextObjects keymaps
+  - [ ] re-evaluate keymaps after upgrading to nightly based on keymaps added in https://github.com/neovim/neovim/commit/bb7604eddafb31cd38261a220243762ee013273a
+  - [ ] add ]r and [r for navigating lsp references
+  - [ ] add a substitute operation that uses text objects for pasting similar to [substitute.nvim](https://github.com/gbprod/substitute.nvim)
+  - [ ] add keymap for next/previous partial word for navigating within snake-case and camel-case variables similar to [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
+  - [ ] maybe use some prefix like g for my navigation keymaps to move the cursor to the end
+        of the item like how gp works. For example if ]m navigates to the begining of
+        the next method then ]gm should go to the end of the next method. That way I can
+        reserve capital letters for the first and last extremes
+  - [ ] for my treesitter text objects I am finding how they work with spacing annoying as deleting
+        an pasting results in a lot of extra lines (maybe play around with settings to there are more intuitive options)
+  - [ ] comments navigation/textobjects
+    - gc
+      - operate exactly over the range of text that the gc operator would have commented
+    - igc
+      - operate over text inside comment when single line comment
+      - operate over text inside block comment
+      - operate over text inside comment forcing block select for line comments when multiple lines
+    - agc
+      - operate over text around comment when single line comment
+      - operate over text around comment when multiple single line comment
+      - operate over text around comment block comments
+  - [ ] I want to improve my indent text objec igi and agi based on [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
+  - [ ] modify visual and around keymaps to extend current selection (some care may be needed for how to handle whitespace)
+  - [ ] text objexts I want to try out [chrisgrieser/nvim-various-textobjs](https://github.com/chrisgrieser/nvim-various-textobjs)
+  - [ ] try out [matze/vim-move](https://github.com/matze/vim-move)
+  - [ ] try out [custom surrounds](https://github.com/kylechui/nvim-surround/discussions/53)
+  - [ ] try out https://www.reddit.com/r/neovim/comments/1ckd1rs/helpful_treesitter_node_motion/?utm_medium=android_app&utm_source=share
+- [ ] Prune Plugins (plugins I might want to create my own version of or see if I still need it)
+  - akinsho/toggleterm.nvim (replace with custom code)
+  - iamcco/markdown-preview.nvim (replace with maybe my own version)
+  - nvim-tree/nvim-web-devicons (replace with echasnovski/mini.icons)
+  - WhoIsSethDaniel/mason-tool-installer.nvim (replace with custom code)
 
 ### Vim Practice
 
