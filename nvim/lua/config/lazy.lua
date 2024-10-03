@@ -549,7 +549,6 @@ require('lazy').setup({
                 end,
                 desc = 'Telescope: harpoon',
             },
-
             {
                 '<leader>fn',
                 function()
@@ -564,6 +563,22 @@ require('lazy').setup({
                     })
                 end,
                 desc = 'Telescope: find files in note directory ',
+                mode = { 'n' },
+            },
+            {
+                '<leader>fz',
+                function()
+                    local config_path = vim.fn.stdpath('config')
+                    if type(config_path) ~= 'string' then
+                        error('config path was not a string')
+                    end
+                    local skeleton_path =
+                        vim.fs.joinpath(config_path, 'skeletons')
+                    require('telescope.builtin').find_files({
+                        cwd = skeleton_path,
+                    })
+                end,
+                desc = 'Telescope: find skeletons (file templates) ',
                 mode = { 'n' },
             },
         },
