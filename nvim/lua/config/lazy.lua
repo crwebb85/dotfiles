@@ -2390,6 +2390,8 @@ require('lazy').setup({
                     taplo = lsp.setup_tablo,
                     omnisharp = lsp.setup_omnisharp,
                     powershell_es = lsp.setup_powershell_es,
+                    markdown_oxide = lsp.setup_markdown_oxide,
+                    marksman = lsp.setup_marksman,
                 },
             })
         end,

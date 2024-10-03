@@ -688,4 +688,50 @@ function M.setup_powershell_es(name)
     })
 end
 
+--Mark down lsp comparison
+--
+-- Completion
+-- - markdown_oxide - keeps periods in note references and also completes headers (better completion)
+-- - marksman - removes periods by default (can be configured to keep periods) in note references and does not complete headers
+--
+-- Hover
+-- - markdown_oxide - hover always preview the current note (can be disabled in .moxide.toml)
+-- - marksman - hover over note references previews the note
+--
+-- Go To Definition
+-- - markdown_oxide - not supported
+-- - marksman - goes to note reference
+--
+-- Code References
+-- - marksman
+--   - create table of contents
+--   - create note for note reference that does not exist
+--
+-- Diagnostics
+-- - marksman - errors for non existent document links
+--
+-- Rename
+-- - markdown_oxide
+--   header rename - did not update links containing the header
+
+function M.setup_marksman(name)
+    lsp_server.setup(name, {
+        -- Note: create a .marksman.toml file in note folder to get full
+        -- capabilities https://github.com/artempyanykh/marksman/blob/main/docs/configuration.md
+        --
+
+        --TODO add handlers to determine which lsp to prioritize for different capabilities
+    })
+end
+
+function M.setup_markdown_oxide(name)
+    lsp_server.setup(name, {
+        -- Note: create a .moxide.toml file in note folder to get full
+        -- capabilities https://oxide.md/v0/References/v0+Configuration+Reference
+
+        --TODO add handlers to determine which lsp to prioritize for different capabilities
+        --TODO add commands for creating notes
+    })
+end
+
 return M
