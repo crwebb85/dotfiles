@@ -520,7 +520,7 @@ end, {
 })
 
 vim.api.nvim_create_user_command(
-    'QFCopyToLoc',
+    'QFToLoc',
     function(_)
         vim.cmd(
             [[call setloclist(0, [], ' ', {'items': get(getqflist({'items': 1}), 'items')})]]
@@ -531,8 +531,19 @@ vim.api.nvim_create_user_command(
     }
 )
 
+vim.api.nvim_create_user_command('QFToLocAdd', function(_)
+    local new_items = vim.fn.getqflist()
+    local items = vim.fn.getloclist(0)
+    for _, item in ipairs(new_items) do
+        table.insert(items, item)
+    end
+    vim.fn.setloclist(0, {}, ' ', { items = items })
+end, {
+    desc = 'Appends items from QF list to end of Loc list',
+})
+
 vim.api.nvim_create_user_command(
-    'LocCopyToQF',
+    'LocToQF',
     function(_)
         vim.cmd(
             [[call setqflist([], ' ', {'items': get(getloclist(0, {'items': 1}), 'items')})]]
