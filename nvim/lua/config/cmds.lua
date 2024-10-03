@@ -796,9 +796,8 @@ vim.api.nvim_create_user_command('Makeit', function(_)
     local state = require('telescope.actions.state')
     local pickers = require('telescope.pickers')
     local finders = require('telescope.finders')
-    local options = get_makefile_options(
-        require('utils.path').concat({ vim.fn.getcwd(), 'Makefile' })
-    )
+    local options =
+        get_makefile_options(vim.fs.joinpath(vim.fn.getcwd(), 'Makefile'))
 
     --- On option selected → Run action depending of the language
     local function on_option_selected(prompt_bufnr)
