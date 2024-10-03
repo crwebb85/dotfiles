@@ -88,6 +88,8 @@ vim.o.pumblend = 15 -- makes the completion menu slightly transparent
 vim.o.inccommand = 'split' -- shows search in replace changes in a preview window
 vim.o.hlsearch = false
 vim.o.incsearch = true
+vim.o.wildignore =
+    '*/node_modules/**,*/.git/**,*/venv/**,*/.venv/**,*/obj/**,*/bin/**'
 vim.o.grepprg = [[rg --glob "!.git" --no-heading --vimgrep --follow $*]]
 vim.opt.grepformat = vim.opt.grepformat ^ { '%f:%l:%c:%m' }
 
