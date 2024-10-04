@@ -1173,6 +1173,16 @@ require('lazy').setup({
         build = function() vim.fn['mkdp#util#install']() end,
         lazy = true,
     },
+    {
+        'MeanderingProgrammer/render-markdown.nvim',
+        dependencies = {
+            'nvim-treesitter/nvim-treesitter',
+            'echasnovski/mini.icons',
+        },
+        ---@module 'render-markdown'
+        ---@type render.md.UserConfig
+        opts = {},
+    },
 
     -- Open terminal within neovim
     {

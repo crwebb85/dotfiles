@@ -49,6 +49,7 @@
   "plenary.nvim": { "branch": "master", "commit": "ec289423a1693aeae6cd0d503bac2856af74edaa" },
   "profile.nvim": { "branch": "master", "commit": "0ee32b7aba31d84b0ca76aaff2ffcb11f8f5449f" },
   "refactoring.nvim": { "branch": "master", "commit": "c406fc5fb4d7ba5fce7b668637075fad6e75e9f8" },
+  "render-markdown.nvim": { "branch": "main", "commit": "fe1002fddc61207e4ef4325d4bc0ca33697bbc7a" },
   "schemastore.nvim": { "branch": "main", "commit": "bfe74baf72ca8964a211286fed864f30c672f19b" },
   "telescope-luasnip.nvim": { "branch": "master", "commit": "11668478677de360dea45cf2b090d34f21b8ae07" },
   "telescope-media-files.nvim": { "branch": "master", "commit": "46af264c76782a2fda6dd74c5ebb282c5cc3eb9f" },
