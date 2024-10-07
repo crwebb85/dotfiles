@@ -30,13 +30,18 @@
   (or at least that was happening in the past but I can't replicate it at this moment.)
 - `<leader>gd` does not open git diff tab if the tab is already open
 - conform throws an error when the formatter times out
+- when in wezterm and I open my `nvim ./` from my .config directory then new wezterm tab the cwd will be .config/nvim instead of .config
+- 'gC' keymap doesn't invert correctly when comments have nested comments
+- fix my_on_output_quickfix.lua file as invalid characters added are added to
+  the begining of items when using tail = true and append = true at the same time
+  (this has been confirmed to happen with my GrepAdd command)
 
 ### TODO and Workflows that need improvements
 
 - [ ] Settings
   - [ ] match tabs with what my formatters use for various file types
 - [ ] Requests
-  - [ ] Commands for interacting with hurl files (may use plugin)
+  - [x] Commands for interacting with hurl files (may use plugin)
   - [ ] templates/snippets
   - [ ] wsdl support with code completion for fields
   - [ ] add a proxy that can log the requests as hurl files
@@ -56,21 +61,26 @@
 - [ ] QuickFix
   - [ ] keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
   - [ ] make quickfix/loc list editable
+  - [ ] add Add version of quickfix commands similar to vimgrepadd
 - [ ] SQL
   - [ ] tsql treesitter
   - [ ] tsql formatter
   - [ ] running sql queries
+  - [ ] lsp https://github.com/sqls-server/sqls
+- [ ] XML
+  - [ ] Add xml lsp
+  - [ ] Get xml schemas working similar to how I have it with json schemas or yaml schemas
 - [ ] Markdown
   - [ ] special treesitter keymaps/text objexts
     - [ ] add `` i` and a` `` text objexts for inner and arround backticks (if in a markdown file use exclude the filetype when doing inner selection by using treesitter)
-  - [ ] try out https://github.com/MeanderingProgrammer/render-markdown.nvim
+  - [x] try out https://github.com/MeanderingProgrammer/render-markdown.nvim
   - [ ] possibly replace the markdown viewer I am using
 - [ ] Notetaking
-  - [ ] add some lsp/plugin for notetaking compatible with obsidian or other some other note taking app
-  - [ ] https://github.com/Feel-ix-343/markdown-oxide
+  - [x] add some lsp/plugin for notetaking compatible with obsidian/dendron or other some other note taking app
+  - [x] https://github.com/Feel-ix-343/markdown-oxide
   - [ ] daily notes
   - [ ] people references
-  - [ ] note templates
+  - [ ] note templates using dendron format
 - [ ] Notebook support
   - [ ] jupyter notebooks
 - [ ] Debugging
@@ -90,6 +100,7 @@
 - [ ] Refactor
   - [ ] replace client.supports_method with client.server_capabilities
   - [ ] cleanup deprecated code
+  - [ ] properly use setqflist action parameter for appending to an existing list.
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
   - [ ] add html formatter

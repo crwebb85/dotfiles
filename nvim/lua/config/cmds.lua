@@ -532,12 +532,9 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command('QFToLocAdd', function(_)
-    local new_items = vim.fn.getqflist()
-    local items = vim.fn.getloclist(0)
-    for _, item in ipairs(new_items) do
-        table.insert(items, item)
-    end
-    vim.fn.setloclist(0, {}, ' ', { items = items })
+    local items = vim.fn.getqflist()
+    local action = 'a' -- add to existing list
+    vim.fn.setloclist(0, {}, action, { items = items })
 end, {
     desc = 'Appends items from QF list to end of Loc list',
 })
@@ -870,20 +867,45 @@ end, {})
 
 vim.api.nvim_create_user_command('Grep', function(params)
     local overseer = require('overseer')
-    -- Insert args at the '$*' in the grepprg
+    -- insert args at the '$*' in the grepprg
     local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
     if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
     local task = overseer.new_task({
         cmd = vim.fn.expandcmd(cmd),
         components = {
             {
-                'on_output_quickfix',
+                'quickfix.my_on_output_quickfix',
                 errorformat = vim.o.grepformat,
                 open = not params.bang,
                 open_height = 8,
                 items_only = true,
             },
-            -- We don't care to keep this around as long as most tasks
+            -- we don't care to keep this around as long as most tasks
+            { 'on_complete_dispose', timeout = 30 },
+            'default',
+        },
+    })
+    task:start()
+end, { nargs = '*', bang = true, complete = 'file' })
+
+vim.api.nvim_create_user_command('GrepAdd', function(params)
+    local overseer = require('overseer')
+    -- insert args at the '$*' in the grepprg
+    local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
+    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    local task = overseer.new_task({
+        cmd = vim.fn.expandcmd(cmd),
+        components = {
+            {
+                'quickfix.my_on_output_quickfix',
+                errorformat = vim.o.grepformat,
+                open = not params.bang,
+                open_height = 8,
+                items_only = true,
+                append = true,
+                tail = false, -- must set to false when append equals true because of a bug I have in my TODO list (TODO: remove `tail = false` when bug is fixed)
+            },
+            -- we don't care to keep this around as long as most tasks
             { 'on_complete_dispose', timeout = 30 },
             'default',
         },
