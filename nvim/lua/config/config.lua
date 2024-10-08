@@ -1,3 +1,4 @@
+--Parameters I like to change depending on the machine I am using
 local M = {
     ---@type boolean
     foldenable = true,
@@ -18,6 +19,10 @@ local M = {
         -- 'debugpy',
         -- 'markdown-oxide',
     },
+
+    enable_render_markdown = true,
+
+    dev_plugins_path = 'C:\\Users\\crweb\\Documents\\projects\\',
 }
 
 return M
