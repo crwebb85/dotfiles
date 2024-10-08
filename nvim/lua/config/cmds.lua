@@ -682,7 +682,7 @@ vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
                 col = col + 1,
                 end_col = end_col,
                 text = capture_name .. ': ' .. vim.trim(text[1]),
-                valid = true,
+                valid = 1,
             }
             table.insert(items, item)
             -- TODO remove duplicates
@@ -855,16 +855,6 @@ end, {
     desc = 'Opens telescope picker to pick the Make task to run',
 })
 
-vim.api.nvim_create_user_command('OverseerRestartLast', function()
-    local overseer = require('overseer')
-    local tasks = overseer.list_tasks({ recent_first = true })
-    if vim.tbl_isempty(tasks) then
-        vim.notify('No tasks found', vim.log.levels.WARN)
-    else
-        overseer.run_action(tasks[1], 'restart')
-    end
-end, {})
-
 vim.api.nvim_create_user_command('Grep', function(params)
     local overseer = require('overseer')
     -- insert args at the '$*' in the grepprg
@@ -918,6 +908,16 @@ vim.api.nvim_create_user_command(
     function() require('overseer').debug_parser() end,
     {}
 )
+
+vim.api.nvim_create_user_command('OverseerRestartLast', function()
+    local overseer = require('overseer')
+    local tasks = overseer.list_tasks({ recent_first = true })
+    if vim.tbl_isempty(tasks) then
+        vim.notify('No tasks found', vim.log.levels.WARN)
+    else
+        overseer.run_action(tasks[1], 'restart')
+    end
+end, {})
 
 --https://github.com/stevearc/dotfiles/blob/master/.config/nvim/plugin/stacktrace.lua
 vim.api.nvim_create_user_command('Stacktrace', function(params)

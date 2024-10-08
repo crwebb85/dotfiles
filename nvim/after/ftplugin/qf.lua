@@ -1,6 +1,5 @@
 local qf_properties = require('config/quickfix').properties
 
-vim.print('qf after plugin')
 local qf_bufnr = vim.api.nvim_get_current_buf()
 local qf_win_id = vim.fn.win_getid()
 local qf_is_loc = vim.fn.getwininfo(qf_win_id)[1].loclist == 1
