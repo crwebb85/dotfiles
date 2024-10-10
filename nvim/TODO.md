@@ -130,6 +130,7 @@
   - [ ] cleanup deprecated code
   - [ ] properly use setqflist action parameter for appending to an existing list.
   - [ ] refactor my windows check to use `vim.fn.has('win32') == 1`
+  - [ ] refactor telescope keymap `<leader>fh` to no longer use a register in visual mode
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
   - [ ] add html formatter
