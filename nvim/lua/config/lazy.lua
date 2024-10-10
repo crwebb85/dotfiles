@@ -1293,7 +1293,7 @@ require('lazy').setup({
             },
         },
         config = function(_, _)
-            if require('utils.platform').is.win then
+            if vim.fn.has('win32') == 1 then
                 vim.g.undotree_DiffCommand = 'FC'
             end
         end,
@@ -3002,7 +3002,7 @@ require('lazy').setup({
                 max_height = 25,
                 default_detail = 1,
             },
-            templates = { 'builtin', 'hurl.hurl_run' },
+            templates = { 'builtin', 'hurl.hurl_run', 'user.run_script' },
         },
     },
 

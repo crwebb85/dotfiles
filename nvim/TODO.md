@@ -35,20 +35,42 @@
 - fix my_on_output_quickfix.lua file as invalid characters added are added to
   the begining of items when using tail = true and append = true at the same time
   (this has been confirmed to happen with my GrepAdd command)
+- fix python formatters
 
 ### TODO and Workflows that need improvements
 
 - [ ] Settings
   - [ ] match tabs with what my formatters use for various file types
+  - [ ] add a local leader to start replacing keymaps from plugins with UI buffers like telescope, diffview, fugitive
+  - [ ] try out cspell lsp instead of vim spell check
+- [ ] Snippets and Skeletons
+  - [ ] Add t-sql snippets
+    - [ ] update
+    - [ ] insert
+    - [ ] update or insert
+  - [ ]Add mermaid snippets (at a minimum include the examples on the mermaid website for each diagram type[ ] )
+  - [ ] Add markdown snippets
+    - [ ] code block snippet
+  - [ ] Add C# snippets
+    - [ ] unit tests
+    - [ ] class
+    - [ ] test class
+  - [ ] hurl
+    - [ ] get request
+    - [ ] post request
+    - [ ] delete request
+    - [ ] put request
+    - [ ] oauth request
+    - [ ] ntlm auth request
+  - [ ] add snippets using pythons faker library to generate fake data
 - [ ] Requests
   - [x] Commands for interacting with hurl files (may use plugin)
-  - [ ] templates/snippets
   - [ ] wsdl support with code completion for fields
   - [ ] add a proxy that can log the requests as hurl files
   - [ ] telescope navigation for hurl files
   - [ ] add keymap to telescope navigation to create a duplicate of an existing hurl file
   - [ ] add a keymap to oil.nvim that lets me select a hurl file via telescope to create a duplicate of
-  - [ ] add snippets using pythons faker library to generate fake data
+  - [ ] add hurl completion
 - [ ] Log files
   - [ ] make log files read only
   - [ ] searching
@@ -62,6 +84,9 @@
   - [ ] keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
   - [ ] make quickfix/loc list editable
   - [ ] add Add version of quickfix commands similar to vimgrepadd
+  - [ ] exclude `Time Elapsed 00|1| 01.52` from error format (at least in overseer tasks)
+  - [ ] add location list as an option for overseer output
+  -
 - [ ] SQL
   - [ ] tsql treesitter
   - [ ] tsql formatter
@@ -91,9 +116,11 @@
   - [ ] Add a heirline component for harpoon
   - [ ] show workspace diagnostic counts in heirline
   - [ ] add a save and save all button to heirline so I know when I have unsaved buffers
+  - [ ] if an lsp diagnostics are hidden the lsp should appear orange in heirline
 - [ ] CLI
   - [ ] add ripgrep completion to my powershell profile https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#complete
   - [ ] Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
+  - [ ] fix powershell profile to not display tab completion for failed commands
 - [ ] Config
   - [x] add list of mason items to not install automatically
   - [ ] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
@@ -101,6 +128,7 @@
   - [ ] replace client.supports_method with client.server_capabilities
   - [ ] cleanup deprecated code
   - [ ] properly use setqflist action parameter for appending to an existing list.
+  - [ ] refactor my windows check to use `vim.fn.has('win32') == 1`
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
   - [ ] add html formatter
@@ -137,6 +165,7 @@
   - iamcco/markdown-preview.nvim (replace with maybe my own version)
   - nvim-tree/nvim-web-devicons (replace with echasnovski/mini.icons)
   - WhoIsSethDaniel/mason-tool-installer.nvim (replace with custom code)
+  - hrsh7th/nvim-cmp (replace with native completion and https://www.reddit.com/r/neovim/comments/1fwhhp0/new_plugin_cmp2lsp/?utm_medium=android_app&utm_source=share)
 
 ### Vim Practice
 
