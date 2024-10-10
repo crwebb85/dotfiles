@@ -44,16 +44,17 @@
   - [ ] add a local leader to start replacing keymaps from plugins with UI buffers like telescope, diffview, fugitive
   - [ ] try out cspell lsp instead of vim spell check
 - [ ] Snippets and Skeletons
+  - [x] Add keymap to select snippets with telescope (should help with discovering snippets from friendly-snippets)
   - [ ] Add t-sql snippets
     - [ ] update
     - [ ] insert
     - [ ] update or insert
   - [ ]Add mermaid snippets (at a minimum include the examples on the mermaid website for each diagram type[ ] )
   - [ ] Add markdown snippets
-    - [ ] code block snippet
+    - [x] code block snippet (friendly-snippets adds the prefix `codeblock`)
   - [ ] Add C# snippets
     - [ ] unit tests
-    - [ ] class
+    - [x] class (friendly-snippets adds the prefix `class`)
     - [ ] test class
   - [ ] hurl
     - [ ] get request
@@ -86,7 +87,7 @@
   - [ ] add Add version of quickfix commands similar to vimgrepadd
   - [ ] exclude `Time Elapsed 00|1| 01.52` from error format (at least in overseer tasks)
   - [ ] add location list as an option for overseer output
-  -
+  - [ ] integrate overseer with neotest
 - [ ] SQL
   - [ ] tsql treesitter
   - [ ] tsql formatter

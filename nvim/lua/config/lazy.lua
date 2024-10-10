@@ -431,14 +431,37 @@ require('lazy').setup({
             },
             {
                 '<leader>fs',
-                function() require('telescope.builtin').grep_string() end,
-                desc = 'Telescope: grep at cursor/selection',
-                mode = { 'n', 'v' },
+                function()
+                    require('telescope').load_extension('luasnip').luasnip()
+                end,
+                desc = 'Telescope Luasnip: Select a snippet',
+                mode = { 'n' },
             },
+
+            -- {
+            --     '<leader>fs',
+            --     function() require('telescope.builtin').grep_string() end,
+            --     desc = 'Telescope: grep at cursor/selection',
+            --     mode = { 'n', 'v' },
+            -- },
             {
                 '<leader>fg',
-                function() require('telescope.builtin').live_grep() end,
+                function()
+                    local mode = vim.api.nvim_get_mode().mode
+                    vim.print(mode)
+                    if mode == 'v' then
+                        -- First greps for the visual selection then lets you grep those results with a new grep
+                        --
+                        -- Note: while I used to have telescope grep_string as a different keymap so that I could
+                        -- also use it in normal mode to search the <cword> (word under cursor) I just never remembered
+                        -- to use it that way so I decided to free up that keymap namespace for other uses
+                        require('telescope.builtin').grep_string()
+                    else
+                        require('telescope.builtin').live_grep()
+                    end
+                end,
                 desc = 'Telescope: live_grep',
+                mode = { 'n', 'v' },
             },
             {
                 '<leader>fb',
@@ -456,6 +479,7 @@ require('lazy').setup({
                 function()
                     -- based on https://github.com/nvim-telescope/telescope.nvim/issues/1923#issuecomment-1122642431
                     local function getVisualSelection()
+                        --TODO fix so that this no longer nukes my registers
                         vim.cmd('noau normal! "vy"')
                         local text = vim.fn.getreg('v')
                         vim.fn.setreg('v', {})
