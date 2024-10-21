@@ -121,16 +121,9 @@ local comp = {
                     action = 'a'
                 elseif prev_context == task.id or self.qf_id ~= 0 then
                     -- If we have a quickfix ID, or if the current QF has a matching context, replace the list
-                    -- instead of creating a new one
-                    action = 'r'
+                    -- instead of creating a new one. Leave current selected entry the same.
+                    action = 'u'
                 end
-                -- if prev_context == task.id or self.qf_id ~= 0 then
-                --     -- If we have a quickfix ID, or if the current QF has a matching context, replace the list
-                --     -- instead of creating a new one
-                --     action = 'r'
-                -- elseif params.append then
-                --     action = 'a'
-                -- end
 
                 local items
                 -- Run this in the context of the task cwd so that relative filenames are parsed correctly
@@ -188,19 +181,10 @@ local comp = {
                     action = 'a'
                 elseif cur_qf.context == task.id then
                     -- qf_id is 0 after a restart. If we're restarting; replace the contents of the list.
-                    -- Otherwise append.
-                    action = 'r'
+                    -- Otherwise append. Leave current selected entry the same.
+                    action = 'u'
                 end
-                -- if cur_qf.context == task.id then
-                --     -- qf_id is 0 after a restart. If we're restarting; replace the contents of the list.
-                --     -- Otherwise append.
-                --     action = self.qf_id == 0 and 'r' or 'a'
-                -- elseif params.append then
-                --     action = 'a'
-                -- end
 
-                -- local scroll_buffer = action ~= 'a'
-                --     or is_cursor_at_bottom(cur_qf.winid)
                 local scroll_buffer = cur_qf.context ~= task.id
                     or self.qf_id == 0
                     or is_cursor_at_bottom(cur_qf.winid)
@@ -247,10 +231,6 @@ local comp = {
                     -- TODO fix comment with actual meaning
                     what.id = self.qf_id
                 end
-                -- if action == 'a' then
-                --     -- Only pass the ID if appending to existing list
-                --     what.id = self.qf_id
-                -- end
 
                 vim.fn.setqflist({}, action, what)
                 -- Store the quickfix list ID if we don't have one yet

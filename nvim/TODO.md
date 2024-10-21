@@ -36,6 +36,7 @@
   the begining of items when using tail = true and append = true at the same time
   (this has been confirmed to happen with my GrepAdd command)
 - fix python formatters
+- Bug heirline: new upstaged files say main the git branch and new files staged preview doesn't show git branch
 
 ### TODO and Workflows that need improvements
 
@@ -88,6 +89,7 @@
   - [ ] exclude `Time Elapsed 00|1| 01.52` from error format (at least in overseer tasks)
   - [ ] add location list as an option for overseer output
   - [ ] integrate overseer with neotest
+  - [ ] add buffer and path completion to Grep and GrepAdd commands
 - [ ] SQL
   - [ ] tsql treesitter
   - [ ] tsql formatter
