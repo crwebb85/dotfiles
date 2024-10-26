@@ -55,6 +55,77 @@ function M.dot_repeat(
 end
 
 -------------------------------------------------------------------------------
+---Fallback keymapping
+---based on https://github.com/kamalsacranie/nvim-mapper/blob/0c33bba518636cf0ad74c991bed32bc992bc4977/lua/nvim-mapper/init.lua
+
+local feedkeys_keys_with_count = function(keys)
+    local count = vim.api.nvim_get_vvar('count')
+    local keys_with_count = vim.api.nvim_replace_termcodes(
+        (count ~= 0 and count or '') .. keys,
+        true,
+        false,
+        true
+    )
+    if vim.api.nvim_get_mode().mode == 'niI' then
+        return vim.cmd('normal ' .. keys_with_count)
+    end
+    return vim.api.nvim_feedkeys(keys_with_count, 'n', false)
+end
+
+---@param mode string: Mode "short-name" (see |nvim_set_keymap()|). (Cannot be a list since this is for creating the fallback for a specific mapping)
+---@param lhs string: Left-hand side |{lhs}| of the mapping.
+---@param rhs string|fun(fallback: function): string|nil Right-hand side |{rhs}| of the mapping, can be a Lua function.
+local generate_fallback_mapping = function(mode, lhs, rhs)
+    if type(rhs) == 'string' then
+        return function() feedkeys_keys_with_count(rhs) end
+    end
+
+    local mapping_or_default = function(mapping_callback)
+        return function()
+            local success, res = pcall(mapping_callback)
+            if not success then
+                return feedkeys_keys_with_count(lhs) -- send the raw keys back if we have not mapped the key
+            end
+            if type(res) == 'string' then feedkeys_keys_with_count(res) end
+        end
+    end
+
+    ---@type string|function
+    local prev_mapping
+    local keymap_meta_info = vim.fn.maparg(lhs, mode, nil, true)
+    if vim.fn.len(keymap_meta_info) ~= 0 then
+        prev_mapping = keymap_meta_info.rhs or keymap_meta_info.callback
+    end
+
+    if not prev_mapping then return mapping_or_default(rhs) end
+
+    ---@type function
+    prev_mapping = type(prev_mapping) == 'function' and prev_mapping
+        or function() feedkeys_keys_with_count(prev_mapping) end
+
+    return mapping_or_default(function() rhs(prev_mapping) end)
+end
+
+---@param mode string|string[]: Mode "short-name" (see |nvim_set_keymap()|), or a list thereof.
+---@param lhs string: Left-hand side |{lhs}| of the mapping.
+---@param rhs string|fun(fallback: function): string|nil Right-hand side |{rhs}| of the mapping, can be a Lua function.
+---@param opts? vim.keymap.set.Opts: keymap options. Same as vim.keymap.set
+M.map_fallback_keymap = function(mode, lhs, rhs, opts)
+    ---@type string[]
+    mode = type(mode) == 'table' and mode or { mode }
+    opts = opts or {}
+    local new_mapping = rhs
+    for _, m in ipairs(mode) do
+        vim.keymap.set(
+            m,
+            lhs,
+            generate_fallback_mapping(m, lhs, new_mapping),
+            opts
+        )
+    end
+end
+
+-------------------------------------------------------------------------------
 --- smart navigation
 
 ---Runs the callback or cmd and if the cursor has changed it will vertically

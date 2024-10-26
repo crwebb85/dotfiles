@@ -82,7 +82,11 @@ vim.o.foldlevelstart = 3
 --- Completion menu
 vim.o.pumheight = 15 -- limits the size of the completion menu to only show 15 items at a time
 vim.o.pumblend = 15 -- makes the completion menu slightly transparent
-
+vim.opt.completeopt = { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy' }
+-- vim.opt.completeopt =
+--     { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'popup' }
+-- vim.opt.completeopt =
+-- { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'preview' }
 -------------------------------------------------------------------------------
 --- Search and replace
 vim.o.inccommand = 'split' -- shows search in replace changes in a preview window

@@ -46,6 +46,258 @@ M.lazytoggle = function()
     M.lazygitTerminal:toggle()
 end
 
+local nvim_cmp_config = {
+    --This is only used so that I don't have to create cmp file for monkey patching
+    --cmp utilities when using cmp-buffer in native completion
+    --TODO once I have fully converted to native completion consider
+    --removing this
+    'hrsh7th/nvim-cmp',
+    lazy = true,
+    config = function(_, _)
+        local cmp = require('cmp')
+        --Monkey patch the functions that plugins depend on
+        cmp.register_source = function(_, _) end
+    end,
+}
+if not config.use_native_completion then
+    nvim_cmp_config = {
+        'hrsh7th/nvim-cmp',
+        lazy = true,
+        event = { 'InsertEnter', 'CmdlineEnter' },
+        dependencies = {
+            { 'L3MON4D3/LuaSnip' },
+            { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
+            { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
+            { 'hrsh7th/cmp-path' }, -- Completion for file paths
+            { 'hrsh7th/cmp-cmdline' },
+            { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capabilities to that cmp adds to neovim
+            { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
+            { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
+            {
+                'petertriho/cmp-git', -- Provides info about git repo
+                lazy = true,
+                ft = 'gitcommit',
+                dependencies = { 'nvim-lua/plenary.nvim' },
+            },
+        },
+
+        config = function()
+            local cmp = require('cmp')
+
+            local cmdline_mappings = {
+                ['<C-z>'] = {
+                    c = function()
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                },
+                ['<Tab>'] = {
+                    c = function()
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                },
+                ['<S-Tab>'] = {
+                    c = function()
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                },
+                ['<C-n>'] = {
+                    c = function(fallback)
+                        if cmp.visible() then
+                            cmp.select_next_item()
+                        else
+                            fallback()
+                        end
+                    end,
+                },
+                ['<C-p>'] = {
+                    c = function(fallback)
+                        if cmp.visible() then
+                            cmp.select_prev_item()
+                        else
+                            fallback()
+                        end
+                    end,
+                },
+                --Toggle showing completion menu
+                ['<C-e>'] = cmp.mapping({
+                    c = function()
+                        if cmp.visible() then
+                            cmp.close()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                }),
+            }
+
+            local buffer_mappings = {
+                ['<Down>'] = {
+                    i = cmp.mapping.select_next_item({
+                        behavior = 'select',
+                    }),
+                },
+                ['<Up>'] = {
+                    i = cmp.mapping.select_prev_item({
+                        behavior = 'select',
+                    }),
+                },
+                --Toggle showing completion menu
+                ['<C-e>'] = cmp.mapping({
+                    i = function()
+                        if cmp.visible() then
+                            cmp.abort()
+                        else
+                            cmp.complete()
+                        end
+                    end,
+                }),
+                -- `Enter` key to confirm completion
+                ['<CR>'] = cmp.mapping({
+                    i = function(fallback)
+                        if cmp.visible() and cmp.get_active_entry() then
+                            ---setting the undolevels creates a new undo break
+                            ---so by setting it to itself I can create an undo break
+                            ---without side effects just before a comfirming a completion.
+                            -- Use <c-u> in insert mode to undo the completion
+                            vim.cmd([[let &g:undolevels = &g:undolevels]])
+                            cmp.confirm({
+                                behavior = cmp.ConfirmBehavior.Insert,
+                                select = false,
+                            })
+                        else
+                            fallback()
+                        end
+                    end,
+                }),
+                ['<c-y>'] = cmp.mapping({
+                    i = function(fallback)
+                        if cmp.visible() and cmp.get_active_entry() then
+                            ---setting the undolevels creates a new undo break
+                            ---so by setting it to itself I can create an undo break
+                            ---without side effects just before a comfirming a completion.
+                            -- Use <c-u> in insert mode to undo the completion
+                            vim.cmd([[let &g:undolevels = &g:undolevels]])
+                            cmp.confirm({
+                                behavior = cmp.ConfirmBehavior.Replace,
+                                select = false,
+                            })
+                        else
+                            fallback()
+                        end
+                    end,
+                }),
+                ['<C-t>'] = cmp.mapping(function()
+                    if cmp.visible_docs() then
+                        cmp.close_docs()
+                    else
+                        cmp.open_docs()
+                    end
+                end, { 'i', 's' }),
+                -- Scroll up and down in the completion documentation
+                ['<C-u>'] = cmp.mapping(function(falback)
+                    if cmp.visible() then
+                        cmp.mapping.scroll_docs(-4)
+                    else
+                        falback()
+                    end
+                end, { 'i', 's' }),
+                ['<C-d>'] = cmp.mapping(function(falback)
+                    if cmp.visible() then
+                        cmp.mapping.scroll_docs(4)
+                    else
+                        falback()
+                    end
+                end, { 'i', 's' }),
+                ['<C-n>'] = cmp.mapping(function(fallback)
+                    local luasnip = require('luasnip')
+                    if luasnip.expand_or_jumpable() then
+                        luasnip.expand_or_jump()
+                    else
+                        fallback()
+                    end
+                end, { 'i', 's' }),
+
+                ['<C-p>'] = cmp.mapping(function(fallback)
+                    local luasnip = require('luasnip')
+
+                    if luasnip.jumpable(-1) then
+                        luasnip.jump(-1)
+                    else
+                        fallback()
+                    end
+                end, { 'i', 's' }),
+            }
+            cmp.setup({
+                sources = cmp.config.sources({
+                    { name = 'nvim_lsp' },
+                    { name = 'nvim_lsp_signature_help' },
+                    { name = 'nvim_lua' },
+                    { name = 'luasnip' },
+                    { name = 'buffer', keyword_length = 5 },
+                    { name = 'path' },
+                }),
+                snippet = {
+                    expand = function(args)
+                        require('luasnip').lsp_expand(args.body)
+                    end,
+                },
+                formatting = {
+                    format = require('lspkind').cmp_format({
+                        with_text = true,
+                        menu = {
+                            buffer = '[buf]',
+                            nvim_lsp = '[LSP]',
+                            path = '[path]',
+                            luasnip = '[snip]',
+                            git = '[git]',
+                            cmdline = '[cmd]',
+                            nvim_lsp_signature_help = '[info]',
+                        },
+                    }),
+                },
+                mapping = buffer_mappings,
+            })
+
+            cmp.setup.filetype('gitcommit', {
+                sources = cmp.config.sources({
+                    { name = 'git' },
+                    { name = 'luasnip' },
+                    { name = 'buffer', keyword_length = 5 },
+                }),
+            })
+
+            -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+            cmp.setup.cmdline({ '/', '?' }, {
+                mapping = cmdline_mappings,
+                sources = {
+                    { name = 'buffer', keyword_length = 3 },
+                },
+            })
+
+            -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+            cmp.setup.cmdline(':', {
+                mapping = cmdline_mappings,
+                sources = cmp.config.sources({
+                    { name = 'path' },
+                    { name = 'cmdline' },
+                }),
+            })
+        end,
+    }
+end
+
 require('lazy').setup({
 
     {
@@ -1032,7 +1284,9 @@ require('lazy').setup({
             {
                 '<leader>sp',
                 function()
-                    require('spectre').open_file_search({ select_word = true })
+                    require('spectre').open_file_search({
+                        select_word = true,
+                    })
                 end,
                 mode = { 'n' },
                 desc = 'Spectre: Search on current file',
@@ -1092,10 +1346,26 @@ require('lazy').setup({
             wk.add({
                 { '[', mode = { 'x' }, group = 'Prev node mappings' },
                 { ']', mode = { 'x' }, group = 'Next node mappings' },
-                { '[gc', mode = { 'x', 'n' }, group = 'Prev comment mappings' },
-                { ']gc', mode = { 'x', 'n' }, group = 'Next comment mappings' },
-                { '[h', mode = { 'x', 'n' }, group = 'Prev git hunk mappings' },
-                { ']h', mode = { 'x', 'n' }, group = 'Next git hunk mappings' },
+                {
+                    '[gc',
+                    mode = { 'x', 'n' },
+                    group = 'Prev comment mappings',
+                },
+                {
+                    ']gc',
+                    mode = { 'x', 'n' },
+                    group = 'Next comment mappings',
+                },
+                {
+                    '[h',
+                    mode = { 'x', 'n' },
+                    group = 'Prev git hunk mappings',
+                },
+                {
+                    ']h',
+                    mode = { 'x', 'n' },
+                    group = 'Next git hunk mappings',
+                },
                 {
                     '[d',
                     mode = { 'x', 'n' },
@@ -1422,12 +1692,9 @@ require('lazy').setup({
             )
 
             -- Add and remove cursors with control + left click.
-            vim.keymap.set(
-                'n',
-                '<c-leftmouse>',
-                mc.handleMouse,
-                { desc = 'Custom Multicursor: Add a cursor with the mouse.' }
-            )
+            vim.keymap.set('n', '<c-leftmouse>', mc.handleMouse, {
+                desc = 'Custom Multicursor: Add a cursor with the mouse.',
+            })
 
             vim.keymap.set({ 'n', 'v' }, '<c-q>', function()
                 if mc.cursorsEnabled() then
@@ -1470,12 +1737,9 @@ require('lazy').setup({
             )
 
             -- Split visual selections by regex.
-            vim.keymap.set(
-                'v',
-                '<leader>ws',
-                mc.splitCursors,
-                { desc = 'Custom Multicursor: Split visual slection by regex' }
-            )
+            vim.keymap.set('v', '<leader>ws', mc.splitCursors, {
+                desc = 'Custom Multicursor: Split visual slection by regex',
+            })
 
             -- Append/insert for each line of visual selections.
             vim.keymap.set(
@@ -2543,247 +2807,18 @@ require('lazy').setup({
                 -- I must have cmp-nvim-lsp load before nvim-lspconfig for
                 -- lua snips to show up in cmp
                 'hrsh7th/cmp-nvim-lsp',
+                enabled = not config.use_native_completion,
             },
         },
     },
 
     -- Auto completion
     {
-        'hrsh7th/nvim-cmp',
+        -- Completion for words in buffer
+        'hrsh7th/cmp-buffer',
         lazy = true,
-        event = { 'InsertEnter', 'CmdlineEnter' },
-        dependencies = {
-            { 'L3MON4D3/LuaSnip' },
-            { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
-            { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
-            { 'hrsh7th/cmp-path' }, -- Completion for file paths
-            { 'hrsh7th/cmp-cmdline' },
-            { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capabilities to that cmp adds to neovim
-            { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
-            { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
-            {
-                'petertriho/cmp-git', -- Provides info about git repo
-                lazy = true,
-                ft = 'gitcommit',
-                dependencies = { 'nvim-lua/plenary.nvim' },
-            },
-        },
-
-        config = function()
-            local cmp = require('cmp')
-
-            local cmdline_mappings = {
-                ['<C-z>'] = {
-                    c = function()
-                        if cmp.visible() then
-                            cmp.select_next_item()
-                        else
-                            cmp.complete()
-                        end
-                    end,
-                },
-                ['<Tab>'] = {
-                    c = function()
-                        if cmp.visible() then
-                            cmp.select_next_item()
-                        else
-                            cmp.complete()
-                        end
-                    end,
-                },
-                ['<S-Tab>'] = {
-                    c = function()
-                        if cmp.visible() then
-                            cmp.select_prev_item()
-                        else
-                            cmp.complete()
-                        end
-                    end,
-                },
-                ['<C-n>'] = {
-                    c = function(fallback)
-                        if cmp.visible() then
-                            cmp.select_next_item()
-                        else
-                            fallback()
-                        end
-                    end,
-                },
-                ['<C-p>'] = {
-                    c = function(fallback)
-                        if cmp.visible() then
-                            cmp.select_prev_item()
-                        else
-                            fallback()
-                        end
-                    end,
-                },
-                --Toggle showing completion menu
-                ['<C-e>'] = cmp.mapping({
-                    c = function()
-                        if cmp.visible() then
-                            cmp.close()
-                        else
-                            cmp.complete()
-                        end
-                    end,
-                }),
-            }
-
-            local buffer_mappings = {
-                ['<Down>'] = {
-                    i = cmp.mapping.select_next_item({
-                        behavior = 'select',
-                    }),
-                },
-                ['<Up>'] = {
-                    i = cmp.mapping.select_prev_item({
-                        behavior = 'select',
-                    }),
-                },
-                --Toggle showing completion menu
-                ['<C-e>'] = cmp.mapping({
-                    i = function()
-                        if cmp.visible() then
-                            cmp.abort()
-                        else
-                            cmp.complete()
-                        end
-                    end,
-                }),
-                -- `Enter` key to confirm completion
-                ['<CR>'] = cmp.mapping({
-                    i = function(fallback)
-                        if cmp.visible() and cmp.get_active_entry() then
-                            ---setting the undolevels creates a new undo break
-                            ---so by setting it to itself I can create an undo break
-                            ---without side effects just before a comfirming a completion.
-                            -- Use <c-u> in insert mode to undo the completion
-                            vim.cmd([[let &g:undolevels = &g:undolevels]])
-                            cmp.confirm({
-                                behavior = cmp.ConfirmBehavior.Insert,
-                                select = false,
-                            })
-                        else
-                            fallback()
-                        end
-                    end,
-                }),
-                ['<c-y>'] = cmp.mapping({
-                    i = function(fallback)
-                        if cmp.visible() and cmp.get_active_entry() then
-                            ---setting the undolevels creates a new undo break
-                            ---so by setting it to itself I can create an undo break
-                            ---without side effects just before a comfirming a completion.
-                            -- Use <c-u> in insert mode to undo the completion
-                            vim.cmd([[let &g:undolevels = &g:undolevels]])
-                            cmp.confirm({
-                                behavior = cmp.ConfirmBehavior.Replace,
-                                select = false,
-                            })
-                        else
-                            fallback()
-                        end
-                    end,
-                }),
-                ['<C-t>'] = cmp.mapping(function()
-                    if cmp.visible_docs() then
-                        cmp.close_docs()
-                    else
-                        cmp.open_docs()
-                    end
-                end, { 'i', 's' }),
-                -- Scroll up and down in the completion documentation
-                ['<C-u>'] = cmp.mapping(function(falback)
-                    if cmp.visible() then
-                        cmp.mapping.scroll_docs(-4)
-                    else
-                        falback()
-                    end
-                end, { 'i', 's' }),
-                ['<C-d>'] = cmp.mapping(function(falback)
-                    if cmp.visible() then
-                        cmp.mapping.scroll_docs(4)
-                    else
-                        falback()
-                    end
-                end, { 'i', 's' }),
-                ['<C-n>'] = cmp.mapping(function(fallback)
-                    local luasnip = require('luasnip')
-                    if luasnip.expand_or_jumpable() then
-                        luasnip.expand_or_jump()
-                    else
-                        fallback()
-                    end
-                end, { 'i', 's' }),
-
-                ['<C-p>'] = cmp.mapping(function(fallback)
-                    local luasnip = require('luasnip')
-
-                    if luasnip.jumpable(-1) then
-                        luasnip.jump(-1)
-                    else
-                        fallback()
-                    end
-                end, { 'i', 's' }),
-            }
-            cmp.setup({
-                sources = cmp.config.sources({
-                    { name = 'nvim_lsp' },
-                    { name = 'nvim_lsp_signature_help' },
-                    { name = 'nvim_lua' },
-                    { name = 'luasnip' },
-                    { name = 'buffer', keyword_length = 5 },
-                    { name = 'path' },
-                }),
-                snippet = {
-                    expand = function(args)
-                        require('luasnip').lsp_expand(args.body)
-                    end,
-                },
-                formatting = {
-                    format = require('lspkind').cmp_format({
-                        with_text = true,
-                        menu = {
-                            buffer = '[buf]',
-                            nvim_lsp = '[LSP]',
-                            path = '[path]',
-                            luasnip = '[snip]',
-                            git = '[git]',
-                            cmdline = '[cmd]',
-                            nvim_lsp_signature_help = '[info]',
-                        },
-                    }),
-                },
-                mapping = buffer_mappings,
-            })
-
-            cmp.setup.filetype('gitcommit', {
-                sources = cmp.config.sources({
-                    { name = 'git' },
-                    { name = 'luasnip' },
-                    { name = 'buffer', keyword_length = 5 },
-                }),
-            })
-
-            -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-            cmp.setup.cmdline({ '/', '?' }, {
-                mapping = cmdline_mappings,
-                sources = {
-                    { name = 'buffer', keyword_length = 3 },
-                },
-            })
-
-            -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-            cmp.setup.cmdline(':', {
-                mapping = cmdline_mappings,
-                sources = cmp.config.sources({
-                    { name = 'path' },
-                    { name = 'cmdline' },
-                }),
-            })
-        end,
     },
+    nvim_cmp_config,
 
     -- Snippets
     {
@@ -2811,10 +2846,7 @@ require('lazy').setup({
             )
             local config_path = vim.fn.stdpath('config')
             if config_path ~= nil and type(config_path) == 'string' then
-                local luasnip_path = require('utils.path').concat({
-                    config_path,
-                    'LuaSnip/',
-                })
+                local luasnip_path = vim.fs.joinpath(config_path, 'LuaSnip/')
                 require('luasnip.loaders.from_lua').load({
                     paths = {
                         luasnip_path,

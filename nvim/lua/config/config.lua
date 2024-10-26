@@ -23,6 +23,10 @@ local M = {
     enable_render_markdown = true,
 
     dev_plugins_path = 'C:\\Users\\crweb\\Documents\\projects\\',
+
+    ---@type boolean
+    use_native_completion = true,
+    -- use_native_completion = false,
 }
 
 return M

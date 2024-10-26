@@ -19,6 +19,7 @@
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
 - maybe change clipboard so that yanks don't get automatically saved to the clipboard
 - make file buffers not in current directory slightly redder
+- look into overseer docker templates https://github.com/LoricAndre/dotfiles/blob/main/dot_config/nvim/lua/overseer/template/docker/build.lua
 
 ### Bugs
 
@@ -204,7 +205,6 @@
 - https://github.com/xeluxee/competitest.nvim
 - https://github.com/MunifTanjim/nui.nvim#popup
 - https://github.com/nvim-java/nvim-java
-- https://github.com/kamalsacranie/nvim-mapper
 - https://github.com/ronakg/quickr-preview.vim/tree/master
 - https://github.com/NicholasMata/nvim-dap-cs
 

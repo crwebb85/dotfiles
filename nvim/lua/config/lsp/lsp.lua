@@ -5,8 +5,21 @@ local lsp_commands = require('config.lsp.commands')
 local lsp_progress = require('config.lsp.progress')
 local lsp_server = require('config.lsp.server')
 local lsp_inlayhints = require('config.lsp.inlayhints')
+local config = require('config.config')
 require('config.lsp.codeaction')
+
 local M = {}
+
+local function pumvisible() return tonumber(vim.fn.pumvisible()) ~= 0 end
+
+---@param keys string
+local function feedkeys(keys)
+    vim.api.nvim_feedkeys(
+        vim.api.nvim_replace_termcodes(keys, true, false, true),
+        'n',
+        true
+    )
+end
 
 ---
 -- Commands
@@ -232,6 +245,140 @@ local function default_keymaps(bufnr, client)
             buffer = bufnr,
         })
     end
+
+    if config.use_native_completion then
+        --Note I previously used the following cmp confirm behavior for <CR>
+        --```lua
+        -- cmp.confirm({
+        --     behavior = cmp.ConfirmBehavior.Insert,
+        --     select = false,
+        -- })
+        -- ```
+        -- and the following for <C-y>
+        -- ```lua
+        -- cmp.confirm({
+        --     behavior = cmp.ConfirmBehavior.Replace,
+        --     select = false,
+        -- })
+        -- TODO try to replicate that old functionality
+        -- ```
+        require('utils.mapping').map_fallback_keymap(
+            'i',
+            '<CR>',
+            function(fallback)
+                local is_entry_active = true
+                if pumvisible() and is_entry_active then
+                    ---setting the undolevels creates a new undo break
+                    ---so by setting it to itself I can create an undo break
+                    ---without side effects just before a comfirming a completion.
+                    -- Use <c-u> in insert mode to undo the completion
+                    vim.cmd([[let &g:undolevels = &g:undolevels]])
+                    feedkeys('<C-y>')
+                else
+                    fallback()
+                end
+            end,
+            {
+                desc = 'Custom Remap: Select active completion item or fallback',
+            }
+        )
+
+        require('utils.mapping').map_fallback_keymap(
+            'i',
+            '<C-e>',
+            function(fallback)
+                if pumvisible() then
+                    fallback()
+                else
+                    if vim.bo.omnifunc == '' then
+                        feedkeys('<C-x><C-n>')
+                    else
+                        feedkeys('<C-x><C-o>')
+                    end
+                end
+            end,
+            { desc = 'Custom Remap: Toggle completion window' }
+        )
+
+        require('utils.mapping').map_fallback_keymap(
+            { 'i', 's' },
+            '<C-n>',
+            function(fallback)
+                local luasnip = require('luasnip')
+                if luasnip.expand_or_jumpable() then
+                    luasnip.expand_or_jump()
+                elseif vim.snippet.active({ direction = 1 }) then
+                    vim.snippet.jump(1)
+                else
+                    fallback()
+                end
+            end,
+            { desc = 'Custom Remap: Jump to next snippet location or fallback' }
+        )
+
+        require('utils.mapping').map_fallback_keymap(
+            { 'i', 's' },
+            '<C-p>',
+            function(fallback)
+                local luasnip = require('luasnip')
+
+                if luasnip.jumpable(-1) then
+                    luasnip.jump(-1)
+                elseif vim.snippet.active({ direction = -1 }) then
+                    vim.snippet.jump(-1)
+                else
+                    fallback()
+                end
+            end,
+            {
+                desc = 'Custom Remap: Jump to previous snippet location or fallback',
+            }
+        )
+
+        require('utils.mapping').map_fallback_keymap(
+            { 'i', 's' },
+            '<C-u>',
+            function(fallback)
+                if pumvisible() then
+                    require('config.lsp.completion.documentation').scroll_docs(
+                        -4
+                    )
+                else
+                    fallback()
+                end
+            end,
+            {
+                desc = 'Custom Remap: Scroll up documentation window or fallback',
+            }
+        )
+
+        require('utils.mapping').map_fallback_keymap(
+            { 'i', 's' },
+            '<C-d>',
+            function(fallback)
+                if pumvisible() then
+                    require('config.lsp.completion.documentation').scroll_docs(
+                        4
+                    )
+                else
+                    fallback()
+                end
+            end,
+            {
+                desc = 'Custom Remap: Scroll down documentation window or fallback',
+            }
+        )
+
+        vim.keymap.set({ 'i', 's' }, '<C-t>', function()
+            local is_hidden =
+                require('config.lsp.completion.documentation').is_hidden()
+            require('config.lsp.completion.documentation').hide_docs(
+                not is_hidden
+            )
+        end, {
+            desc = 'Custom Remap: Toggle the completion docs',
+        })
+    end
 end
 
 --- @class lsp_attach_event_data
@@ -330,8 +477,27 @@ local function lsp_attach(event)
             }
         )
     end
+
+    -- Enable completion.
+    if client.supports_method(vim.lsp.protocol.textDocument_completion) then
+        if config.use_native_completion then
+            vim.lsp.completion.enable(
+                true,
+                client.id,
+                event.buf,
+                { autotrigger = true }
+            )
+
+            -- require('config.lsp.completion.omnifunc')
+            -- vim.bo[event.buf].omnifunc = 'v:lua.MyOmnifunc'
+
+            require('config.lsp.completion.documentation').show_complete_documentation(
+                event.buf
+            )
+        end
+    end
+
     default_keymaps(event.buf, client)
-    -- vim.print(client.name)
 end
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -352,6 +518,17 @@ vim.api.nvim_create_autocmd({ 'LspProgress' }, {
     group = vim.api.nvim_create_augroup('lsp_progress', { clear = true }),
     callback = lsp_progress.update_lsp_progress_display,
 })
+
+if config.use_native_completion then
+    vim.api.nvim_create_autocmd('FileType', {
+        pattern = '*',
+        callback = function(_)
+            require('config.lsp.completion.cmp').start_cmp_lsp()
+            require('config.lsp.completion.snippet_server').start_snippet_lsp()
+        end,
+    })
+end
+
 ---
 -- UI settings
 ---

@@ -1,4 +1,5 @@
 local M = {}
+local config = require('config.config')
 
 local state = {
     exclude = {},
@@ -11,8 +12,9 @@ function M.get_default_capabilities()
         local base_capabilities = vim.lsp.protocol.make_client_capabilities()
 
         --Get completion capabilities from cmp
-        local cmp_default_capabilities =
-            require('cmp_nvim_lsp').default_capabilities()
+        --TODO remove once I am happy with my native completion configuration
+        local cmp_default_capabilities = config.use_native_completion and {}
+            or require('cmp_nvim_lsp').default_capabilities()
 
         --Setup document_link_capabilities for my custom implementation
         --of the client capability
