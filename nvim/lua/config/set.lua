@@ -1,4 +1,6 @@
+local config = require('config.config')
 -------------------------------------------------------------------------------
+
 --- Look and feel
 vim.o.title = true
 vim.o.titlestring = [[%t – %{fnamemodify(getcwd(), ':t')}]]
@@ -82,11 +84,14 @@ vim.o.foldlevelstart = 3
 --- Completion menu
 vim.o.pumheight = 15 -- limits the size of the completion menu to only show 15 items at a time
 vim.o.pumblend = 15 -- makes the completion menu slightly transparent
-vim.opt.completeopt = { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy' }
--- vim.opt.completeopt =
---     { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'popup' }
--- vim.opt.completeopt =
--- { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'preview' }
+if config.use_native_completion then
+    -- vim.opt.completeopt =
+    -- { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'preview' }
+    vim.opt.completeopt =
+        { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'popup' }
+else
+    vim.opt.completeopt = { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy' }
+end
 -------------------------------------------------------------------------------
 --- Search and replace
 vim.o.inccommand = 'split' -- shows search in replace changes in a preview window
