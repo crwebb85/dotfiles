@@ -2991,10 +2991,12 @@ require('lazy').setup({
                     sh = require('config.formatter').get_buffer_enabled_formatter_list,
                 },
                 formatters = {
+                    ---@type conform.FileFormatterConfig
                     xmlformat = {
                         command = 'xmlformat',
                         args = { '--selfclose', '-' },
                     },
+                    ---@type conform.FileFormatterConfig
                     prettierxml = {
                         command = 'npm',
                         args = {
