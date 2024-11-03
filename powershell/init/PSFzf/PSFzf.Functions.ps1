@@ -40,14 +40,16 @@ function Get-EditorLaunch() {
     if ($null -ne $env:VSCODE_PID) {
         $editor = 'code'
         $editorOptions += ' --reuse-window'
-    }
-    else {
-        $editor = if ($ENV:VISUAL) { $ENV:VISUAL }elseif ($ENV:EDITOR) { $ENV:EDITOR }
+    } else {
+        $editor = if ($ENV:VISUAL) {
+            $ENV:VISUAL 
+        } elseif ($ENV:EDITOR) {
+            $ENV:EDITOR 
+        }
         if ($null -eq $editor) {
             if (!$IsWindows) {
                 $editor = 'vim'
-            }
-            else {
+            } else {
                 $editor = 'code'
             }
         }
@@ -59,39 +61,32 @@ function Get-EditorLaunch() {
                 $FileList[$i] = '"{0}"' -f $(Resolve-Path $FileList[$i].Trim('"'))
             }
             "$editor$editorOptions {0}" -f ($FileList -join ' ')
-        }
-        else {
+        } else {
             "$editor$editorOptions --goto ""{0}:{1}""" -f $(Resolve-Path $FileList.Trim('"')), $LineNum
         }
-    }
-    elseif ($editor -match '[gn]?vi[m]?') {
+    } elseif ($editor -match '[gn]?vi[m]?') {
         if ($FileList -is [array] -and $FileList.length -gt 1) {
             for ($i = 0; $i -lt $FileList.Count; $i++) {
                 $FileList[$i] = '"{0}"' -f $(Resolve-Path $FileList[$i].Trim('"'))
             }
             "$editor$editorOptions {0}" -f ($FileList -join ' ')
-        }
-        else {
+        } else {
             "$editor$editorOptions ""{0}"" +{1}" -f $(Resolve-Path $FileList.Trim('"')), $LineNum
         }
-    }
-    elseif ($editor -eq 'nano') {
+    } elseif ($editor -eq 'nano') {
         if ($FileList -is [array] -and $FileList.length -gt 1) {
             for ($i = 0; $i -lt $FileList.Count; $i++) {
                 $FileList[$i] = '"{0}"' -f $(Resolve-Path $FileList[$i].Trim('"'))
             }
             "$editor$editorOptions {0}" -f ($FileList -join ' ')
-        }
-        else {
+        } else {
             "$editor$editorOptions  +{1} ""{0}""" -f $(Resolve-Path $FileList.Trim('"')), $LineNum
         }
-    }
-    else {
+    } else {
         # select the first file as we don't know if the editor supports opening multiple files from the cmd line
         if ($FileList -is [array] -and $FileList.length -gt 1) {
             "$editor$editorOptions ""{0}""" -f $(Resolve-Path $FileList[0].Trim('"'))
-        }
-        else {
+        } else {
             "$editor$editorOptions ""{0}""" -f $(Resolve-Path $FileList.Trim('"'))
         }
     }
@@ -106,16 +101,13 @@ function Invoke-FuzzyEdit() {
                 $prevDir = $PWD.ProviderPath
                 cd $Directory
                 Invoke-Expression (Get-FileSystemCmd .) | Invoke-Fzf -Multi | ForEach-Object { $files += "$_" }
-            }
-            else {
+            } else {
                 $files += $Directory
                 $Directory = Split-Path -Parent $Directory
             }
         }
-    }
-    catch {
-    }
-    finally {
+    } catch {
+    } finally {
         if ($prevDir) {
             cd $prevDir
         }
@@ -134,10 +126,8 @@ function Invoke-FuzzyEdit() {
             Write-Host "Executing '$cmd'..."
             ($Editor, $Arguments) = $cmd.Split(' ')
             Start-Process $Editor -ArgumentList $Arguments -Wait:$Wait -NoNewWindow
-        }
-        catch {
-        }
-        finally {
+        } catch {
+        } finally {
             if ($prevDir) {
                 cd $prevDir
             }
@@ -152,12 +142,10 @@ function Invoke-FuzzyFasd() {
     try {
         if (Get-Command Get-Frecents -ErrorAction Ignore) {
             Get-Frecents | ForEach-Object { $_.FullPath } | Invoke-Fzf -ReverseInput -NoSort | ForEach-Object { $result = $_ }
-        }
-        elseif (Get-Command fasd -ErrorAction Ignore) {
+        } elseif (Get-Command fasd -ErrorAction Ignore) {
             fasd -l | Invoke-Fzf -ReverseInput -NoSort | ForEach-Object { $result = $_ }
         }
-    }
-    catch {
+    } catch {
 
     }
     if ($null -ne $result) {
@@ -171,8 +159,7 @@ function Invoke-FuzzyFasd() {
 function Invoke-FuzzyHistory() {
     if (Get-Command Get-PSReadLineOption -ErrorAction Ignore) {
         $result = Get-Content (Get-PSReadLineOption).HistorySavePath | Invoke-Fzf -Reverse -Scheme history
-    }
-    else {
+    } else {
         $result = Get-History | ForEach-Object { $_.CommandLine } | Invoke-Fzf -Reverse -Scheme history
     }
     if ($null -ne $result) {
@@ -185,15 +172,15 @@ function Invoke-FuzzyHistory() {
 # needs to match helpers/GetProcessesList.ps1
 function GetProcessesList() {
     Get-Process | `
-        Where-Object { ![string]::IsNullOrEmpty($_.ProcessName) } | `
-        ForEach-Object {
-        $pmSize = $_.PM / 1MB
-        $cpu = $_.CPU
-        # make sure we display a value so we can correctly parse selections:
-        if ($null -eq $cpu) {
-            $cpu = 0.0
-        }
-        "{0,-8:n2} {1,-8:n2} {2,-8} {3}" -f $pmSize, $cpu, $_.Id, $_.ProcessName }
+            Where-Object { ![string]::IsNullOrEmpty($_.ProcessName) } | `
+            ForEach-Object {
+            $pmSize = $_.PM / 1MB
+            $cpu = $_.CPU
+            # make sure we display a value so we can correctly parse selections:
+            if ($null -eq $cpu) {
+                $cpu = 0.0
+            }
+            "{0,-8:n2} {1,-8:n2} {2,-8} {3}" -f $pmSize, $cpu, $_.Id, $_.ProcessName }
 }
 
 function GetProcessSelection() {
@@ -211,10 +198,10 @@ function GetProcessSelection() {
         "{0,-8} {1,-8} {2,-8} {3,-12}" -f "-----", "---", "--", "------------"
 
     $result = GetProcessesList | `
-        Invoke-Fzf -Multi -Header $header `
-        -Bind "ctrl-r:reload($cmd)", "ctrl-a:select-all", "ctrl-d:deselect-all", "ctrl-t:toggle-all" `
-        -Preview "echo {}" -PreviewWindow """down,3,wrap""" `
-        -Layout reverse -Height 80%
+            Invoke-Fzf -Multi -Header $header `
+            -Bind "ctrl-r:reload($cmd)", "ctrl-a:select-all", "ctrl-d:deselect-all", "ctrl-t:toggle-all" `
+            -Preview "echo {}" -PreviewWindow """down,3,wrap""" `
+            -Layout reverse -Height 80%
     $result | ForEach-Object {
         &$ResultAction $_
     }
@@ -235,12 +222,13 @@ function Invoke-FuzzyKillProcess() {
 function Invoke-FuzzySetLocation() {
     param($Directory = $null)
 
-    if ($null -eq $Directory) { $Directory = $PWD.ProviderPath }
+    if ($null -eq $Directory) {
+        $Directory = $PWD.ProviderPath 
+    }
     $result = $null
     try {
         Get-ChildItem $Directory -Recurse -ErrorAction Ignore | Where-Object { $_.PSIsContainer } | Invoke-Fzf | ForEach-Object { $result = $_ }
-    }
-    catch {
+    } catch {
 
     }
 
@@ -256,15 +244,13 @@ if ((-not $IsLinux) -and (-not $IsMacOS)) {
         if ($null -eq $Directory) {
             $Directory = $PWD.ProviderPath
             $Global = $False
-        }
-        else {
+        } else {
             $Global = $True
         }
         $result = $null
         try {
             Search-Everything -Global:$Global -PathInclude $Directory -FolderInclude @('') | Invoke-Fzf | ForEach-Object { $result = $_ }
-        }
-        catch {
+        } catch {
 
         }
         if ($null -ne $result) {
@@ -279,8 +265,7 @@ function Invoke-FuzzyZLocation() {
     $result = $null
     try {
         (Get-ZLocation).GetEnumerator() | Sort-Object { $_.Value } -Descending | ForEach-Object { $_.Key } | Invoke-Fzf -NoSort | ForEach-Object { $result = $_ }
-    }
-    catch {
+    } catch {
 
     }
     if ($null -ne $result) {
@@ -329,14 +314,12 @@ function Invoke-PsFzfRipgrep() {
     $RG_PREFIX = "rg --column --line-number --no-heading --color=always --smart-case "
     $INITIAL_QUERY = $SearchString
 
-    $script:OverrideFzfDefaultCommand = [FzfDefaultCmd]::new('')
     try {
         if ($script:IsWindows) {
             $sleepCmd = ''
             $trueCmd = 'cd .'
             $env:FZF_DEFAULT_COMMAND = "$RG_PREFIX ""$INITIAL_QUERY"""
-        }
-        else {
+        } else {
             $sleepCmd = 'sleep 0.1;'
             $trueCmd = 'true'
             $env:FZF_DEFAULT_COMMAND = '{0} $(printf %q "{1}")' -f $RG_PREFIX, $INITIAL_QUERY
@@ -353,7 +336,7 @@ function Invoke-PsFzfRipgrep() {
             --header '╱ CTRL-R (Ripgrep mode) ╱ CTRL-F (fzf mode) ╱' `
             --preview 'bat --color=always {1} --highlight-line {2}' `
             --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' | `
-            ForEach-Object { $results += $_ }
+                ForEach-Object { $results += $_ }
 
         if (-not [string]::IsNullOrEmpty($results)) {
             $split = $results.Split(':')
@@ -361,22 +344,14 @@ function Invoke-PsFzfRipgrep() {
             $lineNum = $split[1]
             if ($NoEditor) {
                 Resolve-Path $fileList
-            }
-            else {
+            } else {
                 $cmd = Get-EditorLaunch -FileList $fileList -LineNum $lineNum
                 Write-Host "Executing '$cmd'..."
                 Invoke-Expression -Command $cmd
             }
         }
-    }
-    catch {
+    } catch {
         Write-Error "Error occurred: $_"
-    }
-    finally {
-        if ($script:OverrideFzfDefaultCommand) {
-            $script:OverrideFzfDefaultCommand.Restore()
-            $script:OverrideFzfDefaultCommand = $null
-        }
     }
 }
 
