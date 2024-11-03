@@ -114,6 +114,7 @@ local function default_keymaps(bufnr, client)
         desc = [[LSP: Displays hover information about the symbol under the cursor in a floating window. Calling the function twice will jump into the floating window.]],
     })
     vim.keymap.set('n', 'gd', function()
+        vim.cmd([[norm! m']]) -- This adds the current location to the jumplist. There must be some change to how jumplists work that made me have to add this line and I should check the changelog.
         if vim.bo.filetype == 'cs' then
             --I should probably be checking for if client is omnisharp but this is good enough
             require('omnisharp_extended').lsp_definition()
@@ -481,12 +482,9 @@ local function lsp_attach(event)
     -- Enable completion.
     if client.supports_method(vim.lsp.protocol.textDocument_completion) then
         if config.use_native_completion then
-            vim.lsp.completion.enable(
-                true,
-                client.id,
-                event.buf,
-                { autotrigger = true }
-            )
+            vim.lsp.completion.enable(true, client.id, event.buf, {
+                autotrigger = true,
+            })
 
             -- require('config.lsp.completion.omnifunc')
             -- vim.bo[event.buf].omnifunc = 'v:lua.MyOmnifunc'

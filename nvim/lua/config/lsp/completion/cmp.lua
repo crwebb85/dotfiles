@@ -191,8 +191,29 @@ local handlers = {
 
     ['textDocument/completion'] = function(request, callback, _)
         local abstracted_context = M.create_abstracted_context(request)
-        local response = {}
-
+        local response = {
+            -- --For testing
+            -- {
+            --     detail = 'testing',
+            --     documentation = 'a red fruit',
+            --     label = 'apple',
+            -- },
+            -- {
+            --     detail = 'testing',
+            --     documentation = 'an orange fruit',
+            --     label = 'orange',
+            -- },
+            -- {
+            --     detail = 'fruit',
+            --     documentation = 'a fruit',
+            --     label = 'a fruit',
+            -- },
+            -- {
+            --     detail = 'for',
+            --     documentation = 'plaintext for',
+            --     label = 'for',
+            -- },
+        }
         for _, source in ipairs(M.sources) do
             if type(source) == 'string' then
                 if #response > 0 then
