@@ -95,6 +95,15 @@ local function display_documentation(lsp_documentation, selected)
     end
 end
 
+---@param documentation string|lsp.MarkupContent|nil
+local function is_lsp_completion_documention_empty(documentation)
+    -- vim.print(documentation)
+    return documentation == nil
+        or documentation == ''
+        or (type(documentation) == table and documentation.value == '')
+        or (type(documentation) == table and documentation.value == nil)
+end
+
 function M.set_documentation(completion_item)
     if completion_item == nil then return end
 
@@ -128,9 +137,16 @@ function M.set_documentation(completion_item)
     ---@type string|lsp.MarkupContent
     local lsp_documentation = lsp_completion_item.documentation
     if lsp_documentation ~= nil then
-        if preview_bufnr == nil then
+        --we do this check here so that we don't close the completion window
+        --if we are not going to replace it.
+        if is_lsp_completion_documention_empty(lsp_documentation) then
+            -- vim.print('empty')
+            -- vim.print(lsp_documentation)
+            return
+        elseif preview_bufnr == nil then
             display_documentation(lsp_documentation, complete_info.selected)
         else
+            --Note: scheduling for the nvim_win_hide hack so we can close the window
             vim.schedule(function()
                 local current_complete_info = vim.fn.complete_info({
                     'selected',
@@ -159,7 +175,6 @@ function M.set_documentation(completion_item)
     local client = vim.lsp.get_client_by_id(client_id)
     if client == nil then return end
 
-    local selected_index = complete_info.selected
     local is_resolve_support = true --TODO actually check for resolve support
     if not is_resolve_support then return end
     client.request(
@@ -171,54 +186,37 @@ function M.set_documentation(completion_item)
                 return
             end
 
-            ---@type string|lsp.MarkupContent
-            local documentation = result and result.documentation or ''
-
-            if
-                documentation == ''
-                or documentation.value == ''
-                or documentation.value == nil
-            then
-                -- vim.print('documentation was empty in resolve')
+            --we do this check here so that we don't close the completion window
+            --if we are not going to replace it.
+            if is_lsp_completion_documention_empty(result.documentation) then
                 return
-            end
-
-            local documentation_value = type(documentation) == 'string'
-                    and documentation
-                or documentation.value
-
-            local kind = documentation.kind or ''
-            local filetype = kind == 'markdown' and 'markdown' or ''
-
-            vim.schedule(function()
-                --Note: scheduling for the nvim_win_hide hack since lsp requests
-                --can't close windows.
-                local current_complete_info = vim.fn.complete_info({
-                    'selected',
-                    'preview_winid',
-                    'preview_bufnr',
-                })
-                if current_complete_info.preview_winid ~= nil then
-                    --HACK: nvim_win_hide will cause a whole new
-                    --buffer and window to be generated when I call nvim__complete_set
-                    --Since it is a new buffer, it will recalculate
-                    --the the treessiter highlights correctly. Without this
-                    --the treessiter highlights don't refresh
-                    vim.api.nvim_win_hide(complete_info.preview_winid)
-                end
-                local preview_info =
-                    vim.api.nvim__complete_set(selected_index, {
-                        info = documentation_value,
+            elseif preview_bufnr == nil then
+                display_documentation(
+                    result.documentation,
+                    complete_info.selected
+                )
+            else
+                vim.schedule(function()
+                    --Note: scheduling for the nvim_win_hide hack so we can close the window
+                    local current_complete_info = vim.fn.complete_info({
+                        'selected',
+                        'preview_winid',
+                        'preview_bufnr',
                     })
-
-                preview_bufnr = preview_info.bufnr
-                if preview_bufnr ~= nil then
-                    -- vim.print(
-                    --     'set filetype (' .. filetype .. ') in resolve'
-                    -- )
-                    vim.bo[preview_bufnr].filetype = filetype
-                end
-            end)
+                    if current_complete_info.preview_winid ~= nil then
+                        --HACK: nvim_win_hide will cause a whole new
+                        --buffer and window to be generated when I call nvim__complete_set
+                        --Since it is a new buffer, it will recalculate
+                        --the the treessiter highlights correctly. Without this
+                        --the treessiter highlights don't refresh
+                        vim.api.nvim_win_hide(complete_info.preview_winid)
+                    end
+                    display_documentation(
+                        result.documentation,
+                        complete_info.selected
+                    )
+                end)
+            end
         end
     )
 end
