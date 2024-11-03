@@ -129,6 +129,21 @@
   - [x] add list of mason items to not install automatically
   - [ ] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
 - [ ] Refactor
+  - [ ] replace lsp setup functions setup_jsonls with a table like
+  ```lua
+    local settings = {
+        omnisharp = {
+            --the settings
+        },
+
+        jsonls = function()
+        return {
+            -- the settings
+        }
+        end,
+    }
+    lsp_server.setup(name) -- automatically uses the settings
+  ```
   - [ ] replace client.supports_method with client.server_capabilities
   - [ ] cleanup deprecated code
   - [ ] properly use setqflist action parameter for appending to an existing list.
