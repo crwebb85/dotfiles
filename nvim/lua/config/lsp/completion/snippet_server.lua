@@ -25,7 +25,7 @@ local function interpolate(s, items)
     return string.gsub(s, '${(%w+)}', function(n) return items[n] end)
 end
 
-local function build_snip_documentation(snip, data)
+local function build_snip_documentation(snip, filetype)
     ---@type string|string[]
     local codeblock = snip:get_docstring() or ''
     if type(codeblock) == 'table' then
@@ -40,7 +40,7 @@ local function build_snip_documentation(snip, data)
 
     local documentation_str = interpolate(DOC_TEMPLATE, {
         name = snip.name or '',
-        filetype = data.filetype or '',
+        filetype = filetype or '',
         description = description,
         codeblock = codeblock,
     })
@@ -50,17 +50,38 @@ local function build_snip_documentation(snip, data)
     return documentation
 end
 
+---@alias LspServer.Handler fun(params: table?, callback: fun(err: lsp.ResponseError|nil, result: any), notify_reply_callback: fun(message_id: integer)|nil)
+
+local is_client_resolve_support = false
+
+---@type {string: LspServer.Handler}
 local handlers = {
 
-    ---@type lsp.Handler
-    [vim.lsp.protocol.Methods.initialize] = function(_, callback, _)
+    ---@type LspServer.Handler
+    [vim.lsp.protocol.Methods.initialize] = function(params, callback, _)
+        local resolve_properties = vim.tbl_get(
+            params,
+            'capabilities',
+            'textDocument',
+            'completion',
+            'completionItem',
+            'resolveSupport',
+            'properties'
+        ) or {}
+        for _, property in ipairs(resolve_properties) do
+            if property == 'documentation' then
+                is_client_resolve_support = true
+                vim.notify(
+                    'Documentation resolve support detected for client',
+                    vim.log.levels.DEBUG
+                )
+            end
+        end
+
         local initializeResult = {
             capabilities = {
                 completionProvider = {
                     resolveProvider = true,
-                    completionItem = {
-                        labelDetailsSupport = true,
-                    },
                 },
             },
             serverInfo = {
@@ -72,12 +93,13 @@ local handlers = {
         callback(nil, initializeResult)
     end,
 
-    ---@type lsp.Handler
+    ---@type LspServer.Handler
     [vim.lsp.protocol.Methods.textDocument_completion] = function(
         _,
         callback,
         _
     )
+        vim.notify('Creating completion list for luasnip', vim.log.levels.DEBUG)
         ---@type lsp.CompletionItem[]
         local completion_items_result = {}
 
@@ -113,6 +135,20 @@ local handlers = {
                                 title = 'expandLuasnip',
                             },
                         }
+
+                        if not is_client_resolve_support then
+                            vim.notify(
+                                'Creating documentation for snippet ' .. snip.id,
+                                vim.log.levels.DEBUG
+                            )
+                            completion_item.documentation = {
+                                kind = vim.lsp.protocol.MarkupKind.Markdown,
+                                value = build_snip_documentation(
+                                    snip,
+                                    filetype
+                                ),
+                            }
+                        end
                         table.insert(ft_completion_items, completion_item)
                         completion_by_snip_id[snip.id] = completion_item
                     end
@@ -129,7 +165,7 @@ local handlers = {
         callback(nil, completion_items_result)
     end,
 
-    ---@type lsp.Handler
+    ---@type LspServer.Handler
     [vim.lsp.protocol.Methods.completionItem_resolve] = function(
         request,
         callback,
@@ -154,10 +190,11 @@ local handlers = {
                 'Creating cached documentation for snippet ' .. snip_id,
                 vim.log.levels.DEBUG
             )
+            local filetype = request.data and request.data.filetype
             --Side-effect: modifies cache to include the documentation
             completion_item.documentation = {
                 kind = vim.lsp.protocol.MarkupKind.Markdown,
-                value = build_snip_documentation(snip, request.data),
+                value = build_snip_documentation(snip, filetype),
             }
         end
 
@@ -205,14 +242,26 @@ vim.lsp.commands['luasnip.expand'] = function(params)
     })
 end
 
-M.start_snippet_lsp = function()
+local message_id = -1
+local function next_message_id()
+    message_id = message_id + 1
+    return message_id
+end
+
+--- @param capabilities? lsp.ClientCapabilities
+M.start_snippet_lsp = function(capabilities)
     local client_id = vim.lsp.start({
         name = 'luasnip',
         filetypes = { '*' },
         root_dir = vim.fn.getcwd(),
+        capabilities = capabilities
+            or vim.lsp.protocol.make_client_capabilities(),
+        ---@type fun(dispatchers: vim.lsp.rpc.Dispatchers): vim.lsp.rpc.PublicClient
         cmd = function(_)
+            ---@type vim.lsp.rpc.PublicClient
             return {
-                trace = 'messages',
+
+                ---@type fun(method: string, params: table?, callback: fun(err: lsp.ResponseError|nil, result: any), notify_reply_callback: fun(message_id: integer)|nil):boolean,integer?
                 request = function(
                     method,
                     params,
@@ -225,10 +274,13 @@ M.start_snippet_lsp = function()
                             callback,
                             notify_reply_callback
                         )
+                        return true, next_message_id()
+                    else
+                        return false, nil
                     end
                 end,
-                notify = function(_, _) end,
-                is_closing = function() end,
+                notify = function(_, _) return false end,
+                is_closing = function() return false end,
                 terminate = function() end,
             }
         end,
