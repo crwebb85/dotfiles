@@ -67,11 +67,15 @@ local completion_plugins = {
     luasnip_plugin,
     {
         'crwebb85/luasnip-lsp-server.nvim',
-        dev = true,
+        dependencies = {
+            { 'L3MON4D3/LuaSnip' },
+        },
+        -- dev = true,
+        config = true,
     },
 }
 if not config.use_native_completion then
-    completion_plugins =
+    completion_plugins = {
         {
             'hrsh7th/nvim-cmp',
             lazy = true,
@@ -261,7 +265,9 @@ if not config.use_native_completion then
                         { name = 'path' },
                     }),
                     snippet = {
-                        expand = function(args) require('luasnip').lsp_expand(args.body) end,
+                        expand = function(args)
+                            require('luasnip').lsp_expand(args.body)
+                        end,
                     },
                     formatting = {
                         format = require('lspkind').cmp_format({
@@ -305,7 +311,9 @@ if not config.use_native_completion then
                     }),
                 })
             end,
-        }, luasnip_plugin
+        },
+        luasnip_plugin,
+    }
 end
 
 return completion_plugins

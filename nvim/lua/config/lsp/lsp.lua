@@ -522,15 +522,6 @@ if config.use_native_completion then
         pattern = '*',
         callback = function(_)
             require('config.lsp.completion.cmp').start_cmp_lsp()
-
-            local client_capabilities =
-                vim.lsp.protocol.make_client_capabilities()
-            local resolve_properties =
-                client_capabilities.textDocument.completion.completionItem.resolveSupport.properties
-            table.insert(resolve_properties, 'documentation')
-            require('config.lsp.completion.snippet_server').start_snippet_lsp(
-                client_capabilities
-            )
         end,
     })
 end

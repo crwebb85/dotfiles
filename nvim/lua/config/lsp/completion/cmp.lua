@@ -289,7 +289,7 @@ M.start_cmp_lsp = function()
             return members
         end,
         on_init = function(_)
-            vim.notify('Snippet LSP server initialized', vim.log.levels.INFO)
+            vim.notify('cmp LSP server initialized', vim.log.levels.INFO)
         end,
     }, dispatchers)
     if client_id == nil then error('Something went wrong') end

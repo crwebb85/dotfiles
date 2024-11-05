@@ -1,8 +1,5 @@
 local M = {}
 
--- ---@type boolean
--- local is_hidden = false
-
 --TODO handle preview option
 function M.is_hidden()
     local options = vim.opt.completeopt:get('popup')
