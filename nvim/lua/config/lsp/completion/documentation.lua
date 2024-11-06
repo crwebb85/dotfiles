@@ -1,20 +1,57 @@
 local M = {}
 
 --TODO handle preview option
-function M.is_hidden()
-    local options = vim.opt.completeopt:get('popup')
+function M.is_documentation_disabled()
+    local options = vim.opt.completeopt:get()
     for _, option in ipairs(options) do
         if option == 'popup' then return false end
+        if option == 'preview' then return false end
     end
     return true
 end
 
-function M.hide_docs(is_hidden)
+local function get_preview_type()
+    local type = nil
+    local options = vim.opt.completeopt:get()
+    for _, option in ipairs(options) do
+        if option == 'popup' then return 'popup' end
+        if option == 'preview' then type = 'preview' end
+    end
+    return type
+end
+
+---@class PreviewCompleteInfo
+---@field selected integer
+---@field preview_bufnr? integer
+---@field preview_winid? integer
+
+---@return PreviewCompleteInfo
+local function get_preview_info()
+    local type = get_preview_type()
+
     local complete_info = vim.fn.complete_info({
-        'selected', -- TODO BUG: without fetching selected preview_winid and preview_bufnr will always be null
+        'selected',
         'preview_winid',
         'preview_bufnr',
     })
+    if type == 'preview' then
+        for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+            local wininfo = vim.fn.getwininfo(winid)[1]
+            -- vim.print(winid, wininfo.winnr)
+            local window_type = vim.fn.win_gettype(wininfo.winnr)
+            if window_type == 'preview' then
+                complete_info.preview_winid = winid
+                complete_info.preview_bufnr = wininfo.bufnr
+                return complete_info
+            end
+        end
+    end
+    return complete_info
+end
+
+--TODO fix so that this works for preview option as well
+function M.hide_docs(is_hidden)
+    local complete_info = get_preview_info()
     if is_hidden then
         vim.opt.completeopt:remove('popup')
         -- -- vim.print(complete_info)
@@ -35,12 +72,7 @@ function M.hide_docs(is_hidden)
 end
 
 function M.scroll_docs(delta)
-    local complete_info = vim.fn.complete_info({
-        'selected', -- TODO BUG: without fetching selected preview_winid and preview_bufnr will always be null
-        'preview_winid',
-        'preview_bufnr',
-    })
-    -- vim.print(complete_info)
+    local complete_info = get_preview_info()
     local winid = complete_info.preview_winid
     local bufnr = complete_info.preview_bufnr
 
@@ -53,16 +85,19 @@ function M.scroll_docs(delta)
         return false
     end
 
-    if not M.is_hidden() then
+    if not M.is_documentation_disabled() then
         vim.defer_fn(function()
             vim.api.nvim_buf_call(bufnr, function()
                 local info = vim.fn.getwininfo(winid)[1] or {}
+                local old_scrolloff = vim.wo[info.winid].scrolloff
+                vim.wo[info.winid].scrolloff = 0
                 local top = info.topline or 1
                 top = top + delta
                 top = math.max(top, 1)
                 local content_height = vim.fn.line('$')
                 top = math.min(top, content_height - info.height + 1)
                 vim.api.nvim_command('normal! ' .. top .. 'zt')
+                vim.wo[info.winid].scrolloff = old_scrolloff
             end)
         end, 0)
         return true
@@ -82,7 +117,7 @@ end
 
 ---@param lsp_documentation string|lsp.MarkupContent
 ---@param selected integer index of selected completion item 0-indexed
-local function display_documentation(lsp_documentation, selected)
+local function display_documentation_popup(lsp_documentation, selected)
     local kind = lsp_documentation and lsp_documentation.kind
     local filetype = kind == 'markdown' and 'markdown' or ''
     local documentation_value = type(lsp_documentation) == 'string'
@@ -101,23 +136,56 @@ local function display_documentation(lsp_documentation, selected)
 end
 
 ---@param lsp_documentation string|lsp.MarkupContent
+local function display_documentation_preview(lsp_documentation)
+    local kind = lsp_documentation and lsp_documentation.kind
+    local filetype = kind == 'markdown' and 'markdown' or ''
+    local documentation_value = type(lsp_documentation) == 'string'
+            and lsp_documentation
+        or lsp_documentation.value
+
+    local preview_buf_name = 'Documentation\\ Preview'
+    vim.cmd(
+        'silent! pedit! +setlocal\\ buftype=nofile\\ nobuflisted\\ noswapfile\\ filetype='
+            .. filetype
+            .. ' '
+            .. preview_buf_name
+    )
+    local preview_info = get_preview_info()
+    if preview_info.preview_bufnr ~= nil then
+        local lines = vim.split(documentation_value, '\n')
+        vim.api.nvim_buf_set_lines(
+            preview_info.preview_bufnr,
+            0,
+            -1,
+            false,
+            lines
+        )
+        vim.bo[preview_info.preview_bufnr].filetype = filetype
+    end
+end
+
+---@param lsp_documentation string|lsp.MarkupContent
 local function refresh_documentation(lsp_documentation)
-    local complete_info = vim.fn.complete_info({
-        'selected',
-        'preview_winid',
-        'preview_bufnr',
-    })
+    local complete_info = get_preview_info()
     --we do this check here so that we don't close the completion window
     --if we are not going to replace it.
     if is_lsp_completion_documention_empty(lsp_documentation) then
         return
-    elseif complete_info.preview_bufnr == nil then
-        --If the preview buffer is already close we can just create a new one without
-        --needing to schedule it
-        display_documentation(lsp_documentation, complete_info.selected)
+    elseif
+        complete_info.preview_bufnr == nil
+        and get_preview_type() ~= 'preview'
+    then
+        --If the documentation buffer is already closed and does not need to be
+        --a "preview" buffer we can just create a new one without needing to schedule it
+        display_documentation_popup(lsp_documentation, complete_info.selected)
     else
         --Note: scheduling for the nvim_win_hide hack so we can close the window
         vim.schedule(function()
+            if get_preview_type() == 'preview' then
+                display_documentation_preview(lsp_documentation)
+                return
+            end
+
             local current_complete_info = vim.fn.complete_info({
                 'selected',
                 'preview_winid',
@@ -131,7 +199,7 @@ local function refresh_documentation(lsp_documentation)
                 --the treessiter highlights don't refresh
                 vim.api.nvim_win_hide(current_complete_info.preview_winid)
             end
-            display_documentation(
+            display_documentation_popup(
                 lsp_documentation,
                 current_complete_info.selected
             )
@@ -149,11 +217,8 @@ function M.set_documentation(completion_item)
         'lsp',
         'completion_item'
     )
-    local complete_info = vim.fn.complete_info({
-        'selected',
-        'preview_winid',
-        'preview_bufnr',
-    })
+    local complete_info = get_preview_info()
+    -- vim.print(complete_info)
 
     local preview_bufnr = complete_info.preview_bufnr
     if lsp_completion_item == nil then
@@ -213,10 +278,13 @@ M.show_complete_documentation = function(bufnr)
         ),
         buffer = bufnr,
         callback = function(_)
-            if tonumber(vim.fn.pumvisible()) == 0 or M.is_hidden() then
+            if
+                tonumber(vim.fn.pumvisible()) == 0
+                or M.is_documentation_disabled()
+            then
                 return
             end
-            local event = vim.v.event --need to grab from vim.v.event for some reason to get the data I need
+            local event = vim.v.event --need to grab from vim.v.event
             M.set_documentation(event.completed_item)
         end,
     })

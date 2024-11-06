@@ -86,7 +86,7 @@ vim.o.pumheight = 15 -- limits the size of the completion menu to only show 15 i
 vim.o.pumblend = 15 -- makes the completion menu slightly transparent
 if config.use_native_completion then
     -- vim.opt.completeopt =
-    -- { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'preview' }
+    --     { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'preview' }
     vim.opt.completeopt =
         { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'popup' }
 else

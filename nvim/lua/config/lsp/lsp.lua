@@ -372,7 +372,7 @@ local function default_keymaps(bufnr, client)
 
         vim.keymap.set({ 'i', 's' }, '<C-t>', function()
             local is_hidden =
-                require('config.lsp.completion.documentation').is_hidden()
+                require('config.lsp.completion.documentation').is_documentation_disabled()
             require('config.lsp.completion.documentation').hide_docs(
                 not is_hidden
             )
