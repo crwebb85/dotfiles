@@ -673,7 +673,7 @@ vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
                 end_col,
                 {}
             )
-            vim.print(text)
+            -- vim.print(text)
 
             local item = {
                 filename = base_buf_name,

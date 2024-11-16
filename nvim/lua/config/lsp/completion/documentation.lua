@@ -1,6 +1,5 @@
 local M = {}
 
---TODO handle preview option
 function M.is_documentation_disabled()
     local options = vim.opt.completeopt:get()
     for _, option in ipairs(options) do
@@ -49,7 +48,6 @@ local function get_preview_info()
     return complete_info
 end
 
---TODO fix so that this works for preview option as well
 function M.hide_docs(is_hidden)
     local complete_info = get_preview_info()
     if is_hidden then

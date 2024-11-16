@@ -1867,12 +1867,15 @@ require('lazy').setup({
             'nvim-lua/plenary.nvim',
             'antoinemadec/FixCursorHold.nvim',
             'nvim-treesitter/nvim-treesitter',
-            --adapters
+            -- adapters
             'rouge8/neotest-rust',
             'nvim-neotest/neotest-python',
             {
-                'Issafalcon/neotest-dotnet',
-                -- dev = true
+                --Using my fork until the PR https://github.com/Issafalcon/neotest-dotnet/pull/123/files
+                --from BurkeStrange is merged into in
+                'crwebb85/neotest-dotnet',
+                -- 'Issafalcon/neotest-dotnet',
+                -- dev = true,
             },
         },
         lazy = true,
@@ -1909,6 +1912,14 @@ require('lazy').setup({
         },
         config = function(_, _)
             require('neotest').setup({
+                consumers = {
+                    overseer = require('neotest.consumers.overseer'),
+                },
+                quickfix = {
+                    --disabling adding to the quickfix because it was nuking my custom problem matcher that extracting file locations from stacktraces.
+                    --I can see wanting this functionality back so may need to think of a workaround
+                    enabled = false,
+                },
                 adapters = {
                     require('neotest-python')({
                         dap = { justMyCode = false },
@@ -1924,6 +1935,9 @@ require('lazy').setup({
                             args = { justMyCode = false },
                             -- Enter the name of your dap adapter, the default value is netcoredbg
                             adapter_name = 'netcoredbg',
+                        },
+                        dotnet_additional_args = {
+                            '--logger "console;verbosity=detailed"',
                         },
                         -- Let the test-discovery know about your custom attributes (otherwise tests will not be picked up)
                         -- Note: Only custom attributes for non-parameterized tests should be added here. See the support note about parameterized tests
@@ -2752,6 +2766,33 @@ require('lazy').setup({
                 default_detail = 1,
             },
             templates = { 'builtin', 'hurl.hurl_run', 'user.run_script' },
+            component_aliases = {
+                default_neotest = {
+                    {
+                        'on_output_parse',
+                        parser = {
+                            diagnostics = {
+                                {
+                                    'extract',
+                                    '^%s+at%s(.*)%sin%s(.+%.cs):line%s([0-9]+)%s*$',
+                                    'message',
+                                    'filename',
+                                    'lnum',
+                                },
+                            },
+                        },
+                    },
+                    'on_result_diagnostics',
+                    {
+                        'on_result_diagnostics_quickfix',
+                        open = true,
+                    },
+                    'on_output_summarize',
+                    'on_exit_set_status',
+                    'on_complete_notify',
+                    'on_complete_dispose',
+                },
+            },
         },
     },
 

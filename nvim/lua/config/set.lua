@@ -85,12 +85,10 @@ vim.o.foldlevelstart = 3
 vim.o.pumheight = 15 -- limits the size of the completion menu to only show 15 items at a time
 vim.o.pumblend = 15 -- makes the completion menu slightly transparent
 if config.use_native_completion then
-    -- vim.opt.completeopt =
-    --     { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'preview' }
-    vim.opt.completeopt =
-        { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy', 'popup' }
+    -- vim.o.completeopt = 'menu,menuone,noinsert,noselect,fuzzy,preview'
+    vim.o.completeopt = 'menu,menuone,noinsert,noselect,fuzzy,popup'
 else
-    vim.opt.completeopt = { 'menu', 'menuone', 'noinsert', 'noselect', 'fuzzy' }
+    vim.o.completeopt = 'menu,menuone,noinsert,noselect,fuzzy'
 end
 -------------------------------------------------------------------------------
 --- Search and replace

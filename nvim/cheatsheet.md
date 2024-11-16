@@ -26,6 +26,8 @@ Use \t instead of spaces when typing tab
 
 # Useful command
 
+- `nvim --headless "+TSUpdateSync" +qa`
+
 "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
 
 - `:help <a neovim api function/object>` opens help for the function
@@ -288,3 +290,10 @@ local function create_popup_window(lines)
     }
 end
 ```
+
+---
+
+Overseer.nvim
+
+- project tasks can be created with a `.vscode/tasks.json` file
+- changes to the tasks.json file can be reloaded with command `:OverseerClearCache`
