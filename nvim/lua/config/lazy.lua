@@ -1926,11 +1926,11 @@ require('lazy').setup({
                 consumers = {
                     overseer = require('neotest.consumers.overseer'),
                 },
-                quickfix = {
-                    --disabling adding to the quickfix because it was nuking my custom problem matcher that extracting file locations from stacktraces.
-                    --I can see wanting this functionality back so may need to think of a workaround
-                    enabled = false,
-                },
+                -- quickfix = {
+                --     --disabling adding to the quickfix because it was nuking my custom problem matcher that extracting file locations from stacktraces.
+                --     --I can see wanting this functionality back so may need to think of a workaround
+                --     enabled = false,
+                -- },
                 adapters = {
                     require('neotest-python')({
                         dap = { justMyCode = false },
@@ -2833,10 +2833,12 @@ require('lazy').setup({
                         },
                     },
                     'on_result_diagnostics',
-                    {
-                        'on_result_diagnostics_quickfix',
-                        open = true,
-                    },
+                    --Im going to try out disabling on_result_diagnostics_quickfix
+                    --since I can just OverseerQuickAction to add them to the quick fix list
+                    -- {
+                    --     'on_result_diagnostics_quickfix',
+                    --     open = true,
+                    -- },
                     'on_output_summarize',
                     'on_exit_set_status',
                     'on_complete_notify',
