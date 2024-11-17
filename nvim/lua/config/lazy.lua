@@ -2753,21 +2753,9 @@ require('lazy').setup({
     { -- The task runner we use
         'stevearc/overseer.nvim',
         lazy = true,
-        cmd = {
-            'OverseerOpen',
-            'OverseerClose',
-            'OverseerToggle',
-            'OverseerSaveBundle',
-            'OverseerLoadBundle',
-            'OverseerDeleteBundle',
-            'OverseerRunCmd',
-            'OverseerRun',
-            'OverseerInfo',
-            'OverseerBuild',
-            'OverseerQuickAction',
-            'OverseerTaskAction',
-            'OverseerClearCache',
-        },
+        --Overseer claims to lazy load by default so Im just going to use
+        --the VerryLazy event
+        event = 'VeryLazy',
         keys = {
             {
                 '<leader>oo',
@@ -2810,6 +2798,12 @@ require('lazy').setup({
                 '<cmd>OverseerClearCache<CR>',
                 mode = 'n',
                 desc = 'Overseer: Clear Cache',
+            },
+            {
+                '<leader>og',
+                '<cmd>OverseerRestartLast<CR>',
+                mode = 'n',
+                desc = 'Overseer: Restart Last',
             },
         },
         opts = {
