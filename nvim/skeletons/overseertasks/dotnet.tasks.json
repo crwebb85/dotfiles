@@ -1,0 +1,22 @@
+//copy to a .vscode/tasks.json file
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dotnet_test",
+      "type": "shell",
+      "command": "dotnet test",
+      "problemMatcher": {
+        "pattern": {
+          // "vim_regexp": "^%s+at%s(.*)%sin%s(.+%.cs):line%s([0-9]+)%s*$",
+          "regexp": "^\\s+at\\s(.*)\\sin\\s(.+\\.cs):line\\s([0-9]+)\\s*$",
+          "message": 1,
+          "file": 2,
+          "line": 3
+        }
+      }
+    }
+  ]
+}
