@@ -38,6 +38,23 @@
   (this has been confirmed to happen with my GrepAdd command)
 - fix python formatters
 - Bug heirline: new upstaged files say main the git branch and new files staged preview doesn't show git branch
+- Bug Telescope: plugin documentation now shows up in Telescope even if not yet loaded.
+  When you select it in telescope you will get the following error:
+
+```
+
+E5108: Error executing lua: vim/_editor.lua:439: nvim_exec2(): Vim(help):E661: Sorry, no 'en' help for Overseer
+stack traceback:
+	[C]: in function 'nvim_exec2'
+	vim/_editor.lua:439: in function 'cmd'
+	...lazy/telescope.nvim/lua/telescope/builtin/__internal.lua:806: in function 'run_replace_or_original'
+	...im-data/lazy/telescope.nvim/lua/telescope/actions/mt.lua:65: in function 'run_replace_or_original'
+	...im-data/lazy/telescope.nvim/lua/telescope/actions/mt.lua:65: in function 'select_default'
+	C:\Users\crweb\Documents\.config\nvim/lua/config/lazy.lua:617: in function 'key_func'
+	...nvim-data/lazy/telescope.nvim/lua/telescope/mappings.lua:293: in function <...nvim-data/lazy/telescope.nvim/lua/telescope/mappings.lua:292>
+```
+
+the workaround is to make sure the plugin is loaded
 
 ### TODO and Workflows that need improvements
 
@@ -129,7 +146,9 @@
   - [x] add list of mason items to not install automatically
   - [ ] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
 - [ ] Refactor
+
   - [ ] replace lsp setup functions setup_jsonls with a table like
+
   ```lua
     local settings = {
         omnisharp = {
@@ -144,11 +163,13 @@
     }
     lsp_server.setup(name) -- automatically uses the settings
   ```
+
   - [ ] replace client.supports_method with client.server_capabilities
   - [ ] cleanup deprecated code
   - [ ] properly use setqflist action parameter for appending to an existing list.
   - [ ] refactor my windows check to use `vim.fn.has('win32') == 1`
   - [ ] refactor telescope keymap `<leader>fh` to no longer use a register in visual mode
+
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
   - [ ] add html formatter

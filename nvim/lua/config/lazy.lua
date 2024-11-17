@@ -126,13 +126,16 @@ require('lazy').setup({
                     'n',
                     '<leader>ggs',
                     actions.toggle_stage_entry,
-                    { desc = 'Stage / unstage the selected entry' },
+                    { desc = 'Diffview: Stage / unstage the selected entry' },
                 },
                 {
                     'n',
                     'q',
                     '<cmd>DiffviewClose<CR>',
-                    { silent = true },
+                    {
+                        silent = true,
+                        desc = 'Diffview: close',
+                    },
                 },
                 {
                     'n',
@@ -1909,6 +1912,13 @@ require('lazy').setup({
                 function() require('neotest').run.attach() end,
                 desc = 'Neotest: Attach to the nearest test',
             },
+
+            {
+                '<leader>to',
+                '<cmd>Neotest summary<CR>',
+                mode = 'n',
+                desc = 'Neotest: Toggle Summary',
+            },
         },
         config = function(_, _)
             require('neotest').setup({
@@ -2757,6 +2767,50 @@ require('lazy').setup({
             'OverseerQuickAction',
             'OverseerTaskAction',
             'OverseerClearCache',
+        },
+        keys = {
+            {
+                '<leader>oo',
+                '<cmd>OverseerToggle!<CR>',
+                mode = 'n',
+                desc = 'Overseer: Toggle',
+            },
+            {
+                '<leader>or',
+                '<cmd>OverseerRun<CR>',
+                mode = 'n',
+                desc = 'Overseer: Run',
+            },
+            {
+                '<leader>oc',
+                '<cmd>OverseerRunCmd<CR>',
+                mode = 'n',
+                desc = 'Overseer: Run command',
+            },
+            {
+                '<leader>oj',
+                '<cmd>OverseerLoadBundle<CR>',
+                mode = 'n',
+                desc = 'Overseer: Load',
+            },
+            {
+                '<leader>od',
+                '<cmd>OverseerQuickAction<CR>',
+                mode = 'n',
+                desc = 'Overseer: Do quick action',
+            },
+            {
+                '<leader>os',
+                '<cmd>OverseerTaskAction<CR>',
+                mode = 'n',
+                desc = 'Overseer: Select task action',
+            },
+            {
+                '<leader>ox',
+                '<cmd>OverseerClearCache<CR>',
+                mode = 'n',
+                desc = 'Overseer: Clear Cache',
+            },
         },
         opts = {
             task_list = {
