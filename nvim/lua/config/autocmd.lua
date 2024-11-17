@@ -64,26 +64,34 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
     end,
 })
 
--- If opening a terminal start in insert mode and set local parameters
--- Works for both the :terminal command and toggleterm plugin
-vim.api.nvim_create_autocmd('TermOpen', {
-    group = vim.api.nvim_create_augroup('term_open_insert', { clear = true }),
-    pattern = { 'term://*' },
-    command = [[
-    startinsert
-    setlocal nonumber norelativenumber nospell signcolumn=no noruler
-  ]],
-})
-
+-- The two autocmds below started getting annoying when using overseer
+-- because they were causing me to enter insert mode even when my cursor wasn't
+-- in the terminal buffer. I could fix this but I want to try without these first
+-- to see if what I prefer. The other annoyance was that when I was yanking things
+-- from toggle term it would always send me back to insert mode and back to the
+-- back to the bottom causing me to need to navigate back up the the previous line
+-- if I wanted to yank a few more lines
+--
+-- -- If opening a terminal start in insert mode and set local parameters
+-- -- Works for both the :terminal command and toggleterm plugin
+-- vim.api.nvim_create_autocmd('TermOpen', {
+--     group = vim.api.nvim_create_augroup('term_open_insert', { clear = true }),
+--     pattern = { 'term://*' },
+--       command = [[
+--       startinsert
+--       setlocal nonumber norelativenumber nospell signcolumn=no noruler
+--     ]],
+-- })
+--
 -- When entering terminal start in insert mode. This is useful if I had toggled
 -- the terminal closed in normal mode but then try to toggle it back up.
-vim.api.nvim_create_autocmd({ 'BufWinEnter', 'WinEnter' }, {
-    group = vim.api.nvim_create_augroup('term_insert', { clear = true }),
-    pattern = { 'term://*' },
-    command = [[
-    startinsert
-  ]],
-})
+-- vim.api.nvim_create_autocmd({ 'BufWinEnter', 'WinEnter' }, {
+--     group = vim.api.nvim_create_augroup('term_insert', { clear = true }),
+--     pattern = { 'term://*' },
+--     command = [[
+--     startinsert
+--   ]],
+-- })
 
 -- Dockerfile filetype
 vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
