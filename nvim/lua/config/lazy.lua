@@ -1922,6 +1922,7 @@ require('lazy').setup({
         },
         config = function(_, _)
             require('neotest').setup({
+                dap = false, --I will manually enable so that dap can be lazy loaded
                 consumers = {
                     overseer = require('neotest.consumers.overseer'),
                 },
@@ -1980,6 +1981,7 @@ require('lazy').setup({
         lazy = true,
         config = function(_, _)
             local dap = require('dap')
+            require('overseer').enable_dap()
 
             --Adapters
             dap.adapters.codelldb = {
