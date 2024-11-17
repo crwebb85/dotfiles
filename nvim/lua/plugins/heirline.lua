@@ -475,6 +475,57 @@ local config = function()
         Space,
         Seperator,
     }
+    local function rpad(child)
+        return {
+            condition = child.condition,
+            child,
+            Space,
+        }
+    end
+    local function OverseerTasksForStatus(status)
+        return {
+            condition = function(self) return self.tasks[status] end,
+            provider = function(self)
+                return string.format(
+                    '%s%d',
+                    self.symbols[status],
+                    #self.tasks[status]
+                )
+            end,
+            hl = function(_)
+                return {
+                    fg = heirlineUtils.get_highlight(
+                        string.format('Overseer%s', status)
+                    ).fg,
+                }
+            end,
+        }
+    end
+
+    local Overseer = {
+        condition = function() return package.loaded.overseer end,
+        init = function(self)
+            local tasks =
+                require('overseer.task_list').list_tasks({ unique = true })
+            local tasks_by_status =
+                require('overseer.util').tbl_group_by(tasks, 'status')
+            self.tasks = tasks_by_status
+        end,
+        static = {
+            symbols = {
+                ['CANCELED'] = is_nerd_font_enabled and ' ' or '[C]',
+                ['FAILURE'] = is_nerd_font_enabled and '󰅚 ' or '[F]',
+                ['SUCCESS'] = is_nerd_font_enabled and '󰄴 ' or '[S]',
+                ['RUNNING'] = is_nerd_font_enabled and '󰑮 ' or '[R]',
+            },
+        },
+        Space,
+
+        rpad(OverseerTasksForStatus('CANCELED')),
+        rpad(OverseerTasksForStatus('RUNNING')),
+        rpad(OverseerTasksForStatus('SUCCESS')),
+        rpad(OverseerTasksForStatus('FAILURE')),
+    }
 
     ---@type StatusLine
     local Ruler = {
@@ -511,6 +562,7 @@ local config = function()
         LSPActive,
         FormatterActive,
         Snippets,
+        Overseer,
         Align,
         Diagnostics,
         Ruler,
