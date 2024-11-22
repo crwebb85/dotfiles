@@ -2809,6 +2809,19 @@ require('lazy').setup({
             },
         },
         opts = {
+            strategy = config.use_overseer_strategy_hack
+                    and {
+                        --Old versions of windows/powershell won't emit all the characters needed
+                        --to determine if the line feed at the end of the line was from the
+                        --source program or from line wrapping. When that happens it becomes impossible
+                        --to parse things like file paths from the terminal output. To fix this we
+                        --disable fetching the output from the terminal.
+                        --The trade of is we loose ansi color sequences so all output will display
+                        --without color.
+                        'jobstart',
+                        use_terminal = false,
+                    }
+                or 'terminal',
             task_list = {
                 direction = 'bottom',
                 min_height = 25,

@@ -27,6 +27,9 @@ local M = {
     ---@type boolean
     use_native_completion = true,
     -- use_native_completion = false,
+
+    use_overseer_strategy_hack = false,
+    -- use_overseer_strategy_hack = true,
 }
 
 return M
