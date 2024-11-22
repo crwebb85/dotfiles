@@ -97,6 +97,7 @@ vim.o.hlsearch = false
 vim.o.incsearch = true
 vim.o.wildignore =
     '*/node_modules/**,*/.git/**,*/venv/**,*/.venv/**,*/obj/**,*/bin/**'
+vim.opt.wildoptions:append('fuzzy') -- makes ex-command completion fuzzy matching
 vim.o.grepprg = [[rg --glob "!.git" --no-heading --vimgrep --follow $*]]
 vim.opt.grepformat = vim.opt.grepformat ^ { '%f:%l:%c:%m' }
 
