@@ -40,6 +40,18 @@
 - Bug heirline: new upstaged files say main the git branch and new files staged preview doesn't show git branch
 - Bug Telescope: plugin documentation now shows up in Telescope even if not yet loaded.
   When you select it in telescope you will get the following error:
+- my keymap for running neotest on files marks succeeded test as faile if any test failed in the file
+  on old versions of windows (but works correctly on windows 11)
+
+```lua
+
+            {
+                '<leader>tc',
+                function() require('neotest').run.run(vim.fn.expand('%')) end,
+                desc = 'Neotest: Run the current file',
+            },
+
+```
 
 ```
 

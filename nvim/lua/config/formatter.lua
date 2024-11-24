@@ -54,6 +54,7 @@ local function setup()
         xml = { 'prettierxml' },
         graphql = { 'prettierd' },
         sh = { 'shfmt' },
+        c = { 'clang-format' },
     }
 
     state.project_formatters = vim.deepcopy(state.default_formatters)
@@ -510,7 +511,12 @@ function M.format_on_save(bufnr)
     local filetype = vim.bo[bufnr].filetype
     if P.is_format_after_save_enabled(filetype) then return end
     local function on_format(err)
-        if err and err:match('timeout$') then
+        if err == nil then return end
+        if type(err) ~= 'string' then
+            vim.print("Debug: fomatter error that wasn't a string")
+            vim.print(err)
+        end
+        if type(err) == 'string' and err:match('timeout$') then
             if P.is_format_after_save_enabled(filetype) then --In case of some wierd race condition I only want one notification
                 vim.notify(
                     'Auto-formatting on save for filetype `'

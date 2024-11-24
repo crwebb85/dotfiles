@@ -1,6 +1,7 @@
 vim.g.mapleader = ' '
 local shellslash_hack = require('utils.misc').shellslash_hack
 local config = require('config.config')
+local get_icon = require('config.icons').get_icon
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
@@ -1220,6 +1221,8 @@ require('lazy').setup({
     },
     {
         'MeanderingProgrammer/render-markdown.nvim',
+        lazy = true,
+        ft = 'markdown',
         dependencies = {
             'nvim-treesitter/nvim-treesitter',
             'echasnovski/mini.icons',
@@ -1968,6 +1971,22 @@ require('lazy').setup({
                         discovery_root = 'solution',
                     }),
                 },
+                icons = {
+                    child_indent = get_icon('neotest_child_indent'),
+                    child_prefix = get_icon('neotest_child_prefix'),
+                    collapsed = get_icon('neotest_collapsed'),
+                    expanded = get_icon('neotest_expanded'),
+                    failed = get_icon('neotest_failed'),
+                    final_child_indent = get_icon('neotest_final_child_indent'),
+                    final_child_prefix = get_icon('neotest_final_child_prefix'),
+                    non_collapsible = get_icon('neotest_non_collapsible'),
+                    notify = get_icon('neotest_notify'),
+                    passed = get_icon('neotest_passed'),
+                    running = get_icon('neotest_running'),
+                    skipped = get_icon('neotest_skipped'),
+                    unknown = get_icon('neotest_unknown'),
+                    watching = get_icon('neotest_watching'),
+                },
             })
         end,
     },
@@ -1979,6 +1998,140 @@ require('lazy').setup({
     {
         'mfussenegger/nvim-dap',
         lazy = true,
+        keys = {
+            {
+                '<leader>xb',
+                function() require('dap').toggle_breakpoint() end,
+                desc = 'Debug: Add Breakpoint',
+            },
+            {
+                '<leader>xB',
+                function()
+                    require('dap').set_breakpoint(
+                        vim.fn.input('Breakpoint condition: ')
+                    )
+                end,
+                desc = 'Debug: Breakpoint Condition',
+            },
+            {
+                '<leader>xc',
+                function() require('dap').continue() end,
+                desc = 'Debug: Start/Continue Debugger',
+            },
+            -- {
+            --     '<leader>xa',
+            --     function()
+            --         require('dap').continue({
+            --             ---From https://github.com/LazyVim/LazyVim/blob/2c37492461bf6af09a3e940f8b3ea0a123608bfd/lua/lazyvim/plugins/extras/dap/core.lua#L1C1-L17C4
+            --             ---I haven't tested this yet. TODO remove this note once I have tried this out
+            --             ---@type fun(before_args: {type?:string, args?:string[]|fun():string[]?}):any
+            --             before = function(before_args)
+            --                 local args = type(before_args.args) == 'function'
+            --                         and (before_args.args() or {})
+            --                     or before_args.args
+            --                     or {} --[[@as string[] | string ]]
+            --                 local args_str = type(args) == 'table'
+            --                         and table.concat(args, ' ')
+            --                     or args --[[@as string]]
+            --
+            --                 before_args = vim.deepcopy(before_args)
+            --                 ---@cast args string[]
+            --                 before_args.args = function()
+            --                     local new_args = vim.fn.expand(
+            --                         vim.fn.input('Run with args: ', args_str)
+            --                     ) --[[@as string]]
+            --                     if
+            --                         before_args.type
+            --                         and before_args.type == 'java'
+            --                     then
+            --                         ---@diagnostic disable-next-line: return-type-mismatch
+            --                         return new_args
+            --                     end
+            --                     return require('dap.utils').splitstr(new_args)
+            --                 end
+            --                 return before_args
+            --             end,
+            --         })
+            --     end,
+            --     desc = 'Debug: Run with Args',
+            -- },
+            {
+                '<leader>xC',
+                function() require('dap').run_to_cursor() end,
+                desc = 'Debug: Run to Cursor',
+            },
+            {
+                '<leader>xt',
+                function() require('dap').terminate() end,
+                desc = 'Debug: Terminate Debugger',
+            },
+            {
+                '<leader>xg',
+                function() require('dap').goto_() end,
+                desc = 'Debug: Go to line (no execute)',
+            },
+            {
+                '<leader>xi',
+                function() require('dap').step_into() end,
+                desc = 'Debug: Step Into',
+            },
+            {
+                '<leader>xj',
+                function() require('dap').down() end,
+                desc = 'Debug: Down',
+            },
+            {
+                '<leader>xk',
+                function() require('dap').up() end,
+                desc = 'Debug: Up',
+            },
+            {
+                '<leader>xl',
+                function() require('dap').run_last() end,
+                desc = 'Debug: Run Last',
+            },
+            {
+                '<leader>xo',
+                function() require('dap').step_out() end,
+                desc = 'Debug: Step Out',
+            },
+            {
+                '<leader>xO',
+                function() require('dap').step_over() end,
+                desc = 'Debug: Step Over',
+            },
+            {
+                '<leader>xp',
+                function() require('dap').pause() end,
+                desc = 'Debug: Pause',
+            },
+            {
+                '<leader>xr',
+                function() require('dap').repl.toggle() end,
+                desc = 'Debug: Toggle REPL',
+            },
+            {
+                '<leader>xs',
+                function() require('dap').session() end,
+                desc = 'Debug: Session',
+            },
+            {
+                '<leader>xt',
+                function() require('dap').terminate() end,
+                desc = 'Debug: Terminate',
+            },
+            {
+                '<leader>xw',
+                function() require('dap.ui.widgets').hover() end,
+                desc = 'Debug: Widgets',
+            },
+
+            {
+                '<leader>xf',
+                function() require('dap').focus_frame() end,
+                desc = 'Debug: Focus Frame',
+            },
+        },
         config = function(_, _)
             local dap = require('dap')
             require('overseer').enable_dap()
@@ -2293,83 +2446,6 @@ require('lazy').setup({
                 },
             }
         end,
-        keys = {
-            {
-                '<leader>xc',
-                function() require('dap').continue() end,
-                desc = 'Debug: Start/Continue Debugger',
-            },
-            {
-                '<leader>xb',
-                function() require('dap').toggle_breakpoint() end,
-                desc = 'Debug: Add Breakpoint',
-            },
-            {
-                '<leader>xt',
-                function() require('dap').terminate() end,
-                desc = 'Debug: Terminate Debugger',
-            },
-            {
-                '<leader>xC',
-                function() require('dap').run_to_cursor() end,
-                desc = 'Debug: Run to Cursor',
-            },
-            {
-                '<leader>xg',
-                function() require('dap').goto_() end,
-                desc = 'Debug: Go to line (no execute)',
-            },
-            {
-                '<leader>xi',
-                function() require('dap').step_into() end,
-                desc = 'Debug: Step Into',
-            },
-            {
-                '<leader>xj',
-                function() require('dap').down() end,
-                desc = 'Debug: Down',
-            },
-            {
-                '<leader>xk',
-                function() require('dap').up() end,
-                desc = 'Debug: Up',
-            },
-            {
-                '<leader>xl',
-                function() require('dap').run_last() end,
-                desc = 'Debug: Run Last',
-            },
-            {
-                '<leader>xo',
-                function() require('dap').step_out() end,
-                desc = 'Debug: Step Out',
-            },
-            {
-                '<leader>xO',
-                function() require('dap').step_over() end,
-                desc = 'Debug: Step Over',
-            },
-            {
-                '<leader>xp',
-                function() require('dap').pause() end,
-                desc = 'Debug: Pause',
-            },
-            {
-                '<leader>xr',
-                function() require('dap').repl.toggle() end,
-                desc = 'Debug: Toggle REPL',
-            },
-            {
-                '<leader>xs',
-                function() require('dap').session() end,
-                desc = 'Debug: Session',
-            },
-            {
-                '<leader>xw',
-                function() require('dap.ui.widgets').hover() end,
-                desc = 'Debug: Widgets',
-            },
-        },
     },
 
     -- UI for the debugger
@@ -2385,37 +2461,30 @@ require('lazy').setup({
                 function() require('dapui').toggle() end,
                 desc = 'Debug: Toggle debugger UI',
             },
+            {
+                '<leader>xe',
+                function() require('dapui').eval() end,
+                desc = 'Debug: Eval',
+                mode = { 'n', 'v' },
+            },
         },
         opts = {
             controls = {
                 icons = {
-                    pause = '',
-                    play = '',
-                    step_into = '',
-                    step_over = '',
-                    step_out = '',
-                    step_back = '',
-                    run_last = '',
-                    terminate = '',
-                    disconnect = '',
+                    pause = get_icon('debug_pause'),
+                    play = get_icon('debug_play'),
+                    step_into = get_icon('debug_step_into'),
+                    step_over = get_icon('debug_step_over'),
+                    step_out = get_icon('debug_step_out'),
+                    step_back = get_icon('debug_step_back'),
+                    run_last = get_icon('debug_run_last'),
+                    terminate = get_icon('debug_terminate'),
+                    disconnect = get_icon('debug_disconnect'),
                 },
             },
         },
         -- automatically open/close the DAP UI when starting/stopping the debugger
         config = function(_, opts)
-            if not config.nerd_font_enabled then
-                opts.controls.icons = {
-                    pause = '||',
-                    play = '|>',
-                    step_into = 'v',
-                    step_over = '>',
-                    step_out = '^',
-                    step_back = '<',
-                    run_last = 'rl',
-                    terminate = '|=|',
-                    disconnect = 'x',
-                }
-            end
             require('dapui').setup(opts)
             local listener = require('dap').listeners
             listener.after.event_initialized['dapui_config'] = function()

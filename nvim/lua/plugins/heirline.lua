@@ -1,4 +1,4 @@
-local is_nerd_font_enabled = require('config.config').nerd_font_enabled
+local get_icon = require('config.icons').get_icon
 local config = function()
     local heirline = require('heirline')
     local conditions = require('heirline.conditions')
@@ -42,10 +42,10 @@ local config = function()
     local Diagnostics = {
         condition = conditions.has_diagnostics,
         static = {
-            info_icon = is_nerd_font_enabled and ' ' or 'I',
-            hint_icon = is_nerd_font_enabled and ' ' or 'H',
-            warn_icon = is_nerd_font_enabled and ' ' or 'W',
-            error_icon = is_nerd_font_enabled and ' ' or 'E',
+            info_icon = get_icon('diagnostics_info'),
+            hint_icon = get_icon('diagnostics_hint'),
+            warn_icon = get_icon('diagnostics_warn'),
+            error_icon = get_icon('diagnostics_error'),
         },
         init = function(self)
             local buf_sev_counts = vim.diagnostic.count(0, {})
@@ -160,7 +160,10 @@ local config = function()
         -- control the padding and make sure our string is always at least 2
         -- characters long. Plus a nice Icon.
         provider = function(self)
-            return ' %2(' .. self.mode_names[self.mode] .. '%)'
+            return get_icon('mode_icon')
+                .. '%2('
+                .. self.mode_names[self.mode]
+                .. '%)'
         end,
         -- Same goes for the highlight. Now the foreground will change according to the current mode.
         hl = function(self)
@@ -189,7 +192,10 @@ local config = function()
         Space,
         {
             provider = function(self)
-                return ' ' .. self.status_dict.head .. ' '
+                return get_icon('git_branch')
+                    .. ' '
+                    .. self.status_dict.head
+                    .. ' '
             end,
             hl = {
                 fg = git_branch_name_foreground_color,
@@ -248,7 +254,10 @@ local config = function()
                     end
                     table.insert(names, tostring(client.id) .. ':' .. name)
                 end
-                return ' [' .. table.concat(names, ' ') .. ']'
+                return get_icon('lsp_icon')
+                    .. ' ['
+                    .. table.concat(names, ' ')
+                    .. ']'
             end,
             hl = { fg = 'green', bold = true },
         },
@@ -334,7 +343,7 @@ local config = function()
                 for i, lsp_formatter in ipairs(lsp_formatters) do
                     ---@type StatusLine
                     local formatter_component = {
-                        provider = vim.fn.trim(lsp_formatter),
+                        provider = vim.fn.trim(lsp_formatter.name),
                     }
                     table.insert(alt_children, formatter_component)
                     if i < #formatters then
@@ -381,8 +390,9 @@ local config = function()
         Space,
         {
             {
-                provider = ' ',
+                provider = get_icon('format_icon'),
             },
+            Space,
             {
                 provider = '[',
             },
@@ -436,10 +446,13 @@ local config = function()
         end,
         {
             condition = function(self) return self.reg_recording ~= '' end,
+            Space,
             {
-                provider = '   ',
+                provider = get_icon('macro_recording'),
                 hl = { fg = macro_recording_forground_color },
             },
+            Space,
+            Space,
             {
                 provider = function(self) return '@' .. self.reg_recording end,
                 hl = { italic = false, bold = true },
@@ -465,16 +478,20 @@ local config = function()
         Space,
         {
             provider = function()
-                local backward = require('luasnip').jumpable(-1) and ' '
+                local backward = require('luasnip').jumpable(-1)
+                        and get_icon('snippet_jumpable_left')
                     or ''
-                local forward = require('luasnip').jumpable(1) and ' ' or ''
-                return backward .. '' .. forward
+                local forward = require('luasnip').jumpable(1)
+                        and get_icon('snippet_jumpable_right')
+                    or ''
+                return backward .. get_icon('snippet_icon') .. forward
             end,
             hl = { fg = 'red', bold = true },
         },
         Space,
         Seperator,
     }
+
     local function rpad(child)
         return {
             condition = child.condition,
@@ -513,10 +530,10 @@ local config = function()
         end,
         static = {
             symbols = {
-                ['CANCELED'] = is_nerd_font_enabled and ' ' or '[C]',
-                ['FAILURE'] = is_nerd_font_enabled and '󰅚 ' or '[F]',
-                ['SUCCESS'] = is_nerd_font_enabled and '󰄴 ' or '[S]',
-                ['RUNNING'] = is_nerd_font_enabled and '󰑮 ' or '[R]',
+                ['CANCELED'] = get_icon('overseer_status_canceled'),
+                ['FAILURE'] = get_icon('overseer_status_failure'),
+                ['SUCCESS'] = get_icon('overseer_status_success'),
+                ['RUNNING'] = get_icon('overseer_status_running'),
             },
         },
         Space,
@@ -525,6 +542,86 @@ local config = function()
         rpad(OverseerTasksForStatus('RUNNING')),
         rpad(OverseerTasksForStatus('SUCCESS')),
         rpad(OverseerTasksForStatus('FAILURE')),
+    }
+
+    -- Note that we add spaces separately, so that only the icon characters will be clickable
+    local DAPMessages = {
+        condition = function()
+            return package.loaded.dap and require('dap').session() ~= nil
+        end,
+        {
+            provider = function()
+                return get_icon('debug_debugging_active')
+                    .. ' '
+                    .. require('dap').status()
+                    .. ' '
+            end,
+            on_click = {
+                callback = function() require('dap').focus_frame() end,
+                name = 'heirline_dap_goto',
+            },
+        },
+        hl = 'Debug',
+
+        {
+            provider = get_icon('debug_play'),
+            on_click = {
+                callback = function() require('dap').continue() end,
+                name = 'heirline_dap_play',
+            },
+        },
+        { provider = ' ' },
+        {
+            provider = get_icon('debug_step_into'),
+            on_click = {
+                callback = function() require('dap').step_into() end,
+                name = 'heirline_dap_step_into',
+            },
+        },
+        { provider = ' ' },
+        {
+            provider = get_icon('debug_step_over'),
+            on_click = {
+                callback = function() require('dap').step_over() end,
+                name = 'heirline_dap_step_over',
+            },
+        },
+        { provider = ' ' },
+        {
+            provider = get_icon('debug_step_out'),
+            on_click = {
+                callback = function() require('dap').step_out() end,
+                name = 'heirline_dap_step_out',
+            },
+        },
+        -- { provider = ' ' },
+        -- {
+        --     provider = get_icon('debug_step_back'),
+        --     on_click = {
+        --         callback = function() require('dap').step_back() end,
+        --         name = 'heirline_dap_step_back',
+        --     },
+        -- },
+        { provider = ' ' },
+        {
+            provider = get_icon('debug_run_last'),
+            on_click = {
+                callback = function() require('dap').run_last() end,
+                name = 'heirline_dap_run_last',
+            },
+        },
+        { provider = ' ' },
+        {
+            provider = get_icon('debug_terminate'),
+            on_click = {
+                callback = function()
+                    require('dap').terminate()
+                    require('dapui').close({})
+                end,
+                name = 'heirline_dap_close',
+            },
+        },
+        { provider = ' ' },
     }
 
     ---@type StatusLine
@@ -563,6 +660,7 @@ local config = function()
         FormatterActive,
         Snippets,
         Overseer,
+        DAPMessages,
         Align,
         Diagnostics,
         Ruler,
@@ -646,7 +744,7 @@ local config = function()
             -- shows a lock if the file is readonly
             provider = function()
                 if not vim.bo.modifiable or vim.bo.readonly then
-                    return ' '
+                    return get_icon('file_readonly') .. ' '
                 end
             end,
             hl = {
@@ -691,7 +789,7 @@ local config = function()
             condition = function() return vim.bo.buftype == 'terminal' end,
             provider = function()
                 local tname, _ = vim.api.nvim_buf_get_name(0):gsub('.*:', '')
-                return ' ' .. tname
+                return get_icon('terminal_icon') .. ' ' .. tname
             end,
             hl = { fg = filename_foreground_color, bold = true },
         },

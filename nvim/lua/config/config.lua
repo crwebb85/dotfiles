@@ -5,6 +5,7 @@ local M = {
 
     ---@type boolean
     nerd_font_enabled = true,
+    -- nerd_font_enabled = false,
 
     ---@type uinteger
     bigfile_filesize = 2, --MB
