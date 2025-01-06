@@ -26,7 +26,9 @@ vim.o.clipboard = 'unnamed,unnamedplus'
 
 -------------------------------------------------------------------------------
 --- Performance
-vim.o.lazyredraw = true -- redraw only when required (will lazily redraw during macros)
+-- TODO temporarily removing lazy redraw because redraws now clear the selection window
+-- so it was preventing me seeing which code actions I could pick
+-- vim.o.lazyredraw = true -- redraw only when required (will lazily redraw during macros)
 vim.o.updatetime = 50
 
 -------------------------------------------------------------------------------

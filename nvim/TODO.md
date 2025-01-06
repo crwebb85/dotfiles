@@ -43,6 +43,7 @@
 - my keymap for running neotest on files marks succeeded test as faile if any test failed in the file
   on old versions of windows (but works correctly on windows 11)
 - refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
+- redraw cmd and lazyredraw option now clear the selection messages so it was preventing me seeing which code actions I could pick
 
 ```lua
 

@@ -194,6 +194,7 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
 vim.api.nvim_create_autocmd('FocusGained', {
     pattern = '*',
     callback = function(_)
+        vim.print('highlight')
         vim.wo.cursorline = true
         vim.cmd('redraw')
         vim.defer_fn(function() vim.wo.cursorline = false end, 600)
@@ -219,12 +220,15 @@ vim.api.nvim_create_autocmd('ModeChanged', {
         if new_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = false
             vim.wo.cursorline = true
-            vim.cmd('redraw')
+            -- TODO temporarily removing this redraw because redraws now clear the selection messages
+            -- so it was preventing me seeing which code actions I could pick
+            --vim.cmd('redraw')
         elseif prev_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = true
             vim.wo.cursorline = false
-
-            vim.cmd('redraw')
+            -- TODO temporarily removing this redraw because redraws now clear the selection messages
+            -- so it was preventing me seeing which code actions I could pick
+            --vim.cmd('redraw')
         end
     end,
     group = change_relative_line_number_group,
