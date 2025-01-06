@@ -16,25 +16,25 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-local function init_python_environment()
-    local config_env = os.getenv('XDG_CONFIG_HOME')
-    if config_env == nil then
-        error('cannot find XDG_CONFIG_HOME environment variable')
-    end
-    local config_path = vim.fn.expand(config_env)
-    vim.g.python3_host_prog = vim.fn.expand(
-        vim.fs.joinpath(
-            config_path,
-            'cli-tools',
-            'jupyter_notebook_venv',
-            'venv',
-            'Scripts',
-            'python.exe'
-        )
-    )
-    vim.print(vim.g.python3_host_prog)
-end
-init_python_environment()
+-- local function init_python_environment()
+--     local config_env = os.getenv('XDG_CONFIG_HOME')
+--     if config_env == nil then
+--         error('cannot find XDG_CONFIG_HOME environment variable')
+--     end
+--     local config_path = vim.fn.expand(config_env)
+--     vim.g.python3_host_prog = vim.fn.expand(
+--         vim.fs.joinpath(
+--             config_path,
+--             'cli-tools',
+--             'jupyter_notebook_venv',
+--             'venv',
+--             'Scripts',
+--             'python.exe'
+--         )
+--     )
+--     vim.print(vim.g.python3_host_prog)
+-- end
+-- init_python_environment()
 
 local M = {}
 M.lazygitTerminal = nil
