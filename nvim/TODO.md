@@ -42,6 +42,7 @@
   When you select it in telescope you will get the following error:
 - my keymap for running neotest on files marks succeeded test as faile if any test failed in the file
   on old versions of windows (but works correctly on windows 11)
+- refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
 
 ```lua
 

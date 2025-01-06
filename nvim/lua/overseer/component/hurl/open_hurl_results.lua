@@ -158,6 +158,11 @@ return {
                     end
                 end
 
+                table.insert(items, {
+                    filename = self.report_json_path,
+                    valid = true,
+                })
+
                 local action = ' '
                 if params.append then action = 'a' end
 

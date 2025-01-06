@@ -101,6 +101,8 @@ function M.show_lightbulb()
         -- Get the diagnostics at the cursor
         diagnostics = M.get_diagnostic_at_cursor(),
     }
+
+    --TODO refactor to use correct position encoding for each lsp
     local params = vim.lsp.util.make_range_params()
     params.context = context
     -- Send request to the server to check if a code action is available at the

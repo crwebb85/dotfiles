@@ -30,7 +30,6 @@ return {
                     if item.text ~= '' then break end
                     index = index - 1
                 end
-                vim.print(index)
 
                 local new_items = {}
                 for i, item in ipairs(items) do
