@@ -7,6 +7,7 @@ M.create_abstracted_context = function(request)
     local buf = vim.uri_to_bufnr(request.textDocument.uri)
     local full_line =
         vim.api.nvim_buf_get_lines(buf, line_num, line_num + 1, false)[1]
+    if full_line == nil then return end
     local before_char = (request.context and request.context.triggerCharacter)
         or full_line:sub(col_num, col_num + 1)
     return {
@@ -191,6 +192,7 @@ local handlers = {
 
     ['textDocument/completion'] = function(request, callback, _)
         local abstracted_context = M.create_abstracted_context(request)
+        if abstracted_context == nil then return end
         local response = {
             -- --For testing
             -- {
