@@ -16,6 +16,26 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local function init_python_environment()
+    local config_env = os.getenv('XDG_CONFIG_HOME')
+    if config_env == nil then
+        error('cannot find XDG_CONFIG_HOME environment variable')
+    end
+    local config_path = vim.fn.expand(config_env)
+    vim.g.python3_host_prog = vim.fn.expand(
+        vim.fs.joinpath(
+            config_path,
+            'cli-tools',
+            'jupyter_notebook_venv',
+            'venv',
+            'Scripts',
+            'python.exe'
+        )
+    )
+    vim.print(vim.g.python3_host_prog)
+end
+init_python_environment()
+
 local M = {}
 M.lazygitTerminal = nil
 M.lazytoggle = function()
@@ -452,7 +472,6 @@ require('lazy').setup({
                 '<leader>fg',
                 function()
                     local mode = vim.api.nvim_get_mode().mode
-                    vim.print(mode)
                     if mode == 'v' then
                         -- First greps for the visual selection then lets you grep those results with a new grep
                         --
@@ -1222,7 +1241,7 @@ require('lazy').setup({
     {
         'MeanderingProgrammer/render-markdown.nvim',
         lazy = true,
-        ft = 'markdown',
+        -- ft = 'markdown',
         dependencies = {
             'nvim-treesitter/nvim-treesitter',
             'echasnovski/mini.icons',
@@ -2513,6 +2532,46 @@ require('lazy').setup({
     --- LSP's and more
 
     {
+        'benlubas/molten-nvim',
+        version = '^1.0.0',
+        -- build = ':UpdateRemotePlugins',
+        dependencies = 'willothy/wezterm.nvim',
+        lazy = false,
+        keys = {
+            {
+                '<leader>ip',
+                function()
+                    local venv = os.getenv('VIRTUAL_ENV')
+                        or os.getenv('CONDA_PREFIX')
+                    vim.print(venv)
+                    if venv ~= nil then
+                        -- in the form of /home/benlubas/.virtualenvs/VENV_NAME
+                        venv = string.match(venv, '/.+/(.+)')
+                        vim.cmd(('MoltenInit %s'):format(venv))
+                    else
+                        vim.cmd('MoltenInit python3')
+                    end
+                end,
+
+                desc = 'Initialize Molten for python3',
+                silent = true,
+            },
+        },
+        init = function()
+            vim.g.molten_auto_open_output = false -- cannot be true if molten_image_provider = "wezterm"
+            vim.g.molten_output_show_more = true
+            vim.g.molten_image_provider = 'wezterm'
+            vim.g.molten_output_virt_lines = true
+            vim.g.molten_split_direction = 'right' --direction of the output window, options are "right", "left", "top", "bottom"
+            vim.g.molten_split_size = 40 --(0-100) % size of the screen dedicated to the output window
+            vim.g.molten_virt_text_output = true
+            vim.g.molten_use_border_highlights = true
+            vim.g.molten_virt_lines_off_by_1 = true
+            vim.g.molten_auto_image_popup = false
+        end,
+        -- config = true,
+    },
+    {
         'folke/lazydev.nvim',
         ft = 'lua', -- only load on lua files
         opts = {
@@ -2568,7 +2627,7 @@ require('lazy').setup({
             local ensure_installed = Set:new({
                 -- LSPs
                 'pyright', -- LSP for python
-                'ruff-lsp', -- linter for python (includes flake8, pep8, etc.)
+                'ruff',
                 'marksman', -- Markdown
                 'markdown-oxide', -- Markdown notes
                 'lua-language-server', -- (lua_ls) LSP for lua files
@@ -2876,6 +2935,18 @@ require('lazy').setup({
                 mode = 'n',
                 desc = 'Overseer: Restart Last',
             },
+            {
+                '<leader>oq',
+                '<cmd>OverseerQuickAction open output in quickfix<CR>',
+                mode = 'n',
+                desc = 'Overseer: put the diagnostics results into quickfix',
+            },
+            -- {
+            --     '<leader>ow',
+            --     '<cmd>OverseerQuickAction open output in loclist<CR>',
+            --     mode = 'n',
+            --     desc = 'Overseer: put the diagnostics results into loclist',
+            -- },
         },
         opts = {
             strategy = config.use_overseer_strategy_hack

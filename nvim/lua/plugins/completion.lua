@@ -70,9 +70,19 @@ local completion_plugins = {
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
         },
-        -- dev = true,
+        dev = true,
         config = true,
     },
+
+    --Including these plugins so that they stay in my lock file even when I have them disabled
+    --remove once I remove nvim-cmp
+    { 'hrsh7th/cmp-cmdline', lazy = true },
+    { 'hrsh7th/cmp-git', lazy = true },
+    { 'hrsh7th/cmp-nvim-lsp', lazy = true },
+    { 'hrsh7th/cmp-nvim-lsp-signature-help', lazy = true },
+    { 'hrsh7th/cmp-path', lazy = true },
+    { 'saadparwaiz1/cmp_luasnip', lazy = true },
+    { 'onsails/lspkind.nvim', lazy = true },
 }
 if not config.use_native_completion then
     completion_plugins = {
