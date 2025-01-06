@@ -160,10 +160,14 @@ local config = function()
         -- control the padding and make sure our string is always at least 2
         -- characters long. Plus a nice Icon.
         provider = function(self)
-            return get_icon('mode_icon')
-                .. '%2('
-                .. self.mode_names[self.mode]
-                .. '%)'
+            if self.mode == nil then
+                vim.print(
+                    'wtf the mode was nil when the heirline component tried to check it'
+                )
+            end
+            local mode_chars = self.mode_names[self.mode] or 'nil?wtf' --On rare occations I was getting nil so I want to know when it happens
+
+            return get_icon('mode_icon') .. '%2(' .. mode_chars .. '%)'
         end,
         -- Same goes for the highlight. Now the foreground will change according to the current mode.
         hl = function(self)

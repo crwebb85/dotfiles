@@ -68,12 +68,17 @@ local nerd_font_icons_and_fallback = {
 ---@param name string
 ---@return string
 M.get_icon = function(name)
+    if name == nil then error('cannot get icon of a nil value') end
     if nerd_font_icons_and_fallback[name] == nil then
         return ''
-    elseif nerd_font_enabled then
-        return nerd_font_icons_and_fallback[name][1]
+    elseif #nerd_font_icons_and_fallback[name] ~= 2 then
+        vim.print('misdefined icon and fallback for icon name ' .. name)
+    end
+
+    if nerd_font_enabled then
+        return nerd_font_icons_and_fallback[name][1] or ''
     else
-        return nerd_font_icons_and_fallback[name][2]
+        return nerd_font_icons_and_fallback[name][2] or ''
     end
 end
 
