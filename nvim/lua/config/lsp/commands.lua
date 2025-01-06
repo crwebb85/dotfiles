@@ -23,7 +23,7 @@ local function get_command(args)
         ret = ret .. value .. ' '
     end
 
-    for _, value in ipairs(args.cargoExtraArgs) do
+    for _, value in ipairs(args.cargoExtraArgs or {}) do
         ret = ret .. value .. ' '
     end
 
