@@ -146,6 +146,18 @@ vim.keymap.set(
     { desc = 'Custom - Quick Fix List: cprev quick fix navigation' }
 )
 
+vim.keymap.set('n', '<leader>qt', function()
+    local qf_exists = false
+    for _, win in pairs(vim.fn.getwininfo()) do
+        if win['quickfix'] == 1 then qf_exists = true end
+    end
+    if qf_exists == true then
+        vim.cmd('cclose')
+        return
+    end
+    if not vim.tbl_isempty(vim.fn.getqflist()) then vim.cmd('copen') end
+end, { desc = 'Custom - Quick Fix List: toggle' })
+
 -- Find and replace word cursor is on
 vim.keymap.set(
     'n',
