@@ -70,7 +70,7 @@ local completion_plugins = {
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
         },
-        dev = true,
+        -- dev = true,
         config = true,
     },
 
@@ -321,6 +321,15 @@ if not config.use_native_completion then
                     }),
                 })
             end,
+        },
+
+        {
+            --This is only here so that it stays in my lazy lock file even when Im not using it because I am using cmp
+            'crwebb85/luasnip-lsp-server.nvim',
+            dependencies = {
+                { 'L3MON4D3/LuaSnip' },
+            },
+            lazy = true,
         },
         luasnip_plugin,
     }
