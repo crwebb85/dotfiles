@@ -202,6 +202,11 @@ Add Environment Variables:
   - Path=C:\ProgramData\chocolatey\bin
   - Path=C:\Program Files\PowerShell\7
 
+Rust specific tools:
+
+- [carg-bininstall](https://github.com/cargo-bins/cargo-binstall) used for installing nextest
+- [nextest](https://nexte.st/) the rust test runner that the plugin https://github.com/rouge8/neotest-rust requires
+
 I also had issues with treesitter markdown support `Error in decoration provider treesitter/highlighter.win: Error executing lua: ...im`
 I solved it by trying:
 

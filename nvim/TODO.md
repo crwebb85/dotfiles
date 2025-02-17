@@ -43,7 +43,33 @@
 - my keymap for running neotest on files marks succeeded test as faile if any test failed in the file
   on old versions of windows (but works correctly on windows 11)
 - refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
+- overseer hurl opens the quickfix window in all tabs not just the tab that was I used to run the overseer command
+- keymap ]M doesn't work when recording a macro
+- when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
+  Both the end_of_line and charset will cause the error.
+
+```editorconfig
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+```
+
+The error message
+
+```log
+Error executing vim.schedule lua callback: ...b/AppData/Local/nvim-data/lazy/oil.nvim/lua/oil/init.lua:385: Vim:E37: No write since last change (add ! to override)
+stack traceback:
+	[C]: in function 'edit'
+	...b/AppData/Local/nvim-data/lazy/oil.nvim/lua/oil/init.lua:385: in function 'open'
+	.config\nvim/lua/config/lazy.lua:942: in function <.config\nvim/lua/config/lazy.lua:932>
+```
+
+### Neovim bugs
+
 - redraw cmd and lazyredraw option now clear the selection messages so it was preventing me seeing which code actions I could pick
+- regression: LspStop no longer clears diagnostics
 
 ```lua
 
@@ -72,6 +98,23 @@ the workaround is to make sure the plugin is loaded
 
 ### TODO and Workflows that need improvements
 
+- [ ] terminal
+  - Add keymap to toggle between the terminal window and the current/previous window
+  - seperate terminal keymaps to a different namespace
+  - start insert mode only when it a terminal window is first created
+  - add a keymap to toggle on/off following the text printed in the terminal
+  - see if snacks terminal doesn't have the bug that screws up which-key like toggleterm does
+  - make `<leader>tj` work for non-windows OS's
+  - if terminal 1 is open in tab 1 then toggling a terminal with `<leader>tt`
+    in tab 2 should replace that window's buffer with a temporary buffer without
+    closing the window. The terminal will then open on tab 2. If I then navigate
+    back to window in tab 1 with the temporary buffer the buffer will swap out with the
+    terminal in tab 2.
+  - if I move the terminal to the side then that setting should be remembered for that tab when I toggle it with `<leader>tt`
+- [ ] Window navigation
+  - create a hydra like keymaps for <C-W> keys
+  - add <leader>w as an alias for <C-W> keymaps (move multicursor keymaps to a different namespace)
+  - Add harpoon list for reruning overseer tasks
 - [ ] Settings
   - [ ] match tabs with what my formatters use for various file types
   - [ ] add a local leader to start replacing keymaps from plugins with UI buffers like telescope, diffview, fugitive
@@ -216,7 +259,6 @@ the workaround is to make sure the plugin is loaded
   - [ ] try out [custom surrounds](https://github.com/kylechui/nvim-surround/discussions/53)
   - [ ] try out https://www.reddit.com/r/neovim/comments/1ckd1rs/helpful_treesitter_node_motion/?utm_medium=android_app&utm_source=share
 - [ ] Prune Plugins (plugins I might want to create my own version of or see if I still need it)
-  - akinsho/toggleterm.nvim (replace with custom code)
   - iamcco/markdown-preview.nvim (replace with maybe my own version)
   - nvim-tree/nvim-web-devicons (replace with echasnovski/mini.icons)
   - WhoIsSethDaniel/mason-tool-installer.nvim (replace with custom code)

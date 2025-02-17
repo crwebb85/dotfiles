@@ -72,16 +72,19 @@ vim.api.nvim_create_autocmd({ 'TermOpen' }, {
 -- back to the bottom causing me to need to navigate back up the the previous line
 -- if I wanted to yank a few more lines
 --
+-- Edit: I do need no spell at a minimum
+--
 -- -- If opening a terminal start in insert mode and set local parameters
 -- -- Works for both the :terminal command and toggleterm plugin
--- vim.api.nvim_create_autocmd('TermOpen', {
---     group = vim.api.nvim_create_augroup('term_open_insert', { clear = true }),
---     pattern = { 'term://*' },
---       command = [[
---       startinsert
---       setlocal nonumber norelativenumber nospell signcolumn=no noruler
---     ]],
--- })
+vim.api.nvim_create_autocmd('TermOpen', {
+    group = vim.api.nvim_create_augroup('term_open_insert', { clear = true }),
+    pattern = { 'term://*' },
+    command = [[
+      " startinsert
+      " setlocal nonumber norelativenumber nospell signcolumn=no noruler
+      setlocal nospell
+    ]],
+})
 --
 -- When entering terminal start in insert mode. This is useful if I had toggled
 -- the terminal closed in normal mode but then try to toggle it back up.
@@ -194,7 +197,7 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
 vim.api.nvim_create_autocmd('FocusGained', {
     pattern = '*',
     callback = function(_)
-        vim.print('highlight')
+        -- vim.print('highlight')
         vim.wo.cursorline = true
         vim.cmd('redraw')
         vim.defer_fn(function() vim.wo.cursorline = false end, 600)

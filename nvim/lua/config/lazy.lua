@@ -551,6 +551,11 @@ require('lazy').setup({
                 desc = 'Telescope: git status',
             },
             {
+                '<leader>fr',
+                function() require('telescope.builtin').resume() end,
+                desc = 'Telescope: resume',
+            },
+            {
                 '<leader>fe',
                 function()
                     local conf = require('telescope.config').values
@@ -646,6 +651,12 @@ require('lazy').setup({
                                 true
                             )
                             vim.api.nvim_feedkeys(escape_key, 'm', false) -- Set mode to normal mode
+                        end,
+                        ['<A-v>'] = function(...)
+                            require('telescope.actions').select_vertical(...)
+                        end,
+                        ['<A-x>'] = function(...)
+                            require('telescope.actions').select_horizontal(...)
                         end,
                         ['<C-b>'] = function(prompt_bufnr)
                             --Using my bufdelete (modified version of famiu/bufdelete.nvim)
@@ -1325,11 +1336,11 @@ require('lazy').setup({
         lazy = true,
         cmd = { 'ToggleTerm' },
         keys = {
-            {
-                '<leader>tt',
-                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-                desc = 'Toggleterm: Toggle',
-            },
+            -- {
+            --     '<leader>tt',
+            --     '<cmd>exe v:count1 . "ToggleTerm"<CR>',
+            --     desc = 'Toggleterm: Toggle',
+            -- },
             {
 
                 [[<C-\>]],
@@ -1344,6 +1355,71 @@ require('lazy').setup({
             },
         },
         config = function(_, opts) require('toggleterm').setup(opts) end,
+    },
+
+    {
+        'folke/snacks.nvim',
+        keys = {
+            {
+                '<leader>tt',
+                function()
+                    Snacks.terminal(nil, {
+                        start_insert = true,
+                        auto_insert = false,
+                        auto_close = false,
+                    })
+                end,
+
+                desc = 'Toggleterm: Toggle',
+            },
+
+            {
+                '<leader>tj',
+                function()
+                    Snacks.terminal('pwsh', {
+                        start_insert = true,
+                        auto_close = false,
+                        interactive = true,
+                    })
+                end,
+
+                desc = 'Toggleterm: Toggle',
+            },
+        },
+        ---@type snacks.Config
+        opts = {
+            terminal = {
+                keys = {
+                    gf = function(self)
+                        local f =
+                            vim.fn.findfile(vim.fn.expand('<cfile>'), '**')
+                        if f == '' then
+                            vim.print('No file under cursor')
+                        else
+                            self:hide()
+                            vim.schedule(function() vim.cmd('e ' .. f) end)
+                        end
+                    end,
+                    term_normal = {
+                        '<esc>',
+                        function(self)
+                            self.esc_timer = self.esc_timer
+                                or (vim.uv or vim.loop).new_timer()
+                            if self.esc_timer:is_active() then
+                                self.esc_timer:stop()
+                                vim.cmd('stopinsert')
+                            else
+                                self.esc_timer:start(200, 0, function() end)
+                                return '<esc>'
+                            end
+                        end,
+                        mode = 't',
+                        expr = true,
+                        desc = 'Double escape to normal mode',
+                    },
+                },
+            },
+        },
     },
 
     ---------------------------------------------------------------------------

@@ -1135,7 +1135,7 @@ maputils
     .operations({
         backward_key = '<C-h>',
         forward_key = '<C-l>',
-        mode = { 'n' },
+        mode = { 'n', 'x' }, --Add some check so that non-visual visual mode keymaps don't get repeated
     })
     :navigator({
         default = {

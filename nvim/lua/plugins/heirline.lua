@@ -30,8 +30,8 @@ local config = function()
     local buftype_foreground_color = colors.green2
 
     local winbar_inactive = {
-        buftype = { 'nofile', 'prompt', 'quickfix', 'terminal' },
-        filetype = { 'toggleterm', 'qf', 'terminal', 'gypsy' },
+        buftype = { 'nofile', 'prompt', 'quickfix' },
+        filetype = { 'qf' },
     }
 
     local Align = { provider = '%=' }

@@ -26,8 +26,8 @@ local M = {
     dev_plugins_path = 'C:\\Users\\crweb\\Documents\\projects\\',
 
     ---@type boolean
-    use_native_completion = true,
-    -- use_native_completion = false,
+    -- use_native_completion = true,
+    use_native_completion = false,
 
     use_overseer_strategy_hack = false,
     -- use_overseer_strategy_hack = true,
