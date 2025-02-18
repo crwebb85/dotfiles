@@ -1033,48 +1033,48 @@ require('lazy').setup({
     },
 
     -- File search and replace
-    {
-        'nvim-pack/nvim-spectre',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-        },
-        lazy = true,
-        cmd = { 'Spectre' },
-        opts = {},
-        config = true,
-        keys = {
-            {
-                '<leader>st',
-                function() require('spectre').toggle() end,
-                mode = { 'n' },
-                desc = 'Spectre: Toggle Spectre',
-            },
-            {
-                '<leader>sw',
-                function()
-                    require('spectre').open_visual({ select_word = true })
-                end,
-                mode = { 'n' },
-                desc = 'Spectre: Search current word',
-            },
-            {
-                '<leader>sw',
-                function() require('spectre').open_visual() end,
-                mode = { 'v' },
-                desc = 'Spectre: Search current word',
-            },
-            {
-                '<leader>sp',
-                function()
-                    require('spectre').open_file_search({
-                        select_word = true,
-                    })
-                end,
-                mode = { 'n' },
-                desc = 'Spectre: Search on current file',
-            },
-        },
-    },
+    -- {
+    --     'nvim-pack/nvim-spectre',
+    --     dependencies = {
+    --         'nvim-lua/plenary.nvim',
+    --     },
+    --     lazy = true,
+    --     cmd = { 'Spectre' },
+    --     opts = {},
+    --     config = true,
+    --     keys = {
+    --         {
+    --             '<leader>st',
+    --             function() require('spectre').toggle() end,
+    --             mode = { 'n' },
+    --             desc = 'Spectre: Toggle Spectre',
+    --         },
+    --         {
+    --             '<leader>sw',
+    --             function()
+    --                 require('spectre').open_visual({ select_word = true })
+    --             end,
+    --             mode = { 'n' },
+    --             desc = 'Spectre: Search current word',
+    --         },
+    --         {
+    --             '<leader>sw',
+    --             function() require('spectre').open_visual() end,
+    --             mode = { 'v' },
+    --             desc = 'Spectre: Search current word',
+    --         },
+    --         {
+    --             '<leader>sp',
+    --             function()
+    --                 require('spectre').open_file_search({
+    --                     select_word = true,
+    --                 })
+    --             end,
+    --             mode = { 'n' },
+    --             desc = 'Spectre: Search on current file',
+    --         },
+    --     },
+    -- },
     ---------------------------------------------------------------------------
     -- Utils
 
@@ -1944,6 +1944,59 @@ require('lazy').setup({
             }
             require('nvim-treesitter.configs').setup(opts)
         end,
+    },
+
+    {
+        'gbprod/substitute.nvim',
+        keys = {
+            {
+                '<leader>s',
+                function() require('substitute').operator() end,
+                desc = 'Substitute: operator',
+            },
+            {
+                '<leader>ss',
+                function() require('substitute').line() end,
+                desc = 'Substitute: line',
+            },
+            {
+                '<leader>S',
+                function() require('substitute').eol() end,
+                desc = 'Substitute: eol',
+            },
+            {
+                '<leader>s',
+                function() require('substitute').visual() end,
+                mode = { 'x' },
+                desc = 'Substitute: visual',
+            },
+        },
+        opts = {
+            on_substitute = nil,
+            yank_substituted_text = false,
+            preserve_cursor_position = false,
+            modifiers = nil,
+            highlight_substituted_text = {
+                enabled = true,
+                timer = 500,
+            },
+            range = {
+                prefix = 's',
+                prompt_current_text = false,
+                confirm = false,
+                complete_word = false,
+                subject = nil,
+                range = nil,
+                suffix = '',
+                auto_apply = false,
+                cursor_position = 'end',
+            },
+            exchange = {
+                motion = false,
+                use_esc_to_cancel = true,
+                preserve_cursor_position = false,
+            },
+        },
     },
 
     -- Adds refactor commands

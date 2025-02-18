@@ -233,7 +233,7 @@ the workaround is to make sure the plugin is loaded
 - [ ] Movement/TextObjects keymaps
   - [ ] re-evaluate keymaps after upgrading to nightly based on keymaps added in https://github.com/neovim/neovim/commit/bb7604eddafb31cd38261a220243762ee013273a
   - [ ] add ]r and [r for navigating lsp references
-  - [ ] add a substitute operation that uses text objects for pasting similar to [substitute.nvim](https://github.com/gbprod/substitute.nvim)
+  - [x] add a substitute operation that uses text objects for pasting similar to [substitute.nvim](https://github.com/gbprod/substitute.nvim)
   - [ ] add keymap for next/previous partial word for navigating within snake-case and camel-case variables similar to [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
   - [ ] maybe use some prefix like g for my navigation keymaps to move the cursor to the end
         of the item like how gp works. For example if ]m navigates to the begining of
