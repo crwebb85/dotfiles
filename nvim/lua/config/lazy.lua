@@ -2024,13 +2024,14 @@ require('lazy').setup({
             -- adapters
             'rouge8/neotest-rust',
             'nvim-neotest/neotest-python',
-            {
-                --Using my fork until the PR https://github.com/Issafalcon/neotest-dotnet/pull/123/files
-                --from BurkeStrange is merged into in
-                'crwebb85/neotest-dotnet',
-                -- 'Issafalcon/neotest-dotnet',
-                -- dev = true,
-            },
+            'Issafalcon/neotest-dotnet',
+            -- {
+            --     --Using my fork until the PR https://github.com/Issafalcon/neotest-dotnet/pull/123/files
+            --     --from BurkeStrange is merged into in
+            --     'crwebb85/neotest-dotnet',
+            --     -- 'Issafalcon/neotest-dotnet',
+            --     -- dev = true,
+            -- },
         },
         lazy = true,
         cmd = 'Neotest',
