@@ -1102,10 +1102,11 @@ require('lazy').setup({
         'folke/which-key.nvim',
         lazy = true,
         event = 'VeryLazy',
-        init = function()
-            vim.o.timeout = true
-            vim.o.timeoutlen = 300
-        end,
+        -- Note: decided to set timeout in the set.lua file
+        -- init = function()
+        --     vim.o.timeout = true
+        --     vim.o.timeoutlen = 300
+        -- end,
         opts = {},
         config = function(_, opts)
             local default_opts = {

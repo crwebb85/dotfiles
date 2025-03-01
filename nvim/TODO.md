@@ -45,6 +45,9 @@
 - refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
 - overseer hurl opens the quickfix window in all tabs not just the tab that was I used to run the overseer command
 - keymap ]M doesn't work when recording a macro
+- when going into a big file (only tested when using gd (goto definition)) the first line gets added to the jump list
+- leaving a big file by using `<c-o>` sometimes errors at the line `function() vim.api.nvim_del_autocmd(event.id) end`
+  saying it can't delete the autocmd.
 - when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
   Both the end_of_line and charset will cause the error.
 

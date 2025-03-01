@@ -21,6 +21,14 @@ vim.o.guicursor =
     'n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
 
 -------------------------------------------------------------------------------
+--- Keymap timeout
+--- These settings were picked to play nice with which key
+--- Note: I have an autocommand to temporarily disable timeout during macro
+--- recording since I try to slowly and carefully type my macros
+vim.o.timeout = true
+vim.o.timeoutlen = 300
+
+-------------------------------------------------------------------------------
 --- Clipboard
 vim.o.clipboard = 'unnamed,unnamedplus'
 

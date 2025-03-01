@@ -474,6 +474,9 @@ local function pre_bufread_callback(bufnr)
 
                         --cleanup this autocmd
                         vim.schedule(
+                            -- TODO sometimes vim.api.nvim_del_autocmd(event.id) errors when
+                            -- leaving buffer with <c-o> to go to a different buffer in the jump list
+                            -- The error says it can't delete the autocmd
                             function() vim.api.nvim_del_autocmd(event.id) end
                         )
                     end
@@ -493,6 +496,30 @@ vim.api.nvim_create_autocmd('BufReadPre', {
         'Performance rule for handling files over %sMiB',
         config.bigfile_filesize
     ),
+})
+
+-------------------------------------------------------------------------------
+---Fix macros so that keymap timeout is turned off when recording macros. I was
+---having issues where when I record a macro I would hit the keymaps too slowly
+---and they would timeout
+
+local macro_keymap_augroup =
+    vim.api.nvim_create_augroup('brain_slows_down_during_macro_recording', {})
+vim.api.nvim_create_autocmd('RecordingEnter', {
+    pattern = '*',
+    group = macro_keymap_augroup,
+    callback = function() vim.go.timeout = false end,
+    desc = 'Disable keymap timeout during macro recording since I type a lot slower when recording macros',
+    --Note this is also useful since keymaps that only activate after a timeout can't be used during macros
+    --since the macro doesn't wait a timeout (there might be a way to make it sleep for the timeout but I don't
+    --care since I will never use that and just won't try to support that functionality)
+})
+
+vim.api.nvim_create_autocmd('RecordingLeave', {
+    pattern = '*',
+    group = macro_keymap_augroup,
+    callback = function() vim.go.timeout = true end,
+    desc = 'Re-enable keymap timeout after macro recording is over',
 })
 
 -------------------------------------------------------------------------------
