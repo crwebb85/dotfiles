@@ -1094,6 +1094,45 @@ local myoperations = maputils
     :navigator({
         --visual mode: stays within buffer so visual mode would be useful
         default = {
+            key = 'gmn',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                    '@function_declaration_name.inner',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_start(
+                    '@function_declaration_name.inner',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} function name start',
+            opts = {},
+        },
+        extreme = {
+            key = 'gmN',
+            mode = { 'n', 'x' },
+            backward = function()
+                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                    '@function_declaration_name.inner',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            forward = function()
+                require('nvim-treesitter.textobjects.move').goto_next_end(
+                    '@function_declaration_name.inner',
+                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                )
+            end,
+            desc = 'Custom: jump to the {previous|next} function name end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
             key = 'gt',
             mode = { 'n', 'x' },
             backward = function()
@@ -1140,9 +1179,21 @@ maputils
     :navigator({
         default = {
             key = '',
-            backward = function() myoperations.repeat_backward_callback() end,
-            forward = function() myoperations.repeat_forward_callback() end,
-            desc = 'Custom: Repeat my last {backward|forward} keymap for navigating lists',
+            backward = function()
+                if myoperations.isLastCallbackExtreme then
+                    myoperations.repeat_extreme_backward_callback()
+                else
+                    myoperations.repeat_backward_callback()
+                end
+            end,
+            forward = function()
+                if myoperations.isLastCallbackExtreme then
+                    myoperations.repeat_extreme_forward_callback()
+                else
+                    myoperations.repeat_forward_callback()
+                end
+            end,
+            desc = 'Custom: Repeat my last {backward|forward} keymap for navigating lists (if extreme was used, will repeat extreme)',
             opts = {},
         },
     })
@@ -1157,10 +1208,20 @@ maputils
         default = {
             key = '',
             backward = function()
-                myoperations.repeat_extreme_backward_callback()
+                if myoperations.isLastCallbackExtreme then
+                    myoperations.repeat_backward_callback()
+                else
+                    myoperations.repeat_extreme_backward_callback()
+                end
             end,
-            forward = function() myoperations.repeat_extreme_forward_callback() end,
-            desc = 'Custom: Run the extreme "{backward|forward}" command',
+            forward = function()
+                if myoperations.isLastCallbackExtreme then
+                    myoperations.repeat_forward_callback()
+                else
+                    myoperations.repeat_extreme_forward_callback()
+                end
+            end,
+            desc = 'Custom: Repeat the extreme of my last "{backward|forward}" command navigating lists (if the last movement was extreme then the none extreme will be repeated)',
             opts = {},
         },
     })

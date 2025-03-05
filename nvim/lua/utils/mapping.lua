@@ -240,11 +240,13 @@ end
 ---@field _repeat_forward_callback fun()
 ---@field _repeat_extreme_backward_callback fun()
 ---@field _repeat_extreme_forward_callback fun()
+---@field isLastCallbackExtreme boolean
 ---@field repeat_backward_callback fun()
 ---@field repeat_forward_callback fun()
 ---@field repeat_extreme_backward_callback fun()
 ---@field repeat_extreme_forward_callback fun()
 local MyOperations = {
+    isLastCallbackExtreme = false,
     _repeat_backward_callback = function()
         vim.notify('No callback set', vim.log.levels.WARN)
     end,
@@ -314,7 +316,9 @@ function MyOperations:navigator(args)
     -- create a copy of the options so I can modify it
     local default_keymap_opts =
         vim.tbl_deep_extend('keep', {}, args.default.opts or {})
-    local function set_callbacks()
+
+    local function set_callbacks(isLastCallbackExtreme)
+        self.isLastCallbackExtreme = isLastCallbackExtreme
         self._repeat_backward_callback = function()
             if type(args.default.backward) == 'string' then
                 vim.cmd(args.default.backward)
@@ -356,12 +360,12 @@ function MyOperations:navigator(args)
     end
 
     local backward = function()
-        set_callbacks()
+        set_callbacks(false)
         M.smart_nav(args.default.backward)
     end
 
     local forward = function()
-        set_callbacks()
+        set_callbacks(false)
         M.smart_nav(args.default.forward)
     end
 
@@ -387,12 +391,12 @@ function MyOperations:navigator(args)
             vim.tbl_deep_extend('keep', {}, args.extreme.opts or {})
 
         local extreme_backward = function()
-            set_callbacks()
+            set_callbacks(true)
             M.smart_nav(args.extreme.backward)
         end
 
         local extreme_forward = function()
-            set_callbacks()
+            set_callbacks(true)
             M.smart_nav(args.extreme.forward)
         end
 

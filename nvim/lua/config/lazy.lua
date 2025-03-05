@@ -1704,7 +1704,7 @@ require('lazy').setup({
                     additional_vim_regex_highlighting = false,
                 },
             })
-            local query = [[
+            local custom_csharp_queries = [[
                 (cast_expression
                   (
                     ("(") @start 
@@ -1715,11 +1715,17 @@ require('lazy').setup({
                     (#make-range! "cast.outer" @start @end)
                     )
                   ) 
+
+                (method_declaration
+                    name: (_) @function_declaration_name.inner)
+
+                (constructor_declaration
+                    name: (_) @function_declaration_name.inner)
             ]]
             vim.treesitter.query.set(
                 'c_sharp',
                 config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
-                query
+                custom_csharp_queries
             )
         end,
     },
@@ -1753,9 +1759,12 @@ require('lazy').setup({
             local lang_utils = require('treesj.langs.utils')
             local opts = {
                 use_default_keymaps = false,
+                ---@type number If line after join will be longer than max value, node will not be formatted
+                max_join_length = 2000,
                 langs = {
                     c_sharp = {
                         argument_list = lang_utils.set_preset_for_args(),
+                        initializer_expression = lang_utils.set_preset_for_dict(),
                         formal_parameters = lang_utils.set_preset_for_args(),
                         block = lang_utils.set_preset_for_statement(),
                         constructor_body = lang_utils.set_preset_for_statement(),
@@ -1773,6 +1782,9 @@ require('lazy').setup({
                         },
                         method_declaration = {
                             target_nodes = { 'block' },
+                        },
+                        object_creation_expression = {
+                            target_nodes = { 'initializer_expression' },
                         },
                         variable_declarator = {
                             target_nodes = { 'array_initializer' },
@@ -1794,6 +1806,16 @@ require('lazy').setup({
         event = 'BufReadPre',
         config = function(_, _)
             local opts = {
+                incremental_selection = {
+                    enable = true,
+                    keymaps = {
+                        init_selection = '<leader>vnn',
+                        --TODO these don't work yet or I don't understand what they do
+                        node_incremental = '<leader>grn',
+                        scope_incremental = '<leader>grc',
+                        node_decremental = '<leader>grm',
+                    },
+                },
                 textobjects = {
                     select = {
                         enable = true,
