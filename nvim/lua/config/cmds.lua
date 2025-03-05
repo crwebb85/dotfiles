@@ -728,6 +728,290 @@ vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
 end, {
     desc = 'Remove invalid quickfix items',
 })
+
+-------------------------------------------------------------------------------
+---Treesitter
+
+--Technically nvim-treesitter.textobjects already has commands like these but they
+--don't work for treesitter queries defined outside of the plugin
+
+--TODO
+-- 1. I would like to add marks to the beginning and end so that I can have a command to move toggle between the two
+-- 2. fight the urge to create a repeat command. I can just use a macro for that
+-- 3. it would be nice if I had a flag to include comments when swapping
+
+vim.api.nvim_create_user_command('TSGotoNext', function(params)
+    if #params.fargs ~= 2 then
+        vim.notify(
+            'Must supply 2 arguments. The first must be the treesitter group. Followed a capture name to match on.'
+        )
+        return
+    end
+    local query_group = params.fargs[1]
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+
+    if params.bang then
+        require('nvim-treesitter.textobjects.move').goto_next_end(
+            capture_name,
+            query_group
+        )
+    else
+        require('nvim-treesitter.textobjects.move').goto_next_start(
+            capture_name,
+            query_group
+        )
+    end
+end, {
+    bang = true,
+    nargs = '+',
+    complete = function(_, text, _)
+        --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
+        --second argumet is the text up to the cursor
+        --third argument is the index of the cursor
+        local words = vim.split(text, '%s+')
+        -- vim.print(words)
+        if #words <= 2 then
+            return {
+                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                'textobjects',
+                'folds',
+                'highlights',
+                'injections',
+                'locals',
+            }
+        elseif #words <= 3 then
+            local base_bufnr = vim.api.nvim_win_get_buf(0)
+
+            local lang =
+                vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+            local query_group = words[2]
+            local ok_query, query =
+                pcall(vim.treesitter.query.get, lang, query_group)
+            if not ok_query or query == nil then return end
+            return query.captures
+        end
+        return {}
+    end,
+    desc = 'Go to the treesitter capture group. The first param is the query group and the second param is the capture name. Bang puts the cursor at the end of the capture group.',
+})
+
+vim.api.nvim_create_user_command('TSGotoPrevious', function(params)
+    if #params.fargs ~= 2 then
+        vim.notify(
+            'Must supply 2 arguments. The first must be the treesitter group. Followed a capture name to match on.'
+        )
+        return
+    end
+    local query_group = params.fargs[1]
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+
+    if params.bang then
+        require('nvim-treesitter.textobjects.move').goto_previous_end(
+            capture_name,
+            query_group
+        )
+    else
+        require('nvim-treesitter.textobjects.move').goto_previous_start(
+            capture_name,
+            query_group
+        )
+    end
+end, {
+    bang = true,
+    nargs = '+',
+    complete = function(_, text, _)
+        --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
+        --second argumet is the text up to the cursor
+        --third argument is the index of the cursor
+        local words = vim.split(text, '%s+')
+        -- vim.print(words)
+        if #words <= 2 then
+            return {
+                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                'textobjects',
+                'folds',
+                'highlights',
+                'injections',
+                'locals',
+            }
+        elseif #words <= 3 then
+            local base_bufnr = vim.api.nvim_win_get_buf(0)
+
+            local lang =
+                vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+            local query_group = words[2]
+            local ok_query, query =
+                pcall(vim.treesitter.query.get, lang, query_group)
+            if not ok_query or query == nil then return end
+            return query.captures
+        end
+        return {}
+    end,
+    desc = 'Go to the previous treesitter capture group. The first param is the query group and the second param is the capture name. Bang puts the cursor at the end of the capture group.',
+})
+
+vim.api.nvim_create_user_command('TSSwapNext', function(params)
+    if #params.fargs ~= 2 then
+        vim.notify(
+            'Must supply 2 arguments. The first must be the treesitter group. Followed a capture name to match on.'
+        )
+        return
+    end
+    local query_group = params.fargs[1]
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+
+    require('nvim-treesitter.textobjects.swap').swap_next(
+        capture_name,
+        query_group
+    )
+end, {
+    nargs = '+',
+    complete = function(_, text, _)
+        --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
+        --second argumet is the text up to the cursor
+        --third argument is the index of the cursor
+        local words = vim.split(text, '%s+')
+        -- vim.print(words)
+        if #words <= 2 then
+            return {
+                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                'textobjects',
+                'folds',
+                'highlights',
+                'injections',
+                'locals',
+            }
+        elseif #words <= 3 then
+            local base_bufnr = vim.api.nvim_win_get_buf(0)
+
+            local lang =
+                vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+            local query_group = words[2]
+            local ok_query, query =
+                pcall(vim.treesitter.query.get, lang, query_group)
+            if not ok_query or query == nil then return end
+            return query.captures
+        end
+        return {}
+    end,
+    desc = 'Swap the next treesitter capture group. The first param is the query group and the second param is the capture name.',
+})
+
+vim.api.nvim_create_user_command('TSSwapPrevious', function(params)
+    if #params.fargs ~= 2 then
+        vim.notify(
+            'Must supply 2 arguments. The first must be the treesitter group. Followed a capture name to match on.'
+        )
+        return
+    end
+    local query_group = params.fargs[1]
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+
+    require('nvim-treesitter.textobjects.swap').swap_previous(
+        capture_name,
+        query_group
+    )
+end, {
+    nargs = '+',
+    complete = function(_, text, _)
+        --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
+        --second argumet is the text up to the cursor
+        --third argument is the index of the cursor
+        local words = vim.split(text, '%s+')
+        -- vim.print(words)
+        if #words <= 2 then
+            return {
+                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                'textobjects',
+                'folds',
+                'highlights',
+                'injections',
+                'locals',
+            }
+        elseif #words <= 3 then
+            local base_bufnr = vim.api.nvim_win_get_buf(0)
+
+            local lang =
+                vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+            local query_group = words[2]
+            local ok_query, query =
+                pcall(vim.treesitter.query.get, lang, query_group)
+            if not ok_query or query == nil then return end
+            return query.captures
+        end
+        return {}
+    end,
+    desc = 'Swap the previous treesitter capture group. The first param is the query group and the second param is the capture name.',
+})
+
+vim.api.nvim_create_user_command('TSSelect', function(params)
+    if #params.fargs ~= 2 then
+        vim.notify(
+            'Must supply 2 arguments. The first must be the treesitter group. Followed a capture name to match on.'
+        )
+        return
+    end
+    local query_group = params.fargs[1]
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+
+    require('nvim-treesitter.textobjects.select').select_textobject(
+        capture_name,
+        query_group
+    )
+end, {
+    nargs = '+',
+    complete = function(_, text, _)
+        --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
+        --second argumet is the text up to the cursor
+        --third argument is the index of the cursor
+        local words = vim.split(text, '%s+')
+        -- vim.print(words)
+        if #words <= 2 then
+            return {
+                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+                'textobjects',
+                'folds',
+                'highlights',
+                'injections',
+                'locals',
+            }
+        elseif #words <= 3 then
+            local base_bufnr = vim.api.nvim_win_get_buf(0)
+
+            local lang =
+                vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+            local query_group = words[2]
+            local ok_query, query =
+                pcall(vim.treesitter.query.get, lang, query_group)
+            if not ok_query or query == nil then return end
+            return query.captures
+        end
+        return {}
+    end,
+    desc = 'Select treesitter capture group. The first param is the query group and the second param is the capture name.',
+})
+
+-------------------------------------------------------------------------------
+---Task runner commands
+
+vim.api.nvim_create_user_command('Make', function(params)
+    -- Insert args at the '$*' in the makeprg
+    local cmd, num_subs = vim.o.makeprg:gsub('%$%*', params.args)
+    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    local task = require('overseer').new_task({
+        cmd = vim.fn.expandcmd(cmd),
+        components = {
+            { 'on_output_quickfix', open = not params.bang, open_height = 8 },
+            'default',
+        },
+    })
+    task:start()
+end, {
+    desc = 'Run your makeprg as an Overseer task',
+    nargs = '*',
+    bang = true,
+})
+
 -------------------------------------------------------------------------------
 ---Task runner commands
 
