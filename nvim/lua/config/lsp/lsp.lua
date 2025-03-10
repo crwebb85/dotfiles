@@ -114,8 +114,11 @@ local function default_keymaps(bufnr, client)
         desc = [[LSP: Displays hover information about the symbol under the cursor in a floating window. Calling the function twice will jump into the floating window.]],
     })
     vim.keymap.set('n', 'gd', function()
-        vim.cmd([[norm! m']]) -- This adds the current location to the jumplist. There must be some change to how jumplists work that made me have to add this line and I should check the changelog.
-        if vim.bo.filetype == 'cs' then
+        -- vim.cmd([[norm! m']]) -- This adds the current location to the jumplist. There must be some change to how jumplists work that made me have to add this line and I should check the changelog.
+
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.locations').goto_definition()
+        elseif vim.bo.filetype == 'cs' then
             --I should probably be checking for if client is omnisharp but this is good enough
             require('omnisharp_extended').lsp_definition()
         else
@@ -125,12 +128,20 @@ local function default_keymaps(bufnr, client)
         buffer = bufnr,
         desc = 'LSP: Jumps to the definition of the symbol under the cursor.',
     })
-    vim.keymap.set('n', 'gD', function() vim.lsp.buf.declaration() end, {
+    vim.keymap.set('n', 'gD', function()
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.locations').goto_declaration()
+        else
+            vim.lsp.buf.declaration()
+        end
+    end, {
         buffer = bufnr,
         desc = 'LSP: Jumps to the declaration of the symbol under the cursor.',
     })
     vim.keymap.set('n', 'gi', function()
-        if vim.bo.filetype == 'cs' then
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.locations').goto_implementation()
+        elseif vim.bo.filetype == 'cs' then
             --I should probably be checking for if client is omnisharp but this is good enough
             require('omnisharp_extended').lsp_implementation()
         else
@@ -141,7 +152,9 @@ local function default_keymaps(bufnr, client)
         desc = 'LSP: Lists all the implementations for the symbol under the cursor in the quickfix window.',
     })
     vim.keymap.set('n', 'go', function()
-        if vim.bo.filetype == 'cs' then
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.locations').goto_type_definition()
+        elseif vim.bo.filetype == 'cs' then
             --I should probably be checking for if client is omnisharp but this is good enough
             require('omnisharp_extended').lsp_type_definition()
         else
@@ -153,7 +166,9 @@ local function default_keymaps(bufnr, client)
     })
 
     vim.keymap.set('n', 'grr', function()
-        if vim.bo.filetype == 'cs' then
+        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
+            require('mark-code-action.locations').list_references()
+        elseif vim.bo.filetype == 'cs' then
             --I should probably be checking for if client is omnisharp but this is good enough
             require('omnisharp_extended').lsp_references()
         else
