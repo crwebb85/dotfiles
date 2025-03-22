@@ -17,6 +17,88 @@ vim.keymap.set(
     { desc = 'Customized Remap: Remapped to <nop> to disable this keybinging' }
 )
 
+-------------------------------------------------------------------------------
+---Terminal keymaps
+---
+
+vim.keymap.set('n', '<leader>tt', function()
+    local terminal = require('config.terminal.terminal')
+    terminal.toggle({
+        start_insert = true,
+        auto_insert = false,
+        auto_close = false,
+        namespace = 'normal_group',
+    })
+end, { desc = 'Custom: Toggle Terminal' })
+
+vim.keymap.set('n', '<leader>tjh', function()
+    local terminal = require('config.terminal.terminal')
+    terminal.toggle({
+        start_insert = true,
+        auto_insert = false,
+        auto_close = false,
+        namespace = 'normal_group',
+        position = 'left',
+    })
+end, { desc = 'Custom: Toggle Terminal Left' })
+
+vim.keymap.set('n', '<leader>tjj', function()
+    local terminal = require('config.terminal.terminal')
+    terminal.toggle({
+        start_insert = true,
+        auto_insert = false,
+        auto_close = false,
+        namespace = 'normal_group',
+        position = 'bottom',
+    })
+end, { desc = 'Custom: Toggle Terminal Bottom' })
+
+vim.keymap.set('n', '<leader>tjk', function()
+    local terminal = require('config.terminal.terminal')
+    terminal.toggle({
+        start_insert = true,
+        auto_insert = false,
+        auto_close = false,
+        namespace = 'normal_group',
+        position = 'top',
+    })
+end, { desc = 'Custom: Toggle Terminal Top' })
+
+vim.keymap.set('n', '<leader>tjl', function()
+    local terminal = require('config.terminal.terminal')
+    terminal.toggle({
+        start_insert = true,
+        auto_insert = false,
+        auto_close = false,
+        namespace = 'normal_group',
+        position = 'right',
+    })
+end, { desc = 'Custom: Toggle Terminal Right' })
+
+vim.keymap.set('n', '<leader>tjf', function()
+    local terminal = require('config.terminal.terminal')
+    terminal.toggle({
+        start_insert = true,
+        auto_close = false,
+        interactive = true,
+        namespace = 'normal_group',
+        position = 'float',
+    })
+end, { desc = 'Custom: Toggle Floating Terminal' })
+
+vim.keymap.set('n', '<leader>gs', function()
+    local terminal = require('config.terminal.terminal')
+    terminal.toggle({
+        cmd = 'lazygit',
+        start_insert = true,
+        auto_insert = false,
+        auto_close = false,
+        position = 'float',
+    })
+end, { desc = 'Custom: Toggle LazyGit' })
+
+-------------------------------------------------------------------------------
+
 --Granular undo while in insert mode
 vim.keymap.set(
     'i',

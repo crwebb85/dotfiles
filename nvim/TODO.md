@@ -21,6 +21,17 @@
 - make file buffers not in current directory slightly redder
 - look into overseer docker templates https://github.com/LoricAndre/dotfiles/blob/main/dot_config/nvim/lua/overseer/template/docker/build.lua
 
+### Terminal
+
+- [ ] add terminal resurrection
+- [ ] add yanking last command output
+- [ ] add yanking terminals cd path (use the count when not in the terminal buffer)
+- [ ] add repeat last command (with confirmation)
+- [ ] don't add terminals to jumplist
+- [ ] creating a top terminal and then a different left terminal causes the left
+      one to take up half of the screen horizontally. I think this is due to the
+      equalize function (this may be a sacrifice worth keeping if there isn't a clear fix)
+
 ### Bugs
 
 - Lightbulb still doesn't get removed in some case like when opening help docs with telescope
@@ -50,6 +61,7 @@
 - my `<leader>qt` keymap doesn't work when the location list is open but quickfix list is closed
 - when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
   Both the end_of_line and charset will cause the error.
+- something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
 
 ```editorconfig
 root = true

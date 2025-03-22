@@ -37,35 +37,6 @@ vim.opt.rtp:prepend(lazypath)
 -- init_python_environment()
 
 local M = {}
-M.lazygitTerminal = nil
-M.lazytoggle = function()
-    local Terminal = require('toggleterm.terminal').Terminal
-    if M.lazygitTerminal == nil then
-        M.lazygitTerminal = Terminal:new({
-            cmd = 'lazygit',
-            dir = 'git_dir',
-            direction = 'tab',
-            float_opts = {
-                border = 'double',
-            },
-            -- function to run on opening the terminal
-            on_open = function(term)
-                vim.cmd('startinsert!')
-                vim.api.nvim_buf_set_keymap(
-                    term.bufnr,
-                    'n',
-                    'q',
-                    '<cmd>close<CR>',
-                    { noremap = true, silent = true }
-                )
-            end,
-            -- function to run on closing the terminal
-            on_close = function(_) vim.cmd('startinsert!') end,
-        })
-    end
-
-    M.lazygitTerminal:toggle()
-end
 
 require('lazy').setup({
 
@@ -875,7 +846,7 @@ require('lazy').setup({
 
                     local row = list_item.context.row
                     local row_text =
-                        vim.api.nvim_buf_get_lines(0, row - 1, row, false)
+                        vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)
                     local col = #row_text[1]
 
                     if list_item.context.col > col then
@@ -883,10 +854,11 @@ require('lazy').setup({
                         edited = true
                     end
 
-                    vim.api.nvim_win_set_cursor(0, {
+                    local new_pos = {
                         list_item.context.row or 1,
                         list_item.context.col or 0,
-                    })
+                    }
+                    vim.api.nvim_win_set_cursor(0, new_pos)
 
                     if edited then
                         Extensions.extensions:emit(
@@ -1262,164 +1234,6 @@ require('lazy').setup({
         ---@type render.md.UserConfig
         opts = {
             enabled = config.enable_render_markdown,
-        },
-    },
-
-    -- {
-    --     'jellydn/hurl.nvim',
-    --     dependencies = {
-    --         'MunifTanjim/nui.nvim',
-    --         'nvim-lua/plenary.nvim',
-    --         'nvim-treesitter/nvim-treesitter',
-    --     },
-    --     ft = 'hurl',
-    --     opts = {
-    --         -- Show debugging info
-    --         debug = false,
-    --         -- Show notification on run
-    --         show_notification = false,
-    --         -- Show response in popup or split
-    --         mode = 'split',
-    --         -- Default formatter
-    --         formatters = {
-    --             -- json = { 'jq' }, -- Make sure you have install jq in your system, e.g: brew install jq
-    --             -- html = {
-    --             --     'prettier', -- Make sure you have install prettier in your system, e.g: npm install -g prettier
-    --             --     '--parser',
-    --             --     'html',
-    --             -- },
-    --             -- xml = {
-    --             --     'tidy', -- Make sure you have installed tidy in your system, e.g: brew install tidy-html5
-    --             --     '-xml',
-    --             --     '-i',
-    --             --     '-q',
-    --             -- },
-    --         },
-    --         -- Default mappings for the response popup or split views
-    --         mappings = {
-    --             close = 'q', -- Close the response popup or split view
-    --             next_panel = ']<leader>r', -- Move to the next response popup window
-    --             prev_panel = '[<leader>r', -- Move to the previous response popup window
-    --         },
-    --     },
-    --     keys = {
-    --         -- Run API request
-    --         -- { '<leader>A', '<cmd>HurlRunner<CR>', desc = 'Run All requests' },
-    --         -- { '<leader>a', '<cmd>HurlRunnerAt<CR>', desc = 'Run Api request' },
-    --         -- {
-    --         --     '<leader>te',
-    --         --     '<cmd>HurlRunnerToEntry<CR>',
-    --         --     desc = 'Run Api request to entry',
-    --         -- },
-    --         -- {
-    --         --     '<leader>tm',
-    --         --     '<cmd>HurlToggleMode<CR>',
-    --         --     desc = 'Hurl Toggle Mode',
-    --         -- },
-    --         -- {
-    --         --     '<leader>tv',
-    --         --     '<cmd>HurlVerbose<CR>',
-    --         --     desc = 'Run Api in verbose mode',
-    --         -- },
-    --         -- Run Hurl request in visual mode
-    --         -- {
-    --         --     '<leader>h',
-    --         --     ':HurlRunner<CR>',
-    --         --     desc = 'Hurl Runner',
-    --         --     mode = 'v',
-    --         -- },
-    --     },
-    -- },
-
-    -- Open terminal within neovim
-    {
-        'akinsho/toggleterm.nvim',
-        lazy = true,
-        cmd = { 'ToggleTerm' },
-        keys = {
-            -- {
-            --     '<leader>tt',
-            --     '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-            --     desc = 'Toggleterm: Toggle',
-            -- },
-            {
-
-                [[<C-\>]],
-                '<cmd>exe v:count1 . "ToggleTerm"<CR>',
-                desc = 'ToggleTerm: Toggle',
-                mode = { 'n', 'i' },
-            },
-            {
-                '<leader>gs',
-                function() M.lazytoggle() end,
-                desc = 'LazyGit',
-            },
-        },
-        config = function(_, opts) require('toggleterm').setup(opts) end,
-    },
-
-    {
-        'folke/snacks.nvim',
-        keys = {
-            {
-                '<leader>tt',
-                function()
-                    Snacks.terminal(nil, {
-                        start_insert = true,
-                        auto_insert = false,
-                        auto_close = false,
-                    })
-                end,
-
-                desc = 'Toggleterm: Toggle',
-            },
-
-            {
-                '<leader>tj',
-                function()
-                    Snacks.terminal('pwsh', {
-                        start_insert = true,
-                        auto_close = false,
-                        interactive = true,
-                    })
-                end,
-
-                desc = 'Toggleterm: Toggle',
-            },
-        },
-        ---@type snacks.Config
-        opts = {
-            terminal = {
-                keys = {
-                    gf = function(self)
-                        local f =
-                            vim.fn.findfile(vim.fn.expand('<cfile>'), '**')
-                        if f == '' then
-                            vim.print('No file under cursor')
-                        else
-                            self:hide()
-                            vim.schedule(function() vim.cmd('e ' .. f) end)
-                        end
-                    end,
-                    term_normal = {
-                        '<esc>',
-                        function(self)
-                            self.esc_timer = self.esc_timer
-                                or (vim.uv or vim.loop).new_timer()
-                            if self.esc_timer:is_active() then
-                                self.esc_timer:stop()
-                                vim.cmd('stopinsert')
-                            else
-                                self.esc_timer:start(200, 0, function() end)
-                                return '<esc>'
-                            end
-                        end,
-                        mode = 't',
-                        expr = true,
-                        desc = 'Double escape to normal mode',
-                    },
-                },
-            },
         },
     },
 

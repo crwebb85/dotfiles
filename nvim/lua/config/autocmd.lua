@@ -10,91 +10,131 @@ vim.api.nvim_create_autocmd(
 )
 
 -------------------------------------------------------------------------------
---- Add keybindings/settings to specific buffer types
-
--- Add keybindings to terminal buffers
-vim.api.nvim_create_autocmd({ 'TermOpen' }, {
-    -- if you only want these mappings for toggle term use term://*toggleterm#* instead
-    pattern = 'term://*',
-    callback = function()
-        vim.keymap.set(
-            't',
-            '<leader><esc>',
-            [[<C-\><C-n>]],
-            { buffer = 0, desc = 'Terminal: Esc to terminal normal mode' }
-        )
+--- Terminal Autocmds
+vim.api.nvim_create_autocmd('TermOpen', {
+    group = vim.api.nvim_create_augroup('my.terminal', {}),
+    desc = 'My Default settings for :terminal buffers',
+    callback = function(args)
+        --Set keymaps
+        vim.keymap.set('t', '<leader><esc>', [[<C-\><C-n>]], {
+            buffer = args.buf,
+            desc = 'Terminal: Esc to terminal normal mode',
+        })
         vim.keymap.set(
             't',
             '<leader>',
             [[<leader>]],
             --Note I only need this keymap so that typing space by itself still works and doesn't
             --permanently prompt me for the <esc> key because of the above keymap <leader><esc>
-            { buffer = 0, desc = 'Terminal: enter leader key' }
+            { buffer = args.buf, desc = 'Terminal: enter leader key' }
         )
         vim.keymap.set(
             't',
             '<C-h>',
             [[<Cmd>wincmd h<CR>]],
-            { buffer = 0, desc = 'Terminal: Move to left window' }
+            { buffer = args.buf, desc = 'Terminal: Move to left window' }
         )
         vim.keymap.set(
             't',
             '<C-j>',
             [[<Cmd>wincmd j<CR>]],
-            { buffer = 0, desc = 'Terminal: Move to lower window' }
+            { buffer = args.buf, desc = 'Terminal: Move to lower window' }
         )
         vim.keymap.set(
             't',
             '<C-k>',
             [[<Cmd>wincmd k<CR>]],
-            { buffer = 0, desc = 'Terminal: Move to upper window' }
+            { buffer = args.buf, desc = 'Terminal: Move to upper window' }
         )
         vim.keymap.set(
             't',
             '<C-l>',
             [[<Cmd>wincmd l<CR>]],
-            { buffer = 0, desc = 'Terminal: Move to right window' }
+            { buffer = args.buf, desc = 'Terminal: Move to right window' }
         )
         vim.keymap.set(
             't',
             '<C-w>',
             [[<C-\><C-n><C-w>]],
-            { buffer = 0, desc = 'Terminal: Trigger Window keymaps' }
+            { buffer = args.buf, desc = 'Terminal: Trigger Window keymaps' }
         )
+
+        ---Overrides defaults from _defaults.lua
+        vim.wo[0][0].number = true
+        vim.wo[0][0].relativenumber = true
+        vim.wo[0][0].signcolumn = 'yes'
+        vim.wo[0][0].spell = false
+
+        ---Setup keymaps and window settings for my terminal managers
+        if vim.b[args.buf].my_terminal ~= nil then
+            vim.wo[0][0].sidescrolloff = 0
+            vim.wo[0][0].scrolloff = 0
+            vim.wo[0][0].cursorcolumn = false
+            vim.wo[0][0].cursorline = false
+            vim.wo[0][0].cursorlineopt = 'both'
+            vim.wo[0][0].colorcolumn = ''
+            vim.wo[0][0].fillchars = 'eob: ,lastline:…'
+            vim.wo[0][0].listchars = 'extends:…,tab:  '
+            vim.keymap.set('n', 'gf', function()
+                local terminal_manager =
+                    require('config.terminal.terminal').get_terminal_manager_by_bufnr(
+                        args.buf
+                    )
+                if terminal_manager == nil then return end
+
+                local cfile = vim.fn.expand('<cfile>')
+                local path = vim.fn.findfile(cfile, '**')
+                if path == '' then path = vim.fn.finddir(cfile, '**') end
+
+                if path == '' then
+                    vim.notify(
+                        'No file/directory under cursor',
+                        vim.log.levels.WARN
+                    )
+                else
+                    local window_manager = terminal_manager:get_window_manager()
+                    if
+                        window_manager
+                        and window_manager.position == 'float'
+                    then
+                        terminal_manager:hide()
+                    end
+                    vim.schedule(function() require('oil').open(path) end)
+                end
+            end, {
+                buffer = args.buf,
+                desc = 'Custom Remap: Go to file under cursor (terminal edition)',
+            })
+            vim.keymap.set('t', '<esc>', function()
+                local terminal_manager =
+                    require('config.terminal.terminal').get_terminal_manager_by_bufnr(
+                        args.buf
+                    )
+                if terminal_manager == nil then return end
+                return terminal_manager:escape_key_triggered()
+            end, {
+                expr = true,
+                buffer = args.buf,
+                desc = 'Custom Terminal: Double escape to normal mode',
+            })
+            vim.keymap.set({ 'n', 't' }, '<C-q>', function()
+                local terminal_manager =
+                    require('config.terminal.terminal').get_terminal_manager_by_bufnr(
+                        args.buf
+                    )
+                if terminal_manager == nil then return end
+
+                terminal_manager:hide()
+            end, {
+                buffer = args.buf,
+                desc = 'Custom Terminal: Hide terminal',
+            })
+        end
     end,
 })
 
--- The two autocmds below started getting annoying when using overseer
--- because they were causing me to enter insert mode even when my cursor wasn't
--- in the terminal buffer. I could fix this but I want to try without these first
--- to see if what I prefer. The other annoyance was that when I was yanking things
--- from toggle term it would always send me back to insert mode and back to the
--- back to the bottom causing me to need to navigate back up the the previous line
--- if I wanted to yank a few more lines
---
--- Edit: I do need no spell at a minimum
---
--- -- If opening a terminal start in insert mode and set local parameters
--- -- Works for both the :terminal command and toggleterm plugin
-vim.api.nvim_create_autocmd('TermOpen', {
-    group = vim.api.nvim_create_augroup('term_open_insert', { clear = true }),
-    pattern = { 'term://*' },
-    command = [[
-      " startinsert
-      " setlocal nonumber norelativenumber nospell signcolumn=no noruler
-      setlocal nospell
-    ]],
-})
---
--- When entering terminal start in insert mode. This is useful if I had toggled
--- the terminal closed in normal mode but then try to toggle it back up.
--- vim.api.nvim_create_autocmd({ 'BufWinEnter', 'WinEnter' }, {
---     group = vim.api.nvim_create_augroup('term_insert', { clear = true }),
---     pattern = { 'term://*' },
---     command = [[
---     startinsert
---   ]],
--- })
+-------------------------------------------------------------------------------
+--- Dockerfile autocmds
 
 -- Dockerfile filetype
 vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
@@ -102,6 +142,9 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
     pattern = { 'Dockerfile*', '*.Dockerfile', '*.dockerfile' },
     command = [[set ft=dockerfile]],
 })
+
+-------------------------------------------------------------------------------
+--- Add keybindings/settings to specific buffer types
 
 -- Close some filetypes with <q>
 vim.api.nvim_create_autocmd('FileType', {
@@ -112,15 +155,12 @@ vim.api.nvim_create_autocmd('FileType', {
         'lspinfo',
         'man',
         'notify',
-        -- 'git',
-        'spectre_panel',
         'startuptime',
         'tsplayground',
         'checkhealth',
         'neotest-output',
         'neotest-summary',
         'neotest-output-panel',
-        'guihua',
     },
     callback = function(event)
         vim.bo[event.buf].buflisted = false
@@ -130,10 +170,8 @@ vim.api.nvim_create_autocmd('FileType', {
             '<cmd>close<CR>',
             { buffer = event.buf, silent = true, desc = 'Custom: Close window' }
         )
-        vim.cmd([[
-      setlocal colorcolumn=0
-      stopinsert
-    ]])
+        vim.wo[0][0].colorcolumn = '0' --removes the column I normal have at 80 characters
+        vim.cmd.stopinsert()
     end,
 })
 

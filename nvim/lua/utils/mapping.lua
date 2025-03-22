@@ -288,7 +288,7 @@ function MyOperations:navigator(args)
             validate_navigator_desc,
             'MyListNavigatorDesc',
         },
-        opts = { args.default.opts, 't', true },
+        opts = { args.default.opts, 'table', true },
     })
 
     if args.extreme ~= nil then
@@ -310,7 +310,7 @@ function MyOperations:navigator(args)
                 validate_navigator_desc,
                 'MyListNavigatorDesc',
             },
-            opts = { args.extreme.opts, 't', true },
+            opts = { args.extreme.opts, 'table', true },
         })
     end
     -- create a copy of the options so I can modify it

@@ -793,7 +793,10 @@ local config = function()
             condition = function() return vim.bo.buftype == 'terminal' end,
             provider = function()
                 local tname, _ = vim.api.nvim_buf_get_name(0):gsub('.*:', '')
-                return get_icon('terminal_icon') .. ' ' .. tname
+                local my_terminal_key = vim.b.my_terminal
+                    and vim.b.my_terminal.key
+                local count = my_terminal_key and my_terminal_key.count or ''
+                return get_icon('terminal_icon') .. ' ' .. count .. ' ' .. tname
             end,
             hl = { fg = filename_foreground_color, bold = true },
         },
@@ -837,6 +840,15 @@ local config = function()
     ---@type StatusLine
     local WinBars = {
         {
+            {
+                condition = function()
+                    return vim.api.nvim_win_get_config(vim.fn.win_getid()).zindex
+                        ~= nil
+                end,
+                MacroRecording,
+                heirlineUtils.surround(ComponentDelimiter, nil, ViMode),
+            },
+
             WinBarTitleBlock,
             Align,
             BufType,
@@ -859,6 +871,23 @@ local config = function()
             Space,
             {
                 provider = function(_) return 'winnr:' .. vim.fn.winnr() end,
+            },
+            Space,
+            {
+                provider = function(_)
+                    return 'tabid:' .. vim.api.nvim_get_current_tabpage()
+                end,
+            },
+            {
+                condition = function()
+                    return vim.api.nvim_win_get_config(vim.fn.win_getid()).zindex
+                        ~= nil
+                end,
+                {
+                    provider = ' | ',
+                },
+                Ruler,
+                ScrollBar,
             },
         },
     }
