@@ -2003,6 +2003,19 @@ require('lazy').setup({
                         set_jumps = true, -- whether to set jumps in the jumplist
                         --I setup the move keymaps up manually in my keymaps.lua file
                     },
+                    lsp_interop = {
+                        --TODO fix this so it actually works. It fails for to reasons:
+                        --1. The floating_preview_opts isn't dynamically created
+                        --2. The treesitter queries @function.outer and @class.outer,
+                        --   do not take you to the function name or class name respectively
+                        enable = true,
+                        -- border = 'none',
+                        floating_preview_opts = { width = 100, height = 100 },
+                        peek_definition_code = {
+                            ['<c-w>gk'] = '@function.outer',
+                            ['<c-w>gK'] = '@class.outer',
+                        },
+                    },
                 },
             }
             require('nvim-treesitter.configs').setup(opts)
