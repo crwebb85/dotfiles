@@ -1,5 +1,4 @@
 local platform = require('utils.platform')
-local path = require('utils.path')
 
 local M = {}
 
@@ -10,46 +9,27 @@ end
 
 local __dirname = get_plugin_dir()
 
-local EDITOR_CLI_DIR = path.concat({
-    __dirname,
-    'EditorToolsCLI',
-})
+local EDITOR_CLI_DIR = vim.fs.joinpath(__dirname, 'EditorToolsCLI')
 
-local EDITOR_CLI_FILE_PATH = path.concat({
-    __dirname,
-    'EditorToolsCLI',
-    'src',
-    '__main__.py',
-})
+local EDITOR_CLI_FILE_PATH =
+    vim.fs.joinpath(__dirname, 'EditorToolsCLI', 'src', '__main__.py')
 
-local VENV_DIR = path.concat({
-    __dirname,
-    'EditorToolsCLI',
-    'venv',
-})
+local VENV_DIR = vim.fs.joinpath(__dirname, 'EditorToolsCLI', 'venv')
 
 ---@param executable string
 local function find_venv_executable(executable)
     local candidates = {
-        platform.is.unix and path.concat({
-            VENV_DIR,
-            'bin',
-            executable,
-        }),
+        platform.is.unix and vim.fs.joinpath(VENV_DIR, 'bin', executable),
         -- MSYS2
         platform.is.win
-            and path.concat({
-                VENV_DIR,
-                'bin',
-                ('%s.exe'):format(executable),
-            }),
+            and vim.fs.joinpath(VENV_DIR, 'bin', ('%s.exe'):format(executable)),
         -- Stock Windows
         platform.is.win
-            and path.concat({
+            and vim.fs.joinpath(
                 VENV_DIR,
                 'Scripts',
-                ('%s.exe'):format(executable),
-            }),
+                ('%s.exe'):format(executable)
+            ),
     }
 
     for _, candidate in ipairs(candidates) do

@@ -2232,14 +2232,14 @@ require('lazy').setup({
                 end
 
                 if require('utils.platform').is.win then
-                    return require('utils.path').concat({
+                    return vim.fs.joinpath(
                         data_path,
                         'mason',
                         'packages',
                         'netcoredbg',
                         'netcoredbg',
-                        'netcoredbg.exe',
-                    })
+                        'netcoredbg.exe'
+                    )
                 else
                     return require('utils.path').get_mason_tool_path(
                         'netcoredbg'
@@ -2880,11 +2880,11 @@ require('lazy').setup({
                             end
                             local config_path = vim.fn.expand(config_env)
 
-                            return require('utils.path').concat({
+                            return vim.fs.joinpath(
                                 config_path,
                                 'cli-tools',
-                                'prettier',
-                            })
+                                'prettier'
+                            )
                         end,
                     },
                 },
