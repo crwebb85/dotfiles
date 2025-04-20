@@ -26,7 +26,7 @@ end
 ---@param choices string[]
 ---@return string
 local function char_prompt(text, choices)
-    local choice = vim.fn.confirm(text, table.concat(choices, '\n'), '', 'Q')
+    local choice = vim.fn.confirm(text, table.concat(choices, '\n'), nil, 'Q')
     if choice == 0 then
         return 'C' -- Cancel if no choice was made
     else
@@ -88,7 +88,7 @@ local function buf_kill(target_buffers, switchable_buffers, force, wipeout)
 
     if next(buf_is_deleted) == nil then
         -- No targets, do nothing
-        vim.api.nvim_err_writeln('bufdelete.nvim: No buffers were deleted')
+        vim.notify('No buffers were deleted', vim.log.levels.ERROR)
         return {}
     end
 
@@ -143,7 +143,7 @@ local function buf_kill(target_buffers, switchable_buffers, force, wipeout)
         switch_bufnr = vim.api.nvim_create_buf(true, false)
 
         if switch_bufnr == 0 then
-            vim.api.nvim_err_writeln('bufdelete.nvim: Failed to create buffer')
+            vim.notify('Failed to create buffer', vim.log.levels.ERROR)
         end
     end
 
