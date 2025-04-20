@@ -179,9 +179,7 @@ local config = function()
         update = {
             'ModeChanged',
             pattern = '*:*',
-            callback = vim.schedule_wrap(
-                function() vim.cmd('redrawstatus') end
-            ),
+            callback = vim.schedule_wrap(function() vim.cmd.redrawstatus() end),
         },
     }
 
