@@ -239,13 +239,6 @@ require('lazy').setup({
                 function() require('gitsigns').toggle_linehl() end,
                 desc = 'Gitsigns: Toggle line highlight',
             },
-
-            -- Highlight removed lines.
-            {
-                '<leader>gvd',
-                function() require('gitsigns').toggle_deleted() end,
-                desc = 'Gitsigns: Toggle deleted (all)',
-            },
             {
                 '<leader>gvh',
                 function() require('gitsigns').preview_hunk() end,
