@@ -1523,7 +1523,7 @@ require('lazy').setup({
                   (
                     ("(") @start 
                     .
-                    type: (predefined_type)  @cast.inner
+                    type: (_)  @cast.inner
                     .
                     ")" @end
                     (#make-range! "cast.outer" @start @end)
