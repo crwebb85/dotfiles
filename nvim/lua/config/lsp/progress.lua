@@ -3,12 +3,21 @@
 local M = {}
 
 -- Buffer number and window id for the floating window
-local bufnr
 local winid
 local spinner = { '⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷' }
 local idx = 0
 -- Progress is done or not
 local isDone = true
+local progress_bufnr
+
+local function get_progress_bufnr()
+    if
+        progress_bufnr == nil or not vim.api.nvim_buf_is_valid(progress_bufnr)
+    then
+        progress_bufnr = vim.api.nvim_create_buf(false, true)
+    end
+    return progress_bufnr
+end
 
 -- Get the progress message for all clients. The format is
 -- "65%: [lua_ls] Loading Workspace: 123/1500 | [client2] xxx | [client3] xxx"
@@ -51,7 +60,7 @@ local function get_lsp_progress_msg()
     return message
 end
 
-function M.log_progress_display_vars()
+local function log_progress_display_vars()
     local display_winid = winid
     if winid == nil then display_winid = 'nil' end
     local progress_tabpage = nil
@@ -59,7 +68,7 @@ function M.log_progress_display_vars()
         progress_tabpage = vim.api.nvim_win_get_tabpage(winid)
     end
     local status = {
-        progress_bufnr = bufnr,
+        progress_bufnr = progress_bufnr,
         progress_winid = display_winid,
         progress_tabpage = progress_tabpage,
         current_tabpage = vim.api.nvim_get_current_tabpage(),
@@ -68,67 +77,20 @@ function M.log_progress_display_vars()
         isDone = isDone,
         progress_message = get_lsp_progress_msg(),
     }
-    vim.print(status)
+    vim.notify(vim.inspect(status), vim.log.levels.INFO)
 end
 
-vim.api.nvim_create_user_command(
-    'LspLogProgressDisplayVars',
-    M.log_progress_display_vars,
-    { nargs = 0 }
-)
-
 local function cleanup_old_progress_bar()
-    if vim.fn.getcmdwintype() ~= '' then
-        -- Go ahead and clear the message since so its no longer in the way
-        vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '' })
-
-        --Since we can't delete buffers while the command-window is open we have to schedule
-        --The cleanup till after the command-window is closed
-        --related to https://github.com/neovim/neovim/issues/24452 so this functionality may change at some point
-        vim.api.nvim_create_autocmd({ 'CmdwinLeave' }, {
-            group = vim.api.nvim_create_augroup('CleanupLspProgressBar', {
-                clear = true,
-            }),
-            callback = function()
-                vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-                    group = vim.api.nvim_create_augroup(
-                        'CleanupLspProgressBar',
-                        {
-                            clear = true,
-                        }
-                    ),
-                    callback = function()
-                        if vim.api.nvim_win_is_valid(winid) then
-                            vim.api.nvim_win_close(winid, true)
-                        end
-                        if vim.api.nvim_buf_is_valid(bufnr) then
-                            vim.api.nvim_buf_delete(bufnr, { force = true })
-                        end
-
-                        winid = nil
-                        idx = 0
-                    end,
-                    once = true,
-                })
-            end,
-            once = true,
-        })
-        --Early return since we can't cleanup until the command-window is closed
-        return
-    end
     if vim.api.nvim_win_is_valid(winid) then
         vim.api.nvim_win_close(winid, true)
     end
-    if vim.api.nvim_buf_is_valid(bufnr) then
-        vim.api.nvim_buf_delete(bufnr, { force = true })
-    end
+    vim.api.nvim_buf_set_lines(get_progress_bufnr(), 0, 1, false, { '' })
     winid = nil
     idx = 0
 end
 
 local function create_progress_bar_window_and_buffer(message, win_row)
-    bufnr = vim.api.nvim_create_buf(false, true)
-    winid = vim.api.nvim_open_win(bufnr, false, {
+    winid = vim.api.nvim_open_win(get_progress_bufnr(), false, {
         relative = 'editor',
         width = #message,
         height = 1,
@@ -140,7 +102,7 @@ local function create_progress_bar_window_and_buffer(message, win_row)
     })
 end
 
-function M.update_lsp_progress_display()
+local function update_lsp_progress_display()
     -- The row position of the floating window. Just right above the status line.
     local win_row = vim.o.lines - vim.o.cmdheight - 4
     local message = get_lsp_progress_msg()
@@ -161,8 +123,26 @@ function M.update_lsp_progress_display()
         })
     end
     vim.wo[winid].winhl = 'Normal:Normal'
-    vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { message })
+    vim.api.nvim_buf_set_lines(get_progress_bufnr(), 0, 1, false, { message })
     if isDone then cleanup_old_progress_bar() end
+end
+
+local is_enabled = false
+function M.enable()
+    if is_enabled then return end
+
+    vim.api.nvim_create_autocmd({ 'LspProgress' }, {
+        pattern = '*',
+        group = vim.api.nvim_create_augroup('lsp_progress', { clear = true }),
+        callback = update_lsp_progress_display,
+    })
+
+    --For debugging
+    vim.api.nvim_create_user_command(
+        'LspLogProgressDisplayVars',
+        log_progress_display_vars,
+        { nargs = 0 }
+    )
 end
 
 return M

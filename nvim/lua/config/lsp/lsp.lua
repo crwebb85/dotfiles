@@ -1,7 +1,6 @@
 local lsp_codelens = require('config.lsp.codelens')
 local lsp_links = require('config.lsp.lsplinks')
 local lsp_commands = require('config.lsp.commands')
-local lsp_progress = require('config.lsp.progress')
 local lsp_server = require('config.lsp.server')
 local lsp_inlayhints = require('config.lsp.inlayhints')
 local config = require('config.config')
@@ -426,6 +425,9 @@ local function lsp_attach(event)
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     if client == nil then return end
 
+    --Enable lsp progress display
+    require('config.lsp.progress').enable()
+
     --Disable lsp for large files. The buffer variable is_big_file
     --is set by a BufReadPre autocommand in y autocmd.lua file
     if vim.b[event.buf].is_big_file == true then
@@ -506,12 +508,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     desc = 'lsp on_attach',
     callback = lsp_commands.setup,
     once = true,
-})
-
-vim.api.nvim_create_autocmd({ 'LspProgress' }, {
-    pattern = '*',
-    group = vim.api.nvim_create_augroup('lsp_progress', { clear = true }),
-    callback = lsp_progress.update_lsp_progress_display,
 })
 
 if config.use_native_completion then
