@@ -1,4 +1,3 @@
-local ms = require('vim.lsp.protocol').Methods
 --source https://github.com/rockyzhang24/dotfiles/blob/master/.config/nvim/lua/rockyz/lsp/lightbulb.lua
 local M = {}
 
@@ -41,39 +40,26 @@ end
 -- It is shown at the beginning (the first column) of the same line, or the
 -- previous line if the space is not enough.
 --
-local bulb_bufnr = nil
 local prev_lnum = nil
 local prev_topline_num = nil
-local prev_bufnr = nil
+local lightbulb_bufnr = nil
+local lightbulb_winid = nil
+
+local function get_lightbulb_bufnr()
+    if
+        lightbulb_bufnr == nil or not vim.api.nvim_buf_is_valid(lightbulb_bufnr)
+    then
+        lightbulb_bufnr = vim.api.nvim_create_buf(false, true)
+        local icon = ''
+        vim.api.nvim_buf_set_lines(lightbulb_bufnr, 0, 1, false, { icon })
+    end
+    return lightbulb_bufnr
+end
 
 function M.remove_lightbulb()
-    if bulb_bufnr ~= nil and vim.fn.getcmdwintype() ~= '' then
-        --Since we can't delete buffers while the command-window is open we have to schedule
-        --The cleanup till after the command-window is closed
-        --related to https://github.com/neovim/neovim/issues/24452 so this functionality may change at some point
-        vim.api.nvim_create_autocmd({ 'CmdwinLeave' }, {
-            group = vim.api.nvim_create_augroup('CleanupLightbulb', {
-                clear = true,
-            }),
-            callback = function()
-                vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-                    group = vim.api.nvim_create_augroup('CleanupLightbulb', {
-                        clear = true,
-                    }),
-                    callback = function()
-                        vim.cmd(('noautocmd bwipeout %d'):format(bulb_bufnr))
-                        bulb_bufnr = nil
-                    end,
-                    once = true,
-                })
-            end,
-            once = true,
-        })
-        --Early return since we can't cleanup until the command-window is closed
-        return
-    elseif bulb_bufnr ~= nil then
-        vim.cmd(('noautocmd bwipeout %d'):format(bulb_bufnr))
-        bulb_bufnr = nil
+    if lightbulb_winid ~= nil then
+        vim.api.nvim_win_close(lightbulb_winid, true)
+        lightbulb_winid = nil
     end
 end
 
@@ -90,15 +76,19 @@ local function draw_lightbulb()
     if
         cur_lnum == prev_lnum
         and cur_topline_num == prev_topline_num
-        and bulb_bufnr ~= nil
+        and (
+            lightbulb_winid ~= nil
+            and vim.api.nvim_win_is_valid(lightbulb_winid)
+            and vim.api.nvim_win_get_tabpage(lightbulb_winid)
+                == vim.api.nvim_get_current_tabpage()
+        )
     then
         return
     end
-    -- Remove the old bulb if necessary, and then create a new bulb
+    -- Remove the old bulb in preparation for re-positioning
     M.remove_lightbulb()
     prev_lnum = cur_lnum
     prev_topline_num = cur_topline_num
-    local icon = ''
     -- Calculate the row position of the lightbulb relative to the cursor
     local row = 0
     local line_number = vim.fn.line('.') or 0
@@ -127,8 +117,10 @@ local function draw_lightbulb()
             col = -(cursor_col - tab_cnt + cur_indent) + 1
         end
     end
-    bulb_bufnr = vim.api.nvim_create_buf(false, true)
-    local winid = vim.api.nvim_open_win(bulb_bufnr, false, {
+
+    local bulb_bufnr = get_lightbulb_bufnr()
+
+    local new_lightbulb_winid = vim.api.nvim_open_win(bulb_bufnr, false, {
         relative = 'cursor',
         width = 1,
         height = 1,
@@ -136,21 +128,33 @@ local function draw_lightbulb()
         col = col,
         style = 'minimal',
         noautocmd = true,
+        border = 'none',
     })
-    vim.wo[winid].winhl = 'Normal:LightBulb'
-    vim.api.nvim_buf_set_lines(bulb_bufnr, 0, 1, false, { icon })
+
+    if
+        lightbulb_winid ~= nil and vim.api.nvim_win_is_valid(lightbulb_winid)
+    then
+        vim.notify(
+            'Created a new lightbulb with winid '
+                .. vim.inspect(new_lightbulb_winid)
+                .. ' when previous lightbulb with winid '
+                .. vim.inspect(lightbulb_winid)
+                .. ' has not yet been closed',
+            vim.log.levels.ERROR
+        )
+    end
+
+    vim.wo[new_lightbulb_winid].winhl = 'Normal:LightBulb'
+    lightbulb_winid = new_lightbulb_winid
 end
 
 function M.show_lightbulb()
     -- Check if the method textDocument/codeAction is supported
     local cur_bufnr = vim.api.nvim_get_current_buf()
-    if cur_bufnr ~= prev_bufnr then -- when entering to another buffer
-        prev_bufnr = cur_bufnr
-    end
 
     local clients = vim.lsp.get_clients({
         bufnr = cur_bufnr,
-        method = ms.textDocument_codeAction,
+        method = vim.lsp.protocol.Methods.textDocument_codeAction,
     })
     if #clients <= 0 then
         M.remove_lightbulb()
@@ -159,10 +163,10 @@ function M.show_lightbulb()
 
     vim.lsp.buf_request_all(
         cur_bufnr,
-        ms.textDocument_codeAction,
+        vim.lsp.protocol.Methods.textDocument_codeAction,
         ---@type fun(client: vim.lsp.Client, bufnr: integer): table?
         function(client, _)
-            local win = 0 --I can imaginge this could cause race conditions but lets see how this goes
+            local win = 0 --I can imagine this could cause race conditions but lets see how this goes
 
             local params =
                 vim.lsp.util.make_range_params(win, client.offset_encoding)
@@ -190,6 +194,32 @@ function M.show_lightbulb()
             if has_actions == false then M.remove_lightbulb() end
         end
     )
+end
+
+local is_enabled = false
+function M.enable()
+    if is_enabled then return end
+
+    local augroup_lsp_lightbulb =
+        vim.api.nvim_create_augroup('lsp_lightbulb', { clear = true })
+
+    -- Show a lightbulb when code actions are available at the cursor position
+    vim.api.nvim_create_autocmd({
+        'BufEnter',
+        'CursorHold',
+        'CursorHoldI',
+        'WinScrolled',
+        'LspAttach',
+        'LspDetach',
+    }, {
+        group = augroup_lsp_lightbulb,
+        callback = M.show_lightbulb,
+    })
+
+    vim.api.nvim_create_autocmd({ 'BufLeave' }, {
+        group = augroup_lsp_lightbulb,
+        callback = M.remove_lightbulb,
+    })
 end
 
 return M

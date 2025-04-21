@@ -1,6 +1,5 @@
 local lsp_codelens = require('config.lsp.codelens')
 local lsp_links = require('config.lsp.lsplinks')
-local lsp_lightbulb = require('config.lsp.lightbulb')
 local lsp_commands = require('config.lsp.commands')
 local lsp_progress = require('config.lsp.progress')
 local lsp_server = require('config.lsp.server')
@@ -437,7 +436,6 @@ local function lsp_attach(event)
         )
         return
     end
-    -- vim.print(client.server_capabilities)
 
     if
         client.server_capabilities.codeLensProvider ~= nil
@@ -459,27 +457,6 @@ local function lsp_attach(event)
         )
     end
 
-    if client.server_capabilities.codeActionProvider ~= nil then
-        local augroup_lsp_lightbulb =
-            vim.api.nvim_create_augroup('lsp_lightbulb', { clear = true })
-
-        -- Show a lightbulb when code actions are available at the cursor position
-        vim.api.nvim_create_autocmd(
-            { 'BufEnter', 'CursorHold', 'CursorHoldI', 'WinScrolled' },
-            {
-                group = augroup_lsp_lightbulb,
-                callback = lsp_lightbulb.show_lightbulb,
-                buffer = event.buf,
-            }
-        )
-
-        vim.api.nvim_create_autocmd({ 'BufLeave' }, {
-            group = augroup_lsp_lightbulb,
-            callback = lsp_lightbulb.remove_lightbulb,
-            buffer = event.buf,
-        })
-    end
-
     if client.server_capabilities.documentLinkProvider ~= nil then
         -- vim.print('lsp has documentLinkProvider')
         vim.api.nvim_create_autocmd(
@@ -494,10 +471,13 @@ local function lsp_attach(event)
         )
     end
 
-    -- Enable completion.
     if
         client:supports_method(vim.lsp.protocol.Methods.textDocument_completion)
     then
+        -- Enable lightbulb
+        require('config.lsp.lightbulb').enable()
+
+        -- Enable native completion.
         if config.use_native_completion then
             vim.lsp.completion.enable(true, client.id, event.buf, {
                 autotrigger = true,
