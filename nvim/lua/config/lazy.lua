@@ -36,8 +36,6 @@ vim.opt.rtp:prepend(lazypath)
 -- end
 -- init_python_environment()
 
-local M = {}
-
 require('lazy').setup({
 
     {
