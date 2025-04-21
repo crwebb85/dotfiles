@@ -3,10 +3,6 @@ local M = {}
 --- Toggle Inlay hints
 local isInlayHintsEnabled = false
 function M.toggle_inlay_hints()
-    if not vim.lsp.inlay_hint then
-        print("This version of neovim doesn't support inlay hints")
-    end
-
     isInlayHintsEnabled = not isInlayHintsEnabled
 
     vim.lsp.inlay_hint.enable(isInlayHintsEnabled, { bufnr = 0 })

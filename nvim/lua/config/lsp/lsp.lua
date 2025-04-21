@@ -13,7 +13,7 @@ vim.api.nvim_create_user_command(
 
 vim.api.nvim_create_user_command(
     'LspWorkspaceRemove',
-    function() vim.notify(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
+    function() vim.lsp.buf.add_workspace_folder() end,
     { desc = 'LSP: Remove folder from workspace' }
 )
 
