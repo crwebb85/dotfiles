@@ -126,9 +126,10 @@ local function update_lsp_progress_display()
     if isDone then cleanup_old_progress_bar() end
 end
 
-local is_enabled = false
+local is_autocmds_setup = false
 function M.enable()
-    if is_enabled then return end
+    if is_autocmds_setup then return end
+    is_autocmds_setup = true
 
     vim.api.nvim_create_autocmd({ 'LspProgress' }, {
         pattern = '*',

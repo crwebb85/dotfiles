@@ -57,10 +57,11 @@ local function get_lightbulb_bufnr()
 end
 
 local function remove_lightbulb()
-    if lightbulb_winid ~= nil then
+    if lightbulb_winid == nil then return end
+    if vim.api.nvim_win_is_valid(lightbulb_winid) then
         vim.api.nvim_win_close(lightbulb_winid, true)
-        lightbulb_winid = nil
     end
+    lightbulb_winid = nil
 end
 
 local function draw_lightbulb()
@@ -195,9 +196,10 @@ local function show_lightbulb()
     )
 end
 
-local is_enabled = false
+local is_autocmds_setup = false
 function M.enable()
-    if is_enabled then return end
+    if is_autocmds_setup then return end
+    is_autocmds_setup = true
 
     local augroup_lsp_lightbulb =
         vim.api.nvim_create_augroup('lsp_lightbulb', { clear = true })
