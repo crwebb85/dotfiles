@@ -1,7 +1,7 @@
 --source https://github.com/rockyzhang24/dotfiles/blob/master/.config/nvim/lua/rockyz/lsp/lightbulb.lua
 local M = {}
 
-function M.get_diagnostic_at_cursor()
+local function get_diagnostic_at_cursor()
     local cur_bufnr = vim.api.nvim_get_current_buf()
     local line, col = unpack(vim.api.nvim_win_get_cursor(0)) -- line is 1-based indexing
     -- Get a table of diagnostics at the current line. The structure of the
@@ -56,7 +56,7 @@ local function get_lightbulb_bufnr()
     return lightbulb_bufnr
 end
 
-function M.remove_lightbulb()
+local function remove_lightbulb()
     if lightbulb_winid ~= nil then
         vim.api.nvim_win_close(lightbulb_winid, true)
         lightbulb_winid = nil
@@ -86,7 +86,7 @@ local function draw_lightbulb()
         return
     end
     -- Remove the old bulb in preparation for re-positioning
-    M.remove_lightbulb()
+    remove_lightbulb()
     prev_lnum = cur_lnum
     prev_topline_num = cur_topline_num
     -- Calculate the row position of the lightbulb relative to the cursor
@@ -147,7 +147,7 @@ local function draw_lightbulb()
     lightbulb_winid = new_lightbulb_winid
 end
 
-function M.show_lightbulb()
+local function show_lightbulb()
     -- Check if the method textDocument/codeAction is supported
     local cur_bufnr = vim.api.nvim_get_current_buf()
 
@@ -156,7 +156,7 @@ function M.show_lightbulb()
         method = vim.lsp.protocol.Methods.textDocument_codeAction,
     })
     if #clients <= 0 then
-        M.remove_lightbulb()
+        remove_lightbulb()
         return
     end
 
@@ -172,7 +172,7 @@ function M.show_lightbulb()
 
             return {
                 context = {
-                    diagnostics = M.get_diagnostic_at_cursor(),
+                    diagnostics = get_diagnostic_at_cursor(),
                 },
                 textDocument = params.textDocument,
                 range = params.range,
@@ -190,7 +190,7 @@ function M.show_lightbulb()
             end
             if has_actions then draw_lightbulb() end
             -- If no actions, remove the bulb if it is existing
-            if has_actions == false then M.remove_lightbulb() end
+            if has_actions == false then remove_lightbulb() end
         end
     )
 end
@@ -212,12 +212,12 @@ function M.enable()
         'LspDetach',
     }, {
         group = augroup_lsp_lightbulb,
-        callback = M.show_lightbulb,
+        callback = show_lightbulb,
     })
 
     vim.api.nvim_create_autocmd({ 'BufLeave' }, {
         group = augroup_lsp_lightbulb,
-        callback = M.remove_lightbulb,
+        callback = remove_lightbulb,
     })
 end
 
