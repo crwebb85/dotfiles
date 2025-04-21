@@ -440,23 +440,9 @@ local function lsp_attach(event)
     end
 
     if
-        client.server_capabilities.codeLensProvider ~= nil
-        and client.server_capabilities.codeLensProvider.resolveProvider
+        client:supports_method(vim.lsp.protocol.Methods.textDocument_codeLens)
     then
-        local augroup_codelens =
-            vim.api.nvim_create_augroup('lsp_codelens', { clear = true })
-        vim.api.nvim_clear_autocmds({
-            group = augroup_codelens,
-            buffer = event.buf,
-        })
-        vim.api.nvim_create_autocmd(
-            { 'BufEnter', 'BufWritePost', 'CursorHold' },
-            {
-                group = augroup_codelens,
-                callback = function() lsp_codelens.refresh_codelens(event.buf) end,
-                buffer = event.buf,
-            }
-        )
+        require('config.lsp.codelens').enable()
     end
 
     if client.server_capabilities.documentLinkProvider ~= nil then
