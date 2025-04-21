@@ -2744,7 +2744,7 @@ require('lazy').setup({
             'nvim-telescope/telescope.nvim',
         },
         branch = 'regexp', -- This is the regexp branch, use this for the new version
-        config = function() require('venv-selector').setup() end,
+        config = function() require('venv-selector').setup({}) end,
         --My old setup but haven't retested since upgrading to this newer version
         -- config = function(_, _)
         --     require('venv-selector').setup({
@@ -2761,12 +2761,6 @@ require('lazy').setup({
         lazy = true,
     },
 
-    -- Code Action preview
-    -- {
-    --     'aznhe21/actions-preview.nvim',
-    --     lazy = true,
-    --     config = true,
-    -- },
     {
         'rachartier/tiny-code-action.nvim',
         lazy = true,
