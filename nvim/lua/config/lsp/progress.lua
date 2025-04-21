@@ -98,7 +98,6 @@ local function create_progress_bar_window_and_buffer(message, win_row)
         col = vim.o.columns - #message,
         style = 'minimal',
         noautocmd = true,
-        border = vim.g.border_style,
     })
 end
 
