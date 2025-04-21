@@ -207,9 +207,7 @@ local function process_desc(desc, i)
     if type(desc) == 'table' then
         return desc[({ 'backward', 'forward' })[i]]
     elseif desc then
-        vim.validate({
-            desc = { desc, 'string' },
-        })
+        vim.validate('desc', desc, 'string')
         return desc:gsub('{(.-)}', function(m)
             local parts = vim.split(m, '|', { plain = true })
             if #parts == 2 then return parts[i] end
@@ -266,52 +264,65 @@ local MyOperations = {
 ---@param args MyListNavigatorKeymap
 ---@return MyOperations
 function MyOperations:navigator(args)
-    vim.validate({
-        default = { args.default, 'table', false },
-        extreme = { args.extreme, 'table', true },
-    })
-    vim.validate({
-        key = { args.default.key, 'string', false },
-        mode = { args.default.mode, { 'string', 'table' }, true },
-        backward = {
-            args.default.backward,
-            { 'string', 'function' },
-            false,
-        },
-        forward = {
-            args.default.forward,
-            { 'string', 'function' },
-            false,
-        },
-        desc = {
-            args.default.desc,
-            validate_navigator_desc,
-            'MyListNavigatorDesc',
-        },
-        opts = { args.default.opts, 'table', true },
-    })
+    vim.validate('args', args, 'table', false)
+    vim.validate('args.default', args.default, 'table', false)
+    vim.validate('args.extreme', args.extreme, 'table', true)
+    vim.validate('args.default.key', args.default.key, 'string', false)
+    vim.validate(
+        'args.default.mode',
+        args.default.mode,
+        { 'string', 'table' },
+        true
+    )
+    vim.validate(
+        'args.default.backward',
+        args.default.backward,
+        { 'string', 'function' },
+        false
+    )
+    vim.validate(
+        'args.default.forward',
+        args.default.forward,
+        { 'string', 'function' },
+        false
+    )
+    vim.validate(
+        'args.default.desc',
+        args.default.desc,
+        validate_navigator_desc,
+        false,
+        'MyListNavigatorDesc'
+    )
+    vim.validate('args.default.opts', args.default.opts, 'table', true)
 
     if args.extreme ~= nil then
-        vim.validate({
-            key = { args.extreme.key, 'string', false },
-            mode = { args.extreme.mode, { 'string', 'table' }, true },
-            backward = {
-                args.extreme.backward,
-                { 'string', 'function' },
-                false,
-            },
-            forward = {
-                args.extreme.forward,
-                { 'string', 'function' },
-                false,
-            },
-            desc = {
-                args.extreme.desc,
-                validate_navigator_desc,
-                'MyListNavigatorDesc',
-            },
-            opts = { args.extreme.opts, 'table', true },
-        })
+        vim.validate('args.extreme.key', args.extreme.key, 'string', false)
+        vim.validate(
+            'args.extreme.mode',
+            args.extreme.mode,
+            { 'string', 'table' },
+            true
+        )
+        vim.validate(
+            'args.extreme.backward',
+            args.extreme.backward,
+            { 'string', 'function' },
+            false
+        )
+        vim.validate(
+            'args.extreme.forward',
+            args.extreme.forward,
+            { 'string', 'function' },
+            false
+        )
+        vim.validate(
+            'args.extreme.desc',
+            args.extreme.desc,
+            validate_navigator_desc,
+            false,
+            'MyListNavigatorDesc'
+        )
+        vim.validate('args.extreme.opts', args.extreme.opts, 'table', true)
     end
     -- create a copy of the options so I can modify it
     local default_keymap_opts =
@@ -424,11 +435,10 @@ end
 ---@param opts MyOperationsOptions See |ImpairativeOperationsOptions|
 ---@return MyOperations
 function M.operations(opts)
-    vim.validate({
-        forward_key = { opts.forward_key, 'string', false },
-        backward_key = { opts.backward_key, 'string', false },
-        mode = { opts.mode, { 'string', 'table' }, false },
-    })
+    vim.validate('opts', opts, 'table', false)
+    vim.validate('opts.forward_key', opts.forward_key, 'string', false)
+    vim.validate('backward_key', opts.backward_key, 'string', false)
+    vim.validate('mode', opts.mode, { 'string', 'table' }, false)
     local operations = setmetatable({
         _opts = opts,
 

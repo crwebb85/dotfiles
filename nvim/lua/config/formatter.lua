@@ -421,7 +421,11 @@ function M.get_buffer_lsp_formatters(bufnr)
     local lsp_formatters = {}
     if bufnr == nil then bufnr = vim.api.nvim_get_current_buf() end
     for _, lsp_client in pairs(vim.lsp.get_clients({ bufnr = bufnr })) do
-        if lsp_client.supports_method('textDocument/formatting') then
+        if
+            lsp_client:supports_method(
+                vim.lsp.protocol.Methods.textDocument_formatting
+            )
+        then
             local lsp_formatter_details = {
                 name = lsp_client.name,
                 client_id = lsp_client.id,

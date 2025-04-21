@@ -236,7 +236,7 @@ local function default_keymaps(bufnr, client)
     vim.keymap.set(
         { 'v', 'n' },
         '<F3>',
-        function() require('tiny-code-action').code_action() end,
+        function() require('tiny-code-action').code_action({}) end,
         {
             buffer = bufnr,
             desc = 'LSP - Actions Preview: Code action preview menu',
@@ -495,7 +495,9 @@ local function lsp_attach(event)
     end
 
     -- Enable completion.
-    if client.supports_method(vim.lsp.protocol.textDocument_completion) then
+    if
+        client:supports_method(vim.lsp.protocol.Methods.textDocument_completion)
+    then
         if config.use_native_completion then
             vim.lsp.completion.enable(true, client.id, event.buf, {
                 autotrigger = true,
