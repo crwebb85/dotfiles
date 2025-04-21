@@ -118,18 +118,17 @@ local function draw_lightbulb()
         end
     end
 
-    local bulb_bufnr = get_lightbulb_bufnr()
-
-    local new_lightbulb_winid = vim.api.nvim_open_win(bulb_bufnr, false, {
-        relative = 'cursor',
-        width = 1,
-        height = 1,
-        row = row,
-        col = col,
-        style = 'minimal',
-        noautocmd = true,
-        border = 'none',
-    })
+    local new_lightbulb_winid =
+        vim.api.nvim_open_win(get_lightbulb_bufnr(), false, {
+            relative = 'cursor',
+            width = 1,
+            height = 1,
+            row = row,
+            col = col,
+            style = 'minimal',
+            noautocmd = true,
+            border = 'none',
+        })
 
     if
         lightbulb_winid ~= nil and vim.api.nvim_win_is_valid(lightbulb_winid)
