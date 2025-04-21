@@ -602,6 +602,9 @@ require('lazy').setup({
             defaults = {
                 -- path_display = { 'filename_first' },
                 dynamic_preview_title = true,
+                -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2766504120
+                -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged
+                border = false,
                 mappings = {
                     i = {
 

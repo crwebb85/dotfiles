@@ -543,19 +543,6 @@ if config.use_native_completion then
     })
 end
 
----
--- UI settings
----
-
-local border_style = 'rounded'
-vim.lsp.handlers['textDocument/hover'] =
-    vim.lsp.with(vim.lsp.handlers.hover, { border = border_style })
-
-vim.lsp.handlers['textDocument/signatureHelp'] =
-    vim.lsp.with(vim.lsp.handlers.signature_help, { border = border_style })
-
-if vim.o.signcolumn == 'auto' then vim.o.signcolumn = 'yes' end
-
 -------------------------------------------------------------------------------
 ---Server Setup functions (sets the lsp-config opts)
 ---https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md

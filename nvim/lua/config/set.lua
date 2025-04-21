@@ -8,6 +8,7 @@ vim.o.colorcolumn = '80'
 vim.o.relativenumber = true
 vim.o.number = true
 vim.opt.wrap = false -- It seems that `vim.o.wrap = false` doesn't work for some reason
+vim.o.winborder = 'rounded' -- border around floating windows
 
 vim.o.scrolloff = 8
 vim.o.signcolumn = 'yes'
