@@ -9,6 +9,22 @@ vim.o.relativenumber = true
 vim.o.number = true
 vim.opt.wrap = false -- It seems that `vim.o.wrap = false` doesn't work for some reason
 vim.o.winborder = 'rounded' -- border around floating windows
+vim.opt.diffopt = {
+    -- Diff settings
+    -- mostly from https://www.reddit.com/r/neovim/comments/1k24zgk/comment/mnx3u34/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    'internal',
+    'filler',
+    'closeoff',
+    'context:12',
+    'algorithm:histogram',
+    'linematch:200',
+    'indent-heuristic',
+    'inline:char', -- From https://www.reddit.com/r/neovim/comments/1k24zgk/comment/moj5kxj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+}
+
+vim.opt.fillchars = {
+    diff = '╱', --The character used to denote removed lines
+}
 
 vim.o.scrolloff = 8
 vim.o.signcolumn = 'yes'
