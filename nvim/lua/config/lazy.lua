@@ -2633,7 +2633,6 @@ require('lazy').setup({
         event = 'VeryLazy',
         dependencies = {
             { 'williamboman/mason.nvim' },
-            { 'williamboman/mason-lspconfig.nvim' },
         },
         config = function(_, _)
             local Set = require('utils.datastructure').Set
@@ -2651,8 +2650,8 @@ require('lazy').setup({
                 'omnisharp', -- C#
                 'gopls', -- go lang
                 'rust-analyzer',
-                'yamlls', -- (yaml-language-server)
-                'jsonls', -- (json-lsp)
+                'yaml-language-server', -- (yamlls) (keywords: yaml)
+                'json-lsp', --(jsonls) (keywords: json)
                 'taplo', -- LSP for toml (for pyproject.toml files)
                 'powershell-editor-services', -- powershell
                 'lemminx', -- xml
@@ -2688,45 +2687,70 @@ require('lazy').setup({
         lazy = true,
         config = true,
     },
-    {
-        'williamboman/mason-lspconfig.nvim',
-        lazy = true,
-        config = function()
-            local lsp = require('config.lsp.lsp')
-            require('mason-lspconfig').setup({
-                handlers = {
-                    --my handler requires neovim/lspconfig and hrsh7th/cmp-nvim-lsp
-                    --so those dependencies will get lazily loaded when the lsp attaches
-                    --if they haven't already been loaded
-                    lsp.default_lsp_server_setup,
-                    lua_ls = lsp.setup_lua_ls,
-                    pyright = lsp.setup_pyright,
-                    ts_ls = lsp.setup_tsserver,
-                    yamlls = lsp.setup_yamlls,
-                    jsonls = lsp.setup_jsonls,
-                    taplo = lsp.setup_tablo,
-                    omnisharp = lsp.setup_omnisharp,
-                    powershell_es = lsp.setup_powershell_es,
-                    markdown_oxide = lsp.setup_markdown_oxide,
-                    marksman = lsp.setup_marksman,
-                },
-            })
-        end,
-    },
 
     {
         'neovim/nvim-lspconfig',
-        lazy = true,
-        dependencies = {
-            {
-                -- cmp-nvim-lsp provides a list of lsp capabilities to that cmp adds to neovim
-                -- I must have cmp-nvim-lsp load before nvim-lspconfig for
-                -- lua snips to show up in cmp (this can be removed after fully
-                -- switching to native completion
-                'hrsh7th/cmp-nvim-lsp',
-                enabled = not config.use_native_completion,
-            },
-        },
+        -- lazy = 'VeryLazy',
+
+        config = function(_, _)
+            require('config.lsp.lsp').enable()
+
+            vim.lsp.config('*', {
+                capabilities = require('config.lsp.lsp').get_additional_default_capabilities(),
+            })
+
+            --Go to https://github.com/williamboman/mason-lspconfig.nvim to find translations
+            --between the mason name and the lspconfig name
+            vim.lsp.enable('lua_ls') -- (lua-language-server) LSP for lua files
+            vim.lsp.enable('pyright') -- LSP for python
+            vim.lsp.enable('ruff')
+            vim.lsp.enable('ts_ls') -- ( typescript-language-server ) LSP (keywords: typescript, javascript)
+            vim.lsp.enable('eslint') -- (eslint-lsp) eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
+            vim.lsp.enable('ansiblels') -- (ansible-language-server)
+            vim.lsp.enable('omnisharp') -- C#
+            vim.lsp.enable('gopls') -- go lang
+            vim.lsp.enable('rust_analyzer') -- (rust-analyzer)
+            vim.lsp.enable('yamlls') -- (yaml-language-server)
+            vim.lsp.enable('jsonls') -- (json-lsp)
+            vim.lsp.enable('taplo') -- LSP for toml (for pyproject.toml files)
+            vim.lsp.enable('powershell_es') -- (powershell-editor-services) powershell
+            vim.lsp.enable('lemminx') -- xml
+            vim.lsp.enable('sqls') -- sql
+
+            --Mark down lsp comparison
+            --
+            -- Completion
+            -- - markdown_oxide - keeps periods in note references and also completes headers (better completion)
+            -- - marksman - removes periods by default (can be configured to keep periods) in note references and does not complete headers
+            --
+            -- Hover
+            -- - markdown_oxide - hover always preview the current note (can be disabled in .moxide.toml)
+            -- - marksman - hover over note references previews the note
+            --
+            -- Go To Definition
+            -- - markdown_oxide - not supported
+            -- - marksman - goes to note reference
+            --
+            -- Code References
+            -- - marksman
+            --   - create table of contents
+            --   - create note for note reference that does not exist
+            --
+            -- Diagnostics
+            -- - marksman - errors for non existent document links
+            --
+            -- Rename
+            -- - markdown_oxide
+            --   header rename - did not update links containing the header
+            --
+            -- Note: create a .moxide.toml file in note folder to get full
+            -- capabilities https://oxide.md/v0/References/v0+Configuration+Reference
+            --
+            -- Note: create a .marksman.toml file in note folder to get full
+            -- capabilities https://github.com/artempyanykh/marksman/blob/main/docs/configuration.md
+            vim.lsp.enable('marksman') -- Markdown
+            vim.lsp.enable('markdown_oxide') -- (markdown-oxide) Markdown notes
+        end,
     },
 
     -- Virtual Environments
@@ -2892,7 +2916,7 @@ require('lazy').setup({
         'stevearc/overseer.nvim',
         lazy = true,
         --Overseer claims to lazy load by default so Im just going to use
-        --the VerryLazy event
+        --the VeryLazy event
         event = 'VeryLazy',
         keys = {
             {

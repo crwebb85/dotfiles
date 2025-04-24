@@ -140,7 +140,11 @@ local function debug_command(args, rust_debug_adapter)
         :start()
 end
 
-function M.setup()
+local is_setup = false
+function M.setup_command_handlers()
+    if is_setup then return end
+    is_setup = true
+
     vim.lsp.commands['json.sort'] = sort_json
 
     -- based on https://github.com/E-ricus/lsp_codelens_extensions.nvim/tree/main

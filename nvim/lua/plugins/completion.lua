@@ -78,7 +78,6 @@ local completion_plugins = {
     --remove once I remove nvim-cmp
     { 'hrsh7th/cmp-cmdline', lazy = true },
     { 'hrsh7th/cmp-git', lazy = true },
-    { 'hrsh7th/cmp-nvim-lsp', lazy = true },
     { 'hrsh7th/cmp-nvim-lsp-signature-help', lazy = true },
     { 'hrsh7th/cmp-path', lazy = true },
     { 'saadparwaiz1/cmp_luasnip', lazy = true },
@@ -96,7 +95,6 @@ if not config.use_native_completion then
                 { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
                 { 'hrsh7th/cmp-path' }, -- Completion for file paths
                 { 'hrsh7th/cmp-cmdline' },
-                { 'hrsh7th/cmp-nvim-lsp' }, -- Provides a list of lsp capabilities to that cmp adds to neovim
                 { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
                 { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
                 {
