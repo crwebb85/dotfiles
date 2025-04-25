@@ -516,19 +516,41 @@ function M.format_on_save(bufnr)
     if P.is_format_after_save_enabled(filetype) then return end
     local function on_format(err)
         if err == nil then return end
-        if type(err) ~= 'string' then
-            vim.print("Debug: fomatter error that wasn't a string")
-            vim.print(err)
-        end
         if type(err) == 'string' and err:match('timeout$') then
             if P.is_format_after_save_enabled(filetype) then --In case of some wierd race condition I only want one notification
                 vim.notify(
                     'Auto-formatting on save for filetype `'
                         .. filetype
-                        .. '` was changed to formatting after save'
+                        .. '` was changed to formatting after save (triggered by old if branch)',
+                    vim.log.levels.INFO
                 )
             end
             P.set_format_after_save(filetype, true)
+        elseif
+            type(err) == 'table'
+            and err.code == require('conform.errors').ERROR_CODE.TIMEOUT
+        then
+            if P.is_format_after_save_enabled(filetype) then --In case of some wierd race condition I only want one notification
+                vim.notify(
+                    'Auto-formatting on save for filetype `'
+                        .. filetype
+                        .. '` was changed to formatting after save (triggered by new if branch)',
+                    vim.log.levels.INFO
+                )
+            end
+            P.set_format_after_save(filetype, true)
+        elseif
+            type(err) == 'table'
+            and err.code == require('conform.errors').ERROR_CODE.RUNTIME
+            and type(err.message) == 'string'
+            and err.message:find('No parser could be inferred for file')
+        then
+            vim.notify(err.message, vim.log.levels.INFO)
+        else
+            vim.notify(
+                'Error during formatting: ' .. vim.inspect(err),
+                vim.log.levels.ERROR
+            )
         end
     end
 
