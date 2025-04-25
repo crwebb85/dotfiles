@@ -500,22 +500,21 @@ local function pre_bufread_callback(bufnr)
                     'bigfile_reset_window_settings_' .. win_id,
                     {}
                 )
-            -- vim.api.nvim_create_autocmd({ 'BufWinLeave' }, {
             vim.api.nvim_create_autocmd({ 'BufLeave' }, {
                 group = bigfile_reset_window_settings_augroup,
-                callback = function(event)
+                callback = function(_)
                     if win_id == vim.api.nvim_get_current_win() then
-                        -- vim.print(event)
                         vim.wo.foldmethod = old_foldmethod
                         vim.wo.list = old_list
                         vim.wo.spell = old_spell
 
-                        --cleanup this autocmd
+                        --cleanup this augroup
                         vim.schedule(
-                            -- TODO sometimes vim.api.nvim_del_autocmd(event.id) errors when
-                            -- leaving buffer with <c-o> to go to a different buffer in the jump list
-                            -- The error says it can't delete the autocmd
-                            function() vim.api.nvim_del_autocmd(event.id) end
+                            function()
+                                vim.api.nvim_del_augroup_by_id(
+                                    bigfile_reset_window_settings_augroup
+                                )
+                            end
                         )
                     end
                 end,
