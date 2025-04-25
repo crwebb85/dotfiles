@@ -22,10 +22,6 @@ vim.opt.diffopt = {
     'inline:char', -- From https://www.reddit.com/r/neovim/comments/1k24zgk/comment/moj5kxj/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 }
 
-vim.opt.fillchars = {
-    diff = '╱', --The character used to denote removed lines
-}
-
 vim.o.scrolloff = 8
 vim.o.signcolumn = 'yes'
 vim.opt.isfname:append('@-@')
