@@ -198,12 +198,10 @@ the workaround is to make sure the plugin is loaded
   - [x] add list of mason items to not install automatically
   - [x] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
 - [ ] Refactor
-
   - [x] properly use setqflist action parameter for appending to an existing list.
-  - [ ] refactor my windows check to use `vim.fn.has('win32') == 1`
+  - [x] refactor my windows check to use `vim.fn.has('win32') == 1`
   - [ ] refactor telescope keymap `<leader>fh` to no longer use a register in visual mode
   - [ ] refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
-
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
   - [ ] add html formatter
