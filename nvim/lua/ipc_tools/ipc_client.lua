@@ -1,5 +1,3 @@
-local platform = require('utils.platform')
-
 local M = {}
 
 local function get_plugin_dir()
