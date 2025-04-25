@@ -126,6 +126,10 @@ function M.enable()
                     )
                 end
             end
+
+            if client:supports_method('textDocument/documentColor') then
+                vim.lsp.document_color.enable(true, event.buf)
+            end
         end,
     })
 
