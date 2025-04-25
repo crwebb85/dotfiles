@@ -527,6 +527,12 @@ function M.format_on_save(bufnr)
             end
             P.set_format_after_save(filetype, true)
         elseif
+            type(err) == 'string'
+            and err:find('No formatters available for buffer')
+        then
+            -- Since I don't know how to change the displayed log level I am commenting this out
+            -- vim.notify(err, vim.log.levels.DEBUG) --This is an expected error so I just want to log during debug mode
+        elseif
             type(err) == 'table'
             and err.code == require('conform.errors').ERROR_CODE.TIMEOUT
         then
@@ -545,7 +551,7 @@ function M.format_on_save(bufnr)
             and type(err.message) == 'string'
             and err.message:find('No parser could be inferred for file')
         then
-            vim.notify(err.message, vim.log.levels.INFO)
+            vim.notify(err.message, vim.log.levels.DEBUG) --This is an expected error so I just want to log during debug mode
         else
             vim.notify(
                 'Error during formatting: ' .. vim.inspect(err),
