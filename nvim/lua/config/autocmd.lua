@@ -509,12 +509,8 @@ local function pre_bufread_callback(bufnr)
                         vim.wo.spell = old_spell
 
                         --cleanup this augroup
-                        vim.schedule(
-                            function()
-                                vim.api.nvim_del_augroup_by_id(
-                                    bigfile_reset_window_settings_augroup
-                                )
-                            end
+                        vim.api.nvim_del_augroup_by_id(
+                            bigfile_reset_window_settings_augroup
                         )
                     end
                 end,
