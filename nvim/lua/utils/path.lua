@@ -60,7 +60,7 @@ function M.get_mason_tool_path(mason_tool_name)
                 .. '. Things may not work correctly if it is not installed by the time it needs to be used.'
         )
 
-        if require('utils.platform').is.win then
+        if vim.fn.has('win32') == 1 then
             executable_path = predicted_executable_path .. '.cmd'
         else
             executable_path = predicted_executable_path

@@ -7,7 +7,7 @@ local M = {}
 ---I am using this primarily for debuggers on windows as they seem to have issues
 ---finding the pdb files
 function M.shellslash_hack()
-    if require('utils.platform').is.win then vim.cmd([[set noshellslash]]) end
+    if vim.fn.has('win32') == 1 then vim.cmd([[set noshellslash]]) end
 end
 
 ---Get the get default git branch name

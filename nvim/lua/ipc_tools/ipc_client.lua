@@ -19,12 +19,13 @@ local VENV_DIR = vim.fs.joinpath(__dirname, 'EditorToolsCLI', 'venv')
 ---@param executable string
 local function find_venv_executable(executable)
     local candidates = {
-        platform.is.unix and vim.fs.joinpath(VENV_DIR, 'bin', executable),
+        vim.fn.has('unix') == 1
+            and vim.fs.joinpath(VENV_DIR, 'bin', executable),
         -- MSYS2
-        platform.is.win
+        vim.fn.has('win32') == 1
             and vim.fs.joinpath(VENV_DIR, 'bin', ('%s.exe'):format(executable)),
         -- Stock Windows
-        platform.is.win
+        vim.fn.has('win32') == 1
             and vim.fs.joinpath(
                 VENV_DIR,
                 'Scripts',
@@ -54,7 +55,7 @@ local function get_python_executables_priority_sorted()
         table.insert(executables, host_executable)
     end
 
-    if platform.is.win then
+    if vim.fn.has('win32') == 1 then
         table.insert(executables, 'python')
         table.insert(executables, 'python3')
     else

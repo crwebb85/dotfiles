@@ -162,7 +162,7 @@ vim.diagnostic.config({
 --- Terminal
 vim.o.termguicolors = true
 
-if require('utils.platform').is.win then
+if vim.fn.has('win32') == 1 then
     vim.o.shell = vim.fn.executable('pwsh') == 1 and 'pwsh' or 'powershell'
     vim.o.shellcmdflag =
         '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::Default;'

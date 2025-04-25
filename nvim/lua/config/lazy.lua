@@ -2225,7 +2225,7 @@ require('lazy').setup({
                     error('data path was an array but a string was expected')
                 end
 
-                if require('utils.platform').is.win then
+                if vim.fn.has('win32') == 1 then
                     return vim.fs.joinpath(
                         data_path,
                         'mason',
