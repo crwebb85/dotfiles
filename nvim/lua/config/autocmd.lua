@@ -1,26 +1,5 @@
 local config = require('config.config')
 
----TODO play around with this didn't seem to change my hightlights like it was supposed to
--- vim.api.nvim_create_autocmd('Colorscheme', {
---     group = vim.api.nvim_create_augroup('mydiffcolors', { clear = true }),
---     callback = function()
---         --- From https://www.reddit.com/r/neovim/comments/1k3ugsd/improving_the_vimdiff_highlighting_globally_for/?share_id=1BbaNncN_nD0SGSp7by4x&utm_content=1&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=14
---         vim.cmd([[
---             if &background == "dark"
---                 highlight DiffAdd gui=bold guifg=none guibg=#2e4b2e
---                 highlight DiffDelete gui=bold guifg=none guibg=#4c1e15
---                 highlight DiffChange gui=bold guifg=none guibg=#45565c
---                 highlight DiffText gui=bold guifg=none guibg=#996d74
---             else
---                 highlight DiffAdd gui=bold guifg=none guibg=palegreen
---                 highlight DiffDelete gui=bold guifg=none guibg=tomato
---                 highlight DiffChange gui=bold guifg=none guibg=lightblue
---                 highlight DiffText gui=bold guifg=none guibg=lightpink
---             endif
---         ]])
---     end,
--- })
-
 -------------------------------------------------------------------------------
 --- Temporarily highlight text selection that was yanked
 local yank_group = 'yank_group'
