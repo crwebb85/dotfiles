@@ -2625,16 +2625,13 @@ require('lazy').setup({
         config = function() require('telescope').load_extension('yaml_schema') end,
     },
 
-    -- Manager for external tools (LSPs, linters, debuggers, formatters)
-    -- auto-install of those external tools
     {
-        'WhoIsSethDaniel/mason-tool-installer.nvim',
+        'williamboman/mason.nvim',
         lazy = true,
         event = 'VeryLazy',
-        dependencies = {
-            { 'williamboman/mason.nvim' },
-        },
-        config = function(_, _)
+        config = function(_, opts)
+            require('mason').setup(opts)
+
             local Set = require('utils.datastructure').Set
 
             local ensure_installed = Set:new({
@@ -2675,17 +2672,46 @@ require('lazy').setup({
                 :difference(Set:new(config.exclude_mason_install))
                 :to_array()
 
-            require('mason-tool-installer').setup({
-                ensure_installed = ensure_installed,
-            })
-            require('mason-tool-installer').run_on_start() -- Fix Issue: https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/issues/37
+            ---based on https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/blob/1255518cb067e038a4755f5cb3e980f79b6ab89c/lua/mason-tool-installer/init.lua#L20
+            local mason_registry = require('mason-registry')
+            local install = function()
+                for _, name in ipairs(ensure_installed) do
+                    local mason_package = mason_registry.get_package(name)
+                    if not mason_package:is_installed() then
+                        mason_package:once('install:success', function()
+                            vim.schedule(
+                                function()
+                                    vim.notify(
+                                        string.format(
+                                            '%s: successfully installed',
+                                            mason_package.name
+                                        ),
+                                        vim.log.levels.INFO,
+                                        { title = 'my-mason-tool-installer' }
+                                    )
+                                end
+                            )
+                        end)
+                        mason_package:once('install:failed', function()
+                            vim.schedule(
+                                function()
+                                    vim.notify(
+                                        string.format(
+                                            '%s: failed to install',
+                                            mason_package.name
+                                        ),
+                                        vim.log.levels.ERROR,
+                                        { title = 'my-mason-tool-installer' }
+                                    )
+                                end
+                            )
+                        end)
+                        mason_package:install({ version = nil })
+                    end
+                end
+            end
+            mason_registry.refresh(install)
         end,
-    },
-
-    {
-        'williamboman/mason.nvim',
-        lazy = true,
-        config = true,
     },
 
     {
