@@ -8,7 +8,6 @@
   - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
     `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
 - try out basedpyright lsp [example](https://www.reddit.com/r/neovim/comments/1cpkeqd/comment/l3ux37y/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
-- Use toggle term on_stderr callback to store the last error to use in my StackTrace cmd
 - Use counts on telescope pickers to where each count corresponds to a subfolder in the project to narrow the search scope
 - Use counts on harpoon for multiple lists
 - Use counts with gf to open file in the winnr
@@ -17,31 +16,18 @@
   - https://www.reddit.com/r/neovim/comments/1cjnf0m/fully_eliminate_gds_delay/
   - https://www.reddit.com/r/neovim/comments/1ch6yfz/smart_indent_with_treesitter_indent_fallback/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
-- maybe change clipboard so that yanks don't get automatically saved to the clipboard
 - make file buffers not in current directory slightly redder
 - look into overseer docker templates https://github.com/LoricAndre/dotfiles/blob/main/dot_config/nvim/lua/overseer/template/docker/build.lua
-
-### Terminal
-
-- [ ] add terminal resurrection
-- [ ] add yanking last command output
-- [ ] add yanking terminals cd path (use the count when not in the terminal buffer)
-- [ ] add repeat last command (with confirmation)
-- [ ] don't add terminals to jumplist
-- [ ] creating a top terminal and then a different left terminal causes the left
-      one to take up half of the screen horizontally. I think this is due to the
-      equalize function (this may be a sacrifice worth keeping if there isn't a clear fix)
+- clean up powershell profile
+- add powershell fzf shortcut to search for projects
+- add a powershell fzf shortcut to search for poc's
+- add telescope picker to search for projects (automatically set lcd on splits)
+- add telescope picker shortcut to search for poc's (automatically set lcd on splits)
 
 ### Bugs
 
-- Lightbulb still doesn't get removed in some case like when opening help docs with telescope
 - spelling errors highlight as red squigly line in neovim does not display when using wezterm. It does display in powershell
-- fix cmp completion in the terminal for arguments. For some reason when my cursor
-  moves (using the left arrow key) from the end of the current argument the suggestions
-  will have an incorrect prefix of the current argument up to the cursor
-  (or at least that was happening in the past but I can't replicate it at this moment.)
 - `<leader>gd` does not open git diff tab if the tab is already open
-- conform throws an error when the formatter times out
 - when in wezterm and I open my `nvim ./` from my .config directory then new wezterm tab the cwd will be .config/nvim instead of .config
 - 'gC' keymap doesn't invert correctly when comments have nested comments
 - fix my_on_output_quickfix.lua file as invalid characters added are added to
@@ -49,19 +35,14 @@
   (this has been confirmed to happen with my GrepAdd command)
 - fix python formatters
 - Bug heirline: new upstaged files say main the git branch and new files staged preview doesn't show git branch
-- Bug Telescope: plugin documentation now shows up in Telescope even if not yet loaded.
-  When you select it in telescope you will get the following error:
-- my keymap for running neotest on files marks succeeded test as faile if any test failed in the file
+- my keymap for running neotest on files marks succeeded test as failed if any test failed in the file
   on old versions of windows (but works correctly on windows 11)
-- refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
 - overseer hurl opens the quickfix window in all tabs not just the tab that was I used to run the overseer command
 - when going into a big file (only tested when using gd (goto definition)) the first line gets added to the jump list
-- leaving a big file by using `<c-o>` sometimes errors at the line `function() vim.api.nvim_del_autocmd(event.id) end`
-  saying it can't delete the autocmd.
 - my `<leader>qt` keymap doesn't work when the location list is open but quickfix list is closed
+- something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
 - when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
   Both the end_of_line and charset will cause the error.
-- something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
 
 ```editorconfig
 root = true
@@ -96,6 +77,9 @@ stack traceback:
 
 ```
 
+- Bug Telescope: plugin documentation now shows up in Telescope even if not yet loaded.
+  When you select it in telescope you will get the following error:
+
 ```
 
 E5108: Error executing lua: vim/_editor.lua:439: nvim_exec2(): Vim(help):E661: Sorry, no 'en' help for Overseer
@@ -114,18 +98,14 @@ the workaround is to make sure the plugin is loaded
 ### TODO and Workflows that need improvements
 
 - [ ] terminal
-  - Add keymap to toggle between the terminal window and the current/previous window
-  - seperate terminal keymaps to a different namespace
-  - start insert mode only when it a terminal window is first created
-  - add a keymap to toggle on/off following the text printed in the terminal
-  - see if snacks terminal doesn't have the bug that screws up which-key like toggleterm does
-  - make `<leader>tj` work for non-windows OS's
-  - if terminal 1 is open in tab 1 then toggling a terminal with `<leader>tt`
-    in tab 2 should replace that window's buffer with a temporary buffer without
-    closing the window. The terminal will then open on tab 2. If I then navigate
-    back to window in tab 1 with the temporary buffer the buffer will swap out with the
-    terminal in tab 2.
-  - if I move the terminal to the side then that setting should be remembered for that tab when I toggle it with `<leader>tt`
+  - [ ] add a keymap to toggle on/off following the text printed in the terminal
+  - [ ] add terminal resurrection
+  - [ ] add yanking last command output
+  - [ ] add yanking terminals cd path (use the count when not in the terminal buffer)
+  - [ ] add repeat last command (with confirmation)
+  - [ ] creating a top terminal and then a different left terminal causes the left
+        one to take up half of the screen horizontally. I think this is due to the
+        equalize function (this may be a sacrifice worth keeping if there isn't a clear fix)
 - [ ] Window navigation
   - create a hydra like keymaps for <C-W> keys
   - add <leader>w as an alias for <C-W> keymaps (move multicursor keymaps to a different namespace)
@@ -133,7 +113,7 @@ the workaround is to make sure the plugin is loaded
 - [ ] Settings
   - [ ] match tabs with what my formatters use for various file types
   - [ ] add a local leader to start replacing keymaps from plugins with UI buffers like telescope, diffview, fugitive
-  - [ ] try out cspell lsp instead of vim spell check
+  - [ ] try out cspell or harper lsp instead of vim spell check
 - [ ] Snippets and Skeletons
   - [x] Add keymap to select snippets with telescope (should help with discovering snippets from friendly-snippets)
   - [ ] Add t-sql snippets
@@ -202,13 +182,13 @@ the workaround is to make sure the plugin is loaded
 - [ ] Notebook support
   - [ ] jupyter notebooks
 - [ ] Debugging
-  - [ ] I would like a way to convert old pdb files to portable format for older build processes
+  - [ ] setup debugger for .net46 projects https://www.reddit.com/r/neovim/comments/1k7egep/using_a_custom_lua_mason_registry/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
   - [ ] pid telescope picker for processes
 - [ ] Heirline
   - [ ] Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
   - [ ] Add a heirline component for harpoon
   - [ ] show workspace diagnostic counts in heirline
-  - [ ] add a save and save all button to heirline so I know when I have unsaved buffers
+  - [ ] add a symbol when I have any unsaved buffers
   - [ ] if an lsp diagnostics are hidden the lsp should appear orange in heirline
 - [ ] CLI
   - [ ] add ripgrep completion to my powershell profile https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#complete
@@ -216,31 +196,13 @@ the workaround is to make sure the plugin is loaded
   - [ ] fix powershell profile to not display tab completion for failed commands
 - [ ] Config
   - [x] add list of mason items to not install automatically
-  - [ ] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
+  - [x] configure heirline nerdfonts to use ascii when nerd_font_enabled config value equals false
 - [ ] Refactor
 
-  - [ ] replace lsp setup functions setup_jsonls with a table like
-
-  ```lua
-    local settings = {
-        omnisharp = {
-            --the settings
-        },
-
-        jsonls = function()
-        return {
-            -- the settings
-        }
-        end,
-    }
-    lsp_server.setup(name) -- automatically uses the settings
-  ```
-
-  - [ ] replace client.supports_method with client.server_capabilities
-  - [ ] cleanup deprecated code
-  - [ ] properly use setqflist action parameter for appending to an existing list.
+  - [x] properly use setqflist action parameter for appending to an existing list.
   - [ ] refactor my windows check to use `vim.fn.has('win32') == 1`
   - [ ] refactor telescope keymap `<leader>fh` to no longer use a register in visual mode
+  - [ ] refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
 
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
@@ -276,7 +238,6 @@ the workaround is to make sure the plugin is loaded
 - [ ] Prune Plugins (plugins I might want to create my own version of or see if I still need it)
   - iamcco/markdown-preview.nvim (replace with maybe my own version)
   - nvim-tree/nvim-web-devicons (replace with echasnovski/mini.icons)
-  - WhoIsSethDaniel/mason-tool-installer.nvim (replace with custom code)
   - hrsh7th/nvim-cmp (replace with native completion and https://www.reddit.com/r/neovim/comments/1fwhhp0/new_plugin_cmp2lsp/?utm_medium=android_app&utm_source=share)
 
 ### Vim Practice
