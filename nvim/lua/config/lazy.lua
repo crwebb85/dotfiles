@@ -2550,7 +2550,7 @@ require('lazy').setup({
         version = '^1.0.0',
         -- build = ':UpdateRemotePlugins',
         dependencies = 'willothy/wezterm.nvim',
-        lazy = false,
+        lazy = true,
         keys = {
             {
                 '<leader>ip',
@@ -2831,7 +2831,6 @@ require('lazy').setup({
             { 'nvim-lua/plenary.nvim' },
             { 'nvim-telescope/telescope.nvim' },
         },
-        -- event = 'LspAttach',
         config = function() require('tiny-code-action').setup() end,
     },
     -- Code Action Macros
