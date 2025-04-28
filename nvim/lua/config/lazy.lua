@@ -894,7 +894,7 @@ require('lazy').setup({
             )
             vim.api.nvim_create_autocmd('BufEnter', {
                 group = group_id,
-                desc = 'OIl replacement for Netrw',
+                desc = 'OIL replacement for Netrw',
                 pattern = '*',
                 once = true,
                 callback = function()
@@ -2629,119 +2629,13 @@ require('lazy').setup({
         'williamboman/mason.nvim',
         lazy = true,
         event = 'VeryLazy',
+        dependencies = {
+            -- Need to require nvim-lspconfig so that the configurations are loaded
+            -- before we run vim.lsp.enable
+            { 'neovim/nvim-lspconfig' },
+        },
         config = function(_, opts)
             require('mason').setup(opts)
-
-            local Set = require('utils.datastructure').Set
-
-            local ensure_installed = Set:new({
-                -- LSPs
-                'pyright', -- LSP for python
-                'ruff',
-                'marksman', -- Markdown
-                'markdown-oxide', -- Markdown notes
-                'lua-language-server', -- (lua_ls) LSP for lua files
-                'typescript-language-server', -- tsserver LSP (keywords: typescript, javascript)
-                'eslint-lsp', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
-                'ansible-language-server',
-                'omnisharp', -- C#
-                'gopls', -- go lang
-                'rust-analyzer',
-                'yaml-language-server', -- (yamlls) (keywords: yaml)
-                'json-lsp', --(jsonls) (keywords: json)
-                'taplo', -- LSP for toml (for pyproject.toml files)
-                'powershell-editor-services', -- powershell
-                'lemminx', -- xml
-                'sqls', -- sql
-
-                -- Formatters
-                'stylua', -- Formatter for lua files
-                'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
-                'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
-                'xmlformatter',
-                'jq', --json formatter
-                'shfmt',
-
-                -- 'fixjson', -- json fixer, fixes invalid json like trailing commas
-
-                -- Debuggers
-                'codelldb',
-                'debugpy', -- python debugger
-                'netcoredbg',
-            })
-                :difference(Set:new(config.exclude_mason_install))
-                :to_array()
-
-            ---based on https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/blob/1255518cb067e038a4755f5cb3e980f79b6ab89c/lua/mason-tool-installer/init.lua#L20
-            local mason_registry = require('mason-registry')
-            local install = function()
-                for _, name in ipairs(ensure_installed) do
-                    local mason_package = mason_registry.get_package(name)
-                    if not mason_package:is_installed() then
-                        mason_package:once('install:success', function()
-                            vim.schedule(
-                                function()
-                                    vim.notify(
-                                        string.format(
-                                            '%s: successfully installed',
-                                            mason_package.name
-                                        ),
-                                        vim.log.levels.INFO,
-                                        { title = 'my-mason-tool-installer' }
-                                    )
-                                end
-                            )
-                        end)
-                        mason_package:once('install:failed', function()
-                            vim.schedule(
-                                function()
-                                    vim.notify(
-                                        string.format(
-                                            '%s: failed to install',
-                                            mason_package.name
-                                        ),
-                                        vim.log.levels.ERROR,
-                                        { title = 'my-mason-tool-installer' }
-                                    )
-                                end
-                            )
-                        end)
-                        mason_package:install({ version = nil })
-                    end
-                end
-            end
-            mason_registry.refresh(install)
-        end,
-    },
-
-    {
-        'neovim/nvim-lspconfig',
-        -- lazy = 'VeryLazy',
-
-        config = function(_, _)
-            require('config.lsp.lsp').enable()
-
-            vim.lsp.config('*', {
-                capabilities = require('config.lsp.lsp').get_additional_default_capabilities(),
-            })
-
-            --Go to https://github.com/williamboman/mason-lspconfig.nvim to find translations
-            --between the mason name and the lspconfig name
-            vim.lsp.enable('lua_ls') -- (lua-language-server) LSP for lua files
-            vim.lsp.enable('pyright') -- LSP for python
-            vim.lsp.enable('ruff')
-            vim.lsp.enable('ts_ls') -- ( typescript-language-server ) LSP (keywords: typescript, javascript)
-            vim.lsp.enable('eslint') -- (eslint-lsp) eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
-            vim.lsp.enable('ansiblels') -- (ansible-language-server)
-            vim.lsp.enable('omnisharp') -- C#
-            vim.lsp.enable('gopls') -- go lang
-            vim.lsp.enable('rust_analyzer') -- (rust-analyzer)
-            vim.lsp.enable('yamlls') -- (yaml-language-server)
-            vim.lsp.enable('jsonls') -- (json-lsp)
-            vim.lsp.enable('taplo') -- LSP for toml (for pyproject.toml files)
-            vim.lsp.enable('powershell_es') -- (powershell-editor-services) powershell
-            vim.lsp.enable('lemminx') -- xml
-            vim.lsp.enable('sqls') -- sql
 
             --Mark down lsp comparison
             --
@@ -2774,9 +2668,128 @@ require('lazy').setup({
             --
             -- Note: create a .marksman.toml file in note folder to get full
             -- capabilities https://github.com/artempyanykh/marksman/blob/main/docs/configuration.md
-            vim.lsp.enable('marksman') -- Markdown
-            vim.lsp.enable('markdown_oxide') -- (markdown-oxide) Markdown notes
+
+            local ensure_installed = {
+                -- LSPs
+                --Go to https://github.com/williamboman/mason-lspconfig.nvim to find translations
+                --between the mason name and the lspconfig name
+                ['pyright'] = 'pyright', -- LSP for python
+                ['ruff'] = 'ruff',
+                ['marksman'] = 'marksman', -- Markdown
+                ['markdown-oxide'] = 'markdown_oxide', -- Markdown notes
+                ['lua-language-server'] = 'lua_ls', -- (lua_ls) LSP for lua files
+                ['typescript-language-server'] = 'ts_ls', -- tsserver LSP (keywords: typescript, javascript)
+                ['eslint-lsp'] = 'eslint', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
+                ['ansible-language-server'] = 'ansiblels',
+                ['omnisharp'] = 'omnisharp', -- C#
+                ['gopls'] = 'gopls', -- go lang
+                ['rust-analyzer'] = 'rust_analyzer',
+                ['yaml-language-server'] = 'yamlls', -- (yamlls) (keywords: yaml)
+                ['json-lsp'] = 'jsonls', --(jsonls) (keywords: json)
+                ['taplo'] = 'taplo', -- LSP for toml (for pyproject.toml files)
+                ['powershell-editor-services'] = 'powershell_es', -- powershell
+                ['lemminx'] = 'lemminx', -- xml
+                ['sqls'] = 'sqls', -- sql
+
+                -- Formatters
+                'stylua', -- Formatter for lua files
+                'prettier', -- Formatter typescript (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml
+                'prettierd', --Uses a daemon for faster formatting (keywords: angular, css, flow, graphql, html, json, jsx, javascript, less, markdown, scss, typescript, vue, yaml)
+                'xmlformatter',
+                'jq', --json formatter
+                'shfmt',
+
+                -- 'fixjson', -- json fixer, fixes invalid json like trailing commas
+
+                -- Debuggers
+                'codelldb',
+                'debugpy', -- python debugger
+                'netcoredbg',
+            }
+
+            ---based on https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/blob/1255518cb067e038a4755f5cb3e980f79b6ab89c/lua/mason-tool-installer/init.lua#L20
+            local mason_registry = require('mason-registry')
+            ---
+            ---Installs the mason package
+            ---@param mason_package_name string
+            ---@param lspconfig_name? string
+            local function install_package(mason_package_name, lspconfig_name)
+                local mason_package =
+                    mason_registry.get_package(mason_package_name)
+                if not mason_package:is_installed() then
+                    vim.notify(
+                        string.format('%s: installing', mason_package.name),
+
+                        vim.log.levels.INFO,
+                        { title = 'my-mason-tool-installer' }
+                    )
+                    mason_package:once('install:success', function()
+                        vim.schedule(function()
+                            vim.notify(
+                                string.format(
+                                    '%s: successfully installed',
+                                    mason_package.name
+                                ),
+                                vim.log.levels.INFO,
+                                { title = 'my-mason-tool-installer' }
+                            )
+                            if lspconfig_name ~= nil then
+                                vim.lsp.enable(lspconfig_name)
+                            end
+                        end)
+                    end)
+
+                    mason_package:once('install:failed', function()
+                        vim.schedule(
+                            function()
+                                vim.notify(
+                                    string.format(
+                                        '%s: failed to install',
+                                        mason_package.name
+                                    ),
+                                    vim.log.levels.ERROR,
+                                    { title = 'my-mason-tool-installer' }
+                                )
+                            end
+                        )
+                    end)
+                    mason_package:install({ version = nil })
+                elseif lspconfig_name ~= nil then
+                    vim.lsp.enable(lspconfig_name)
+                end
+            end
+
+            local function install_packages()
+                local Set = require('utils.datastructure').Set
+                local mason_install_exclusion_package_names =
+                    Set:new(config.exclude_mason_install)
+
+                for key, value in pairs(ensure_installed) do
+                    local package_name
+                    local lspconfig_name = nil
+                    if type(key) == 'string' then
+                        package_name = key
+                        lspconfig_name = value
+                    else
+                        package_name = value
+                    end
+
+                    if
+                        not mason_install_exclusion_package_names:has(
+                            package_name
+                        )
+                    then
+                        install_package(package_name, lspconfig_name)
+                    end
+                end
+            end
+            mason_registry.refresh(install_packages)
         end,
+    },
+
+    {
+        'neovim/nvim-lspconfig',
+        lazy = true,
     },
 
     -- Virtual Environments
