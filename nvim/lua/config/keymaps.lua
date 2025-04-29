@@ -230,8 +230,12 @@ vim.keymap.set(
 
 vim.keymap.set('n', '<leader>qt', function()
     local qf_exists = false
+    local tabid = vim.api.nvim_get_current_tabpage()
+    local tabnr = vim.api.nvim_tabpage_get_number(tabid)
     for _, win in pairs(vim.fn.getwininfo()) do
-        if win['quickfix'] == 1 then qf_exists = true end
+        if win.quickfix == 1 and win.loclist == 0 and win.tabnr == tabnr then
+            qf_exists = true
+        end
     end
     if qf_exists == true then
         vim.cmd('cclose')

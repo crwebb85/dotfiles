@@ -39,7 +39,6 @@
   on old versions of windows (but works correctly on windows 11)
 - overseer hurl opens the quickfix window in all tabs not just the tab that was I used to run the overseer command
 - when going into a big file (only tested when using gd (goto definition)) the first line gets added to the jump list
-- my `<leader>qt` keymap doesn't work when the location list is open but quickfix list is closed
 - something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
 - when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
   Both the end_of_line and charset will cause the error.
