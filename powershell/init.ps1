@@ -2,14 +2,16 @@ $checkhealthConfigPath = Get-ChildItem $PSScriptRoot\init\checkhealth.ps1 | Sele
 Write-Output "Sourcing $checkhealthConfigPath"
 . "$checkhealthConfigPath"
 
-$readlineConfigPath = Get-ChildItem $PSScriptRoot\init\PSFzf\PSFzf.ps1 | Select-Object -ExpandProperty FullName
-Write-Output "Sourcing $readlineConfigPath"
-. "$readlineConfigPath"
+$psfzfConfigPath = Get-ChildItem $PSScriptRoot\init\PSFzf\PSFzf.ps1 | Select-Object -ExpandProperty FullName
+Write-Output "Sourcing $psfzfConfigPath"
+. "$psfzfConfigPath"
 
 $readlineConfigPath = Get-ChildItem $PSScriptRoot\init\readline.ps1 | Select-Object -ExpandProperty FullName
 Write-Output "Sourcing $readlineConfigPath"
 . "$readlineConfigPath"
 
+Set-Alias -Name zp -Value Invoke-FuzzyProjectLocation
+Set-Alias -Name zc -Value Invoke-FuzzySetProofOfConceptLocation 
 
 function Write-BranchName () {
     try {

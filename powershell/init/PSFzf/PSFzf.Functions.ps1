@@ -237,6 +237,84 @@ function Invoke-FuzzySetLocation() {
     }
 }
 
+function Invoke-FuzzyProjectLocation() {
+    param($SearchString = $null)
+    $SearchPaths = @()
+    $MyDocumentsPath = [Environment]::GetFolderPath("MyDocuments") # Windows likes to now default this to the OneDrive Documents folder 
+    if ($null -ne $MyDocumentsPath -and $(Test-Path -Path "$MyDocumentsPath" -PathType Any)) {
+        $SearchPath = [System.IO.Path]::Combine($MyDocumentsPath, "projects")
+        if ($(Test-Path -Path "$SearchPath" -PathType Any)) {
+            $SearchPaths += $SearchPath
+        }
+    }
+
+    $UserProfilePath = $env:USERPROFILE
+    if ($null -ne $UserProfilePath -and $(Test-Path -Path "$UserProfilePath" -PathType Any)) { 
+        $SecondaryMyDocumentsPath = [System.IO.Path]::Combine($UserProfilePath, "documents")
+
+        $SearchPath = [System.IO.Path]::Combine($SecondaryMyDocumentsPath, "projects")
+        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPaths -notin $SearchPaths) {
+            $SearchPaths += $SearchPath
+        }
+    }
+
+    $PossiblePaths = Get-ChildItem $searchpaths -Directory -ErrorAction Ignore  | Select-Object FullName
+
+    $ConfigPath = $Env:XDG_CONFIG_HOME
+    if ($null -ne $ConfigPath -and $(Test-Path -Path "$ConfigPath" -PathType Any)) {
+        $PossiblePaths += $ConfigPath
+    }
+    
+    $result = $null
+    try {
+        $PossiblePaths | Invoke-Fzf -Query $SearchString | ForEach-Object { $result = $_ }
+    }
+    catch {
+        
+    }
+
+    if ($null -ne $result) {
+        Set-Location $result
+    }
+}
+
+function Invoke-FuzzySetProofOfConceptLocation() {
+    param($SearchString = $null)
+
+    $SearchPaths = @()
+    $MyDocumentsPath = [Environment]::GetFolderPath("MyDocuments") # Windows likes to now default this to the OneDrive Documents folder 
+    if ($null -ne $MyDocumentsPath -and $(Test-Path -Path "$MyDocumentsPath" -PathType Any)) {
+        $SearchPath = [System.IO.Path]::Combine($MyDocumentsPath, "poc")
+        if ($(Test-Path -Path "$SearchPath" -PathType Any)) {
+            $SearchPaths += $SearchPath
+        }
+    }
+
+    $UserProfilePath = $env:USERPROFILE
+    if ($null -ne $UserProfilePath -and $(Test-Path -Path "$UserProfilePath" -PathType Any)) { 
+        $SecondaryMyDocumentsPath = [System.IO.Path]::Combine($UserProfilePath, "documents")
+
+        $SearchPath = [System.IO.Path]::Combine($SecondaryMyDocumentsPath, "poc")
+        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPaths -notin $SearchPaths) {
+            $SearchPaths += $SearchPath
+        }
+    }
+
+    $PossiblePaths = Get-ChildItem $searchpaths -Directory -ErrorAction Ignore  | Select-Object FullName
+
+    $result = $null
+    try {
+        $PossiblePaths | Invoke-Fzf -Query $SearchString | ForEach-Object { $result = $_ }
+    }
+    catch {
+        
+    }
+
+    if ($null -ne $result) {
+        Set-Location $result
+    }
+}
+
 if ((-not $IsLinux) -and (-not $IsMacOS)) {
     #.ExternalHelp PSFzf.psm1-help.xml
     function Set-LocationFuzzyEverything() {
