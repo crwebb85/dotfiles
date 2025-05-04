@@ -673,6 +673,21 @@ require('lazy').setup({
         config = function(_, opts)
             require('telescope').setup(opts)
             require('telescope').load_extension('media_files')
+
+            -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
+            -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged
+            vim.api.nvim_create_autocmd('User', {
+                pattern = 'TelescopeFindPre',
+                callback = function()
+                    vim.opt_local.winborder = 'none'
+                    vim.api.nvim_create_autocmd('WinLeave', {
+                        once = true,
+                        callback = function()
+                            vim.opt_local.winborder = 'rounded'
+                        end,
+                    })
+                end,
+            })
         end,
     },
 
