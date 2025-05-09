@@ -10,17 +10,20 @@
 ---@field position "float"|"bottom"|"top"|"left"|"right" the position the window is in if open or was last in if closed
 ---@field auto_close boolean close the terminal buffer when the process exits
 ---@field start_insert boolean start insert mode when entering newly opened terminal window
+---@field tui_mode boolean disables signcolumn and line numbers
 local TerminalWindowManager = setmetatable({}, {})
 TerminalWindowManager.__index = TerminalWindowManager
 
 ---@class TerminalWindowManagerOpts
 ---@field auto_close? boolean close the terminal buffer when the process exits (default:true)
 ---@field start_insert? boolean start insert mode when starting the terminal (default:true)
+---@field tui_mode? boolean disables signcolumn and line numbers (default: false)
 ---@field position? "float"|"bottom"|"top"|"left"|"right" (default: bottom)
 
 ---@class TerminalWindowManagerShowOpts
 ---@field position? "float"|"bottom"|"top"|"left"|"right" a position to explicitly set the window to if it wasn't already that position
 ---@field enter? boolean Enter the window after opening (default: true)
+---@field tui_mode? boolean disables signcolumn and line numbers (default: false)
 
 local M = {}
 
@@ -49,6 +52,7 @@ function M.create_window_manager(buffer_manager, tabid)
         position = opts.position or 'bottom',
         auto_close = opts.auto_close or opts.auto_close == nil,
         start_insert = opts.start_insert or opts.start_insert == nil,
+        tui_mode = opts.tui_mode == true,
     }
     local window_manager =
         setmetatable(window_manager_fields, TerminalWindowManager)
@@ -175,6 +179,8 @@ end
 function TerminalWindowManager:toggle(opts)
     opts = opts or {}
     opts.position = opts.position or self.position
+    local tui_mode = vim.F.if_nil(opts.tui_mode, self.tui_mode)
+    assert(tui_mode ~= nil)
 
     if opts.position ~= self.position then
         --If we are changing the position we won't hide the terminal
@@ -333,6 +339,8 @@ function TerminalWindowManager:show(opts)
 
     local position = opts.position or self.position
     local enter = opts.enter or opts.enter == nil
+    local tui_mode = vim.F.if_nil(opts.tui_mode, self.tui_mode)
+    assert(tui_mode ~= nil)
 
     if self:set_position(position) then
         --temporarily close the window so that it can be re-positioned
@@ -356,6 +364,12 @@ function TerminalWindowManager:show(opts)
 
     self.winid =
         vim.api.nvim_open_win(self.buffer_manager.bufnr, enter, win_config)
+
+    if tui_mode then
+        vim.wo[self.winid][0].number = false
+        vim.wo[self.winid][0].relativenumber = false
+        vim.wo[self.winid][0].signcolumn = 'no'
+    end
 
     if enter then vim.api.nvim_set_current_win(self.winid) end
 

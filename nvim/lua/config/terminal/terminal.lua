@@ -30,6 +30,7 @@ local M = {}
 ---@field auto_insert? boolean start insert mode when entering the terminal buffer (default:true)
 ---@field auto_close? boolean close the terminal buffer when the process exits (default:true)
 ---@field position? "float"|"bottom"|"top"|"left"|"right"
+---@field tui_mode? boolean disables signcolumn and line numbers (default: false)
 
 ---Getter for the terminal id (the string representation of the terminal key)
 ---@return string terminal id
@@ -83,6 +84,7 @@ end
 ---@field tabid? uinteger of the tab to create the window for
 ---@field position? "float"|"bottom"|"top"|"left"|"right" a position to explicitly set the window to if it wasn't already that position
 ---@field enter? boolean Enter the window after opening (default: true)
+---@field tui_mode? boolean disables signcolumn and line numbers (default: false)
 
 ---Creates a new WindowManager for the tab if it doesn't exist.
 ---@param opts? TerminalManagerOpenOpts
@@ -94,10 +96,15 @@ function TerminalManager:open(opts)
         or vim.api.nvim_get_current_tabpage()
     local enter = opts.enter or opts.enter == nil
     local position = opts.position
+    local tui_mode = opts.tui_mode == true
 
     if self.window_managers[tabid] ~= nil then
         local window_manager = self.window_managers[tabid]
-        window_manager:show({ position = position, enter = enter })
+        window_manager:show({
+            position = position,
+            enter = enter,
+            tui_mode = tui_mode,
+        })
         return window_manager
     end
 
@@ -108,7 +115,7 @@ function TerminalManager:open(opts)
         )
     self.window_managers[tabid] = window_manager
 
-    window_manager:show({ position = position, enter = enter })
+    window_manager:show({ position = position, enter = enter, tui_mode })
 
     return window_manager
 end
@@ -162,6 +169,7 @@ function M.create(opts)
                 start_insert = opts.start_insert or opts.start_insert == nil,
                 auto_close = opts.auto_close or opts.auto_close == nil,
                 position = opts.position or 'bottom',
+                tui_mode = opts.tui_mode == true,
             },
         })
 
@@ -284,10 +292,16 @@ function M.toggle(opts)
     end
     local window_manager = terminal:get_window_manager()
     if window_manager == nil then
-        window_manager = terminal:open({ position = opts.position })
+        window_manager = terminal:open({
+            position = opts.position,
+            tui_mode = opts.tui_mode,
+        })
         return window_manager
     end
-    return window_manager:toggle({ position = opts.position })
+    return window_manager:toggle({
+        position = opts.position,
+        tui_mode = opts.tui_mode,
+    })
 end
 
 return M

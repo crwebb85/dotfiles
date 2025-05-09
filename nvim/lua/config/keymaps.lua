@@ -94,6 +94,7 @@ vim.keymap.set('n', '<leader>gs', function()
         auto_insert = false,
         auto_close = false,
         position = 'float',
+        tui_mode = true,
     })
 end, { desc = 'Custom: Toggle LazyGit' })
 

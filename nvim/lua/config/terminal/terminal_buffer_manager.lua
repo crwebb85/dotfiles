@@ -29,6 +29,7 @@ function TerminalBufferManager:get_window_default_options()
     local win_opts = {
         start_insert = true,
         auto_close = true,
+        tui_mode = false,
         position = 'bottom',
     }
 
@@ -38,6 +39,10 @@ function TerminalBufferManager:get_window_default_options()
 
     if type(opts.auto_close) == 'boolean' then
         win_opts.auto_close = opts.auto_close
+    end
+
+    if type(opts.tui_mode) == 'boolean' then
+        win_opts.tui_mode = opts.tui_mode
     end
 
     local valid_position = { 'float', 'bottom', 'top', 'left', 'right' }
