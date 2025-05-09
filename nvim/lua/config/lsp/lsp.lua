@@ -187,38 +187,24 @@ local function setup_user_commands()
 
         client:stop()
 
-        local timer = assert(vim.uv.new_timer())
-        local new_client_id
-        timer:start(
-            500,
-            100,
-            vim.schedule_wrap(function()
-                if client:is_stopped() then
-                    vim.notify(
-                        string.format(
-                            'Attaching buffers to restarted LSP %s.',
-                            client.name
-                        ),
-                        vim.log.levels.INFO
-                    )
-                    for _, bufnr in pairs(attached_bufnrs) do
-                        if vim.api.nvim_buf_is_valid(bufnr) then
-                            new_client_id =
-                                vim.lsp.start(client_config, { bufnr = bufnr })
-                        end
-                    end
-                    if not timer:is_closing() then timer:close() end
-                    vim.notify(
-                        string.format(
-                            'Restarted LSP %s. Old client id was %s. New client id is %s',
-                            client.name,
-                            client_id,
-                            new_client_id
-                        ),
-                        vim.log.levels.INFO
-                    )
-                end
-            end)
+        vim.notify(
+            string.format('Attaching buffers to restarted LSP %s.', client.name),
+            vim.log.levels.INFO
+        )
+        local new_client_id = nil
+        for _, bufnr in pairs(attached_bufnrs) do
+            if vim.api.nvim_buf_is_valid(bufnr) then
+                new_client_id = vim.lsp.start(client_config, { bufnr = bufnr })
+            end
+        end
+        vim.notify(
+            string.format(
+                'Restarted LSP %s. Old client id was %s. New client id is %s',
+                client.name,
+                client_id,
+                new_client_id
+            ),
+            vim.log.levels.INFO
         )
     end, {
         complete = function()
