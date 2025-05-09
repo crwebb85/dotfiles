@@ -377,6 +377,10 @@ function M.enable()
 
     if require('config.config').use_native_completion then
         vim.api.nvim_create_autocmd('FileType', {
+            group = vim.api.nvim_create_augroup(
+                'native_completion',
+                { clear = true }
+            ),
             pattern = '*',
             callback = function(_)
                 require('config.lsp.completion.cmp').start_cmp_lsp()

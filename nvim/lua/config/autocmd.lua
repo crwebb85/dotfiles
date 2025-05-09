@@ -2,12 +2,10 @@ local config = require('config.config')
 
 -------------------------------------------------------------------------------
 --- Temporarily highlight text selection that was yanked
-local yank_group = 'yank_group'
-vim.api.nvim_create_augroup(yank_group, { clear = true })
-vim.api.nvim_create_autocmd(
-    'TextYankPost',
-    { group = yank_group, callback = function() vim.highlight.on_yank() end }
-)
+vim.api.nvim_create_autocmd('TextYankPost', {
+    group = vim.api.nvim_create_augroup('yank_group', { clear = true }),
+    callback = function() vim.highlight.on_yank() end,
+})
 
 -------------------------------------------------------------------------------
 --- Terminal Autocmds
@@ -199,19 +197,6 @@ vim.api.nvim_create_autocmd('FileType', {
 --     },
 --     callback = function(_) vim.cmd([[setlocal winfixbuf]]) end,
 -- })
-
--- Close man pages with <q>
-vim.api.nvim_create_autocmd('FileType', {
-    pattern = 'man',
-    callback = function()
-        vim.keymap.set(
-            'n',
-            'q',
-            ':quit<CR>',
-            { buffer = 0, silent = true, desc = 'Custom: Close window' }
-        )
-    end,
-})
 
 -------------------------------------------------------------------------------
 --- Check if we need to reload the file when it changed
