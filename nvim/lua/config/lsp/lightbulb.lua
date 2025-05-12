@@ -1,156 +1,99 @@
---source https://github.com/rockyzhang24/dotfiles/blob/master/.config/nvim/lua/rockyz/lsp/lightbulb.lua
+--originally based on https://github.com/rockyzhang24/dotfiles/blob/master/.config/nvim/lua/rockyz/lsp/lightbulb.lua
+--but this code no longer resembles it.
 local M = {}
 
-local function get_diagnostic_at_cursor()
-    local cur_bufnr = vim.api.nvim_get_current_buf()
-    local line, col = unpack(vim.api.nvim_win_get_cursor(0)) -- line is 1-based indexing
-    -- Get a table of diagnostics at the current line. The structure of the
-    -- diagnostic item is defined by nvim (see :h diagnostic-structure) to
-    -- describe the information of a diagnostic.
-    local diagnostics = vim.diagnostic.get(cur_bufnr, { lnum = line - 1 }) -- lnum is 0-based indexing
-    -- Filter out the diagnostics at the cursor position. And then use each to
-    -- build a LSP Diagnostic (see
-    -- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#diagnostic)
-    local lsp_diagnostics = {}
-    for _, diag in pairs(diagnostics) do
-        if diag.col <= col and diag.end_col >= col then
-            table.insert(lsp_diagnostics, {
-                range = {
-                    ['start'] = {
-                        line = diag.lnum,
-                        character = diag.col,
-                    },
-                    ['end'] = {
-                        line = diag.end_lnum,
-                        character = diag.end_col,
-                    },
-                },
-                severity = diag.severity,
-                code = diag.code,
-                source = diag.source or nil,
-                message = diag.message,
-            })
-        end
-    end
-    return lsp_diagnostics
-end
---
--- Show a lightbulb when code actions are available at the cursor
---
--- It is shown at the beginning (the first column) of the same line, or the
--- previous line if the space is not enough.
---
-local prev_lnum = nil
-local prev_topline_num = nil
-local lightbulb_bufnr = nil
-local lightbulb_winid = nil
+local LIGHTBULB_NS = vim.api.nvim_create_namespace('my-lightbulb')
 
-local function get_lightbulb_bufnr()
-    if
-        lightbulb_bufnr == nil or not vim.api.nvim_buf_is_valid(lightbulb_bufnr)
-    then
-        lightbulb_bufnr = vim.api.nvim_create_buf(false, true)
-        local icon = ''
-        vim.api.nvim_buf_set_lines(lightbulb_bufnr, 0, 1, false, { icon })
-    end
-    return lightbulb_bufnr
-end
+local lightbulb_bufnr = nil
+local lightbulb_extmark_id = nil
 
 local function remove_lightbulb()
-    if lightbulb_winid == nil then return end
-    if vim.api.nvim_win_is_valid(lightbulb_winid) then
-        vim.api.nvim_win_close(lightbulb_winid, true)
-    end
-    lightbulb_winid = nil
-end
-
-local function draw_lightbulb()
-    -- Avoid bulb icon flashing when move the cursor in a line
-    --
-    -- When code actions are available in different positions within a line,
-    -- the bulb will be shown in the same place, so no need to remove the
-    -- previous bulb and create a new one.
-    -- Check if the first line of the screen is changed in order to update the
-    -- bulb when scroll the window (e.g., C-y, C-e, zz, etc)
-    local cur_lnum = vim.fn.line('.')
-    local cur_topline_num = vim.fn.line('w0')
     if
-        cur_lnum == prev_lnum
-        and cur_topline_num == prev_topline_num
-        and (
-            lightbulb_winid ~= nil
-            and vim.api.nvim_win_is_valid(lightbulb_winid)
-            and vim.api.nvim_win_get_tabpage(lightbulb_winid)
-                == vim.api.nvim_get_current_tabpage()
-        )
+        lightbulb_bufnr ~= nil
+        and vim.api.nvim_buf_is_valid(lightbulb_bufnr)
+        and lightbulb_extmark_id ~= nil
     then
-        return
-    end
-    -- Remove the old bulb in preparation for re-positioning
-    remove_lightbulb()
-    prev_lnum = cur_lnum
-    prev_topline_num = cur_topline_num
-    -- Calculate the row position of the lightbulb relative to the cursor
-    local row = 0
-    local line_number = vim.fn.line('.') or 0
-    local cur_indent = vim.fn.indent(line_number)
-    if cur_indent <= 2 then
-        if vim.fn.line('.') == vim.fn.line('w0') then
-            row = 1
-        else
-            row = -1
-        end
-    end
-    -- Calculate the col position of the lightbulb relative to the cursor
-    --
-    -- NOTE: We want to get how many columns (characters) before the cursor
-    -- that will be the offset for placing the bulb. If the indent is TAB,
-    -- each indent level is counted as a single one character no matter how
-    -- many spaces the TAB has. We need to convert it to the number of spaces.
-    local cursor_col = vim.fn.col('.')
-    local col = -cursor_col + 1
-    if not vim.api.nvim_get_option_value('expandtab', {}) then
-        local tabstop = vim.api.nvim_get_option_value('tabstop', {})
-        local tab_cnt = cur_indent / tabstop
-        if cursor_col <= tab_cnt then
-            col = -(cursor_col - 1) * tabstop
-        else
-            col = -(cursor_col - tab_cnt + cur_indent) + 1
-        end
-    end
-
-    local new_lightbulb_winid =
-        vim.api.nvim_open_win(get_lightbulb_bufnr(), false, {
-            relative = 'cursor',
-            width = 1,
-            height = 1,
-            row = row,
-            col = col,
-            style = 'minimal',
-            noautocmd = true,
-            border = 'none',
-        })
-
-    if
-        lightbulb_winid ~= nil and vim.api.nvim_win_is_valid(lightbulb_winid)
-    then
-        vim.notify(
-            'Created a new lightbulb with winid '
-                .. vim.inspect(new_lightbulb_winid)
-                .. ' when previous lightbulb with winid '
-                .. vim.inspect(lightbulb_winid)
-                .. ' has not yet been closed',
-            vim.log.levels.ERROR
+        vim.api.nvim_buf_del_extmark(
+            lightbulb_bufnr,
+            LIGHTBULB_NS,
+            lightbulb_extmark_id
         )
     end
-
-    vim.wo[new_lightbulb_winid].winhl = 'Normal:LightBulb'
-    lightbulb_winid = new_lightbulb_winid
 end
 
-local function show_lightbulb()
+---draws the lightbulb at the position
+---@param position [integer, integer] # (row, col) tuple
+---@param bufnr integer the current buffer
+local function draw_lightbulb(position, bufnr)
+    if
+        bufnr ~= lightbulb_bufnr
+        and bufnr ~= nil
+        and vim.api.nvim_buf_is_valid(bufnr)
+    then
+        remove_lightbulb()
+        lightbulb_bufnr = bufnr
+    end
+    if bufnr == nil or not vim.api.nvim_buf_is_valid(bufnr) then return end
+
+    ---@type vim.api.keyset.set_extmark
+    local extmark_opts = {
+        id = lightbulb_extmark_id,
+        priority = 10,
+        strict = false, -- prevent errors if empty buffer
+        sign_text = '',
+        sign_hl_group = 'LightBulbSign',
+        number_hl_group = 'LightBulbNumber',
+    }
+    local line, col = unpack(position)
+    lightbulb_extmark_id = vim.api.nvim_buf_set_extmark(
+        bufnr,
+        LIGHTBULB_NS,
+        line - 1,
+        col + 1,
+        extmark_opts
+    )
+end
+
+---Copied from rom runtime/lua/vim/lsp/buf.lua
+---@param bufnr integer
+---@param mode "v"|"V"
+---@return table {start={row,col}, end={row,col}} using (1, 0) indexing
+local function range_from_selection(bufnr, mode)
+    -- TODO: Use `vim.fn.getregionpos()` instead.
+
+    -- [bufnum, lnum, col, off]; both row and column 1-indexed
+    local start = vim.fn.getpos('v')
+    local end_ = vim.fn.getpos('.')
+    local start_row = start[2]
+    local start_col = start[3]
+    local end_row = end_[2]
+    local end_col = end_[3]
+
+    -- A user can start visual selection at the end and move backwards
+    -- Normalize the range to start < end
+    if start_row == end_row and end_col < start_col then
+        end_col, start_col = start_col, end_col --- @type integer, integer
+    elseif end_row < start_row then
+        start_row, end_row = end_row, start_row --- @type integer, integer
+        start_col, end_col = end_col, start_col --- @type integer, integer
+    end
+    if mode == 'V' then
+        start_col = 1
+        local lines =
+            vim.api.nvim_buf_get_lines(bufnr, end_row - 1, end_row, true)
+        end_col = #lines[1]
+    end
+    return {
+        ['start'] = { start_row, start_col - 1 },
+        ['end'] = { end_row, end_col - 1 },
+    }
+end
+
+local function refresh_lightbulb()
     -- Check if the method textDocument/codeAction is supported
     local cur_bufnr = vim.api.nvim_get_current_buf()
+
+    local position = vim.api.nvim_win_get_cursor(0) -- line is 1-based indexing
 
     local clients = vim.lsp.get_clients({
         bufnr = cur_bufnr,
@@ -166,18 +109,50 @@ local function show_lightbulb()
         vim.lsp.protocol.Methods.textDocument_codeAction,
         ---@type fun(client: vim.lsp.Client, bufnr: integer): table?
         function(client, _)
-            local win = 0 --I can imagine this could cause race conditions but lets see how this goes
+            --Used same logic for creating paramaters as vim.lsp.buf.code_action
+            --in runtime/lua/vim/lsp/buf.lua
+            local mode = vim.api.nvim_get_mode().mode
+            local win = vim.api.nvim_get_current_win()
+            local bufnr = vim.api.nvim_get_current_buf()
 
-            local params =
-                vim.lsp.util.make_range_params(win, client.offset_encoding)
+            local params
 
-            return {
-                context = {
-                    diagnostics = get_diagnostic_at_cursor(),
-                },
-                textDocument = params.textDocument,
-                range = params.range,
+            if mode == 'v' or mode == 'V' then
+                local range = range_from_selection(bufnr, mode)
+                params = vim.lsp.util.make_given_range_params(
+                    range.start,
+                    range['end'],
+                    bufnr,
+                    client.offset_encoding
+                )
+            else
+                params =
+                    vim.lsp.util.make_range_params(win, client.offset_encoding)
+            end
+
+            local ns_push = vim.lsp.diagnostic.get_namespace(client.id, false)
+            local ns_pull = vim.lsp.diagnostic.get_namespace(client.id, true)
+            local diagnostics = {}
+            local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+            vim.list_extend(
+                diagnostics,
+                vim.diagnostic.get(bufnr, { namespace = ns_pull, lnum = lnum })
+            )
+            vim.list_extend(
+                diagnostics,
+                vim.diagnostic.get(bufnr, { namespace = ns_push, lnum = lnum })
+            )
+
+            ---@diagnostic disable-next-line: inject-field
+            params.context = {
+                ---@diagnostic disable-next-line: no-unknown
+                diagnostics = vim.tbl_map(
+                    function(d) return d.user_data.lsp end,
+                    diagnostics
+                ),
             }
+
+            return params
         end,
         function(results)
             local has_actions = false
@@ -189,12 +164,47 @@ local function show_lightbulb()
                     end
                 end
             end
-            if has_actions then draw_lightbulb() end
-            -- If no actions, remove the bulb if it is existing
-            if has_actions == false then remove_lightbulb() end
+            if has_actions then
+                draw_lightbulb(position, cur_bufnr)
+            else
+                remove_lightbulb()
+            end
         end
     )
 end
+
+---creates a debounced version of a function
+---@param fn function
+---@param timeout integer
+---@return function
+local function debounce_fn(fn, timeout)
+    local timer = assert(vim.uv.new_timer())
+    local running = false
+    local function debounced_fn()
+        if running and timer:is_active() then
+            return
+        elseif running then
+            timer:start(timeout, 1, function()
+                running = true
+                vim.schedule(function()
+                    local ok, err = pcall(fn)
+                    running = false
+                    if not ok and err ~= nil then error(err) end
+                end)
+            end)
+        else
+            running = true
+            vim.schedule(function()
+                local ok, err = pcall(fn)
+                running = false
+                if not ok and err ~= nil then error(err) end
+            end)
+        end
+    end
+    return debounced_fn
+end
+
+local debounced_refresh_lightbulb = debounce_fn(refresh_lightbulb, 30)
 
 local is_autocmds_setup = false
 function M.enable()
@@ -209,12 +219,11 @@ function M.enable()
         'BufEnter',
         'CursorHold',
         'CursorHoldI',
-        'WinScrolled',
         'LspAttach',
         'LspDetach',
     }, {
         group = augroup_lsp_lightbulb,
-        callback = show_lightbulb,
+        callback = debounced_refresh_lightbulb,
     })
 
     vim.api.nvim_create_autocmd({ 'BufLeave' }, {
