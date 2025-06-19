@@ -1,21 +1,18 @@
 --Based on https://github.com/icholy/lsplinks.nvim/blob/master/lua/lsplinks.lua
 
-local util = vim.lsp.util
-local log = vim.lsp.log
-local api = vim.api
 local M = {}
 
 ---@type table<integer, lsp.DocumentLink[]>
 local links_by_buf = {} --TODO handle memory leaks
 
 ---@type integer
-local ns = api.nvim_create_namespace('lsplinks')
+local ns = vim.api.nvim_create_namespace('lsplinks')
 
 ---@return lsp.Position
 local function get_cursor_pos()
-    local cursor = api.nvim_win_get_cursor(0)
+    local cursor = vim.api.nvim_win_get_cursor(0)
     local line = cursor[1] - 1 -- adjust line number for 0-indexing
-    local character = util.character_offset(0, line, cursor[2], 'utf-8')
+    local character = vim.lsp.util.character_offset(0, line, cursor[2], 'utf-8')
     return { line = line, character = character }
 end
 
@@ -35,15 +32,6 @@ local function in_range(pos, range)
     else
         return false
     end
-end
-
----@param name string
----@return boolean
-local function lsp_has_capability(name)
-    for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
-        if client.server_capabilities[name] then return true end
-    end
-    return false
 end
 
 --- Return the link under the cursor.
@@ -76,10 +64,17 @@ function M.open(uri)
     uri = uri or M.current()
     if not uri then return false end
     if uri:find('^file:/') then
-        util.jump_to_location({ uri = remove_uri_fragment(uri) }, 'utf-8', true)
+        vim.lsp.util.show_document(
+            { uri = remove_uri_fragment(uri) },
+            'utf-8',
+            {
+                reuse_win = true,
+                focus = true,
+            }
+        )
         local line_no, col_no = uri:match('.-#(%d+),(%d+)')
         if line_no then
-            api.nvim_win_set_cursor(
+            vim.api.nvim_win_set_cursor(
                 0,
                 { tonumber(line_no), tonumber(col_no) - 1 }
             )
@@ -90,32 +85,38 @@ function M.open(uri)
     return true
 end
 
---- Convinience function which opens current link with fallback
+--- Convenience function which opens current link with fallback
 --- to default gx behaviour
 function M.gx()
-    -- vim.print(links_by_buf)
     local uri = M.current() or vim.fn.expand('<cfile>')
     M.open(uri)
 end
 
 -- Refresh the links for the current buffer
 function M.refresh()
-    if not lsp_has_capability('documentLinkProvider') then return end
-    local params = { textDocument = util.make_text_document_params() }
+    local cur_bufnr = vim.api.nvim_get_current_buf()
+
+    local clients = vim.lsp.get_clients({
+        bufnr = cur_bufnr,
+        method = vim.lsp.protocol.Methods.textDocument_documentLink,
+    })
+    if #clients <= 0 then return end
+
+    local params = { textDocument = vim.lsp.util.make_text_document_params() }
     vim.lsp.buf_request(
         0,
-        'textDocument/documentLink',
+        vim.lsp.protocol.Methods.textDocument_documentLink,
         params,
         function(err, result, ctx)
             if err then
-                log.error('lsplinks', err)
+                vim.lsp.log.error('lsplinks', err)
                 return
             end
             if not links_by_buf[ctx.bufnr] then
-                api.nvim_buf_attach(ctx.bufnr, false, {
+                vim.api.nvim_buf_attach(ctx.bufnr, false, {
                     on_detach = function(b) links_by_buf[b] = nil end,
                     on_lines = function(_, b, _, first_lnum, last_lnum)
-                        api.nvim_buf_clear_namespace(
+                        vim.api.nvim_buf_clear_namespace(
                             b,
                             ns,
                             first_lnum,
@@ -135,18 +136,18 @@ end
 ---@return lsp.DocumentLink[]
 function M.get(bufnr)
     bufnr = bufnr or 0
-    if bufnr == 0 then bufnr = api.nvim_get_current_buf() end
+    if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
     return links_by_buf[bufnr] or {}
 end
 
 --- Highlight links in the current buffer
 function M.display()
-    api.nvim_buf_clear_namespace(0, ns, 0, -1)
+    vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
     for _, link in ipairs(M.get()) do
         -- sometimes the buffer is changed before we get here and the link
         -- ranges are invalid, so we ignore the error.
         pcall(
-            api.nvim_buf_set_extmark,
+            vim.api.nvim_buf_set_extmark,
             0,
             ns,
             link.range.start.line,
@@ -158,6 +159,29 @@ function M.display()
             }
         )
     end
+end
+
+-- If I ever modify the code to enable/disable I will probably also
+-- need to close the timer or I may have a memory leak.
+local refresh_timer
+local throttled_refresh_lsplink
+local is_autocmds_setup = false
+function M.enable()
+    if is_autocmds_setup then return end
+    is_autocmds_setup = true
+
+    if throttled_refresh_lsplink == nil then
+        local throttle = require('utils.timers').throttle
+        throttled_refresh_lsplink, refresh_timer = throttle(M.refresh, 30)
+    end
+
+    vim.api.nvim_create_autocmd(
+        { 'InsertLeave', 'BufEnter', 'CursorHold', 'LspAttach' },
+        {
+            group = vim.api.nvim_create_augroup('lsplinks', { clear = true }),
+            callback = throttled_refresh_lsplink,
+        }
+    )
 end
 
 return M

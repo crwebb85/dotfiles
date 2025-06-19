@@ -319,17 +319,12 @@ function M.enable()
                 require('config.lsp.codelens').enable()
             end
 
-            if client.server_capabilities.documentLinkProvider ~= nil then
-                vim.api.nvim_create_autocmd(
-                    { 'InsertLeave', 'BufEnter', 'CursorHold', 'LspAttach' },
-                    {
-                        group = vim.api.nvim_create_augroup(
-                            'lsplinks',
-                            { clear = true }
-                        ),
-                        callback = require('config.lsp.lsplinks').refresh,
-                    }
+            if
+                client:supports_method(
+                    vim.lsp.protocol.Methods.textDocument_documentLink
                 )
+            then
+                require('config.lsp.lsplinks').enable()
             end
 
             if
