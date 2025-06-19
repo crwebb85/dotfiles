@@ -576,6 +576,7 @@ vim.api.nvim_create_user_command('QFRunTSQueryFromQueryEditor', function(params)
 
     local lang = vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
     local parser = vim.treesitter.get_parser(base_bufnr, lang)
+    if parser == nil then error('No treesitter parser') end
     local query_content = table.concat(
         vim.api.nvim_buf_get_lines(query_bufnr, 0, -1, false),
         '\n'
@@ -593,13 +594,30 @@ vim.api.nvim_create_user_command('QFRunTSQueryFromQueryEditor', function(params)
             capture_names_set.size == 0 or capture_names_set:has(capture_name)
         then
             local lnum, col, end_lnum, end_col = node:range()
+
+            local text = vim.api.nvim_buf_get_text(
+                base_bufnr,
+                lnum,
+                col,
+                end_lnum,
+                end_col,
+                {}
+            )
+
+            local line_text = vim.trim(vim.fn.getline(lnum + 1))
+
             local item = {
                 filename = base_buf_name,
                 lnum = lnum + 1,
                 end_lnum = end_lnum + 1,
                 col = col + 1,
                 end_col = end_col + 1,
-                text = capture_name,
+                text = string.format(
+                    'Query:%s  Node:%s  Line:%s',
+                    capture_name,
+                    vim.trim(text[1]),
+                    line_text
+                ),
             }
             table.insert(items, item)
         end
@@ -647,6 +665,7 @@ vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
 
     local lang = vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
     local parser = vim.treesitter.get_parser(base_bufnr, lang)
+    if parser == nil then error('No treesitter parser') end
 
     local ok_query, query = pcall(vim.treesitter.query.get, lang, query_group)
     if not ok_query or query == nil then return end
@@ -660,9 +679,6 @@ vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
         if
             capture_names_set.size ~= 0 and capture_names_set:has(capture_name)
         then
-            -- vim.print('captured:', capture)
-            -- vim.print('captured_name:', capture_name)
-            -- vim.print('captured_node:', captured_node)
             local lnum, col, end_lnum, end_col = captured_node:range()
 
             local text = vim.api.nvim_buf_get_text(
@@ -673,7 +689,7 @@ vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
                 end_col,
                 {}
             )
-            -- vim.print(text)
+            local line_text = vim.trim(vim.fn.getline(lnum + 1))
 
             local item = {
                 filename = base_buf_name,
@@ -681,7 +697,12 @@ vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
                 end_lnum = end_lnum + 1,
                 col = col + 1,
                 end_col = end_col,
-                text = capture_name .. ': ' .. vim.trim(text[1]),
+                text = string.format(
+                    'Query:%s  Node:%s  Line:%s',
+                    capture_name,
+                    vim.trim(text[1]),
+                    line_text
+                ),
                 valid = 1,
             }
             table.insert(items, item)
