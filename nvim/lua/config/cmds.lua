@@ -1160,54 +1160,6 @@ end, {
     desc = 'Opens telescope picker to pick the Make task to run',
 })
 
-vim.api.nvim_create_user_command('Grep', function(params)
-    local overseer = require('overseer')
-    -- insert args at the '$*' in the grepprg
-    local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
-    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
-    local task = overseer.new_task({
-        cmd = vim.fn.expandcmd(cmd),
-        components = {
-            {
-                'quickfix.my_on_output_quickfix',
-                errorformat = vim.o.grepformat,
-                open = not params.bang,
-                open_height = 8,
-                items_only = true,
-            },
-            -- we don't care to keep this around as long as most tasks
-            { 'on_complete_dispose', timeout = 30 },
-            'default',
-        },
-    })
-    task:start()
-end, { nargs = '*', bang = true, complete = 'file' })
-
-vim.api.nvim_create_user_command('GrepAdd', function(params)
-    local overseer = require('overseer')
-    -- insert args at the '$*' in the grepprg
-    local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
-    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
-    local task = overseer.new_task({
-        cmd = vim.fn.expandcmd(cmd),
-        components = {
-            {
-                'quickfix.my_on_output_quickfix',
-                errorformat = vim.o.grepformat,
-                open = not params.bang,
-                open_height = 8,
-                items_only = true,
-                append = true,
-                tail = false, -- must set to false when append equals true because of a bug I have in my TODO list (TODO: remove `tail = false` when bug is fixed)
-            },
-            -- we don't care to keep this around as long as most tasks
-            { 'on_complete_dispose', timeout = 30 },
-            'default',
-        },
-    })
-    task:start()
-end, { nargs = '*', bang = true, complete = 'file' })
-
 vim.api.nvim_create_user_command('WatchRun', function()
     local overseer = require('overseer')
     overseer.run_template({ name = 'run script' }, function(task)
@@ -1340,6 +1292,97 @@ end, {
     desc = 'Parse a stacktrace using errorformat and add to quickfix',
     bang = true,
     range = true,
+})
+
+-------------------------------------------------------------------------------
+--- File search/creation
+
+vim.api.nvim_create_user_command('Grep', function(params)
+    local overseer = require('overseer')
+    -- insert args at the '$*' in the grepprg
+    local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
+    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    local task = overseer.new_task({
+        cmd = vim.fn.expandcmd(cmd),
+        components = {
+            {
+                'quickfix.my_on_output_quickfix',
+                errorformat = vim.o.grepformat,
+                open = not params.bang,
+                open_height = 8,
+                items_only = true,
+            },
+            -- we don't care to keep this around as long as most tasks
+            { 'on_complete_dispose', timeout = 30 },
+            'default',
+        },
+    })
+    task:start()
+end, { nargs = '*', bang = true, complete = 'file' })
+
+vim.api.nvim_create_user_command('GrepAdd', function(params)
+    local overseer = require('overseer')
+    -- insert args at the '$*' in the grepprg
+    local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
+    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    local task = overseer.new_task({
+        cmd = vim.fn.expandcmd(cmd),
+        components = {
+            {
+                'quickfix.my_on_output_quickfix',
+                errorformat = vim.o.grepformat,
+                open = not params.bang,
+                open_height = 8,
+                items_only = true,
+                append = true,
+                tail = false, -- must set to false when append equals true because of a bug I have in my TODO list (TODO: remove `tail = false` when bug is fixed)
+            },
+            -- we don't care to keep this around as long as most tasks
+            { 'on_complete_dispose', timeout = 30 },
+            'default',
+        },
+    })
+    task:start()
+end, { nargs = '*', bang = true, complete = 'file' })
+
+vim.api.nvim_create_user_command('Find', function(args)
+    --This command is a little to simple for me to really need
+    --but until I remember that I can use :args for this then
+    --this is nice to have in my git history.
+    local search = args.fargs[1]
+    if search == nil or search:match('^%s*$') then
+        error('Must provide a search glob')
+    end
+    local cmd = string.format([[:args %s]], search)
+    vim.cmd(cmd)
+end, {
+    nargs = 1,
+    desc = 'Find files by glob',
+})
+
+vim.api.nvim_create_user_command('CopyToSamePath', function(args)
+    local filename = args.fargs[1]
+    if filename == nil or filename:match('^*$') then
+        error('Must provide a new filename')
+    end
+
+    local src_filepath = vim.fn.expand('%:p')
+    local dir = vim.fn.fnamemodify(src_filepath, ':h')
+
+    if dir == nil or dir:match('^%s*$') then
+        error('Current buffer seems to not have a directory')
+    end
+
+    local stat = vim.loop.fs_stat(dir)
+    if not stat or stat.type ~= 'directory' then
+        error("Current buffer's directory does not seem to exist")
+    end
+
+    local file_path = vim.fs.joinpath(dir, filename)
+    vim.cmd.saveas(file_path)
+end, {
+    nargs = 1,
+    desc = 'Copies the file to the same folder of current buffer with then new name specified by the cmd argument',
 })
 
 -------------------------------------------------------------------------------
