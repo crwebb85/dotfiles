@@ -90,6 +90,7 @@ function M.throttle(fn, timeout)
                 if not running then
                     running = true
                     vim.schedule(function()
+                        if Deque.size(arg_queue) <= 0 then return end
                         local argv_next, argc_next =
                             unpack(Deque.popleft(arg_queue))
                         local ok, err =
