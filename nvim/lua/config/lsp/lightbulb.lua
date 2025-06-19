@@ -172,44 +172,20 @@ local function refresh_lightbulb()
         end
     )
 end
-
----creates a debounced version of a function
----@param fn function
----@param timeout integer
----@return function
-local function debounce_fn(fn, timeout)
-    local timer = assert(vim.uv.new_timer())
-    local running = false
-    local function debounced_fn()
-        if running and timer:is_active() then
-            return
-        elseif running then
-            timer:start(timeout, 1, function()
-                running = true
-                vim.schedule(function()
-                    local ok, err = pcall(fn)
-                    running = false
-                    if not ok and err ~= nil then error(err) end
-                end)
-            end)
-        else
-            running = true
-            vim.schedule(function()
-                local ok, err = pcall(fn)
-                running = false
-                if not ok and err ~= nil then error(err) end
-            end)
-        end
-    end
-    return debounced_fn
-end
-
-local debounced_refresh_lightbulb = debounce_fn(refresh_lightbulb, 30)
-
+-- If I ever modify the code to enable/disable I will probably also
+-- need to close the timer or I may have a memory leak.
+local refresh_timer
+local throttled_refresh_lightbulb
 local is_autocmds_setup = false
 function M.enable()
     if is_autocmds_setup then return end
     is_autocmds_setup = true
+
+    if throttled_refresh_lightbulb == nil then
+        local throttle = require('utils.timers').throttle
+        throttled_refresh_lightbulb, refresh_timer =
+            throttle(refresh_lightbulb, 30)
+    end
 
     local augroup_lsp_lightbulb =
         vim.api.nvim_create_augroup('lsp_lightbulb', { clear = true })
@@ -223,7 +199,7 @@ function M.enable()
         'LspDetach',
     }, {
         group = augroup_lsp_lightbulb,
-        callback = debounced_refresh_lightbulb,
+        callback = throttled_refresh_lightbulb,
     })
 
     vim.api.nvim_create_autocmd({ 'BufLeave' }, {

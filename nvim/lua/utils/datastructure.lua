@@ -233,4 +233,47 @@ end
 -- vim.print(a:to_string())
 -- vim.print(b:to_string())
 M.Set = Set
+
+-------------------------------------------------------------------------------
+---Deque implementation from on https://www.lua.org/pil/11.4.html
+---(this implementation in theory can overflow but supposedly it would take
+---200 years at one million insertions per second for it to happen)
+
+local Deque = {}
+function Deque.new() return { first = 0, last = -1 } end
+
+function Deque.pushleft(deque, value)
+    local first = deque.first - 1
+    deque.first = first
+    deque[first] = value
+end
+
+function Deque.pushright(deque, value)
+    local last = deque.last + 1
+    deque.last = last
+    deque[last] = value
+end
+
+function Deque.popleft(deque)
+    local first = deque.first
+    if first > deque.last then error('list is empty') end
+    local value = deque[first]
+    deque[first] = nil -- to allow garbage collection
+    deque.first = first + 1
+    return value
+end
+
+function Deque.popright(deque)
+    local last = deque.last
+    if deque.first > last then error('list is empty') end
+    local value = deque[last]
+    deque[last] = nil -- to allow garbage collection
+    deque.last = last - 1
+    return value
+end
+
+function Deque.size(deque) return deque.last - deque.first + 1 end
+
+M.Deque = Deque
+
 return M
