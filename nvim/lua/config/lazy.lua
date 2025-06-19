@@ -1941,6 +1941,11 @@ require('lazy').setup({
                 desc = 'Neotest: Run the current file',
             },
             {
+                '<leader>tm',
+                function() require('neotest').run.run(vim.fn.getcwd()) end,
+                desc = 'Neotest: Run all tests in cwd',
+            },
+            {
                 '<leader>td',
                 function()
                     shellslash_hack()
