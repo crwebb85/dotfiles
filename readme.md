@@ -50,3 +50,7 @@ I solved it by trying:
 
 Those commands failed for some reason but the error message told me the file path they
 were downloaded at and I manually deleted them and it fixed the problem
+
+# Updating Config
+
+- `nvim --headless "+Lazy! restore" +qa`
