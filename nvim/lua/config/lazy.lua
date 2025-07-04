@@ -1467,72 +1467,65 @@ require('lazy').setup({
     {
         'nvim-treesitter/nvim-treesitter',
         lazy = true,
-        event = 'VeryLazy',
+        -- event = 'VeryLazy',
+        branch = 'main',
         build = ':TSUpdate',
         config = function()
-            require('nvim-treesitter.configs').setup({
-                modules = {},
-                -- A list of parser names, or "all"
-                ensure_installed = {
-                    'diff',
-                    'javascript',
-                    'typescript',
-                    'tsx',
-                    'css',
-                    'json',
-                    'jsonc',
-                    'html',
-                    'xml',
-                    'yaml',
-                    'c',
-                    'lua',
-                    'rust',
-                    'vim',
-                    'vimdoc',
-                    'query',
-                    'markdown',
-                    'markdown_inline',
-                    'python',
-                    'toml',
-                    'regex',
-                    'c_sharp',
-                    'hurl',
-                },
+            local nvim_treesitter = require('nvim-treesitter')
+            local ensure_installed = {
+                'c',
+                'lua',
+                'vim',
+                'vimdoc',
+                'markdown',
 
-                -- Install parsers synchronously (only applied to `ensure_installed`)
-                sync_install = false,
+                'markdown_inline',
+                'diff',
+                'javascript',
+                'typescript',
+                'tsx',
+                'css',
+                'json',
+                'jsonc',
+                'html',
+                'xml',
+                'yaml',
+                'rust',
+                'query',
+                'python',
+                'toml',
+                'regex',
+                'c_sharp',
+                'hurl',
+            }
 
-                -- Automatically install missing parsers when entering buffer
-                -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-                auto_install = true,
+            local installed_parsers = nvim_treesitter.get_installed()
+            local installed_parsers_set =
+                require('utils.datastructure').dumb_set(installed_parsers)
+            local parsers_to_install = {}
+            for _, parser_name in ipairs(ensure_installed) do
+                if installed_parsers_set[parser_name] == nil then
+                    table.insert(parsers_to_install, parser_name)
+                end
+            end
 
-                -- List of parsers to ignore installing (or "all")
-                ignore_install = {},
+            if #parsers_to_install > 0 then
+                vim.print(parsers_to_install)
+                nvim_treesitter.install(parsers_to_install)
+                --:wait(300000)
+            end
 
-                ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
-                -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
-
-                highlight = {
-                    enable = true,
-
-                    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-                    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-                    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-                    -- Instead of true it can also be a list of languages
-                    additional_vim_regex_highlighting = false,
-                },
-            })
             local custom_csharp_queries = [[
                 (cast_expression
                   (
-                    ("(") @start 
+                    ("(") @start
                     .
                     type: (_)  @cast.inner
                     .
                     ")" @end
                     (#make-range! "cast.outer" @start @end)
                     )
-                  ) 
+                  )
 
                 (method_declaration
                     name: (_) @function_declaration_name.inner)
@@ -1542,35 +1535,35 @@ require('lazy').setup({
             ]]
             local custom_lua_queries = [[
               ; function M.is_dict() ... end
-                  (function_declaration 
-                    name: (dot_index_expression 
+                  (function_declaration
+                    name: (dot_index_expression
                       field: (_) @function_declaration_name.inner
                     )
-                  ) 
+                  )
 
               ;local is_dict = function() ... end
-              local_declaration: (variable_declaration 
-                (assignment_statement 
-                  (variable_list 
-                    name: (identifier) @function_declaration_name.inner ) 
-                  (expression_list 
+              local_declaration: (variable_declaration
+                (assignment_statement
+                  (variable_list
+                    name: (identifier) @function_declaration_name.inner )
+                  (expression_list
                     value: (function_definition))
                 )
               )
 
               ; M.is_dict = function() ... end
-              (assignment_statement 
-                (variable_list 
-                  name: (dot_index_expression 
+              (assignment_statement
+                (variable_list
+                  name: (dot_index_expression
                       field: (_) @function_declaration_name.inner))
-                (expression_list 
+                (expression_list
                   value: (function_definition))
                 )
 
               ; local function is_dict() ... end
-              local_declaration: (function_declaration 
+              local_declaration: (function_declaration
                 name: (identifier) @function_declaration_name.inner
-              ) 
+              )
 
 
             ]]
@@ -1659,6 +1652,7 @@ require('lazy').setup({
     },
     {
         'nvim-treesitter/nvim-treesitter-textobjects',
+        branch = 'main',
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
         lazy = true,
         event = 'BufReadPre',
@@ -1836,7 +1830,7 @@ require('lazy').setup({
                     },
                 },
             }
-            require('nvim-treesitter.configs').setup(opts)
+            require('nvim-treesitter-textobjects').setup(opts)
         end,
     },
 

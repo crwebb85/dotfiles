@@ -772,12 +772,12 @@ vim.api.nvim_create_user_command('TSGotoNext', function(params)
     local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
 
     if params.bang then
-        require('nvim-treesitter.textobjects.move').goto_next_end(
+        require('nvim-treesitter-textobjects.move').goto_next_end(
             capture_name,
             query_group
         )
     else
-        require('nvim-treesitter.textobjects.move').goto_next_start(
+        require('nvim-treesitter-textobjects.move').goto_next_start(
             capture_name,
             query_group
         )
@@ -824,15 +824,15 @@ vim.api.nvim_create_user_command('TSGotoPrevious', function(params)
         return
     end
     local query_group = params.fargs[1]
-    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter-textobjects' requires it
 
     if params.bang then
-        require('nvim-treesitter.textobjects.move').goto_previous_end(
+        require('nvim-treesitter-textobjects.move').goto_previous_end(
             capture_name,
             query_group
         )
     else
-        require('nvim-treesitter.textobjects.move').goto_previous_start(
+        require('nvim-treesitter-textobjects.move').goto_previous_start(
             capture_name,
             query_group
         )
@@ -879,9 +879,9 @@ vim.api.nvim_create_user_command('TSSwapNext', function(params)
         return
     end
     local query_group = params.fargs[1]
-    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter-textobjects' requires it
 
-    require('nvim-treesitter.textobjects.swap').swap_next(
+    require('nvim-treesitter-textobjects.swap').swap_next(
         capture_name,
         query_group
     )
@@ -926,9 +926,9 @@ vim.api.nvim_create_user_command('TSSwapPrevious', function(params)
         return
     end
     local query_group = params.fargs[1]
-    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter-textobjects' requires it
 
-    require('nvim-treesitter.textobjects.swap').swap_previous(
+    require('nvim-treesitter-textobjects.swap').swap_previous(
         capture_name,
         query_group
     )
@@ -973,9 +973,9 @@ vim.api.nvim_create_user_command('TSSelect', function(params)
         return
     end
     local query_group = params.fargs[1]
-    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter.textobjects' requires it
+    local capture_name = '@' .. params.fargs[2] --we prepend `@` to the beginning of the capture_name since 'nvim-treesitter-textobjects' requires it
 
-    require('nvim-treesitter.textobjects.select').select_textobject(
+    require('nvim-treesitter-textobjects.select').select_textobject(
         capture_name,
         query_group
     )

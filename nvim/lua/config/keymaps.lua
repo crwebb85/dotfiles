@@ -872,13 +872,13 @@ local myoperations = maputils
             key = 'm',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@function.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@function.outer',
                     'textobjects'
                 )
@@ -890,13 +890,13 @@ local myoperations = maputils
             key = 'M',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@function.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@function.outer',
                     'textobjects'
                 )
@@ -911,13 +911,13 @@ local myoperations = maputils
             key = 'f',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@call.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@call.outer',
                     'textobjects'
                 )
@@ -929,13 +929,13 @@ local myoperations = maputils
             key = 'F',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@call.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@call.outer',
                     'textobjects'
                 )
@@ -950,13 +950,13 @@ local myoperations = maputils
             key = 'c',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@class.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@class.outer',
                     'textobjects'
                 )
@@ -968,13 +968,13 @@ local myoperations = maputils
             key = 'C',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@class.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@class.outer',
                     'textobjects'
                 )
@@ -989,13 +989,13 @@ local myoperations = maputils
             key = 'i',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@conditional.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@conditional.outer',
                     'textobjects'
                 )
@@ -1007,13 +1007,13 @@ local myoperations = maputils
             key = 'I',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@conditional.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@conditional.outer',
                     'textobjects'
                 )
@@ -1028,13 +1028,13 @@ local myoperations = maputils
             key = 'o',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@loop.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@loop.outer',
                     'textobjects'
                 )
@@ -1046,13 +1046,13 @@ local myoperations = maputils
             key = 'O',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@loop.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@loop.outer',
                     'textobjects'
                 )
@@ -1067,13 +1067,13 @@ local myoperations = maputils
             key = 'va',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@parameter.inner',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@parameter.inner',
                     'textobjects'
                 )
@@ -1085,13 +1085,13 @@ local myoperations = maputils
             key = 'vA',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@parameter.inner',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@parameter.inner',
                     'textobjects'
                 )
@@ -1106,13 +1106,13 @@ local myoperations = maputils
             key = 'gci',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@comment.inner',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@comment.inner',
                     'textobjects'
                 )
@@ -1124,13 +1124,13 @@ local myoperations = maputils
             key = 'gcI',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@comment.inner',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@comment.inner',
                     'textobjects'
                 )
@@ -1145,13 +1145,13 @@ local myoperations = maputils
             key = 'gca',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@comment.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@comment.outer',
                     'textobjects'
                 )
@@ -1163,13 +1163,13 @@ local myoperations = maputils
             key = 'gcA',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@comment.outer',
                     'textobjects'
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@comment.outer',
                     'textobjects'
                 )
@@ -1184,13 +1184,13 @@ local myoperations = maputils
             key = 'gmn',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@function_declaration_name.inner',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@function_declaration_name.inner',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
@@ -1202,13 +1202,13 @@ local myoperations = maputils
             key = 'gmN',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@function_declaration_name.inner',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@function_declaration_name.inner',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
@@ -1223,13 +1223,13 @@ local myoperations = maputils
             key = 'gt',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_start(
+                require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@cast.outer',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_start(
+                require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@cast.outer',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
@@ -1241,13 +1241,13 @@ local myoperations = maputils
             key = 'gT',
             mode = { 'n', 'x' },
             backward = function()
-                require('nvim-treesitter.textobjects.move').goto_previous_end(
+                require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@cast.outer',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
             end,
             forward = function()
-                require('nvim-treesitter.textobjects.move').goto_next_end(
+                require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@cast.outer',
                     config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
                 )
