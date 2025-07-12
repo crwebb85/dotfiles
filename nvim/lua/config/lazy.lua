@@ -1466,7 +1466,7 @@ require('lazy').setup({
     -- Treesitter Parsers and Parser Utils
     {
         'nvim-treesitter/nvim-treesitter',
-        lazy = true,
+        -- lazy = true,
         -- event = 'VeryLazy',
         branch = 'main',
         build = ':TSUpdate',
@@ -1518,14 +1518,13 @@ require('lazy').setup({
             local custom_csharp_queries = [[
                 (cast_expression
                   (
-                    ("(") @start
+                    "(" @cast.outer
                     .
                     type: (_)  @cast.inner
                     .
-                    ")" @end
-                    (#make-range! "cast.outer" @start @end)
-                    )
-                  )
+                    ")" @cast.outer 
+                  ) 
+                )
 
                 (method_declaration
                     name: (_) @function_declaration_name.inner)
@@ -1655,182 +1654,36 @@ require('lazy').setup({
         branch = 'main',
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
         lazy = true,
-        event = 'BufReadPre',
+        -- event = 'BufReadPre',
         config = function(_, _)
-            local opts = {
-                incremental_selection = {
-                    enable = true,
-                    keymaps = {
-                        init_selection = '<leader>vnn',
-                        --TODO these don't work yet or I don't understand what they do
-                        node_incremental = '<leader>grn',
-                        scope_incremental = '<leader>grc',
-                        node_decremental = '<leader>grm',
-                    },
+            require('nvim-treesitter-textobjects').setup({
+                select = {
+                    -- Automatically jump forward to textobj, similar to targets.vim
+                    lookahead = true,
+                    -- You can choose the select mode (default is charwise 'v')
+                    --
+                    -- Can also be a function which gets passed a table with the keys
+                    -- * query_string: eg '@function.inner'
+                    -- * method: eg 'v' or 'o'
+                    -- and should return the mode ('v', 'V', or '<c-v>') or a table
+                    -- mapping query_strings to modes.
+                    -- selection_modes = {
+                    --     ['@parameter.outer'] = 'v', -- charwise
+                    --     ['@function.outer'] = 'V', -- linewise
+                    --     ['@class.outer'] = '<c-v>', -- blockwise
+                    -- },
+                    -- If you set this to `true` (default is `false`) then any textobject is
+                    -- extended to include preceding or succeeding whitespace. Succeeding
+                    -- whitespace has priority in order to act similarly to eg the built-in
+                    -- `ap`.
+                    --
+                    -- Can also be a function which gets passed a table with the keys
+                    -- * query_string: eg '@function.inner'
+                    -- * selection_mode: eg 'v'
+                    -- and should return true of false
+                    include_surrounding_whitespace = false,
                 },
-                textobjects = {
-                    select = {
-                        enable = true,
-
-                        -- Automatically jump forward to textobj, similar to targets.vim
-                        lookahead = true,
-
-                        keymaps = {
-                            -- You can also use captures from other query groups like `locals.scm`
-                            -- ['as'] = {
-                            --     query = '@scope',
-                            --     query_group = 'locals',
-                            --     desc = 'Select language scope',
-                            -- },
-
-                            ['a='] = {
-                                query = '@assignment.outer',
-                                desc = 'Select outer part of an assignment',
-                            },
-                            ['i='] = {
-                                query = '@assignment.inner',
-                                desc = 'Select inner part of an assignment',
-                            },
-                            ['il='] = {
-                                query = '@assignment.lhs',
-                                desc = 'Select left hand side of an assignment',
-                            },
-                            ['ir='] = {
-                                query = '@assignment.rhs',
-                                desc = 'Select right hand side of an assignment',
-                            },
-
-                            ['aa'] = {
-                                query = '@parameter.outer',
-                                desc = 'Select outer part of a parameter/argument',
-                            },
-                            ['ia'] = {
-                                query = '@parameter.inner',
-                                desc = 'Select inner part of a parameter/argument',
-                            },
-
-                            ['ai'] = {
-                                query = '@conditional.outer',
-                                desc = 'Select outer part of a conditional',
-                            },
-                            ['ii'] = {
-                                query = '@conditional.inner',
-                                desc = 'Select inner part of a conditional',
-                            },
-
-                            ['ao'] = {
-                                query = '@loop.outer',
-                                desc = 'Select outer part of a loop',
-                            },
-                            ['io'] = {
-                                query = '@loop.inner',
-                                desc = 'Select inner part of a loop',
-                            },
-
-                            ['af'] = {
-                                query = '@call.outer',
-                                desc = 'Select outer part of a function call',
-                            },
-                            ['if'] = {
-                                query = '@call.inner',
-                                desc = 'Select inner part of a function call',
-                            },
-
-                            ['am'] = {
-                                query = '@function.outer',
-                                desc = 'Select outer part of a method/function definition',
-                            },
-                            ['im'] = {
-                                query = '@function.inner',
-                                desc = 'Select inner part of a method/function definition',
-                            },
-
-                            ['ac'] = {
-                                query = '@class.outer',
-                                desc = 'Select outer part of a class',
-                            },
-                            ['ic'] = {
-                                query = '@class.inner',
-                                desc = 'Select inner part of a class',
-                            },
-                            ['a<leader>c'] = {
-                                -- I plan to replace this with a smarter version of the keymap
-                                query = '@comment.outer',
-                                desc = 'Select outer part of a comment',
-                            },
-                            ['i<leader>c'] = {
-                                -- I plan to replace this with a smarter version of the keymap
-                                query = '@comment.inner',
-                                desc = 'Select inner part of a comment',
-                            },
-                            ['agt'] = {
-                                query = '@cast.outer',
-                                query_group = config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
-                                desc = 'Select outer part of a type cast',
-                            },
-                            ['igt'] = {
-                                query = '@cast.inner',
-                                query_group = config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
-                                desc = 'Select inner part of a type cast',
-                            },
-                        },
-                        -- You can choose the select mode (default is charwise 'v')
-                        --
-                        -- Can also be a function which gets passed a table with the keys
-                        -- * query_string: eg '@function.inner'
-                        -- * method: eg 'v' or 'o'
-                        -- and should return the mode ('v', 'V', or '<c-v>') or a table
-                        -- mapping query_strings to modes.
-                        selection_modes = {
-                            -- ['@parameter.outer'] = 'v', -- charwise
-                            -- ['@function.outer'] = 'V', -- linewise
-                            -- ['@class.outer'] = '<c-v>', -- blockwise
-                        },
-                        -- If you set this to `true` (default is `false`) then any textobject is
-                        -- extended to include preceding or succeeding whitespace. Succeeding
-                        -- whitespace has priority in order to act similarly to eg the built-in
-                        -- `ap`.
-                        --
-                        -- Can also be a function which gets passed a table with the keys
-                        -- * query_string: eg '@function.inner'
-                        -- * selection_mode: eg 'v'
-                        -- and should return true or false
-                        -- include_surrounding_whitespace = true,
-                    },
-                    swap = {
-                        enable = true,
-                        swap_next = {
-                            ['<leader>vna'] = '@parameter.inner',
-                            ['<leader>vn:'] = '@property.outer', -- swap object property with next
-                            ['<leader>vnm'] = '@function.outer', -- swap function with next
-                        },
-                        swap_previous = {
-                            ['<leader>vpa'] = '@parameter.inner',
-                            ['<leader>vp:'] = '@property.outer', -- swap object property with next
-                            ['<leader>vpm'] = '@function.outer', -- swap function with previous
-                        },
-                    },
-                    move = {
-                        enable = true,
-                        set_jumps = true, -- whether to set jumps in the jumplist
-                        --I setup the move keymaps up manually in my keymaps.lua file
-                    },
-                    lsp_interop = {
-                        --TODO fix this so it actually works. It fails for to reasons:
-                        --1. The floating_preview_opts isn't dynamically created
-                        --2. The treesitter queries @function.outer and @class.outer,
-                        --   do not take you to the function name or class name respectively
-                        enable = true,
-                        -- border = 'none',
-                        floating_preview_opts = { width = 100, height = 100 },
-                        peek_definition_code = {
-                            ['<c-w>gk'] = '@function.outer',
-                            ['<c-w>gK'] = '@class.outer',
-                        },
-                    },
-                },
-            }
-            require('nvim-treesitter-textobjects').setup(opts)
+            })
         end,
     },
 

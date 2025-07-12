@@ -42,6 +42,7 @@
 - something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
 - when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
   Both the end_of_line and charset will cause the error.
+- fix non-navigation treesitter keymaps
 
 ```editorconfig
 root = true
@@ -96,6 +97,11 @@ the workaround is to make sure the plugin is loaded
 
 ### TODO and Workflows that need improvements
 
+- [ ] lsp
+  - [ ] keymaps like grr should notify when the no results were found
+  - [ ] try a newer dotnet lsp
+  - [ ] create a way to disable/enable lsp's and formatters on a project level using .nvim.lua file
+  - [ ] add debugger for older dotnet projects
 - [ ] terminal
   - [ ] add a keymap to toggle on/off following the text printed in the terminal
   - [ ] add terminal resurrection

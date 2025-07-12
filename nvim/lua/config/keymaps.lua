@@ -1313,6 +1313,334 @@ maputils
         },
     })
 
+-------------------------------------------------------------------------------
+--- treesitter
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'a=',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@assignment.outer',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select outer part of an assignment',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'i=',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@assignment.inner',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select inner part of an assignment',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'il=',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@assignment.lhs',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select left hand side of an assignment',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'ir=',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@assignment.rhs',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select right hand side of an assignment',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'aa',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@parameter.outer',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select outer part of a parameter/argument',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'ia',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@parameter.inner',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select inner part of a parameter/argument',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'ai',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@conditional.outer',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select outer part of a conditional',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'ii',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@conditional.inner',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select inner part of a conditional',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'ao',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@loop.outer',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select outer part of a loop',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'io',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@loop.inner',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select inner part of a loop',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'af',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@call.outer',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select outer part of a function call',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'if',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@call.inner',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select inner part of a function call',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'am',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@function.outer',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select outer part of a method/function definition',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'im',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@function.inner',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select inner part of a method/function definition',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'ac',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@class.outer',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select outer part of a class',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'ic',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@class.inner',
+            'textobjects'
+        )
+    end,
+    {
+        desc = 'Select inner part of a class',
+    }
+)
+
+vim.keymap.set({ 'x', 'o' }, 'a<leader>c', function()
+    require('nvim-treesitter-textobjects.select').select_textobject(
+        -- I plan to replace this with a smarter version of the keymap
+        '@comment.outer',
+        'textobjects'
+    )
+end, {
+    desc = 'Select outer part of a comment',
+})
+
+vim.keymap.set({ 'x', 'o' }, 'i<leader>c', function()
+    require('nvim-treesitter-textobjects.select').select_textobject(
+        -- I plan to replace this with a smarter version of the keymap
+        '@comment.inner',
+        'textobjects'
+    )
+end, {
+    desc = 'Select inner part of a comment',
+})
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'agt',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@cast.outer',
+            config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+        )
+    end,
+    {
+
+        desc = 'Select outer part of a type cast',
+    }
+)
+
+vim.keymap.set(
+    { 'x', 'o' },
+    'igt',
+    function()
+        require('nvim-treesitter-textobjects.select').select_textobject(
+            '@cast.inner',
+            config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+        )
+    end,
+    {
+        desc = 'Select inner part of a type cast',
+    }
+)
+-------------------------------------------------------------------------------
+---treesitter swap nodes
+vim.keymap.set(
+    'n',
+    '<leader>vna',
+    function()
+        require('nvim-treesitter-textobjects.swap').swap_next(
+            '@parameter.inner'
+        )
+    end,
+    {
+        desc = 'TS: swap next parameter',
+    }
+)
+
+vim.keymap.set(
+    'n',
+    '<leader>vpa',
+    function()
+        require('nvim-treesitter-textobjects.swap').swap_previous(
+            '@parameter.inner'
+        )
+    end,
+    {
+        desc = 'TS: swap previous parameter',
+    }
+)
+
+vim.keymap.set('n', '<leader>vn:', function()
+    require('nvim-treesitter-textobjects.swap').swap_next('@property.outer') -- swap object property with next
+end, {
+    desc = 'TS: swap object property with next',
+})
+
+vim.keymap.set('n', '<leader>vp:', function()
+    require('nvim-treesitter-textobjects.swap').swap_previous('@property.outer') -- swap object property with next
+end, {
+    desc = 'TS: swap object property with previous',
+})
+
+vim.keymap.set('n', '<leader>vnm', function()
+    require('nvim-treesitter-textobjects.swap').swap_next('@function.outer') -- swap function with next
+end, {
+    desc = 'TS: swap function with next',
+})
+
+vim.keymap.set('n', '<leader>vpm', function()
+    require('nvim-treesitter-textobjects.swap').swap_previous('@function.outer') -- swap function with previous
+end, {
+    desc = 'TS: swap function with previous',
+})
+
+-------------------------------------------------------------------------------
 vim.keymap.del({ 'o', 'n', 'x' }, 'gc')
 
 vim.keymap.set(
