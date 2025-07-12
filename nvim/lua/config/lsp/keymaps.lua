@@ -102,17 +102,6 @@ function M.setup_lsp_keymaps(bufnr, client)
     })
 
     --- Rename keymaps
-    vim.keymap.set('n', '<F2>', function()
-        if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
-            require('mark-code-action.renamer').rename()
-        else
-            vim.lsp.buf.rename()
-        end
-    end, {
-        buffer = bufnr,
-        desc = 'LSP: Renames all references to the symbol under the cursor.',
-    })
-
     vim.keymap.set('n', 'grn', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.renamer').rename()
@@ -125,16 +114,6 @@ function M.setup_lsp_keymaps(bufnr, client)
     })
 
     ---Code Action keymaps
-    vim.keymap.set(
-        { 'n', 'x' },
-        '<F4>',
-        function() vim.lsp.buf.code_action() end,
-        {
-            buffer = bufnr,
-            desc = 'LSP: Selects a code action available at the current cursor position.',
-        }
-    )
-
     vim.keymap.set(
         { 'n', 'x' },
         'gra',
