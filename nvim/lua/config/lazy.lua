@@ -226,19 +226,19 @@ require('lazy').setup({
 
             -- Highlight changed words.
             {
-                '<leader>gvw',
+                '<leader>gbw',
                 function() require('gitsigns').toggle_word_diff() end,
                 desc = 'Gitsigns: Toggle word diff',
             },
 
             -- Highlight added lines.
             {
-                '<leader>gvl',
+                '<leader>gbl',
                 function() require('gitsigns').toggle_linehl() end,
                 desc = 'Gitsigns: Toggle line highlight',
             },
             {
-                '<leader>gvh',
+                '<leader>gbh',
                 function() require('gitsigns').preview_hunk() end,
                 desc = 'Gitsigns: Preview hunk',
             },
@@ -1008,49 +1008,6 @@ require('lazy').setup({
         config = function(_, opts) require('oil').setup(opts) end,
     },
 
-    -- File search and replace
-    -- {
-    --     'nvim-pack/nvim-spectre',
-    --     dependencies = {
-    --         'nvim-lua/plenary.nvim',
-    --     },
-    --     lazy = true,
-    --     cmd = { 'Spectre' },
-    --     opts = {},
-    --     config = true,
-    --     keys = {
-    --         {
-    --             '<leader>st',
-    --             function() require('spectre').toggle() end,
-    --             mode = { 'n' },
-    --             desc = 'Spectre: Toggle Spectre',
-    --         },
-    --         {
-    --             '<leader>sw',
-    --             function()
-    --                 require('spectre').open_visual({ select_word = true })
-    --             end,
-    --             mode = { 'n' },
-    --             desc = 'Spectre: Search current word',
-    --         },
-    --         {
-    --             '<leader>sw',
-    --             function() require('spectre').open_visual() end,
-    --             mode = { 'v' },
-    --             desc = 'Spectre: Search current word',
-    --         },
-    --         {
-    --             '<leader>sp',
-    --             function()
-    --                 require('spectre').open_file_search({
-    --                     select_word = true,
-    --                 })
-    --             end,
-    --             mode = { 'n' },
-    --             desc = 'Spectre: Search on current file',
-    --         },
-    --     },
-    -- },
     ---------------------------------------------------------------------------
     -- Utils
 
@@ -1103,8 +1060,6 @@ require('lazy').setup({
             local wk = require('which-key')
             -- Note don't forget to update this if I change the mapping namespaces
             wk.add({
-                { '[', mode = { 'x' }, group = 'Prev node mappings' },
-                { ']', mode = { 'x' }, group = 'Next node mappings' },
                 {
                     '[gc',
                     mode = { 'x', 'n' },
@@ -1142,17 +1097,17 @@ require('lazy').setup({
                 },
                 {
                     '<leader>x',
-                    mode = { 'n' },
+                    mode = { 'n', 'x' },
                     group = 'Debugger mappings',
                 },
                 {
                     '<leader>f',
-                    mode = { 'n' },
+                    mode = { 'n', 'x' },
                     group = 'Telescope mappings',
                 },
                 {
                     '<leader>g',
-                    mode = { 'n' },
+                    mode = { 'n', 'x' },
                     group = 'Git mappings',
                 },
                 {
@@ -1166,14 +1121,14 @@ require('lazy').setup({
                     group = 'Git repo link mappings',
                 },
                 {
-                    '<leader>gv',
+                    '<leader>gb',
                     mode = { 'n' },
                     group = 'Git signs/blame mappings',
                 },
                 {
                     '<leader>s',
                     mode = { 'n' },
-                    group = 'Search (Spectre) mappings',
+                    group = 'Substitute.nvim',
                 },
                 {
                     '<leader>t',
@@ -1207,10 +1162,14 @@ require('lazy').setup({
                 },
                 {
                     '<leader>w',
-                    mode = { 'n' },
+                    mode = { 'n', 'x' },
                     group = 'Multicursor mappings',
                 },
-                --
+                {
+                    '<leader>i',
+                    mode = { 'n', 'x' },
+                    group = 'Molten mappings',
+                },
             })
         end,
     },
@@ -1303,7 +1262,6 @@ require('lazy').setup({
     -- Multicursor support
     {
         'jake-stewart/multicursor.nvim',
-        -- branch = "1.0",
         lazy = true,
         event = 'BufReadPre',
         config = function()
@@ -1311,60 +1269,57 @@ require('lazy').setup({
 
             mc.setup()
 
-            -- Add cursors above/below the main cursor.
             vim.keymap.set(
-                { 'n', 'v' },
+                { 'n', 'x' },
                 '<up>',
                 function() mc.addCursor('k') end,
                 { desc = 'Custom Multicursor: Add cursor above' }
             )
+
             vim.keymap.set(
-                { 'n', 'v' },
+                { 'n', 'x' },
                 '<down>',
                 function() mc.addCursor('j') end,
                 { desc = 'Custom Multicursor: Add cursor below' }
             )
 
-            -- Add a cursor and jump to the next word under cursor.
-            vim.keymap.set(
-                { 'n', 'v' },
-                '<c-n>',
-                function() mc.addCursor('*') end,
-                {
-                    desc = 'Custom Multicursor: Add cursor and jump to next word under cursor.',
-                }
-            )
-
-            -- Jump to the next word under cursor but do not add a cursor.
-            vim.keymap.set(
-                { 'n', 'v' },
-                '<c-s>',
-                function() mc.skipCursor('*') end,
-                {
-                    desc = 'Custom Multicursor: Jump to next word under cursor but do not add a cursor.',
-                }
-            )
-
-            -- Rotate the main cursor.
-            vim.keymap.set(
-                { 'n', 'v' },
-                '<left>',
-                mc.nextCursor,
-                { desc = 'Custom Multicursor: Cycle main cursor left.' }
-            )
-            vim.keymap.set(
-                { 'n', 'v' },
-                '<right>',
-                mc.prevCursor,
-                { desc = 'Custom Multicursor: Cycle main cursor right.' }
-            )
-
-            -- Add and remove cursors with control + left click.
             vim.keymap.set('n', '<c-leftmouse>', mc.handleMouse, {
                 desc = 'Custom Multicursor: Add a cursor with the mouse.',
             })
 
-            vim.keymap.set({ 'n', 'v' }, '<c-q>', function()
+            vim.keymap.set('x', '<leader>ws', mc.splitCursors, {
+                desc = 'Custom Multicursor: Split visual slection by regex',
+            })
+
+            vim.keymap.set('x', '<leader>wm', mc.matchCursors, {
+                desc = 'Custom Multicursor: Add new cursors to visual selection by regex.',
+            })
+
+            vim.keymap.set(
+                'x',
+                '<leader>wt',
+                function() mc.transposeCursors(1) end,
+                {
+                    desc = 'Custom Multicursor: Transpose cursors (Rotate visual selection contents.)',
+                }
+            )
+            vim.keymap.set(
+                'x',
+                '<leader>wT',
+                function() mc.transposeCursors(-1) end,
+                {
+                    desc = 'Custom Multicursor: Transpose cursors (reverse rotate visual selection contents.)',
+                }
+            )
+
+            vim.keymap.set('x', '<leader>wi', mc.insertVisual, {
+                desc = 'Custom Multicursor: Add cursor to beginning of each line of visual selection and enter insert mode with "I"',
+            })
+            vim.keymap.set('x', '<leader>wa', mc.appendVisual, {
+                desc = 'Custom Multicursor: Add cursor to end of each line of visual selection and enter insert mode with "A"',
+            })
+
+            vim.keymap.set({ 'n', 'x' }, '<c-q>', function()
                 if mc.cursorsEnabled() then
                     -- Stop other cursors from moving.
                     -- This allows you to reposition the main cursor.
@@ -1376,88 +1331,209 @@ require('lazy').setup({
                 desc = 'Custom Multicursor: Either disable cursors (for repositioning main cursor) or add cursor.',
             })
 
-            vim.keymap.set('n', '<esc>', function()
-                if not mc.cursorsEnabled() then
-                    mc.enableCursors()
-                elseif mc.hasCursors() then
-                    mc.clearCursors()
-                else
-                    -- Default <esc> handler.
-                end
-            end, {
-                desc = 'Custom Multicursor: Re-enable multi cursors or clear cursors',
-            })
-
-            -- Delete the main cursor.
             vim.keymap.set(
-                { 'n', 'v' },
-                '<leader>wx',
-                mc.deleteCursor,
-                { desc = 'Custom Multicursor: Delete the main cursor.' }
+                { 'n', 'x' },
+                '<leader>w<c-q>',
+                mc.duplicateCursors,
+                {
+                    desc = 'Custom Multicursor: Clone every cursor and disable the originals.',
+                }
             )
 
-            -- Align cursor columns.
+            vim.keymap.set('n', '<leader>wgv', mc.restoreCursors, {
+                desc = 'Custom Multicursor: restore multicursor.',
+            })
+
+            vim.keymap.set('n', '<leader>wga', mc.addCursorOperator, {
+                desc = 'Custom Multicursor: Pressing `gaip` will add a cursor on each line of a paragraph.',
+            })
+
+            vim.keymap.set({ 'n', 'x' }, '<leader>A', mc.matchAllAddCursors, {
+                desc = 'Custom Multicursor: Add a cursor for all matches of cursor word/selection in the document.',
+            })
+
+            vim.keymap.set(
+                { 'n', 'x' },
+                '<leader>wg<c-a>',
+                mc.sequenceIncrement,
+                {
+                    desc = 'Custom Multicursor: Increment sequences, treaing all cursors as one sequence.',
+                }
+            )
+            vim.keymap.set(
+                { 'n', 'x' },
+                '<leader>wg<c-x>',
+                mc.sequenceDecrement,
+                {
+                    desc = 'Custom Multicursor: Decrement sequences, treaing all cursors as one sequence.',
+                }
+            )
+
             vim.keymap.set(
                 'n',
-                '<leader>wa',
-                mc.alignCursors,
-                { desc = 'Custom Multicursor: Align cursor columns.' }
-            )
-
-            -- Split visual selections by regex.
-            vim.keymap.set('v', '<leader>ws', mc.splitCursors, {
-                desc = 'Custom Multicursor: Split visual slection by regex',
-            })
-
-            -- Append/insert for each line of visual selections.
-            vim.keymap.set(
-                'v',
-                '<leader>wi', -- I don't use 'I' because it conflicts with visual block mode 'I'
-                mc.insertVisual,
+                '<leader>w/n',
+                function() mc.searchAddCursor(1) end,
                 {
-                    desc = 'Custom Multicursor: Add cursor to beginning of each line of visual selection and enter insert mode with "I"',
+                    desc = 'Custom Multicursor: Add a cursor and jump to the next search result.',
                 }
             )
             vim.keymap.set(
-                'v',
-                '<leader>wa', -- I don't use 'A' because it conflicts with visual block mode 'A'
-                mc.appendVisual,
+                'n',
+                '<leader>w/N',
+                function() mc.searchAddCursor(-1) end,
                 {
-                    desc = 'Custom Multicursor: Add cursor to end of each line of visual selection and enter insert mode with "A"',
+                    desc = 'Custom Multicursor: Add a cursor and jump to the previous search result.',
                 }
             )
 
-            -- match new cursors within visual selections by regex.
-            vim.keymap.set('v', '<leader>wm', mc.matchCursors, {
-                desc = 'Custom Multicursor: Add new cursors to visual selection by regex.',
+            vim.keymap.set(
+                'n',
+                '<leader>w/s',
+                function() mc.searchSkipCursor(1) end,
+                {
+                    desc = 'Custom Multicursor: Jump to the next search result without adding a cursor.',
+                }
+            )
+            vim.keymap.set(
+                'n',
+                '<leader>w/S',
+                function() mc.searchSkipCursor(-1) end,
+                {
+                    desc = 'Custom Multicursor: Jump to the previous search result without adding a cursor.',
+                }
+            )
+
+            vim.keymap.set('n', '<leader>w/A', mc.searchAllAddCursors, {
+                desc = 'Custom Multicursor: Add a cursor to every search result in the buffer.',
             })
 
-            -- Rotate visual selection contents.
+            vim.keymap.set('n', '<leader>w/A', mc.searchAllAddCursors, {
+                desc = 'Custom Multicursor: Add a cursor to every search result in the buffer.',
+            })
+
             vim.keymap.set(
-                'v',
-                '<leader>wt',
-                function() mc.transposeCursors(1) end,
-                { desc = 'Custom Multicursor: Transpose cursors' }
+                { 'n', 'x' },
+                ']wd',
+                function() mc.diagnosticAddCursor(1) end,
+                {
+                    desc = 'Custom Multicursor: Add  new cursor for next diagnostics.',
+                }
             )
             vim.keymap.set(
-                'v',
-                '<leader>wT',
-                function() mc.transposeCursors(-1) end,
-                { desc = 'Custom Multicursor: Transpose cursors (reverse)' }
+                { 'n', 'x' },
+                '[wd',
+                function() mc.diagnosticAddCursor(-1) end,
+                {
+                    desc = 'Custom Multicursor: Add new cursor for previous diagnostics.',
+                }
             )
+            vim.keymap.set(
+                { 'n', 'x' },
+                ']ws',
+                function() mc.diagnosticSkipCursor(1) end,
+                {
+                    desc = 'Custom Multicursor: Skip adding a new cursor for next diagnostics.',
+                }
+            )
+            vim.keymap.set(
+                { 'n', 'x' },
+                '[wS',
+                function() mc.diagnosticSkipCursor(-1) end,
+                {
+                    desc = 'Custom Multicursor: Skip adding a new cursor for previous diagnostics.',
+                }
+            )
+
+            vim.keymap.set({ 'n', 'x' }, '<leader>wmd', function()
+                -- See `:h vim.diagnostic.GetOpts`.
+                mc.diagnosticMatchCursors({
+                    severity = vim.diagnostic.severity.ERROR,
+                })
+            end, {
+                desc = 'Custom Multicursor: Press `mdip` to add a cursor for every error diagnostic in the range `ip`.',
+            })
+
+            mc.addKeymapLayer(function(layerSet)
+                -- Select a different cursor as the main one. (Rotate the main cursor.)
+                layerSet(
+                    { 'n', 'v' },
+                    '<left>',
+                    mc.nextCursor,
+                    { desc = 'Custom Multicursor: Cycle main cursor left.' }
+                )
+                layerSet(
+                    { 'n', 'v' },
+                    '<right>',
+                    mc.prevCursor,
+                    { desc = 'Custom Multicursor: Cycle main cursor right.' }
+                )
+
+                -- Delete the main cursor.
+                layerSet({ 'n', 'x' }, '<leader>x', mc.deleteCursor)
+
+                -- Enable and clear cursors using escape.
+                layerSet('n', '<esc>', function()
+                    if not mc.cursorsEnabled() then
+                        mc.enableCursors()
+                    else
+                        mc.clearCursors()
+                    end
+                end, {
+                    desc = 'Custom Multicursor: Re-enable multi cursors or clear cursors',
+                })
+
+                -- Add a cursor and jump to the next word under cursor.
+                layerSet(
+                    { 'n', 'x' },
+                    '<c-n>',
+                    function() mc.addCursor('*') end,
+                    {
+                        desc = 'Custom Multicursor: Add cursor and jump to next word under cursor.',
+                    }
+                )
+
+                -- Jump to the next word under cursor but do not add a cursor.
+                layerSet(
+                    { 'n', 'x' },
+                    '<c-s>',
+                    function() mc.skipCursor('*') end,
+                    {
+                        desc = 'Custom Multicursor: Jump to next word under cursor but do not add a cursor.',
+                    }
+                )
+
+                -- Align cursor columns.
+                layerSet(
+                    'n',
+                    '<leader>wa',
+                    mc.alignCursors,
+                    { desc = 'Custom Multicursor: Align cursor columns.' }
+                )
+            end)
 
             -- Customize how cursors look.
-            vim.api.nvim_set_hl(0, 'MultiCursorCursor', { link = 'Cursor' })
+            vim.api.nvim_set_hl(0, 'MultiCursorCursor', { reverse = true })
             vim.api.nvim_set_hl(0, 'MultiCursorVisual', { link = 'Visual' })
+            vim.api.nvim_set_hl(0, 'MultiCursorSign', { link = 'SignColumn' })
+            vim.api.nvim_set_hl(
+                0,
+                'MultiCursorMatchPreview',
+                { link = 'Search' }
+            )
             vim.api.nvim_set_hl(
                 0,
                 'MultiCursorDisabledCursor',
-                { link = 'Visual' }
+                { reverse = true }
             )
             vim.api.nvim_set_hl(
                 0,
                 'MultiCursorDisabledVisual',
                 { link = 'Visual' }
+            )
+            vim.api.nvim_set_hl(
+                0,
+                'MultiCursorDisabledSign',
+                { link = 'SignColumn' }
             )
         end,
     },
