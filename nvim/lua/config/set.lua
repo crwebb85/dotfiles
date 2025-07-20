@@ -171,3 +171,19 @@ if vim.fn.has('win32') == 1 then
     vim.o.shellquote = ''
     vim.o.shellxquote = ''
 end
+
+-------------------------------------------------------------------------------
+-- Enable project local configuration using .nvim.lua file in the project directory
+-- When the .nvim.lua file changes, you will be prompted to confirm if you trust the
+-- file before it will be executed.
+-- I also tested what happens when running `nvim --headless +qa` with a `.nvim.lua`
+-- that hadn't yet been trusted and it didn't get hung up on the confimation and just
+-- didn't run the `.nvim.lua` file. I'm glad it functions that way since I don't need
+-- extra logic to turn off exrc for when running headless.
+-- TODO
+-- 1. Move this to the beginning of config
+-- 2. Add user autocommands for when parts of my config are ran so that my
+--  .nvim.lua file can pinpoint configuration overrid using autocommands to occur
+--  at the exact spot it needs to run. (i.e. PreSet, Set, PreConfig, Config, PreLsp, PostLsp)
+-- 3. Create a .nvim.lua skeleton file with the autocommands templates prepopulated
+vim.o.exrc = true

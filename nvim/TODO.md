@@ -97,6 +97,13 @@ the workaround is to make sure the plugin is loaded
 
 ### TODO and Workflows that need improvements
 
+- [ ] project specific configuration
+  - [ ] improve exrc
+    1. Move this to the beginning of config
+    2. Add user autocommands for when parts of my config are ran so that my
+       .nvim.lua file can pinpoint configuration overrid using autocommands to occur
+       at the exact spot it needs to run. (i.e. PreSet, Set, PreConfig, Config, PreLsp, PostLsp)
+    3. Create a .nvim.lua skeleton file with the autocommands templates prepopulated
 - [ ] lsp
   - [ ] keymaps like grr should notify when the no results were found
   - [ ] try a newer dotnet lsp
