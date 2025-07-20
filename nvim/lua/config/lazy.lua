@@ -1453,6 +1453,10 @@ require('lazy').setup({
                 desc = 'Custom Multicursor: Press `mdip` to add a cursor for every error diagnostic in the range `ip`.',
             })
 
+            vim.keymap.set({ 'n', 'x' }, '<leader>wx', mc.deleteCursor, {
+                desc = 'Custom Multicursor: delete main cursor',
+            })
+
             mc.addKeymapLayer(function(layerSet)
                 -- Select a different cursor as the main one. (Rotate the main cursor.)
                 layerSet(
@@ -1469,7 +1473,10 @@ require('lazy').setup({
                 )
 
                 -- Delete the main cursor.
-                layerSet({ 'n', 'x' }, '<leader>x', mc.deleteCursor)
+                -- TODO I would like to have this work but this causes the
+                -- keymap to wait because of my debuging keymap namespace
+                -- is also <leader>x
+                -- layerSet({ 'n', 'x' }, '<leader>x', mc.deleteCursor)
 
                 -- Enable and clear cursors using escape.
                 layerSet('n', '<esc>', function()
@@ -1500,14 +1507,6 @@ require('lazy').setup({
                     {
                         desc = 'Custom Multicursor: Jump to next word under cursor but do not add a cursor.',
                     }
-                )
-
-                -- Align cursor columns.
-                layerSet(
-                    'n',
-                    '<leader>wa',
-                    mc.alignCursors,
-                    { desc = 'Custom Multicursor: Align cursor columns.' }
                 )
             end)
 
