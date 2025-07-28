@@ -1,15 +1,5 @@
 local M = {}
 
----Hack to fix processes that get confused on windows when paths use a forward slash
----This must as close to the line of code that is having issues as possible and for some
----reason must be reran each time.
----
----I am using this primarily for debuggers on windows as they seem to have issues
----finding the pdb files
-function M.shellslash_hack()
-    if vim.fn.has('win32') == 1 then vim.cmd([[set noshellslash]]) end
-end
-
 ---Get the get default git branch name
 ---@return string
 function M.get_default_branch_name()
