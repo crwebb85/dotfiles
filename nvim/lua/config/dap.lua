@@ -70,14 +70,19 @@ function M.fuzzy_pick_executable()
                     'rg',
                     '--files',
                     '--hidden',
-                    '--glob',
-                    '!.git',
+                    '--ignore-vcs', -- So that ripgrep won't ignore gitignore files
+
                     '--glob',
                     '!node_modules',
                     '--glob',
                     '!venv',
                     '--glob',
                     '!.venv',
+
+                    '--glob',
+                    '*.exe',
+                    '--glob',
+                    '*.dll',
                 }, {}),
                 sorter = conf.generic_sorter(opts),
                 attach_mappings = function(buffer_number)
