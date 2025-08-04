@@ -1,5 +1,12 @@
 local M = {}
 
+M.is_existing_file = function(filepath)
+    vim.validate({ file_path = { filepath, 'string' } })
+
+    local stat = vim.loop.fs_stat(filepath)
+    return stat and stat.type == 'file'
+end
+
 ---Creates the given file if it doesn't exist
 ---from https://github.com/backdround/global-note.nvim/blob/1e0d4bba425d971ed3ce40d182c574a25507115c/lua/global-note/utils.lua#L5C1-L24C4
 ---@param filepath string

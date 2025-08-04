@@ -115,7 +115,7 @@ vim.api.nvim_create_user_command('MessagesTab', function()
             execute ":put =execute(':messages')"
 	    ]])
 
-    vim.print('Refresh message buffer with "<leader>R"')
+    vim.notify('Refresh message buffer with "<leader>R"', vim.log.levels.INFO)
     vim.keymap.set(
         'n',
         '<leader>R',
@@ -143,7 +143,7 @@ vim.api.nvim_create_user_command('Messages', function()
 	    ]])
     vim.go.splitright = old_splitright_value
 
-    vim.print('Refresh message buffer with "<leader>R"')
+    vim.notify('Refresh message buffer with "<leader>R"', vim.log.levels.INFO)
     vim.keymap.set(
         'n',
         '<leader>R',
@@ -265,7 +265,12 @@ end, {
 vim.api.nvim_create_user_command(
     'FormatterDetails',
     function()
-        vim.print(require('config.formatter').get_buffer_formatting_details())
+        vim.notify(
+            vim.inspect(
+                require('config.formatter').get_buffer_formatting_details()
+            ),
+            vim.log.levels.INFO
+        )
     end,
     { desc = 'Prints the formatting details for the buffer' }
 )
@@ -281,7 +286,7 @@ vim.api.nvim_create_user_command('FormatterProjectToggle', function(args)
     ---@type string[]
     local formatters_to_toggle = args.fargs
     if #formatters_to_toggle == 0 then
-        vim.print('No formatters listed to toggle')
+        vim.notify('No formatters listed to toggle', vim.log.levels.ERROR)
         return
     end
     --remove duplicates
@@ -290,9 +295,10 @@ vim.api.nvim_create_user_command('FormatterProjectToggle', function(args)
     local invalid_formatters_set =
         formatters_to_toggle_set:difference(valid_formatters_set)
     if invalid_formatters_set.size >= 0 then
-        vim.print(
+        vim.notify(
             'Ignoring invalid formatters: '
-                .. invalid_formatters_set:to_string()
+                .. invalid_formatters_set:to_string(),
+            vim.log.levels.ERROR
         )
     end
 
@@ -318,7 +324,11 @@ vim.api.nvim_create_user_command('FormatterProjectToggle', function(args)
         end
     end
 
-    vim.print('Project disabled formatters:', new_disabled_formatters_list)
+    vim.notify(
+        'Project disabled formatters:'
+            .. vim.inspect(new_disabled_formatters_list),
+        vim.log.levels.INFO
+    )
     format_properties.set_project_disabled_formatters(
         new_disabled_formatters_list
     )
@@ -333,7 +343,7 @@ vim.api.nvim_create_user_command('FormatterBufferToggle', function(args)
     ---@type string[]
     local formatters_to_toggle = args.fargs
     if #formatters_to_toggle == 0 then
-        vim.print('No formatters listed to toggle')
+        vim.notify('No formatters listed to toggle', vim.log.levels.ERROR)
         return
     end
     --remove duplicates
@@ -342,9 +352,10 @@ vim.api.nvim_create_user_command('FormatterBufferToggle', function(args)
     local invalid_formatters_set =
         formatters_to_toggle_set:difference(valid_formatters_set)
     if invalid_formatters_set.size >= 0 then
-        vim.print(
+        vim.notify(
             'Ignoring invalid formatters: '
-                .. invalid_formatters_set:to_string()
+                .. invalid_formatters_set:to_string(),
+            vim.log.levels.WARN
         )
     end
 
@@ -370,7 +381,11 @@ vim.api.nvim_create_user_command('FormatterBufferToggle', function(args)
         end
     end
 
-    vim.print('Buffer disabled formatters:', new_disabled_formatters_list)
+    vim.notify(
+        'Buffer disabled formatters:'
+            .. vim.inspect(new_disabled_formatters_list),
+        vim.log.levels.INFO
+    )
     format_properties.set_buffer_disabled_formatters(
         new_disabled_formatters_list,
         bufnr
@@ -717,7 +732,6 @@ end, {
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
         local words = vim.split(text, '%s+')
-        -- vim.print(words)
         if #words > 2 then
             local base_bufnr = vim.api.nvim_win_get_buf(0)
 
@@ -790,7 +804,6 @@ end, {
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
         local words = vim.split(text, '%s+')
-        -- vim.print(words)
         if #words <= 2 then
             return {
                 config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
@@ -845,7 +858,6 @@ end, {
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
         local words = vim.split(text, '%s+')
-        -- vim.print(words)
         if #words <= 2 then
             return {
                 config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
@@ -892,7 +904,6 @@ end, {
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
         local words = vim.split(text, '%s+')
-        -- vim.print(words)
         if #words <= 2 then
             return {
                 config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
@@ -939,7 +950,6 @@ end, {
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
         local words = vim.split(text, '%s+')
-        -- vim.print(words)
         if #words <= 2 then
             return {
                 config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
@@ -986,7 +996,6 @@ end, {
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
         local words = vim.split(text, '%s+')
-        -- vim.print(words)
         if #words <= 2 then
             return {
                 config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
@@ -1158,6 +1167,295 @@ vim.api.nvim_create_user_command('Makeit', function(_)
     open_telescope() -- Entry point
 end, {
     desc = 'Opens telescope picker to pick the Make task to run',
+})
+
+---@class HurlUserCommandArguments
+---@field hurl_path string?
+---@field env_path string?
+
+---Parser the hurl command fargs
+---
+---Examples of valid and invalid arguments
+---
+---# (invalid) only one hurl argument allowed:
+---Hurl test.hurl test.hurl
+---
+---# (invalid) only one env argument allowed:
+---Hurl test.env test.env
+---
+---# (valid) all arguments are optional:
+---Hurl
+---
+---# (invalid) the hurl file must exist if the argument is supplied:
+---Hurl nonexisting.hurl
+---
+---# (invalid) the env file must exist if the argument is supplied:
+---Hurl nonexisting.env
+---
+---# (valid) the optional parameter existing.hurl exists:
+---Hurl existing.hurl
+---Hurl C:\Users\user\Documents\.config\existing.hurl
+---Hurl C:\Users\user\Documents\.config\nvim\test.hurl
+---Hurl .\nvim\test.hurl
+---
+---# (valid) the optional parameter existing.env exists:
+---Hurl existing.env
+---Hurl C:\Users\user\Documents\.config\existing.env
+---Hurl C:\Users\user\Documents\.config\nvim\vars.env
+---Hurl .\nvim\vars.env
+---
+---# (invalid) extensions:
+---Hurl readme.md
+---Hurl readme.md existing.hurl
+---Hurl readme.md existing.env
+---Hurl existing.hurl readme.md
+---Hurl existing.env readme.md
+---
+---# (invalid) too many arguments:
+---Hurl existing.hurl readme.md existing.env
+---
+---@param fargs string[]
+---@return HurlUserCommandArguments
+local function parse_hurl_command_fargs(fargs)
+    if #fargs > 2 then
+        error(
+            'Expected at most two optional parameters. The hurl file path and the env file path'
+        )
+    end
+    local valid_param_count = 0
+    local hurl_path
+    local paths_with_hurl_extension = vim.tbl_filter(
+        function(path) return path:match('%.hurl$') ~= nil end,
+        fargs
+    )
+
+    if #paths_with_hurl_extension == 1 then
+        hurl_path = vim.fs.normalize(paths_with_hurl_extension[1])
+        valid_param_count = valid_param_count + 1
+    elseif #paths_with_hurl_extension > 1 then
+        error('Expected at most one hurl file in the optional parameters.')
+    end
+    if
+        hurl_path ~= nil
+        and not require('utils.path').is_existing_file(hurl_path)
+    then
+        local template =
+            'The optional hurl path argument does not exist at path %s'
+        error(template:format(hurl_path))
+    elseif hurl_path ~= nil and #fargs == 2 then
+        error(
+            'If two parameters are supplied one must be the optional hurl path with extension `.hurl` and the other must be the optional env path with extension `.env`.'
+        )
+    end
+
+    local env_path
+    local paths_with_env_extension = vim.tbl_filter(
+        function(path) return path:match('%.env$') ~= nil end,
+        fargs
+    )
+    if #paths_with_env_extension == 1 then
+        env_path = vim.fs.normalize(paths_with_env_extension[1])
+        valid_param_count = valid_param_count + 1
+    elseif #paths_with_env_extension > 1 then
+        error('Expected at most one env file in the optional parameters.')
+    end
+    if
+        env_path ~= nil
+        and not require('utils.path').is_existing_file(env_path)
+    then
+        local template =
+            'The optional hurl path argument does not exist at path %s'
+        error(template:format(env_path))
+    elseif env_path ~= nil and #fargs == 2 then
+        error(
+            'If two parameters are supplied one must be the optional hurl path with extension `.hurl` and the other must be the optional env path with extension `.env`.'
+        )
+    end
+
+    if valid_param_count ~= #fargs then
+        error(
+            'Invalid params. Only two optional params are allowed. The optional hurl file path denoted by `.hurl` extension and the optional env path denoted by `.env` extension'
+        )
+    end
+
+    if hurl_path ~= nil then hurl_path = vim.fs.abspath(hurl_path) end
+    if env_path ~= nil then env_path = vim.fs.abspath(env_path) end
+    return {
+        hurl_path = hurl_path,
+        env_path = env_path,
+    }
+end
+
+---finds the env file and runs the callback with the selection
+---@param current_hurl_args HurlUserCommandArguments
+---@param callback fun(updated_hurl_args: HurlUserCommandArguments)
+local function telescope_find_env(current_hurl_args, callback)
+    local conf = require('telescope.config').values
+    local actions = require('telescope.actions')
+    local state = require('telescope.actions.state')
+    local pickers = require('telescope.pickers')
+    local finders = require('telescope.finders')
+    local opts = {}
+    pickers
+        .new(opts, {
+            prompt_title = 'Path to env',
+            finder = finders.new_oneshot_job({
+                'rg',
+                '--files',
+                '--hidden',
+                '--ignore-vcs', -- So that ripgrep won't ignore gitignore files
+
+                '--glob',
+                '!node_modules',
+                '--glob',
+                '!venv',
+                '--glob',
+                '!.venv',
+
+                '--glob',
+                '*.env',
+            }, {}),
+            sorter = conf.generic_sorter(opts),
+            attach_mappings = function(buffer_number)
+                local updated_hurl_args = vim.deepcopy(current_hurl_args)
+                actions.select_default:replace(function()
+                    local status, err = pcall(function()
+                        local selection = state.get_selected_entry()
+                        if selection == nil then return end
+
+                        updated_hurl_args.env_path =
+                            vim.fs.abspath(selection[1])
+                    end)
+                    actions.close(buffer_number)
+                    if not status then error(err) end
+                end)
+
+                actions.close:enhance({
+                    post = function() callback(updated_hurl_args) end,
+                })
+                return true
+            end,
+        })
+        :find()
+end
+
+---finds the hurl file and runs the callback with the selection
+---@param current_hurl_args HurlUserCommandArguments
+---@param callback fun(updated_hurl_args: HurlUserCommandArguments)
+local function telescope_find_hurl(current_hurl_args, callback)
+    local conf = require('telescope.config').values
+    local actions = require('telescope.actions')
+    local state = require('telescope.actions.state')
+    local pickers = require('telescope.pickers')
+    local finders = require('telescope.finders')
+    local opts = {}
+    pickers
+        .new(opts, {
+            prompt_title = 'Path to env',
+            finder = finders.new_oneshot_job({
+                'rg',
+                '--files',
+                '--hidden',
+                '--ignore-vcs', -- So that ripgrep won't ignore gitignore files
+
+                '--glob',
+                '!node_modules',
+                '--glob',
+                '!venv',
+                '--glob',
+                '!.venv',
+
+                '--glob',
+                '*.hurl',
+            }, {}),
+            sorter = conf.generic_sorter(opts),
+            attach_mappings = function(buffer_number)
+                local updated_hurl_args = vim.deepcopy(current_hurl_args)
+                actions.select_default:replace(function()
+                    local status, err = pcall(function()
+                        local selection = state.get_selected_entry()
+                        if selection == nil then return end
+
+                        updated_hurl_args.hurl_path =
+                            vim.fs.abspath(selection[1])
+                    end)
+                    actions.close(buffer_number)
+                    if not status then error(err) end
+                end)
+
+                actions.close:enhance({
+                    post = function()
+                        if updated_hurl_args.hurl_path == nil then
+                            vim.notify(
+                                'Canceling hurl command because no hurl file was selected',
+                                vim.log.levels.WARN
+                            )
+                            return
+                        end
+                        callback(updated_hurl_args)
+                    end,
+                })
+                return true
+            end,
+        })
+        :find()
+end
+
+vim.api.nvim_create_user_command('Hurl', function(params)
+    local args = parse_hurl_command_fargs(params.fargs)
+
+    if args.hurl_path == nil then
+        -- find hurl path (fuzzy picker)
+        -- then find env path (fuzzy picker)
+        telescope_find_hurl(args, function(hurl_args_updated_with_hurl_path)
+            -- vim.print('hi from hurl')
+            if args.env_path == nil then
+                telescope_find_env(
+                    hurl_args_updated_with_hurl_path,
+                    function(hurl_args_updated_with_env_path)
+                        -- vim.print('hi from hurl to env')
+                        -- vim.print(hurl_args_updated_with_env_path)
+                        local builder =
+                            require('overseer.template.hurl.hurl').hurl_builder_builder({
+                                hurl_path = hurl_args_updated_with_env_path.hurl_path,
+                                env_path = hurl_args_updated_with_env_path.env_path,
+                            })
+
+                        local task = require('overseer').new_task(builder())
+                        task:start()
+                    end
+                )
+            else
+                -- vim.print('hi')
+                -- vim.print(hurl_args_updated_with_hurl_path)
+                local builder =
+                    require('overseer.template.hurl.hurl').hurl_builder_builder({
+                        hurl_path = hurl_args_updated_with_hurl_path.hurl_path,
+                        env_path = hurl_args_updated_with_hurl_path.env_path,
+                    })
+
+                local task = require('overseer').new_task(builder())
+                task:start()
+            end
+        end)
+    elseif args.env_path == nil then
+        -- find env path (fuzzy picker)
+        telescope_find_env(args, function(updated_hurl_args)
+            -- vim.print('hi from hurl')
+            -- vim.print(updated_hurl_args)
+            local builder =
+                require('overseer.template.hurl.hurl').hurl_builder_builder({
+                    hurl_path = updated_hurl_args.hurl_path,
+                    env_path = updated_hurl_args.env_path,
+                })
+
+            local task = require('overseer').new_task(builder())
+            task:start()
+        end)
+    end
+end, {
+    desc = 'Hurl file with env via overseer',
+    nargs = '*',
 })
 
 vim.api.nvim_create_user_command('WatchRun', function()
@@ -1389,7 +1687,6 @@ end, {
 --- File cleanup
 
 vim.api.nvim_create_user_command('ConvertLineEndings', function(params)
-    -- vim.print(params)
     local line_ending = params.args
     if line_ending == 'lf' then
         vim.cmd([[
@@ -1405,7 +1702,10 @@ vim.api.nvim_create_user_command('ConvertLineEndings', function(params)
                 :w
             ]])
     else
-        vim.print('Invalid line_ending name of:' .. line_ending)
+        vim.notify(
+            'Invalid line_ending name of:' .. line_ending,
+            vim.log.levels.ERROR
+        )
     end
 end, {
     nargs = 1,

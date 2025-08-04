@@ -146,6 +146,7 @@ the workaround is to make sure the plugin is loaded
     - [ ] put request
     - [ ] oauth request
     - [ ] ntlm auth request
+    - [x] add .env picker
   - [ ] add snippets using pythons faker library to generate fake data
 - [ ] Requests
   - [x] Commands for interacting with hurl files (may use plugin)
@@ -195,7 +196,10 @@ the workaround is to make sure the plugin is loaded
   - [ ] jupyter notebooks
 - [ ] Debugging
   - [ ] setup debugger for .net46 projects https://www.reddit.com/r/neovim/comments/1k7egep/using_a_custom_lua_mason_registry/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-  - [ ] pid telescope picker for processes
+  - [x] pid telescope picker for processes
+  - [ ] replace my custom build action with overseer actions
+- [ ] Testing
+  - [ ] Add a picker for running test files
 - [ ] Heirline
   - [ ] Add a heirline component for python virtual environment. There is an example in the docs for venv-selector.nvim
   - [ ] Add a heirline component for harpoon
