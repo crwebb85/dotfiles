@@ -31,6 +31,8 @@ local M = {
 
     use_overseer_strategy_hack = false,
     -- use_overseer_strategy_hack = true,
+
+    use_telescope_for_vim_ui_select = true,
 }
 
 return M

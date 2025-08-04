@@ -371,7 +371,6 @@ require('lazy').setup({
                     local text = vim.fn.join(text_lines, '')
 
                     local root_dir = vim.fn.getcwd()
-                    vim.print(root_dir)
                     if root_dir ~= nil then
                         --escape special regex characters
                         local root_dir_regex = root_dir
@@ -519,77 +518,26 @@ require('lazy').setup({
             {
                 '<leader>fe',
                 function()
-                    local conf = require('telescope.config').values
-                    local harpoon = require('harpoon')
-
-                    local file_paths = {}
-                    for _, item in ipairs(harpoon:list().items) do
-                        --Decode dynamic harpoon items based on current date
-                        --for example "${test%Y-%m-%d.log}" would become "test2024-09-27.log"
-                        --if todays date was 2024-09-27 this allows adding current days log file
-                        --to the harpoon list without having to change it each day.
-                        local list_item_value, _ = string.gsub(
-                            item.value,
-                            '^%${(.*)}$',
-                            function(n) return os.date(n) end
-                        )
-                        table.insert(file_paths, list_item_value)
-                    end
-
-                    require('telescope.pickers')
-                        .new({}, {
-                            prompt_title = 'Harpoon',
-                            finder = require('telescope.finders').new_table({
-                                results = file_paths,
-                            }),
-                            previewer = conf.file_previewer({}),
-                            sorter = conf.generic_sorter({}),
-                            attach_mappings = function(buffer_number)
-                                local actions = require('telescope.actions')
-                                local action_state =
-                                    require('telescope.actions.state')
-                                actions.select_default:replace(function()
-                                    actions.close(buffer_number)
-                                    vim.cmd(
-                                        'e '
-                                            .. action_state.get_selected_entry()[1]
-                                    )
-                                end)
-                                return true
-                            end,
-                        })
-                        :find()
+                    --My custom picker defined in .config\nvim\lua\telescope\_extensions
+                    require('telescope').load_extension('harpoon').harpoon()
                 end,
                 desc = 'Telescope: harpoon',
             },
             {
                 '<leader>fn',
                 function()
-                    local note_path = vim.fs.normalize('$MY_NOTES')
-                    if note_path == '$MY_NOTES' then
-                        error(
-                            "$MY_NOTES environment variable is not defined. Please create the environment variable in order to search it's directory."
-                        )
-                    end
-                    require('telescope.builtin').find_files({
-                        cwd = note_path,
-                    })
+                    --My custom picker defined in .config\nvim\lua\telescope\_extensions
+                    require('telescope').load_extension('notes').notes()
                 end,
                 desc = 'Telescope: find files in note directory ',
                 mode = { 'n' },
             },
             {
                 '<leader>fz',
+
                 function()
-                    local config_path = vim.fn.stdpath('config')
-                    if type(config_path) ~= 'string' then
-                        error('config path was not a string')
-                    end
-                    local skeleton_path =
-                        vim.fs.joinpath(config_path, 'skeletons')
-                    require('telescope.builtin').find_files({
-                        cwd = skeleton_path,
-                    })
+                    --My custom picker defined in .config\nvim\lua\telescope\_extensions
+                    require('telescope').load_extension('skeleton').skeleton()
                 end,
                 desc = 'Telescope: find skeletons (file templates) ',
                 mode = { 'n' },
@@ -669,6 +617,9 @@ require('lazy').setup({
         config = function(_, opts)
             require('telescope').setup(opts)
             require('telescope').load_extension('media_files')
+            require('telescope').load_extension('skeleton')
+            require('telescope').load_extension('notes')
+            require('telescope').load_extension('harpoon')
 
             -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
             -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged

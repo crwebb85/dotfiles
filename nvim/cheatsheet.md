@@ -24,6 +24,10 @@ Use \t instead of spaces when typing tab
 :set noexpandtab
 ```
 
+# Things I don't want to forget
+
+- `:tab split` opens current buffer in new tab page (unlike `:tab sb` this works for non-file buffers
+
 # Useful command
 
 "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
@@ -36,27 +40,22 @@ Use \t instead of spaces when typing tab
 - `:Inspect` to show the highlight groups under the cursor
 - `:InspectTree` to show the parsed syntax tree
 - `:EditQuery` to open the Live Query Editor
-- `ConformInfo` check if formatters are working and picking up config files
-- `LspInfo` check info about lsps for buffer
-- `Telescope luasnip` check list of snippets for buffer
-
+- `:ConformInfo` check if formatters are working and picking up config files
+- `:LspInfo` check info about lsps for buffer
+- `:Telescope luasnip` check list of snippets for buffer
 - `:DiffviewOpen` to open the git diff for current changes
-
 - `:Mason` to open the package manager for LSPs, linters, formatters, and debugers.
-
-- `:lua= vim.lsp.get_active_clients({ name = "lua_ls" })[1].config.settings.Lua` to print info about the lua lsp config
 - `:Gitsigns toggle_current_line_blame` to toggle git blame
+- `:Git Difftool` adds all git changes to the quick fix list
+- `:Telescope lsp_document_symbols` find symbols in buffer
 
 - `:redir @a | silent scriptnames | redir END` redirect output of script to register https://vi.stackexchange.com/a/18833
 - `:put =execute(':scriptnames')` directly paste output of script into the current buffer https://vi.stackexchange.com/a/18834
-
-- `:Telescope lsp_document_symbols` find symbols in buffer
 
 - `<C-k>` opens information in popup about the symbol using the lsp (press again to move cursor into the popup and q to leave the popup)
 - `shift-K` opens hover diagnostics in popup about the symbol (press again to move cursor into the popup and q to leave the popup)
 
 - `:vimgrep "\%^" **/*.md` add all files with md extension to quick fix list (`\%^` is the regex for the first line of a file)
-- `:Git Difftool` adds all git changes to the quick fix list
 
 - `gv` re-select last selection
 
@@ -64,8 +63,6 @@ Use \t instead of spaces when typing tab
 - `:echo stdpath('data')` to find the path that neovim saves user data to
 
 - `:wshada!` will fix most shada errors (I believe it overwrites the shada file)
-
-- `lua= vim.lsp.protocol.make_client_capabilities()` to see lsp capabilities
 
 You can pass arbitrary data to a User autocmd callback by doing
 
