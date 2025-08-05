@@ -1535,7 +1535,10 @@ require('lazy').setup({
             end
 
             if #parsers_to_install > 0 then
-                vim.print(parsers_to_install)
+                vim.notify(
+                    'parsers to install:' .. vim.inspect(parsers_to_install),
+                    vim.log.levels.INFO
+                )
                 nvim_treesitter.install(parsers_to_install)
                 --:wait(300000)
             end
