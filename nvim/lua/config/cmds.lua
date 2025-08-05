@@ -178,7 +178,7 @@ end, { nargs = 0, desc = 'Compares buffer file with clipboard contents' })
 
 vim.api.nvim_create_user_command('CompareClipboardSelection', function()
     local file_type = vim.bo.filetype
-    local selection_text = require('utils.misc').get_visual_selection(0)
+    local selection_text = require('utils.mapping').get_visual_selection(0)
     vim.cmd([[
 		" open new tab, set options to prevent save prompt when closing
 		execute 'tabnew'
