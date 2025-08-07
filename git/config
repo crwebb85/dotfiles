@@ -1,0 +1,50 @@
+;To see if the configuration is loaded correctly
+;run `git config --list --show-origin`
+;This configuration file should be loaded if the XDG_CONFIG_HOME environment
+;variable is set to this repo path
+
+[core]
+	editor = nvim
+	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+    autocrlf = false
+    longpaths = true
+[branch]
+	sort = -committerdate ;TODO see if I like this over default sorting
+[tag]
+	sort = version:refname
+[init]
+	defaultBranch = main
+[checkout]
+	defaultRemote = origin
+[rerere]
+	enabled = 1
+	autoupdate = 1
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+	renames = true
+	tool = nvimdiff
+    ;opens git diffs in neovim you can test this with the command `git difftool`
+    cmd = 'nvim -d "$LOCAL" "$REMOTE"'
+[difftool]
+    ;Disables prompting if you want to open the diff of the next file after closing the
+    ;current files diff
+	prompt = false
+[push]
+    ;automatically determine --set-upstream when no upstream is setup
+    ;TODO see if I like this setting
+	autoSetupRemote = true
+    ; TODO figure out what follow tags does
+	; followTags = true
+[fetch]
+    ;TODO determine if I like these settings
+	prune = true
+	pruneTags = true
+	all = true
+; TODO try out the following rebase settings
+; [rebase]
+; 	autoSquash = true 
+; 	updateRefs = true
+[sequence]
+    ;The text editor used by `git rebase -i`
+	editor = nvim

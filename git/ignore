@@ -1,0 +1,6 @@
+#This is my global git ignore
+#This configuration file should be loaded if the XDG_CONFIG_HOME environment
+#variable is set to this repo path
+.nvim.lua
+Session.vim
+

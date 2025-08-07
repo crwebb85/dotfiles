@@ -72,6 +72,11 @@ require('lazy').setup({
             },
         },
     },
+
+    --Used to unnest neovim instances (like if a git command opened a child neovim instance)
+    {
+        'brianhuster/unnest.nvim',
+    },
     ---------------------------------------------------------------------------
     -- Colorscheme
     {
