@@ -176,9 +176,12 @@ vim.api.nvim_create_user_command('CompareClipboard', function()
     vim.cmd('set filetype=' .. ftype)
 end, { nargs = 0, desc = 'Compares buffer file with clipboard contents' })
 
-vim.api.nvim_create_user_command('CompareClipboardSelection', function()
+vim.api.nvim_create_user_command('CompareClipboardSelection', function(opts)
     local file_type = vim.bo.filetype
-    local selection_text = require('utils.mapping').get_visual_selection(0)
+    local selection_text = require('utils.misc').get_text_selection({
+        bufnr = 0,
+        user_command_opts = opts,
+    })
     vim.cmd([[
 		" open new tab, set options to prevent save prompt when closing
 		execute 'tabnew'
@@ -1496,32 +1499,10 @@ end, {})
 
 --https://github.com/stevearc/dotfiles/blob/master/.config/nvim/plugin/stacktrace.lua
 vim.api.nvim_create_user_command('Stacktrace', function(params)
-    local selection_text = {}
-
-    if params.range == 2 then
-        local start_pos = vim.api.nvim_buf_get_mark(0, '<')
-        local start_row = start_pos[1]
-
-        local end_pos = vim.api.nvim_buf_get_mark(0, '>')
-        local end_row = end_pos[1]
-
-        if start_row ~= params.line1 or end_row ~= params.line2 then
-            --Assume that a range was selected likn 1,3Stacktrace or %Stacktrace command was typed
-            --For 1,3Stacktrace the first three lines are selected
-            --For %Stacktrace the whole buffer should be selected
-            selection_text = vim.api.nvim_buf_get_lines(
-                0,
-                params.line1 - 1,
-                params.line2,
-                true
-            )
-        else
-            --TODO handle visual block mode selection
-            --TODO there has to be a better way to determine what the range was
-            --as marks other then `<` and `>` could have been used to define the range
-            selection_text = require('utils.mapping').get_visual_selection(0)
-        end
-    end
+    local selection_text = require('utils.misc').get_text_selection({
+        bufnr = 0,
+        user_command_opts = params,
+    })
 
     local bufnr = vim.api.nvim_create_buf(false, true)
 

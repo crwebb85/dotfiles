@@ -465,24 +465,14 @@ require('lazy').setup({
             {
                 '<leader>fh',
                 function()
-                    -- based on https://github.com/nvim-telescope/telescope.nvim/issues/1923#issuecomment-1122642431
-                    local function getVisualSelection()
-                        --TODO fix so that this no longer nukes my registers
-                        vim.cmd('noau normal! "vy"')
-                        local text = vim.fn.getreg('v')
-                        vim.fn.setreg('v', {})
+                    local start_pos = vim.fn.getpos('v')
+                    local end_pos = vim.fn.getpos('.')
+                    local text_lines = vim.fn.getregion(start_pos, end_pos)
 
-                        if type(text) ~= 'string' then return '' end
+                    local text = table.concat(text_lines, '\n')
+                    text = string.gsub(text, '\n', '')
+                    text = vim.trim(text)
 
-                        text = string.gsub(text, '\n', '')
-                        if #text > 0 then
-                            return text
-                        else
-                            return ''
-                        end
-                    end
-
-                    local text = getVisualSelection()
                     require('telescope.builtin').help_tags({
                         default_text = text,
                     })
@@ -934,29 +924,44 @@ require('lazy').setup({
                 ['<C-q>'] = {
                     desc = 'Oil: Append file to quick fix list',
                     callback = function()
-                        local entry = require('oil').get_cursor_entry()
-
                         local dir = require('oil').get_current_dir()
+                        if not dir then return end
 
-                        if not entry or entry.type ~= 'file' or not dir then
-                            return
+                        local items = vim.fn.getqflist()
+
+                        local start_line = vim.api.nvim_win_get_cursor(0)[1]
+                        local end_line = start_line
+                        if vim.tbl_contains({ 'v', 'V' }, vim.fn.mode()) then
+                            local start_pos = vim.fn.getpos('v')
+                            local end_pos = vim.fn.getpos('.')
+                            start_line = start_pos[2]
+                            end_line = end_pos[2]
+                            if end_line < start_line then
+                                start_line, end_line = end_line, start_line
+                            end
                         end
 
-                        local file_path = dir .. entry.name
-                        local items = vim.fn.getqflist()
-                        table.insert(items, {
-                            text = file_path,
-                            filename = file_path,
-                            row = 0,
-                            col = 0,
-                            valid = 1,
-                        })
+                        for lnum = start_line, end_line do
+                            local entry =
+                                require('oil').get_entry_on_line(0, lnum)
+                            if entry and entry.type == 'file' then
+                                local file_path = dir .. entry.name
+                                table.insert(items, {
+                                    text = file_path,
+                                    filename = file_path,
+                                    row = 0,
+                                    col = 0,
+                                    valid = 1,
+                                })
+                            end
+                        end
 
                         vim.fn.setqflist({}, ' ', {
                             title = 'Oil Appended Files',
                             items = items,
                         })
                     end,
+                    mode = { 'n', 'x' },
                 },
             },
         },
@@ -2534,7 +2539,7 @@ require('lazy').setup({
             { 'nvim-lua/plenary.nvim' },
             { 'nvim-telescope/telescope.nvim' },
         },
-        config = function() require('tiny-code-action').setup() end,
+        config = function(opts) require('tiny-code-action').setup(opts) end,
     },
     -- Code Action Macros
     {
