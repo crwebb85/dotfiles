@@ -1,4 +1,4 @@
-local qf_properties = require('config/quickfix').properties
+local qf_properties = require('myconfig/quickfix').properties
 
 local qf_bufnr = vim.api.nvim_get_current_buf()
 local qf_win_id = vim.fn.win_getid()

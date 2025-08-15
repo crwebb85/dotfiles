@@ -1,6 +1,6 @@
 vim.g.mapleader = ' '
-local config = require('config.config')
-local get_icon = require('config.icons').get_icon
+local config = require('myconfig.config')
+local get_icon = require('myconfig.icons').get_icon
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
@@ -582,7 +582,7 @@ require('lazy').setup({
                             )
                             current_picker:delete_selection(function(selection)
                                 local ok, result = pcall(
-                                    require('config.bufdelete').bufdelete,
+                                    require('myconfig.bufdelete').bufdelete,
                                     selection.bufnr
                                 )
                                 return ok and result[selection.bufnr] == true
@@ -1845,7 +1845,7 @@ require('lazy').setup({
             {
                 '<leader>td',
                 function()
-                    require('config.dap').shellslash_hack()
+                    require('myconfig.dap').shellslash_hack()
                     require('neotest').run.run({ strategy = 'dap' })
                 end,
                 desc = 'Neotest: Debug the nearest test',
@@ -2125,7 +2125,7 @@ require('lazy').setup({
             -- Then directly use the netcoredbg.exe not the netcoredbg.cmd that mason downloads
             dap.adapters.coreclr = {
                 type = 'executable',
-                command = require('config.dap').get_mason_tool_netcoredbg_path(),
+                command = require('myconfig.dap').get_mason_tool_netcoredbg_path(),
                 args = { '--interpreter=vscode' },
                 options = {
                     --https://github.com/Wiebesiek/ZeoVim
@@ -2136,7 +2136,7 @@ require('lazy').setup({
             -- Neotest Test runner looks at this table
             dap.adapters.netcoredbg = {
                 type = 'executable',
-                command = require('config.dap').get_mason_tool_netcoredbg_path(),
+                command = require('myconfig.dap').get_mason_tool_netcoredbg_path(),
                 args = { '--interpreter=vscode' },
                 options = {
                     --https://github.com/Wiebesiek/ZeoVim
@@ -2150,7 +2150,7 @@ require('lazy').setup({
                     name = 'codelldb: Launch file',
                     type = 'codelldb',
                     request = 'launch',
-                    program = require('config.dap').input_executable,
+                    program = require('myconfig.dap').input_executable,
                     cwd = '${workspaceFolder}',
                     stopOnEntry = false,
                 },
@@ -2161,26 +2161,26 @@ require('lazy').setup({
                     type = 'coreclr',
                     name = 'netcoredbg: build and launch',
                     request = 'launch',
-                    program = require('config.dap').dotnet_build_and_pick_executable,
+                    program = require('myconfig.dap').dotnet_build_and_pick_executable,
                 },
                 {
                     type = 'coreclr',
                     name = 'netcoredbg: launch (fuzzy pick executable)',
                     request = 'launch',
                     console = 'integratedTerminal',
-                    program = require('config.dap').fuzzy_pick_executable,
+                    program = require('myconfig.dap').fuzzy_pick_executable,
                 },
                 {
                     type = 'coreclr',
                     name = 'netcoredbg: launch via input',
                     request = 'launch',
-                    program = require('config.dap').input_executable,
+                    program = require('myconfig.dap').input_executable,
                 },
                 {
                     type = 'coreclr',
                     name = 'netcoredbg: attach (fuzzy pick process)',
                     request = 'attach',
-                    processId = require('config.dap').fuzzy_pick_process,
+                    processId = require('myconfig.dap').fuzzy_pick_process,
                 },
                 --TODO - possibly useful snippet to automatically find the dll
                 --https://www.reddit.com/r/csharp/comments/15ktebq/comment/ks2dvb0/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
@@ -2195,7 +2195,7 @@ require('lazy').setup({
                     type = 'coreclr',
                     name = 'netcoredbg: launch',
                     request = 'launch',
-                    program = require('config.dap').dotnet_build_and_pick_executable,
+                    program = require('myconfig.dap').dotnet_build_and_pick_executable,
                 },
             }
         end,
@@ -2592,7 +2592,7 @@ require('lazy').setup({
                 'grf',
                 function()
                     local params =
-                        require('config.formatter').construct_conform_formatting_params()
+                        require('myconfig.formatter').construct_conform_formatting_params()
                     require('conform').format(params)
                 end,
                 mode = { 'n', 'x' },
@@ -2605,25 +2605,25 @@ require('lazy').setup({
         config = function(_, _)
             require('conform').setup({
                 formatters_by_ft = {
-                    lua = require('config.formatter').get_buffer_enabled_formatter_list,
-                    python = require('config.formatter').get_buffer_enabled_formatter_list,
-                    typescript = require('config.formatter').get_buffer_enabled_formatter_list,
-                    javascript = require('config.formatter').get_buffer_enabled_formatter_list,
-                    typescriptreact = require('config.formatter').get_buffer_enabled_formatter_list,
-                    javascriptreact = require('config.formatter').get_buffer_enabled_formatter_list,
-                    css = require('config.formatter').get_buffer_enabled_formatter_list,
-                    yaml = require('config.formatter').get_buffer_enabled_formatter_list,
-                    json = require('config.formatter').get_buffer_enabled_formatter_list,
-                    jsonc = require('config.formatter').get_buffer_enabled_formatter_list,
-                    json5 = require('config.formatter').get_buffer_enabled_formatter_list,
-                    ansible = require('config.formatter').get_buffer_enabled_formatter_list,
+                    lua = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    python = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    typescript = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    javascript = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    typescriptreact = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    javascriptreact = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    css = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    yaml = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    json = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    jsonc = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    json5 = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    ansible = require('myconfig.formatter').get_buffer_enabled_formatter_list,
                     --use `:set ft=yaml.ansible` to get treesitter highlights for yaml,
                     -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
-                    ['yaml.ansible'] = require('config.formatter').get_buffer_enabled_formatter_list,
-                    markdown = require('config.formatter').get_buffer_enabled_formatter_list,
-                    xml = require('config.formatter').get_buffer_enabled_formatter_list,
-                    graphql = require('config.formatter').get_buffer_enabled_formatter_list,
-                    sh = require('config.formatter').get_buffer_enabled_formatter_list,
+                    ['yaml.ansible'] = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    markdown = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    xml = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    graphql = require('myconfig.formatter').get_buffer_enabled_formatter_list,
+                    sh = require('myconfig.formatter').get_buffer_enabled_formatter_list,
                 },
                 formatters = {
                     ---@type conform.FileFormatterConfig
@@ -2659,8 +2659,8 @@ require('lazy').setup({
                     },
                 },
                 -- enable format-on-save
-                format_on_save = require('config.formatter').format_on_save,
-                format_after_save = require('config.formatter').format_after_save,
+                format_on_save = require('myconfig.formatter').format_on_save,
+                format_after_save = require('myconfig.formatter').format_after_save,
             })
             -- -- Set this value to true to silence errors when formatting a block fails
             -- require('conform.formatters.injected').options.ignore_errors = false

@@ -94,13 +94,13 @@ local function setup_user_commands()
 
     vim.api.nvim_create_user_command(
         'LspToggleInlayHints',
-        require('config.lsp.inlayhints').toggle_inlay_hints,
+        require('myconfig.lsp.inlayhints').toggle_inlay_hints,
         { desc = 'LSP: Toggle Inlay Hints' }
     )
 
     vim.api.nvim_create_user_command(
         'LspToggleCodeLens',
-        require('config.lsp.codelens').toggle_codelens,
+        require('myconfig.lsp.codelens').toggle_codelens,
         { desc = 'LSP: Toggle Codelens' }
     )
 
@@ -280,9 +280,9 @@ function M.enable()
             setup_user_commands()
 
             --Enable lsp progress display
-            require('config.lsp.progress').enable()
+            require('myconfig.lsp.progress').enable()
             --Setup commands
-            require('config.lsp.command_handlers').setup_command_handlers()
+            require('myconfig.lsp.command_handlers').setup_command_handlers()
         end,
         once = true,
     })
@@ -295,7 +295,7 @@ function M.enable()
             if client == nil then return end
 
             --Setup keymap
-            require('config.lsp.keymaps').setup_lsp_keymaps(event.buf, client)
+            require('myconfig.lsp.keymaps').setup_lsp_keymaps(event.buf, client)
 
             --Disable lsp for large files. The buffer variable is_big_file
             --is set by a BufReadPre autocommand in y autocmd.lua file
@@ -316,7 +316,7 @@ function M.enable()
                     vim.lsp.protocol.Methods.textDocument_codeLens
                 )
             then
-                require('config.lsp.codelens').enable()
+                require('myconfig.lsp.codelens').enable()
             end
 
             if
@@ -324,7 +324,7 @@ function M.enable()
                     vim.lsp.protocol.Methods.textDocument_documentLink
                 )
             then
-                require('config.lsp.lsplinks').enable()
+                require('myconfig.lsp.lsplinks').enable()
             end
 
             if
@@ -333,18 +333,18 @@ function M.enable()
                 )
             then
                 -- Enable lightbulb
-                require('config.lsp.lightbulb').enable()
+                require('myconfig.lsp.lightbulb').enable()
 
                 -- Enable native completion.
-                if require('config.config').use_native_completion then
+                if require('myconfig.config').use_native_completion then
                     vim.lsp.completion.enable(true, client.id, event.buf, {
                         autotrigger = true,
                     })
 
-                    -- require('config.lsp.completion.omnifunc')
+                    -- require('myconfig.lsp.completion.omnifunc')
                     -- vim.bo[event.buf].omnifunc = 'v:lua.MyOmnifunc'
 
-                    require('config.lsp.completion.documentation').show_complete_documentation(
+                    require('myconfig.lsp.completion.documentation').show_complete_documentation(
                         event.buf
                     )
                 end
@@ -356,7 +356,7 @@ function M.enable()
         end,
     })
 
-    if require('config.config').use_native_completion then
+    if require('myconfig.config').use_native_completion then
         vim.api.nvim_create_autocmd('FileType', {
             group = vim.api.nvim_create_augroup(
                 'native_completion',
@@ -364,7 +364,7 @@ function M.enable()
             ),
             pattern = '*',
             callback = function(_)
-                require('config.lsp.completion.cmp').start_cmp_lsp()
+                require('myconfig.lsp.completion.cmp').start_cmp_lsp()
             end,
         })
     else
@@ -375,7 +375,7 @@ function M.enable()
             ),
             pattern = '*',
             callback = function()
-                require('config.lsp.completion.cmp_nvim_lsp').enable_cmp_completion()
+                require('myconfig.lsp.completion.cmp_nvim_lsp').enable_cmp_completion()
             end,
         })
     end
@@ -433,7 +433,7 @@ function M.get_additional_default_capabilities()
     }
     local capabilities = vim.tbl_deep_extend(
         'force',
-        require('config.config').use_native_completion and {}
+        require('myconfig.config').use_native_completion and {}
             or cmp_default_capabilities,
         document_link_capabilities
     )

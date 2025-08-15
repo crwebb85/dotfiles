@@ -229,6 +229,6 @@ vim.api.nvim_create_user_command(
 
 -------------------------------------------------------------------------------
 --- Setup folding
-M.setup_folding(require('config.config').foldenable)
+M.setup_folding(require('myconfig.config').foldenable)
 
 return M

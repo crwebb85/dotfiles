@@ -1,7 +1,7 @@
 local Set = require('utils.datastructure').Set
-local format_properties = require('config.formatter').properties
+local format_properties = require('myconfig.formatter').properties
 local Path = require('utils.path')
-local config = require('config.config')
+local config = require('myconfig.config')
 local M = {}
 
 -------------------------------------------------------------------------------
@@ -270,7 +270,7 @@ vim.api.nvim_create_user_command(
     function()
         vim.notify(
             vim.inspect(
-                require('config.formatter').get_buffer_formatting_details()
+                require('myconfig.formatter').get_buffer_formatting_details()
             ),
             vim.log.levels.INFO
         )
@@ -1715,7 +1715,7 @@ vim.api.nvim_create_user_command(
 -- Define Bdelete and Bwipeout.
 vim.api.nvim_create_user_command(
     'Bdelete',
-    function(opts) require('config.bufdelete')._buf_kill_cmd(opts, false) end,
+    function(opts) require('myconfig.bufdelete')._buf_kill_cmd(opts, false) end,
     {
         bang = true,
         bar = true,
@@ -1728,7 +1728,7 @@ vim.api.nvim_create_user_command(
 
 vim.api.nvim_create_user_command(
     'Bwipeout',
-    function(opts) require('config.bufdelete')._buf_kill_cmd(opts, true) end,
+    function(opts) require('myconfig.bufdelete')._buf_kill_cmd(opts, true) end,
     {
         bang = true,
         bar = true,
@@ -1741,7 +1741,7 @@ vim.api.nvim_create_user_command(
 
 vim.api.nvim_create_user_command(
     'BCloseAllInactive',
-    function(_) require('config.bufdelete').close_inactive_file_buffers() end,
+    function(_) require('myconfig.bufdelete').close_inactive_file_buffers() end,
     {
         desc = 'Close all inactive unmodified file buffer',
     }

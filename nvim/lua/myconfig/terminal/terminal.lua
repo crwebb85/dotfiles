@@ -109,7 +109,7 @@ function TerminalManager:open(opts)
     end
 
     local window_manager =
-        require('config.terminal.terminal_window_manager').create_window_manager(
+        require('myconfig.terminal.terminal_window_manager').create_window_manager(
             self.buffer_manager,
             tabid
         )
@@ -161,7 +161,7 @@ function M.create(opts)
     })
 
     local buffer_manager =
-        require('config.terminal.terminal_buffer_manager').create_terminal_buffer_manager({
+        require('myconfig.terminal.terminal_buffer_manager').create_terminal_buffer_manager({
             key = terminal_key,
             auto_insert = opts.auto_insert,
             ---@type TerminalWindowManagerOpts

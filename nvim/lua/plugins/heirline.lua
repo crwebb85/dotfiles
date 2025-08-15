@@ -1,4 +1,4 @@
-local get_icon = require('config.icons').get_icon
+local get_icon = require('myconfig.icons').get_icon
 local config = function()
     local heirline = require('heirline')
     local conditions = require('heirline.conditions')
@@ -278,18 +278,18 @@ local config = function()
             local bufnr = vim.api.nvim_get_current_buf()
             local filetype = vim.bo[bufnr].filetype
             local formatters =
-                require('config.formatter').properties.get_project_formatters(
+                require('myconfig.formatter').properties.get_project_formatters(
                     filetype
                 )
 
             local project_disabled_formatters =
-                require('config.formatter').properties.get_project_disabled_formatters_set()
+                require('myconfig.formatter').properties.get_project_disabled_formatters_set()
             local buffer_disabled_formatters =
-                require('config.formatter').properties.get_buffer_disabled_formatters_set(
+                require('myconfig.formatter').properties.get_buffer_disabled_formatters_set(
                     bufnr
                 )
             local lsp_format_strategy =
-                require('config.formatter').determine_conform_lsp_fallback(
+                require('myconfig.formatter').determine_conform_lsp_fallback(
                     bufnr
                 )
 
@@ -328,7 +328,9 @@ local config = function()
                 if #children > 0 then table.insert(children, Space) end
                 -- add lsp formatters to the end of the list
                 local lsp_formatters =
-                    require('config.formatter').get_buffer_lsp_formatters(bufnr)
+                    require('myconfig.formatter').get_buffer_lsp_formatters(
+                        bufnr
+                    )
                 for i, lsp_formatter in ipairs(lsp_formatters) do
                     ---@type StatusLine
                     local formatter_component = {
@@ -341,7 +343,9 @@ local config = function()
                 -- add lsp formatters to the begining of the list
                 local alt_children = {}
                 local lsp_formatters =
-                    require('config.formatter').get_buffer_lsp_formatters(bufnr)
+                    require('myconfig.formatter').get_buffer_lsp_formatters(
+                        bufnr
+                    )
                 for i, lsp_formatter in ipairs(lsp_formatters) do
                     ---@type StatusLine
                     local formatter_component = {
@@ -380,9 +384,9 @@ local config = function()
     local FormatterActive = {
         condition = function(_)
             local buffer_formatter_details =
-                require('config.formatter').get_buffer_enabled_formatter_list()
+                require('myconfig.formatter').get_buffer_enabled_formatter_list()
             local lsp_formatters =
-                require('config.formatter').get_buffer_lsp_formatters()
+                require('myconfig.formatter').get_buffer_lsp_formatters()
             return #buffer_formatter_details > 0 or #lsp_formatters > 0
         end,
         update = {
@@ -405,12 +409,13 @@ local config = function()
             },
 
             hl = function()
-                local is_format_after_save_enabled =
-                    require('config.formatter').properties.is_format_after_save_enabled(
-                        vim.bo.filetype
-                    )
+                local is_format_after_save_enabled = require(
+                    'myconfig.formatter'
+                ).properties.is_format_after_save_enabled(
+                    vim.bo.filetype
+                )
                 if
-                    require('config.formatter').properties.is_project_autoformat_disabled()
+                    require('myconfig.formatter').properties.is_project_autoformat_disabled()
                 then
                     return {
                         fg = 'red',
@@ -418,7 +423,7 @@ local config = function()
                         italic = is_format_after_save_enabled,
                     }
                 elseif
-                    require('config.formatter').properties.is_buffer_autoformat_disabled(
+                    require('myconfig.formatter').properties.is_buffer_autoformat_disabled(
                         vim.api.nvim_get_current_buf()
                     )
                 then

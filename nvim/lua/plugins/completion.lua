@@ -1,4 +1,4 @@
-local config = require('config.config')
+local config = require('myconfig.config')
 
 local luasnip_plugin = {
     'L3MON4D3/LuaSnip',

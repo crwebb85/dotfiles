@@ -1,4 +1,4 @@
-local config = require('config.config')
+local config = require('myconfig.config')
 
 -------------------------------------------------------------------------------
 --- Temporarily highlight text selection that was yanked
@@ -75,7 +75,7 @@ vim.api.nvim_create_autocmd('TermOpen', {
             vim.wo[0][0].listchars = 'extends:…,tab:  '
             vim.keymap.set('n', 'gf', function()
                 local terminal_manager =
-                    require('config.terminal.terminal').get_terminal_manager_by_bufnr(
+                    require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
                         args.buf
                     )
                 if terminal_manager == nil then return end
@@ -105,7 +105,7 @@ vim.api.nvim_create_autocmd('TermOpen', {
             })
             vim.keymap.set('t', '<esc>', function()
                 local terminal_manager =
-                    require('config.terminal.terminal').get_terminal_manager_by_bufnr(
+                    require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
                         args.buf
                     )
                 if terminal_manager == nil then return end
@@ -117,7 +117,7 @@ vim.api.nvim_create_autocmd('TermOpen', {
             })
             vim.keymap.set({ 'n', 't' }, '<C-q>', function()
                 local terminal_manager =
-                    require('config.terminal.terminal').get_terminal_manager_by_bufnr(
+                    require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
                         args.buf
                     )
                 if terminal_manager == nil then return end

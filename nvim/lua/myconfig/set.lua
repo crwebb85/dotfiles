@@ -1,4 +1,4 @@
-local config = require('config.config')
+local config = require('myconfig.config')
 -------------------------------------------------------------------------------
 
 --- Look and feel
@@ -140,7 +140,7 @@ vim.filetype.add({
 -- helloworld\helloworld.csproj : warning NU1901: Package 'my.helloworld' 1.0.0 has a known low severity vulnerability
 vim.opt.errorformat:append([[%f:\ %tarning\ %m]])
 -- vim.opt.errorformat:append([[Source:\ %f:%m]])
-local is_nerd_font_enabled = require('config.config').nerd_font_enabled
+local is_nerd_font_enabled = require('myconfig.config').nerd_font_enabled
 vim.diagnostic.config({
     float = { border = 'rounded' },
     signs = {

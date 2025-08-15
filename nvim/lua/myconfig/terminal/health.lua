@@ -1,7 +1,7 @@
 local M = {}
 M.check = function()
     vim.health.start('My Terminal Manager')
-    local all_terminals = require('config.terminal.terminal').list(
+    local all_terminals = require('myconfig.terminal.terminal').list(
         function(_) return true end
     )
     for _, terminal in pairs(all_terminals) do
