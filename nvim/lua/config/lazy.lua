@@ -519,12 +519,21 @@ require('lazy').setup({
                 desc = 'Telescope: harpoon',
             },
             {
-                '<leader>fn',
+                '<leader>fnf',
                 function()
                     --My custom picker defined in .config\nvim\lua\telescope\_extensions
-                    require('telescope').load_extension('notes').notes()
+                    require('telescope').load_extension('notes').find_files()
                 end,
                 desc = 'Telescope: find files in note directory ',
+                mode = { 'n' },
+            },
+            {
+                '<leader>fng',
+                function()
+                    --My custom picker defined in .config\nvim\lua\telescope\_extensions
+                    require('telescope').load_extension('notes').live_grep()
+                end,
+                desc = 'Telescope: grep files in note directory ',
                 mode = { 'n' },
             },
             {
@@ -532,7 +541,7 @@ require('lazy').setup({
 
                 function()
                     --My custom picker defined in .config\nvim\lua\telescope\_extensions
-                    require('telescope').load_extension('skeleton').skeleton()
+                    require('telescope').load_extension('skeleton').find_files()
                 end,
                 desc = 'Telescope: find skeletons (file templates) ',
                 mode = { 'n' },
@@ -615,6 +624,9 @@ require('lazy').setup({
             require('telescope').load_extension('skeleton')
             require('telescope').load_extension('notes')
             require('telescope').load_extension('harpoon')
+            require('telescope').load_extension('neovim-runtime')
+            require('telescope').load_extension('neovim-data')
+            require('telescope').load_extension('neovim-plugin')
 
             -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
             -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged
