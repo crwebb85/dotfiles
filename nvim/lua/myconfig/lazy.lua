@@ -344,10 +344,6 @@ require('lazy').setup({
         dependencies = {
             'nvim-lua/plenary.nvim', -- telescope uses plenary to create the UI
             'nvim-tree/nvim-web-devicons',
-            {
-                'crwebb85/telescope-media-files.nvim',
-                -- dev = true,
-            },
         },
         lazy = true,
         cmd = { 'Telescope' },
@@ -627,6 +623,7 @@ require('lazy').setup({
             require('telescope').load_extension('neovim-runtime')
             require('telescope').load_extension('neovim-data')
             require('telescope').load_extension('neovim-plugin')
+            require('telescope').load_extension('neovim-config')
 
             -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
             -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged
