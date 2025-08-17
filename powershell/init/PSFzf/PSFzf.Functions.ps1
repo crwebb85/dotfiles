@@ -253,23 +253,27 @@ function Invoke-FuzzyProjectLocation() {
         $SecondaryMyDocumentsPath = [System.IO.Path]::Combine($UserProfilePath, "documents")
 
         $SearchPath = [System.IO.Path]::Combine($SecondaryMyDocumentsPath, "projects")
-        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPaths -notin $SearchPaths) {
+        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPath -notin $SearchPaths) {
             $SearchPaths += $SearchPath
         }
     }
 
-    $PossiblePaths = Get-ChildItem $searchpaths -Directory -ErrorAction Ignore  | Select-Object FullName
+    $PossiblePaths = Get-ChildItem $SearchPaths -Directory -ErrorAction Ignore  | Select-Object FullName
 
+
+    # Add my dotfiles to the searchable list (for quick selection)
     $ConfigPath = $Env:XDG_CONFIG_HOME
     if ($null -ne $ConfigPath -and $(Test-Path -Path "$ConfigPath" -PathType Any)) {
         $PossiblePaths += $ConfigPath
     }
+
+    # Add the project parent directories to the searchable list (to make creating new projects easier)
+    $PossiblePaths += $SearchPaths
     
     $result = $null
     try {
         $PossiblePaths | Invoke-Fzf -Query $SearchString | ForEach-Object { $result = $_ }
-    }
-    catch {
+    } catch {
         
     }
 
@@ -295,18 +299,20 @@ function Invoke-FuzzySetProofOfConceptLocation() {
         $SecondaryMyDocumentsPath = [System.IO.Path]::Combine($UserProfilePath, "documents")
 
         $SearchPath = [System.IO.Path]::Combine($SecondaryMyDocumentsPath, "poc")
-        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPaths -notin $SearchPaths) {
+        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPath -notin $SearchPaths) {
             $SearchPaths += $SearchPath
         }
     }
 
-    $PossiblePaths = Get-ChildItem $searchpaths -Directory -ErrorAction Ignore  | Select-Object FullName
+    $PossiblePaths = Get-ChildItem $SearchPaths -Directory -ErrorAction Ignore  | Select-Object FullName
+
+    # Add the poc parent directories to the searchable list (to make creating new poc's easier)
+    $PossiblePaths += $SearchPaths
 
     $result = $null
     try {
         $PossiblePaths | Invoke-Fzf -Query $SearchString | ForEach-Object { $result = $_ }
-    }
-    catch {
+    } catch {
         
     }
 

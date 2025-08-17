@@ -77,6 +77,16 @@ function M.get_mason_tool_path(mason_tool_name)
     return executable_path
 end
 
+function M.is_directory(path)
+    local stat = vim.loop.fs_stat(path)
+    return stat and stat.type == 'directory'
+end
+
+function M.is_file(path)
+    local stat = vim.loop.fs_stat(path)
+    return stat and stat.type == 'file'
+end
+
 function M.get_project_paths()
     ---@type string[]
     local project_search_paths = {} -- The folders called projects not the actual project folders
@@ -117,7 +127,25 @@ function M.get_project_paths()
             end
         end
     end
+
+    -- Add my dotfiles to the searchable list (for quick selection)
+    local config_path = M.get_path_from_environment_variable('XDG_CONFIG_HOME')
+    if M.is_directory(config_path) then
+        table.insert(project_paths, config_path)
+    end
+
+    -- Add the project parent directories to the searchable list (to make creating new projects easier)
+    vim.list_extend(project_paths, project_search_paths)
+
     return project_paths
+end
+
+function M.get_path_from_environment_variable(env_name)
+    local env_search_string = '$' .. env_name
+
+    local path = vim.fs.normalize(env_search_string)
+    if path == env_search_string then return nil end
+    return path
 end
 
 function M.get_poc_paths()
@@ -155,6 +183,10 @@ function M.get_poc_paths()
             end
         end
     end
+
+    -- Add the poc parent directories to the searchable list (to make creating new poc's easier)
+    vim.list_extend(poc_paths, poc_search_paths)
+
     return poc_paths
 end
 
