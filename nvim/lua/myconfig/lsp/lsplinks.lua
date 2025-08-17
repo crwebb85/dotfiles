@@ -171,7 +171,7 @@ function M.enable()
     is_autocmds_setup = true
 
     if throttled_refresh_lsplink == nil then
-        local throttle = require('utils.timers').throttle
+        local throttle = require('myconfig.utils.timers').throttle
         throttled_refresh_lsplink, refresh_timer = throttle(M.refresh, 30)
     end
 

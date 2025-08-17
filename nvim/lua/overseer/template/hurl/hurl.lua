@@ -41,7 +41,7 @@ local function resolve_hurl_options(opts)
 
     hurl_path = vim.fs.normalize(hurl_path)
     hurl_path = vim.fs.abspath(hurl_path)
-    if not require('utils.path').is_existing_file(hurl_path) then
+    if not require('myconfig.utils.path').is_existing_file(hurl_path) then
         local template = 'Hurl path does not exist: %s'
         error(template:format(hurl_path))
     end
@@ -69,7 +69,8 @@ local function resolve_hurl_options(opts)
     end
 
     if
-        env_path ~= nil and not require('utils.path').is_existing_file(env_path)
+        env_path ~= nil
+        and not require('myconfig.utils.path').is_existing_file(env_path)
     then
         local template = 'Env path does not exist: %s'
         error(template:format(env_path))

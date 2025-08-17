@@ -1,5 +1,5 @@
 local config = require('myconfig.config')
-local maputils = require('utils.mapping')
+local maputils = require('myconfig.utils.mapping')
 
 vim.g.mapleader = ' '
 
@@ -219,13 +219,13 @@ vim.keymap.set('n', 'N', 'Nzzzv', {
 vim.keymap.set(
     'n',
     '<C-j>',
-    function() require('utils.mapping').smart_nav('cnext') end,
+    function() require('myconfig.utils.mapping').smart_nav('cnext') end,
     { desc = 'Custom - Quick Fix List: cnext quick fix navigation' }
 )
 vim.keymap.set(
     'n',
     '<C-k>',
-    function() require('utils.mapping').smart_nav('cprev') end,
+    function() require('myconfig.utils.mapping').smart_nav('cprev') end,
     { desc = 'Custom - Quick Fix List: cprev quick fix navigation' }
 )
 
@@ -1646,7 +1646,7 @@ vim.keymap.del({ 'o', 'n', 'x' }, 'gc')
 vim.keymap.set(
     { 'o' },
     'gc',
-    function() require('utils.mapping').comment_lines_textobject() end,
+    function() require('myconfig.utils.mapping').comment_lines_textobject() end,
     { desc = 'Comment textobject identical to gc operator' }
     --note: vgc does not select the commented lines. It really does a block
     --comment arround the character (which in my opinion pretty useless so I might
@@ -1657,20 +1657,22 @@ vim.keymap.set(
 vim.keymap.set(
     { 'o', 'x' },
     'agc',
-    function() require('utils.mapping').around_comment_lines_textobject() end,
+    function()
+        require('myconfig.utils.mapping').around_comment_lines_textobject()
+    end,
     { desc = 'Comment textobject with treesitter fallback' }
 )
 
 vim.keymap.set(
     { 'o', 'x' },
     'igi',
-    ":<c-u>lua require('utils.mapping').select_indent()<cr>",
+    ":<c-u>lua require('myconfig.utils.mapping').select_indent()<cr>",
     { desc = 'Select inner indent textobject', silent = true }
 )
 
 vim.keymap.set(
     { 'o', 'x' },
     'agi',
-    ":<c-u>lua require('utils.mapping').select_indent(true)<cr>",
+    ":<c-u>lua require('myconfig.utils.mapping').select_indent(true)<cr>",
     { desc = 'Select around indent textobject', silent = true }
 )

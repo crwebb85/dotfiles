@@ -4,7 +4,7 @@ return require('telescope').register_extension({
         poc = function(_)
             local conf = require('telescope.config').values
 
-            local project_paths = require('utils.path').get_poc_paths()
+            local project_paths = require('myconfig.utils.path').get_poc_paths()
 
             require('telescope.pickers')
                 .new({}, {

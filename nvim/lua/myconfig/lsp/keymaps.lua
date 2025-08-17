@@ -169,7 +169,7 @@ function M.setup_lsp_keymaps(bufnr, client)
         -- })
         -- TODO try to replicate that old functionality
         -- ```
-        require('utils.mapping').map_fallback_keymap(
+        require('myconfig.utils.mapping').map_fallback_keymap(
             'i',
             '<CR>',
             function(fallback)
@@ -190,7 +190,7 @@ function M.setup_lsp_keymaps(bufnr, client)
             }
         )
 
-        require('utils.mapping').map_fallback_keymap(
+        require('myconfig.utils.mapping').map_fallback_keymap(
             'i',
             '<C-e>',
             function(fallback)
@@ -207,7 +207,7 @@ function M.setup_lsp_keymaps(bufnr, client)
             { desc = 'Custom Remap: Toggle completion window' }
         )
 
-        require('utils.mapping').map_fallback_keymap(
+        require('myconfig.utils.mapping').map_fallback_keymap(
             { 'i', 's' },
             '<C-n>',
             function(fallback)
@@ -223,7 +223,7 @@ function M.setup_lsp_keymaps(bufnr, client)
             { desc = 'Custom Remap: Jump to next snippet location or fallback' }
         )
 
-        require('utils.mapping').map_fallback_keymap(
+        require('myconfig.utils.mapping').map_fallback_keymap(
             { 'i', 's' },
             '<C-p>',
             function(fallback)
@@ -242,7 +242,7 @@ function M.setup_lsp_keymaps(bufnr, client)
             }
         )
 
-        require('utils.mapping').map_fallback_keymap(
+        require('myconfig.utils.mapping').map_fallback_keymap(
             { 'i', 's' },
             '<C-u>',
             function(fallback)
@@ -259,7 +259,7 @@ function M.setup_lsp_keymaps(bufnr, client)
             }
         )
 
-        require('utils.mapping').map_fallback_keymap(
+        require('myconfig.utils.mapping').map_fallback_keymap(
             { 'i', 's' },
             '<C-d>',
             function(fallback)

@@ -1,6 +1,6 @@
-local Set = require('utils.datastructure').Set
+local Set = require('myconfig.utils.datastructure').Set
 local format_properties = require('myconfig.formatter').properties
-local Path = require('utils.path')
+local Path = require('myconfig.utils.path')
 local config = require('myconfig.config')
 local M = {}
 
@@ -178,7 +178,7 @@ end, { nargs = 0, desc = 'Compares buffer file with clipboard contents' })
 
 vim.api.nvim_create_user_command('CompareClipboardSelection', function(opts)
     local file_type = vim.bo.filetype
-    local selection_text = require('utils.misc').get_text_selection({
+    local selection_text = require('myconfig.utils.misc').get_text_selection({
         bufnr = 0,
         user_command_opts = opts,
     })
@@ -1240,7 +1240,7 @@ local function parse_hurl_command_fargs(fargs)
     end
     if
         hurl_path ~= nil
-        and not require('utils.path').is_existing_file(hurl_path)
+        and not require('myconfig.utils.path').is_existing_file(hurl_path)
     then
         local template =
             'The optional hurl path argument does not exist at path %s'
@@ -1264,7 +1264,7 @@ local function parse_hurl_command_fargs(fargs)
     end
     if
         env_path ~= nil
-        and not require('utils.path').is_existing_file(env_path)
+        and not require('myconfig.utils.path').is_existing_file(env_path)
     then
         local template =
             'The optional hurl path argument does not exist at path %s'
@@ -1499,7 +1499,7 @@ end, {})
 
 --https://github.com/stevearc/dotfiles/blob/master/.config/nvim/plugin/stacktrace.lua
 vim.api.nvim_create_user_command('Stacktrace', function(params)
-    local selection_text = require('utils.misc').get_text_selection({
+    local selection_text = require('myconfig.utils.misc').get_text_selection({
         bufnr = 0,
         user_command_opts = params,
     })

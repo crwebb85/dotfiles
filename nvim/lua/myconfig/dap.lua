@@ -179,7 +179,7 @@ function M.get_mason_tool_netcoredbg_path()
             'netcoredbg.exe'
         )
     else
-        return require('utils.path').get_mason_tool_path('netcoredbg')
+        return require('myconfig.utils.path').get_mason_tool_path('netcoredbg')
     end
 end
 

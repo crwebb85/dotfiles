@@ -66,7 +66,7 @@ vim.o.spell = true
 vim.o.spelllang = 'en_us'
 -- vim.g.spellfile_URL = 'https://ftp.nluug.nl/vim/runtime/spell'
 -- local function get_spellfile_path()
---     local path_utils = require('utils.path')
+--     local path_utils = require('myconfig.utils.path')
 --     local data_path = vim.fn.stdpath('config')
 --     if type(data_path) ~= 'string' then
 --         error('something went wrong getting the datapath')

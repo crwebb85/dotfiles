@@ -193,7 +193,7 @@ require('lazy').setup({
                 function()
                     vim.cmd(
                         'DiffviewOpen '
-                            .. require('utils.misc').get_default_branch_name()
+                            .. require('myconfig.utils.misc').get_default_branch_name()
                     )
                 end,
                 desc = 'Diffview: Diff against master',
@@ -205,7 +205,7 @@ require('lazy').setup({
                 function()
                     vim.cmd(
                         'DiffviewOpen HEAD..origin/'
-                            .. require('utils.misc').get_default_branch_name()
+                            .. require('myconfig.utils.misc').get_default_branch_name()
                     )
                 end,
                 desc = 'Diffview: Diff against origin/master',
@@ -953,7 +953,7 @@ require('lazy').setup({
                             local dir = oil.get_current_dir()
                             local fileName = entry['name']
                             local fullName = dir .. fileName
-                            require('utils.image_preview').preview_image(
+                            require('myconfig.utils.image_preview').preview_image(
                                 vim.fs.normalize(fullName)
                             )
                         end
@@ -1260,8 +1260,10 @@ require('lazy').setup({
             },
             {
                 'gC',
-                require('utils.mapping').dot_repeat(
-                    function() require('utils.mapping').flip_flop_comment() end
+                require('myconfig.utils.mapping').dot_repeat(
+                    function()
+                        require('myconfig.utils.mapping').flip_flop_comment()
+                    end
                 ),
                 mode = { 'n', 'x' },
                 desc = 'Comment.nvim: Invert comments (dot repeatable)',
@@ -1597,8 +1599,9 @@ require('lazy').setup({
             }
 
             local installed_parsers = nvim_treesitter.get_installed()
-            local installed_parsers_set =
-                require('utils.datastructure').dumb_set(installed_parsers)
+            local installed_parsers_set = require(
+                'myconfig.utils.datastructure'
+            ).dumb_set(installed_parsers)
             local parsers_to_install = {}
             for _, parser_name in ipairs(ensure_installed) do
                 if installed_parsers_set[parser_name] == nil then
@@ -2136,7 +2139,7 @@ require('lazy').setup({
                 type = 'server',
                 port = '${port}',
                 executable = {
-                    command = require('utils.path').get_mason_tool_path(
+                    command = require('myconfig.utils.path').get_mason_tool_path(
                         'codelldb'
                     ),
                     args = { '--port', '${port}' },
@@ -2147,7 +2150,9 @@ require('lazy').setup({
             }
             dap.adapters.executable = {
                 type = 'executable',
-                command = require('utils.path').get_mason_tool_path('codelldb'),
+                command = require('myconfig.utils.path').get_mason_tool_path(
+                    'codelldb'
+                ),
                 name = 'lldb1',
                 host = '127.0.0.1',
                 port = 13000,
@@ -2530,7 +2535,7 @@ require('lazy').setup({
             end
 
             local function install_packages()
-                local Set = require('utils.datastructure').Set
+                local Set = require('myconfig.utils.datastructure').Set
                 local mason_install_exclusion_package_names =
                     Set:new(config.exclude_mason_install)
 

@@ -182,7 +182,7 @@ function M.enable()
     is_autocmds_setup = true
 
     if throttled_refresh_lightbulb == nil then
-        local throttle = require('utils.timers').throttle
+        local throttle = require('myconfig.utils.timers').throttle
         throttled_refresh_lightbulb, refresh_timer =
             throttle(refresh_lightbulb, 30)
     end
