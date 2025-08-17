@@ -533,13 +533,30 @@ require('lazy').setup({
                 mode = { 'n' },
             },
             {
-                '<leader>fz',
-
+                '<leader>fzz',
                 function()
                     --My custom picker defined in .config\nvim\lua\telescope\_extensions
                     require('telescope').load_extension('skeleton').find_files()
                 end,
                 desc = 'Telescope: find skeletons (file templates) ',
+                mode = { 'n' },
+            },
+            {
+                '<leader>fzp',
+                function()
+                    --My custom picker defined in .config\nvim\lua\telescope\_extensions
+                    require('telescope').load_extension('projects').projects()
+                end,
+                desc = 'Telescope: find project directory',
+                mode = { 'n' },
+            },
+            {
+                '<leader>fzc',
+                function()
+                    --My custom picker defined in .config\nvim\lua\telescope\_extensions
+                    require('telescope').load_extension('poc').poc()
+                end,
+                desc = 'Telescope: find poc directory',
                 mode = { 'n' },
             },
         },
@@ -604,15 +621,6 @@ require('lazy').setup({
                     },
                 },
             },
-            extensions = {
-                media_files = {
-                    -- file types white list
-                    -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
-                    filetypes = { 'png', 'webp', 'jpg', 'jpeg' },
-                    -- find command (defaults to `fd`)
-                    find_cmd = 'rg',
-                },
-            },
         },
         config = function(_, opts)
             require('telescope').setup(opts)
@@ -624,6 +632,8 @@ require('lazy').setup({
             require('telescope').load_extension('neovim-data')
             require('telescope').load_extension('neovim-plugin')
             require('telescope').load_extension('neovim-config')
+            require('telescope').load_extension('projects')
+            require('telescope').load_extension('poc')
 
             -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
             -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged

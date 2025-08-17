@@ -61,10 +61,11 @@ function M.get_mason_tool_path(mason_tool_name)
 
     local executable_path = vim.fn.exepath(predicted_executable_path)
     if executable_path == '' then
-        vim.print(
+        vim.notify(
             'Cannot find mason tool called '
                 .. mason_tool_name
-                .. '. Things may not work correctly if it is not installed by the time it needs to be used.'
+                .. '. Things may not work correctly if it is not installed by the time it needs to be used.',
+            vim.log.levels.WARN
         )
 
         if vim.fn.has('win32') == 1 then
@@ -74,6 +75,87 @@ function M.get_mason_tool_path(mason_tool_name)
         end
     end
     return executable_path
+end
+
+function M.get_project_paths()
+    ---@type string[]
+    local project_search_paths = {} -- The folders called projects not the actual project folders
+    if vim.fn.has('win32') == 1 then
+        local user_profile_path = vim.fs.normalize('$USERPROFILE')
+        if user_profile_path == '$USERPROFILE' then
+            error(
+                'On Windows you are expected to have a `$USERPROFILE` environment variable'
+            )
+        end
+
+        --Get projects folder in OneDrive dir
+        local search_path = vim.fs.joinpath(
+            user_profile_path,
+            'OneDrive',
+            'documents',
+            'projects'
+        )
+        search_path = vim.fs.abspath(vim.fs.normalize(search_path))
+        table.insert(project_search_paths, search_path)
+
+        --Get projects folder in regular documents dir
+        search_path =
+            vim.fs.joinpath(user_profile_path, 'documents', 'projects')
+        search_path = vim.fs.abspath(vim.fs.normalize(search_path))
+        table.insert(project_search_paths, search_path)
+    else
+        error("TODO: Implement get_projects_paths for other  OS's")
+    end
+
+    vim.list.unique(project_search_paths)
+    local project_paths = {}
+    for _, project_search_path in ipairs(project_search_paths) do
+        for name, type in vim.fs.dir(project_search_path, { depth = 1 }) do
+            if type == 'directory' then
+                local project_path = vim.fs.joinpath(project_search_path, name)
+                table.insert(project_paths, project_path)
+            end
+        end
+    end
+    return project_paths
+end
+
+function M.get_poc_paths()
+    ---@type string[]
+    local poc_search_paths = {} -- The folders called pocs not the actual poc folders
+    if vim.fn.has('win32') == 1 then
+        local user_profile_path = vim.fs.normalize('$USERPROFILE')
+        if user_profile_path == '$USERPROFILE' then
+            error(
+                'On Windows you are expected to have a `$USERPROFILE` environment variable'
+            )
+        end
+
+        --Get pocs folder in OneDrive dir
+        local search_path =
+            vim.fs.joinpath(user_profile_path, 'OneDrive', 'documents', 'poc')
+        search_path = vim.fs.abspath(vim.fs.normalize(search_path))
+        table.insert(poc_search_paths, search_path)
+
+        --Get pocs folder in regular documents dir
+        search_path = vim.fs.joinpath(user_profile_path, 'documents', 'poc')
+        search_path = vim.fs.abspath(vim.fs.normalize(search_path))
+        table.insert(poc_search_paths, search_path)
+    else
+        error("TODO: Implement get_pocs_paths for other  OS's")
+    end
+
+    vim.list.unique(poc_search_paths)
+    local poc_paths = {}
+    for _, poc_search_path in ipairs(poc_search_paths) do
+        for name, type in vim.fs.dir(poc_search_path, { depth = 1 }) do
+            if type == 'directory' then
+                local poc_path = vim.fs.joinpath(poc_search_path, name)
+                table.insert(poc_paths, poc_path)
+            end
+        end
+    end
+    return poc_paths
 end
 
 return M
