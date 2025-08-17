@@ -422,15 +422,8 @@ require('lazy').setup({
                 desc = 'Telescope Luasnip: Select a snippet',
                 mode = { 'n' },
             },
-
-            -- {
-            --     '<leader>fs',
-            --     function() require('telescope.builtin').grep_string() end,
-            --     desc = 'Telescope: grep at cursor/selection',
-            --     mode = { 'n', 'v' },
-            -- },
             {
-                '<leader>fg',
+                '<leader>fl',
                 function()
                     local mode = vim.api.nvim_get_mode().mode
                     if mode == 'v' then
@@ -446,6 +439,56 @@ require('lazy').setup({
                 end,
                 desc = 'Telescope: live_grep',
                 mode = { 'n', 'v' },
+            },
+            {
+                '<leader>fgd',
+                function()
+                    require('telescope.builtin').lsp_definitions({
+                        jump_type = 'never',
+                    })
+                end,
+                desc = 'Telescope: LSP definition',
+                mode = { 'n' },
+            },
+            -- {
+            --     '<leader>fgD',
+            --     function()
+            --         require('telescope.builtin').lsp_declarations({ --This builtin doesn't exist
+            --             jump_type = 'never',
+            --         })
+            --     end,
+            --     desc = 'Telescope: LSP declaration',
+            --     mode = { 'n' },
+            -- },
+            {
+                '<leader>fgi',
+                function()
+                    require('telescope.builtin').lsp_implementations({
+                        jump_type = 'never',
+                    })
+                end,
+                desc = 'Telescope: LSP implementation',
+                mode = { 'n' },
+            },
+            {
+                '<leader>fgo',
+                function()
+                    require('telescope.builtin').lsp_type_definitions({
+                        jump_type = 'never',
+                    })
+                end,
+                desc = 'Telescope: LSP type definition',
+                mode = { 'n' },
+            },
+            {
+                '<leader>fgrr',
+                function()
+                    require('telescope.builtin').lsp_references({
+                        jump_type = 'never',
+                    })
+                end,
+                desc = 'Telescope: LSP references',
+                mode = { 'n' },
             },
             {
                 '<leader>fb',
