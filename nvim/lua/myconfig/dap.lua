@@ -26,7 +26,7 @@ function M.fuzzy_pick_process()
         }
     end
 
-    local processes = require('dap.utils').get_processes({})
+    local processes = require('dap.utils').get_processes()
     return coroutine.create(function(coro)
         local opts = {}
         pickers

@@ -130,7 +130,7 @@ end
 ---the mode to terminal normal mode
 ---@return string?
 function TerminalManager:escape_key_triggered()
-    self.esc_timer = self.esc_timer or (vim.uv or vim.loop).new_timer()
+    self.esc_timer = self.esc_timer or vim.uv.new_timer()
     if self.esc_timer:is_active() then
         self.esc_timer:stop()
         vim.cmd('stopinsert')

@@ -1652,7 +1652,7 @@ vim.api.nvim_create_user_command('CopyToSamePath', function(args)
         error('Current buffer seems to not have a directory')
     end
 
-    local stat = vim.loop.fs_stat(dir)
+    local stat = vim.uv.fs_stat(dir)
     if not stat or stat.type ~= 'directory' then
         error("Current buffer's directory does not seem to exist")
     end

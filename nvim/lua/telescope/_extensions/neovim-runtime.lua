@@ -3,7 +3,7 @@ return require('telescope').register_extension({
     exports = {
         find_files = function(_)
             local runtime_path = vim.fs.normalize('$VIMRUNTIME')
-            local stat = vim.loop.fs_stat(runtime_path)
+            local stat = vim.uv.fs_stat(runtime_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
@@ -18,7 +18,7 @@ return require('telescope').register_extension({
 
         live_grep = function(_)
             local runtime_path = vim.fs.normalize('$VIMRUNTIME')
-            local stat = vim.loop.fs_stat(runtime_path)
+            local stat = vim.uv.fs_stat(runtime_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"

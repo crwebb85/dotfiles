@@ -58,8 +58,8 @@ local M = {}
 --- immediant feedback on the leading edge but also prevents the last call
 --- in the sequence from getting skipped.
 ---
----@param fn (function) Function to throttle. fn can take any number of arguments
----@param timeout (number) Timeout in ms
+---@param fn function Function to throttle. fn can take any number of arguments
+---@param timeout integer Timeout in ms
 ---@returns (function, timer) Throttled function and timer. Remember to call
 ---`timer:close()` at the if you are done with the throttled function or you
 ---will leak memory!

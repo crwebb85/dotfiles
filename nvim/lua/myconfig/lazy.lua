@@ -1064,6 +1064,7 @@ require('lazy').setup({
         -- end,
         opts = {},
         config = function(_, opts)
+            ---@type wk.Opts
             local default_opts = {
 
                 -- https://github.com/folke/which-key.nvim/issues/648#issuecomment-2226881346
@@ -1076,6 +1077,7 @@ require('lazy').setup({
                 -- doesn't behave exactly like it used to
                 delay = vim.o.timeoutlen,
             }
+            ---@type wk.Opts
             opts = vim.tbl_deep_extend('keep', opts, default_opts)
             require('which-key').setup(opts)
 
@@ -1759,7 +1761,8 @@ require('lazy').setup({
         lazy = true,
         -- event = 'BufReadPre',
         config = function(_, _)
-            require('nvim-treesitter-textobjects').setup({
+            ---@type TSTextObjects.UserConfig
+            local opts = {
                 select = {
                     -- Automatically jump forward to textobj, similar to targets.vim
                     lookahead = true,
@@ -1786,7 +1789,8 @@ require('lazy').setup({
                     -- and should return true of false
                     include_surrounding_whitespace = false,
                 },
-            })
+            }
+            require('nvim-treesitter-textobjects').setup(opts)
         end,
     },
 
@@ -1899,7 +1903,10 @@ require('lazy').setup({
                 '<leader>td',
                 function()
                     require('myconfig.dap').shellslash_hack()
-                    require('neotest').run.run({ strategy = 'dap' })
+                    require('neotest').run.run({
+                        strategy = 'dap',
+                        suite = false, --TODO haven't tested if this needs to be false or true
+                    })
                 end,
                 desc = 'Neotest: Debug the nearest test',
             },
@@ -1922,7 +1929,8 @@ require('lazy').setup({
             },
         },
         config = function(_, _)
-            require('neotest').setup({
+            ---@type neotest.Config
+            local opts = {
                 dap = false, --I will manually enable so that dap can be lazy loaded
                 consumers = {
                     overseer = require('neotest.consumers.overseer'),
@@ -1985,7 +1993,8 @@ require('lazy').setup({
                     unknown = get_icon('neotest_unknown'),
                     watching = get_icon('neotest_watching'),
                 },
-            })
+            }
+            require('neotest').setup(opts)
         end,
     },
 
@@ -2310,9 +2319,11 @@ require('lazy').setup({
         config = function()
             -- configures debugpy
             -- uses the debugypy installation by mason
-            local debugpyPythonPath = require('mason-registry')
-                .get_package('debugpy')
-                :get_install_path() .. '/venv/bin/python3'
+            local debugpy_package =
+                require('mason-registry').get_package('debugpy')
+            local debugpyPythonPackagePath = debugpy_package:get_install_path()
+            local debugpyPythonPath = debugpyPythonPackagePath
+                .. '/venv/bin/python3'
             require('dap-python').setup(debugpyPythonPath, {})
         end,
     },
@@ -2484,7 +2495,7 @@ require('lazy').setup({
 
             ---based on https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/blob/1255518cb067e038a4755f5cb3e980f79b6ab89c/lua/mason-tool-installer/init.lua#L20
             local mason_registry = require('mason-registry')
-            ---
+
             ---Installs the mason package
             ---@param mason_package_name string
             ---@param lspconfig_name? string
@@ -2658,7 +2669,8 @@ require('lazy').setup({
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
         end,
         config = function(_, _)
-            require('conform').setup({
+            ---@type conform.setupOpts
+            local opts = {
                 formatters_by_ft = {
                     lua = require('myconfig.formatter').get_buffer_enabled_formatter_list,
                     python = require('myconfig.formatter').get_buffer_enabled_formatter_list,
@@ -2716,7 +2728,8 @@ require('lazy').setup({
                 -- enable format-on-save
                 format_on_save = require('myconfig.formatter').format_on_save,
                 format_after_save = require('myconfig.formatter').format_after_save,
-            })
+            }
+            require('conform').setup(opts)
             -- -- Set this value to true to silence errors when formatting a block fails
             -- require('conform.formatters.injected').options.ignore_errors = false
         end,

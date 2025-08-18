@@ -381,6 +381,8 @@ function M.enable()
     end
 end
 
+---Get the augmented lsp capabilities based on I have implemented in my config
+---@return lsp.ClientCapabilities
 function M.get_additional_default_capabilities()
     local cmp_default_capabilities = {
         textDocument = {

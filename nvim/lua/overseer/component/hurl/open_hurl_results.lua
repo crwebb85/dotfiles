@@ -30,7 +30,7 @@ return {
         -- You may optionally define any of the methods below
         return {
 
-            on_init = function(self, task)
+            on_init = function(self, _task)
                 -- Called when the task is created
                 -- This is a good place to initialize resources, if needed
 
@@ -45,12 +45,12 @@ return {
                     vim.fs.joinpath(self.report_path, 'report.json')
             end,
 
-            on_reset = function(self, task)
+            on_reset = function(self, _task)
                 -- Called when the task is reset to run again
                 if params.cleanup then vim.fn.delete(self.report_path, 'rf') end
             end,
 
-            on_dispose = function(self, task)
+            on_dispose = function(self, _task)
                 -- Called when the task is disposed
                 -- Will be called IFF on_init was called, and will be called exactly once.
                 -- This is a good place to free resources (e.g. timers, files, etc)

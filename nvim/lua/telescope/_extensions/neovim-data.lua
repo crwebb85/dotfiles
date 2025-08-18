@@ -9,7 +9,7 @@ return require('telescope').register_extension({
                 error('data path was an array but a string was expected')
             end
 
-            local stat = vim.loop.fs_stat(data_path)
+            local stat = vim.uv.fs_stat(data_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
@@ -30,7 +30,7 @@ return require('telescope').register_extension({
                 error('data path was an array but a string was expected')
             end
 
-            local stat = vim.loop.fs_stat(data_path)
+            local stat = vim.uv.fs_stat(data_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"

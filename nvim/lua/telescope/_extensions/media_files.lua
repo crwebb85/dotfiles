@@ -130,7 +130,7 @@ local function get_command(opts, entry, status)
 
     local tmp_table = vim.split(entry.value, '\t')
 
-    opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
+    opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
 
     if vim.tbl_isempty(tmp_table) then
         return nil, 'Hello from empty temp_table'
@@ -247,7 +247,7 @@ local function media_previewer(opts)
             if cmd then
                 vim.api.nvim_buf_call(bufnr, function()
                     local term_id = vim.fn.jobstart(cmd, {
-                        cwd = opts.cwd or vim.loop.cwd(),
+                        cwd = opts.cwd or vim.uv.cwd(),
                         env = opts.env
                             or require('telescope.config').values.set_env,
                         term = true,

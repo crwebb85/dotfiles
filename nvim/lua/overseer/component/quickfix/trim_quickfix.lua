@@ -20,9 +20,9 @@ return {
     constructor = function(params)
         -- You may optionally define any of the methods below
         return {
-            ---@param status overseer.Status Can be CANCELED, FAILURE, or SUCCESS
-            ---@param result table A result table.
-            on_complete = function(self, task, status, result)
+            ---@param _status overseer.Status Can be CANCELED, FAILURE, or SUCCESS
+            ---@param _result table A result table.
+            on_complete = function(_self, _task, _status, _result)
                 local items = vim.fn.getqflist()
                 local index = #items
                 while index >= 1 do

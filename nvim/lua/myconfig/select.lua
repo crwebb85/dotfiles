@@ -108,11 +108,11 @@ function M.telescope_ui_select(items, opts, on_choice)
     local indexed_items, widths = vim.F.if_nil(
         sopts.make_indexed,
         function(items_)
-            local indexed_items = {}
+            local updated_indexed_items = {}
             for idx, item in ipairs(items_) do
-                table.insert(indexed_items, { idx = idx, text = item })
+                table.insert(updated_indexed_items, { idx = idx, text = item })
             end
-            return indexed_items
+            return updated_indexed_items
         end
     )(items)
     local displayer = vim.F.if_nil(sopts.make_displayer, function() end)(widths)
@@ -163,6 +163,8 @@ function M.telescope_ui_select(items, opts, on_choice)
 end
 
 function M.get_select_function()
+    ---@diagnostic disable-next-line: unknown-diag-code
+    ---@diagnostic disable-next-line: unnecessary-if
     if require('myconfig.config').use_telescope_for_vim_ui_select then
         return M.telescope_ui_select
     else

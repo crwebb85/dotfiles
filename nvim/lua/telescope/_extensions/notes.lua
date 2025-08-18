@@ -8,7 +8,7 @@ return require('telescope').register_extension({
                     "$MY_NOTES environment variable is not defined. Please create the environment variable in order to search it's directory."
                 )
             end
-            local stat = vim.loop.fs_stat(note_path)
+            local stat = vim.uv.fs_stat(note_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
@@ -28,7 +28,7 @@ return require('telescope').register_extension({
                     "$MY_NOTES environment variable is not defined. Please create the environment variable in order to search it's directory."
                 )
             end
-            local stat = vim.loop.fs_stat(note_path)
+            local stat = vim.uv.fs_stat(note_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"

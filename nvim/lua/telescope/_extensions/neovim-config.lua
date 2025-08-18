@@ -6,7 +6,7 @@ return require('telescope').register_extension({
             if type(config_path) ~= 'string' then
                 error('config path was not a string')
             end
-            local stat = vim.loop.fs_stat(config_path)
+            local stat = vim.uv.fs_stat(config_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
@@ -24,7 +24,7 @@ return require('telescope').register_extension({
             if type(config_path) ~= 'string' then
                 error('config path was not a string')
             end
-            local stat = vim.loop.fs_stat(config_path)
+            local stat = vim.uv.fs_stat(config_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"

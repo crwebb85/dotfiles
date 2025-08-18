@@ -10,7 +10,7 @@ return require('telescope').register_extension({
             end
 
             local lazy_path = vim.fs.joinpath(data_path, 'lazy')
-            local stat = vim.loop.fs_stat(lazy_path)
+            local stat = vim.uv.fs_stat(lazy_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
@@ -33,7 +33,7 @@ return require('telescope').register_extension({
             end
 
             local lazy_path = vim.fs.joinpath(data_path, 'lazy')
-            local stat = vim.loop.fs_stat(lazy_path)
+            local stat = vim.uv.fs_stat(lazy_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
@@ -79,7 +79,7 @@ return require('telescope').register_extension({
             end
 
             local lazy_path = vim.fs.joinpath(data_path, 'lazy')
-            local stat = vim.loop.fs_stat(lazy_path)
+            local stat = vim.uv.fs_stat(lazy_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
