@@ -2374,6 +2374,7 @@ require('lazy').setup({
     {
         'folke/lazydev.nvim',
         ft = 'lua', -- only load on lua files
+        lazy = true,
         opts = {
             library = {
                 { path = 'wezterm-types', mods = { 'wezterm' } },
@@ -2464,6 +2465,7 @@ require('lazy').setup({
                 ['marksman'] = 'marksman', -- Markdown
                 ['markdown-oxide'] = 'markdown_oxide', -- Markdown notes
                 ['lua-language-server'] = 'lua_ls', -- (lua_ls) LSP for lua files
+                ['emmylua_ls'] = 'emmylua_ls', --lua
                 ['typescript-language-server'] = 'ts_ls', -- tsserver LSP (keywords: typescript, javascript)
                 ['eslint-lsp'] = 'eslint', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
                 ['ansible-language-server'] = 'ansiblels',

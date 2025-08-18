@@ -19,6 +19,8 @@ local M = {
         -- 'ruff-lsp',
         -- 'debugpy',
         -- 'markdown-oxide',
+        -- 'lua-language-server',
+        -- 'emmylua_ls',
     },
 
     enable_render_markdown = true,
