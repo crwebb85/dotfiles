@@ -61,10 +61,10 @@ local function gif_preview(opts)
         nil
 end
 
----@param opts PreviewDrawerOptions
+---@param _opts PreviewDrawerOptions
 ---@return string[] | nil command and arguments or nil if error
 ---@return string? error
-local function video_preview(opts)
+local function video_preview(_opts)
     -- TODO
     return nil, 'unimplemented video preview'
     -- if ! command -v viu &> /dev/null; then
@@ -80,10 +80,10 @@ local function video_preview(opts)
     -- return get_render_at_size_command(opts.path, opts.preview_width, opts.preview_height)
 end
 
----@param opts PreviewDrawerOptions
+---@param _opts PreviewDrawerOptions
 ---@return string[] | nil command and arguments or nil if error
 ---@return string? error
-local function pdf_preview(opts)
+local function pdf_preview(_opts)
     return nil, 'unimplemented pdf preview'
     -- path="${2##*/}"
     --   echo -e "Loading preview..\nFile: $path"

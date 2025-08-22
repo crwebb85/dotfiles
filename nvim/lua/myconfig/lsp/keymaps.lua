@@ -146,7 +146,12 @@ function M.setup_lsp_keymaps(bufnr, client)
         { desc = 'LSP: Run Codelens', buffer = bufnr }
     )
 
-    if client.server_capabilities.documentLinkProvider ~= nil then
+    if
+        client:supports_method(
+            vim.lsp.protocol.Methods.textDocument_documentLink
+        )
+    then
+        -- TODO reevaluate how I remap the gx key there might be better options
         vim.keymap.set('n', 'gx', require('myconfig.lsp.lsplinks').gx, {
             desc = 'LSP Remap: Open lsp links if exists. Otherwise, fallback to default neovim functionality for open link',
             buffer = bufnr,

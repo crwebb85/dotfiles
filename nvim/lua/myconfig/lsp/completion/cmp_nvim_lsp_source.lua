@@ -58,13 +58,14 @@ end
 
 ---Get get_keyword_pattern.
 ---@param params cmp.SourceApiParams
----@return string
+---@return string?
 source.get_keyword_pattern = function(self, params)
     local option
     option = params.option or {}
     option = option[self.client.name] or {}
-    return option.keyword_pattern
-        or require('cmp').get_config().completion.keyword_pattern
+    if option.keyword_pattern then return option.keyword_pattern end
+    local completion = require('cmp').get_config().completion
+    return completion and completion.keyword_pattern
 end
 
 ---Resolve LSP CompletionItem.
@@ -73,10 +74,10 @@ end
 source.complete = function(self, params, callback)
     local lsp_params =
         vim.lsp.util.make_position_params(0, self.client.offset_encoding)
-    lsp_params.context = {}
-    lsp_params.context.triggerKind = params.completion_context.triggerKind
-    lsp_params.context.triggerCharacter =
-        params.completion_context.triggerCharacter
+    lsp_params.context = {
+        triggerKind = params.completion_context.triggerKind,
+        triggerCharacter = params.completion_context.triggerCharacter,
+    }
     self:_request(
         'textDocument/completion',
         lsp_params,

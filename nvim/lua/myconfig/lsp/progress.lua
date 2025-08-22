@@ -3,11 +3,14 @@
 local M = {}
 
 -- Buffer number and window id for the floating window
+---@type integer?
 local winid
 local spinner = { '⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷' }
 local idx = 0
 -- Progress is done or not
 local isDone = true
+
+---@type integer
 local progress_bufnr
 
 local function get_progress_bufnr()
@@ -81,7 +84,7 @@ local function log_progress_display_vars()
 end
 
 local function cleanup_old_progress_bar()
-    if vim.api.nvim_win_is_valid(winid) then
+    if winid and vim.api.nvim_win_is_valid(winid) then
         vim.api.nvim_win_close(winid, true)
     end
     vim.api.nvim_buf_set_lines(get_progress_bufnr(), 0, 1, false, { '' })
@@ -121,7 +124,9 @@ local function update_lsp_progress_display()
             col = vim.o.columns - #message,
         })
     end
-    vim.wo[winid].winhl = 'Normal:Normal'
+    if winid and vim.api.nvim_win_is_valid(winid) then
+        vim.wo[winid].winhl = 'Normal:Normal'
+    end
     vim.api.nvim_buf_set_lines(get_progress_bufnr(), 0, 1, false, { message })
     if isDone then cleanup_old_progress_bar() end
 end

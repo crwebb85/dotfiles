@@ -6,7 +6,7 @@
 ---@field private buffer_manager TerminalBufferManager
 ---@field tabid uinteger of the tab to the window manager is locked to
 ---@field winid? uinteger the winid of the window. Will be nil when window is hidden.
----@field augroup number the augroup of the window manager's autocmds.
+---@field augroup integer the augroup of the window manager's autocmds.
 ---@field position "float"|"bottom"|"top"|"left"|"right" the position the window is in if open or was last in if closed
 ---@field auto_close boolean close the terminal buffer when the process exits
 ---@field start_insert boolean start insert mode when entering newly opened terminal window
@@ -217,25 +217,26 @@ function TerminalWindowManager:equalize()
 
     for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(self.tabid)) do
         local win_info = vim.fn.getwininfo(winid)[1] --getwinfo returns one item in the list when you specify the winid
+        if win_info ~= nil then
+            window_info_by_wincol[win_info.wincol] = window_info_by_wincol[win_info.wincol]
+                or {}
+            table.insert(window_info_by_wincol[win_info.wincol], win_info)
 
-        window_info_by_wincol[win_info.wincol] = window_info_by_wincol[win_info.wincol]
-            or {}
-        table.insert(window_info_by_wincol[win_info.wincol], win_info)
+            window_info_by_winrow[win_info.winrow] = window_info_by_winrow[win_info.winrow]
+                or {}
+            table.insert(window_info_by_winrow[win_info.winrow], win_info)
 
-        window_info_by_winrow[win_info.winrow] = window_info_by_winrow[win_info.winrow]
-            or {}
-        table.insert(window_info_by_winrow[win_info.winrow], win_info)
-
-        local position = vim.w[winid].my_terminal_window
-            and vim.w[winid].my_terminal_window.position
-        if position == 'bottom' then
-            table.insert(bottom_terminal_winrows, win_info.winrow)
-        elseif position == 'top' then
-            table.insert(top_terminal_winrows, win_info.winrow)
-        elseif position == 'left' then
-            table.insert(left_terminal_wincols, win_info.wincol)
-        elseif position == 'right' then
-            table.insert(right_terminal_wincols, win_info.wincol)
+            local position = vim.w[winid].my_terminal_window
+                and vim.w[winid].my_terminal_window.position
+            if position == 'bottom' then
+                table.insert(bottom_terminal_winrows, win_info.winrow)
+            elseif position == 'top' then
+                table.insert(top_terminal_winrows, win_info.winrow)
+            elseif position == 'left' then
+                table.insert(left_terminal_wincols, win_info.wincol)
+            elseif position == 'right' then
+                table.insert(right_terminal_wincols, win_info.wincol)
+            end
         end
     end
 

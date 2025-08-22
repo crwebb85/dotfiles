@@ -87,6 +87,8 @@ function M.throttle(fn, timeout)
                     timer:stop()
                     return
                 end
+                ---@diagnostic disable-next-line: unknown-diag-code
+                ---@diagnostic disable-next-line: unnecessary-if
                 if not running then
                     running = true
                     vim.schedule(function()

@@ -14,22 +14,24 @@ local LspFormatStrategyEnums = {
 P.LspFormatStrategyEnums = LspFormatStrategyEnums
 
 ---@class FormatterState
----@field default_formatters {string:string[]} The map of filetypes to list of formatters that are default for the project. Used to for setting things back to default.
----@field project_formatters {string:string[]} The map of filetypes to list of formatters that are configured for the project
----@field project_disabled_formatters {string:boolean} map formatters disabled for the project
----@field additional_formatters {string:string[]} A map of filetypes to list of formatters that are not enabled by default but can be manually added with a command
----@field lsp_format_strategy_for_filetype {string:LspFormatStrategyEnum} A map of lsp format strategies for a filetype. The default strategy will always be "FALLBACK"
+---@field default_formatters {[string]:string[]} The map of filetypes to list of formatters that are default for the project. Used to for setting things back to default.
+---@field project_formatters {[string]:string[]} The map of filetypes to list of formatters that are configured for the project
+---@field project_disabled_formatters {[string]:boolean} map formatters disabled for the project
+---@field additional_formatters {[string]:string[]} A map of filetypes to list of formatters that are not enabled by default but can be manually added with a command
+---@field lsp_format_strategy_for_filetype {[string]:LspFormatStrategyEnum} A map of lsp format strategies for a filetype. The default strategy will always be "FALLBACK"
 ---@field is_project_autoformat_disabled boolean The property to determine if autoformat is disabled project-wide
 ---@field formatter_timeout_milliseconds integer The property to determine how long the formatter should run before switching to running after save
----@field format_after_save_filetypes {string:boolean} lookup table for filetypes to format after save asyncronously
+---@field format_after_save_filetypes {[string]:boolean} lookup table for filetypes to format after save asyncronously
 
 ---Setups the default settings for the formatter
 ---@return FormatterState
 local function setup()
-    local state = {}
+    --- The default timeout for how long the formatter should run before switching to running
+    --- after save
+    local DEFUALT_FORMATTING_TIMEOUT = 500
 
-    ---@type table<string,string[]>
-    state.default_formatters = {
+    ---@type { [string]: string[] }
+    local default_formatters = {
         lua = { 'stylua' },
         -- first use isort and then black
         python = { 'isort', 'black' },
@@ -57,18 +59,19 @@ local function setup()
         c = { 'clang-format' },
     }
 
-    state.project_formatters = vim.deepcopy(state.default_formatters)
-    state.project_disabled_formatters = {}
-    state.additional_formatters = { --TODO add getter and setter
-        xml = { 'xmlformat' },
+    ---@type FormatterState
+    local state = {
+        default_formatters = default_formatters,
+        project_formatters = vim.deepcopy(default_formatters),
+        project_disabled_formatters = {},
+        additional_formatters = { --TODO add getter and setter
+            xml = { 'xmlformat' },
+        },
+        lsp_format_strategy_for_filetype = {},
+        is_project_autoformat_disabled = false,
+        formatter_timeout_milliseconds = DEFUALT_FORMATTING_TIMEOUT,
+        format_after_save_filetypes = {},
     }
-    state.lsp_format_strategy_for_filetype = {}
-    state.is_project_autoformat_disabled = false
-    --- The default timeout for how long the formatter should run before switching to running
-    --- after save
-    local DEFUALT_FORMATTING_TIMEOUT = 500
-    state.formatter_timeout_milliseconds = DEFUALT_FORMATTING_TIMEOUT
-    state.format_after_save_filetypes = {}
 
     return state
 end
@@ -125,7 +128,7 @@ function P.set_project_disabled_formatters(formatters)
 end
 
 ---Gets the set of project disabled formatters
----@return table<string, boolean> project_disabled_formatters_set
+---@return {[string]:boolean} project_disabled_formatters_set
 function P.get_project_disabled_formatters_set()
     return vim.deepcopy(config.project_disabled_formatters)
 end
@@ -192,7 +195,7 @@ function P.get_filetype_lsp_format_strategy(filetype)
 end
 
 ---Gets a copy of the lsp format strategy for the filetype
----@return table<string, LspFormatStrategyEnum>
+---@return {[string]: LspFormatStrategyEnum}
 function P.get_filetype_lsp_format_strategy_map()
     return vim.deepcopy(config.lsp_format_strategy_for_filetype)
 end
@@ -273,7 +276,7 @@ end
 function P.get_formatting_timeout() return config.formatter_timeout_milliseconds end
 
 ---Sets the formatting timeout
----@param time_milliseconds number the time in milliseconds before the formatter times out
+---@param time_milliseconds integer the time in milliseconds before the formatter times out
 function P.set_formatting_timeout(time_milliseconds)
     if time_milliseconds <= 0 then
         error(
@@ -417,7 +420,7 @@ end
 ---@param bufnr? integer the buffer number. Defaults to buffer 0.
 ---@return LspFormatterDetails[] lsp_formatter_details that can be used for the buffer
 function M.get_buffer_lsp_formatters(bufnr)
-    ---@type string[]
+    ---@type LspFormatterDetails[]
     local lsp_formatters = {}
     if bufnr == nil then bufnr = vim.api.nvim_get_current_buf() end
     for _, lsp_client in pairs(vim.lsp.get_clients({ bufnr = bufnr })) do

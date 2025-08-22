@@ -1,17 +1,23 @@
 local M = {}
 
+---@param filepath string
+---@return boolean
 M.is_existing_file = function(filepath)
-    vim.validate({ file_path = { filepath, 'string' } })
+    vim.validate('file_path', filepath, 'string')
 
-    local stat = vim.loop.fs_stat(filepath)
-    return stat and stat.type == 'file'
+    local stat = vim.uv.fs_stat(filepath)
+    if stat and stat.type == 'file' then
+        return true
+    else
+        return false
+    end
 end
 
 ---Creates the given file if it doesn't exist
 ---from https://github.com/backdround/global-note.nvim/blob/1e0d4bba425d971ed3ce40d182c574a25507115c/lua/global-note/utils.lua#L5C1-L24C4
 ---@param filepath string
 M.ensure_file_exists = function(filepath)
-    vim.validate({ file_path = { filepath, 'string' } })
+    vim.validate('file_path', filepath, 'string')
 
     local stat = vim.uv.fs_stat(filepath)
     if stat and stat.type == 'file' then return end
@@ -31,7 +37,7 @@ end
 ---from https://github.com/backdround/global-note.nvim/blob/1e0d4bba425d971ed3ce40d182c574a25507115c/lua/global-note/utils.lua#L28C1-L46C4
 ---@param path string
 M.ensure_directory_exists = function(path)
-    vim.validate({ directory_path = { path, 'string' } })
+    vim.validate('directory_path', path, 'string')
 
     local stat = vim.uv.fs_stat(path)
     if stat and stat.type == 'directory' then return end

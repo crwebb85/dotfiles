@@ -60,9 +60,7 @@ return {
                     vim.fn.delete(self.report_path, 'd')
                 end
             end,
-            ---@param status overseer.Status Can be CANCELED, FAILURE, or SUCCESS
-            ---@param result table A result table.
-            on_complete = function(self, task, status, result)
+            on_complete = function(self, _task, _status, _result)
                 local report_json_file =
                     assert(io.open(self.report_json_path, 'r'))
                 local report_json = report_json_file:read('*all')

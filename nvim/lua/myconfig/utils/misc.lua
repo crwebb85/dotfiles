@@ -88,6 +88,8 @@ end
 ---sorts the start_pos and end_pos
 ---@param start_pos [integer, integer] (row, col) tuple, (0, 0) if the mark is not set
 ---@param end_pos [integer, integer] (row, col) tuple, (0, 0) if the mark is not set
+---@return [integer, integer] new_start_pos (row, col) tuple
+---@return [integer, integer] new_end_pos (row, col) tuple
 function M.sort_start_end_pos(start_pos, end_pos)
     vim.validate(
         'start_pos',
@@ -135,7 +137,7 @@ end
 ---
 ---@param opts UserCommandTextSelectionOptions
 function M.get_text_selection(opts)
-    opts = opts or {}
+    vim.validate('opts', opts, 'table')
     local bufnr = opts.bufnr or 0
     local user_command_opts = opts.user_command_opts
     vim.validate('user_command_opts', opts.user_command_opts, 'table')

@@ -32,9 +32,7 @@ local function find_venv_executable(executable)
     }
 
     for _, candidate in ipairs(candidates) do
-        if
-            candidate ~= nil and vim.fn.executable(vim.fs.normalize(candidate))
-        then
+        if candidate and vim.fn.executable(vim.fs.normalize(candidate)) then
             return candidate
         end
     end
@@ -116,18 +114,6 @@ function M.init_venv()
     create_venv()
 end
 
-function M.hello_world()
-    local python_executable_path = find_venv_executable('python')
-
-    vim.print(python_executable_path)
-    local output = vim.fn.system({
-        python_executable_path,
-        EDITOR_CLI_FILE_PATH,
-        'hello',
-    })
-    if output then print(output) end
-end
-
 function M.sort_json_file()
     local python_executable_path = find_venv_executable('python')
 
@@ -152,7 +138,6 @@ end
 
 M.setup = function()
     vim.api.nvim_create_user_command('EditorToolsInit', M.init_venv, {})
-    vim.api.nvim_create_user_command('Hello', M.hello_world, {})
     vim.api.nvim_create_user_command('SortJsonFile', M.sort_json_file, {})
 end
 

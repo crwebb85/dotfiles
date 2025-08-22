@@ -4,7 +4,9 @@ local M = {}
 
 local LIGHTBULB_NS = vim.api.nvim_create_namespace('my-lightbulb')
 
+---@type integer?
 local lightbulb_bufnr = nil
+---@type integer?
 local lightbulb_extmark_id = nil
 
 local function remove_lightbulb()
@@ -107,7 +109,6 @@ local function refresh_lightbulb()
     vim.lsp.buf_request_all(
         cur_bufnr,
         vim.lsp.protocol.Methods.textDocument_codeAction,
-        ---@type fun(client: vim.lsp.Client, bufnr: integer): table?
         function(client, _)
             --Used same logic for creating paramaters as vim.lsp.buf.code_action
             --in runtime/lua/vim/lsp/buf.lua
@@ -172,9 +173,11 @@ local function refresh_lightbulb()
         end
     )
 end
+
 -- If I ever modify the code to enable/disable I will probably also
 -- need to close the timer or I may have a memory leak.
 local refresh_timer
+
 local throttled_refresh_lightbulb
 local is_autocmds_setup = false
 function M.enable()

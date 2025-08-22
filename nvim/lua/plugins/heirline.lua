@@ -236,8 +236,11 @@ local config = function()
     ---@return string
     local function get_yaml_schema_name()
         local schema = require('yaml-companion').get_buf_schema(0)
-        if schema.result[1].name == 'none' then return '' end
-        return schema.result[1].name
+        local result = schema.result
+        if type(result) ~= 'table' then return '' end
+        local name = result[1].name
+        if name ~= 'string' or name == 'none' then return '' end
+        return name
     end
 
     ---@type StatusLine
