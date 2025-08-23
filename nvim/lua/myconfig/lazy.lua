@@ -2578,6 +2578,13 @@ require('lazy').setup({
     {
         'neovim/nvim-lspconfig',
         lazy = true,
+        config = function(_, _)
+            ---Removing lspconfigs version of these autocmds and reenable my own
+            vim.api.nvim_del_user_command('LspStart')
+            vim.api.nvim_del_user_command('LspRestart')
+            vim.api.nvim_del_user_command('LspStop')
+            require('myconfig.lsp.lsp').setup_user_commands()
+        end,
     },
 
     -- Virtual Environments
@@ -2619,7 +2626,7 @@ require('lazy').setup({
             { 'nvim-lua/plenary.nvim' },
             { 'nvim-telescope/telescope.nvim' },
         },
-        config = function(opts) require('tiny-code-action').setup(opts) end,
+        config = function(_, opts) require('tiny-code-action').setup(opts) end,
     },
     -- Code Action Macros
     {

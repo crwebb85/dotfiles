@@ -73,7 +73,7 @@ end
 -- Commands
 ---
 ---
-local function setup_user_commands()
+function M.setup_user_commands()
     vim.api.nvim_create_user_command(
         'LspWorkspaceAdd',
         function() vim.lsp.buf.add_workspace_folder() end,
@@ -248,7 +248,7 @@ local function setup_user_commands()
             return
         end
 
-        vim.lsp.enable(client.name, false)
+        vim.lsp.enable(client.name, false) --TODO this actually stops all lsps with that name. What we really want is to disable for a specific root
         client:stop()
     end, {
         complete = function()
@@ -277,7 +277,7 @@ function M.enable()
         ),
         desc = 'lsp on_attach',
         callback = function()
-            setup_user_commands()
+            M.setup_user_commands()
 
             --Enable lsp progress display
             require('myconfig.lsp.progress').enable()

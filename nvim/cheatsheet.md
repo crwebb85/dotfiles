@@ -27,6 +27,7 @@ Use \t instead of spaces when typing tab
 # Things I don't want to forget
 
 - `:tab split` opens current buffer in new tab page (unlike `:tab sb` this works for non-file buffers
+- `g<` keymap shows messages from external commands like `!ls` or `Git push`
 
 # Useful command
 
