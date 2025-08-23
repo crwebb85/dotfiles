@@ -1,6 +1,49 @@
 local default_select = vim.ui.select
+local default_open = vim.ui.open
 
 local M = {}
+
+--- Opens `path` with the system default handler (macOS `open`, Windows `explorer.exe`, Linux
+--- `xdg-open`, …), or returns (but does not show) an error message on failure.
+---
+--- Can also be invoked with `:Open`. [:Open]()
+---
+--- Expands "~/" and environment variables in filesystem paths.
+---
+--- Examples:
+---
+--- ```lua
+--- -- Asynchronous.
+--- vim.ui.open("https://neovim.io/")
+--- vim.ui.open("~/path/to/file")
+--- -- Use the "osurl" command to handle the path or URL.
+--- vim.ui.open("gh#neovim/neovim!29490", { cmd = { 'osurl' } })
+--- -- Synchronous (wait until the process exits).
+--- local cmd, err = vim.ui.open("$VIMRUNTIME")
+--- if cmd then
+---   cmd:wait()
+--- end
+--- ```
+---
+---@param path string Path or URL to open
+---@param opt? vim.ui.open.Opts Options
+---
+---@return vim.SystemObj|nil # Command object, or nil if not found.
+---@return nil|string # Error message on failure, or nil on success.
+---
+---@see |vim.system()|
+function M.open(path, opt)
+    local is_dir = require('myconfig.utils.path').is_directory(path)
+    if vim.fn.executable('explorer') == 1 and is_dir then
+        vim.cmd([[!explorer ]] .. path)
+        --TODO for some reason vim.system({'explore.exe', path}) does not work when
+        --path is a directory as a result default_open also doesn't work when path
+        --is a directory. However the command works just fine in powershell to open the
+        --directory.
+    else
+        default_open(path, opt)
+    end
+end
 
 --From https://github.com/nvim-telescope/telescope-ui-select.nvim/blob/6e51d7da30bd139a6950adf2a47fda6df9fa06d2/lua/telescope/_extensions/ui-select.lua
 local function make_codeaction_indexed(items)
@@ -173,5 +216,6 @@ function M.get_select_function()
 end
 
 vim.ui.select = M.get_select_function()
+vim.ui.open = M.open
 
 return M
