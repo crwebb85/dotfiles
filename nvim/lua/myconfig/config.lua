@@ -28,13 +28,19 @@ local M = {
     dev_plugins_path = 'C:\\Users\\crweb\\Documents\\projects\\',
 
     ---@type boolean
-    -- use_native_completion = true,
-    use_native_completion = false,
+    use_native_completion = true,
+    -- use_native_completion = false,
 
+    ---@type boolean
     use_overseer_strategy_hack = false,
     -- use_overseer_strategy_hack = true,
 
-    use_telescope_for_vim_ui_select = true,
+    ---@type boolean
+    use_telescope_for_vim_ui_select = false,
+    -- use_telescope_for_vim_ui_select = true,
+
+    ---@type boolean
+    use_extui = true,
 }
 
 return M

@@ -220,10 +220,26 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
 vim.api.nvim_create_autocmd('FocusGained', {
     pattern = '*',
     callback = function(_)
-        -- vim.print('highlight')
+        local winid = vim.api.nvim_get_current_win()
         vim.wo.cursorline = true
         vim.cmd('redraw')
-        vim.defer_fn(function() vim.wo.cursorline = false end, 600)
+        vim.defer_fn(function()
+            local mode = vim.api.nvim_get_mode()
+            -- We skip the removal of the the cursorline if it has a cursorline
+            -- because I'm in command mode since it will get removed later when
+            -- I switch back to normal mode due to my other autocmds
+            local is_skip_removal = mode.mode == 'c'
+                and winid == vim.api.nvim_get_current_win()
+            if vim.api.nvim_win_is_valid(winid) and not is_skip_removal then
+                vim.wo[winid].cursorline = false
+                if
+                    vim.api.nvim_win_get_tabpage(winid)
+                    == vim.api.nvim_win_get_tabpage(0)
+                then
+                    vim.cmd('redraw')
+                end
+            end
+        end, 600)
     end,
     group = vim.api.nvim_create_augroup(
         'draw_temp_cursor_line',
@@ -246,15 +262,21 @@ vim.api.nvim_create_autocmd('ModeChanged', {
         if new_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = false
             vim.wo.cursorline = true
-            -- TODO temporarily removing this redraw because redraws now clear the selection messages
-            -- so it was preventing me seeing which code actions I could pick
-            --vim.cmd('redraw')
+            -- we only redraw when using extui or telescope override for vim.ui.select
+            -- because redraws clears the ui select messages without one of those
+            -- features which was it was preventing me seeing which code actions I could pick
+            if config.use_extui or config.use_telescope_for_vim_ui_select then
+                vim.cmd('redraw')
+            end
         elseif prev_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = true
             vim.wo.cursorline = false
-            -- TODO temporarily removing this redraw because redraws now clear the selection messages
-            -- so it was preventing me seeing which code actions I could pick
-            --vim.cmd('redraw')
+            -- we only redraw when using extui or telescope override for vim.ui.select
+            -- because redraws clears the ui select messages without one of those
+            -- features which was it was preventing me seeing which code actions I could pick
+            if config.use_extui or config.use_telescope_for_vim_ui_select then
+                vim.cmd('redraw')
+            end
         end
     end,
     group = change_relative_line_number_group,

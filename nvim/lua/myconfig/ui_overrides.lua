@@ -206,8 +206,6 @@ function M.telescope_ui_select(items, opts, on_choice)
 end
 
 function M.get_select_function()
-    ---@diagnostic disable-next-line: unknown-diag-code
-    ---@diagnostic disable-next-line: unnecessary-if
     if require('myconfig.config').use_telescope_for_vim_ui_select then
         return M.telescope_ui_select
     else

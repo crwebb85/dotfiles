@@ -2,6 +2,10 @@ local config = require('myconfig.config')
 -------------------------------------------------------------------------------
 
 --- Look and feel
+if config.use_extui then
+    --Note this doesn't play nice with cmp command completion
+    require('vim._extui').enable({})
+end
 vim.o.title = true
 vim.o.titlestring = [[%t – %{fnamemodify(getcwd(), ':t')}]]
 vim.o.colorcolumn = '80'
