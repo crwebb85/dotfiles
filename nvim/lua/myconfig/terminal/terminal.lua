@@ -201,7 +201,7 @@ function M.create(opts)
     vim.api.nvim_create_autocmd('TabClosed', {
         group = term_augroup,
         callback = function()
-            --Scheduling since there is know way to get the tabid of closed
+            --Scheduling since there is no way to get the tabid of closed
             --tab until after this autocmd finishes because it nvim_tabpage_is_valid
             --doesn't return false until after TabClosed autocmds finish
             vim.schedule(function()
