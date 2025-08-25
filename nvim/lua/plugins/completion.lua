@@ -73,11 +73,16 @@ local completion_plugins = {
         -- dev = true,
         config = true,
     },
+    {
+        'petertriho/cmp-git', -- Provides info about git repo
+        lazy = true,
+        ft = 'gitcommit',
+        dependencies = { 'nvim-lua/plenary.nvim' },
+    },
 
     --Including these plugins so that they stay in my lock file even when I have them disabled
     --remove once I remove nvim-cmp
     { 'hrsh7th/cmp-cmdline', lazy = true },
-    { 'hrsh7th/cmp-git', lazy = true },
     { 'hrsh7th/cmp-nvim-lsp-signature-help', lazy = true },
     { 'hrsh7th/cmp-path', lazy = true },
     { 'saadparwaiz1/cmp_luasnip', lazy = true },
