@@ -77,6 +77,9 @@ require('lazy').setup({
     {
         'brianhuster/unnest.nvim',
     },
+    -- {
+    --     'cossonleo/dirdiff.nvim',
+    -- },
     ---------------------------------------------------------------------------
     -- Colorscheme
     {
@@ -1619,6 +1622,14 @@ require('lazy').setup({
                 nvim_treesitter.install(parsers_to_install)
                 --:wait(300000)
             end
+
+            vim.api.nvim_create_autocmd('FileType', {
+                pattern = installed_parsers,
+                callback = function()
+                    -- enable treesitter highlighting
+                    vim.treesitter.start()
+                end,
+            })
 
             local custom_csharp_queries = [[
                 (cast_expression
