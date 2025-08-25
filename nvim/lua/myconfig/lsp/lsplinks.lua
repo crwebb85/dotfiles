@@ -37,9 +37,9 @@ end
 --- Return the link under the cursor.
 ---
 ---@return string | nil
-function M.current()
+function M.get_link_at_cursor()
     local cursor = get_cursor_pos()
-    for _, link in ipairs(M.get()) do
+    for _, link in ipairs(M.get_lsp_links_by_bufnr()) do
         if in_range(cursor, link.range) then return link.target end
     end
     return nil
@@ -59,9 +59,10 @@ end
 --- The return value indicates if a link was found.
 ---
 ---@param uri string | nil
----@return boolean
+---@return vim.SystemObj?
+---@return string?
 function M.open(uri)
-    uri = uri or M.current()
+    uri = uri or M.get_link_at_cursor()
     if not uri then return false end
     if uri:find('^file:/') then
         vim.lsp.util.show_document(
@@ -79,17 +80,10 @@ function M.open(uri)
                 { tonumber(line_no), tonumber(col_no) - 1 }
             )
         end
+        return nil, nil
     else
-        vim.ui.open(uri)
+        return vim.ui.open(uri)
     end
-    return true
-end
-
---- Convenience function which opens current link with fallback
---- to default gx behaviour
-function M.gx()
-    local uri = M.current() or vim.fn.expand('<cfile>')
-    M.open(uri)
 end
 
 -- Refresh the links for the current buffer
@@ -134,7 +128,7 @@ end
 --- Get links for bufnr
 ---@param bufnr integer | nil
 ---@return lsp.DocumentLink[]
-function M.get(bufnr)
+function M.get_lsp_links_by_bufnr(bufnr)
     bufnr = bufnr or 0
     if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
     return links_by_buf[bufnr] or {}
@@ -143,7 +137,7 @@ end
 --- Highlight links in the current buffer
 function M.display()
     vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
-    for _, link in ipairs(M.get()) do
+    for _, link in ipairs(M.get_lsp_links_by_bufnr()) do
         -- sometimes the buffer is changed before we get here and the link
         -- ranges are invalid, so we ignore the error.
         pcall(

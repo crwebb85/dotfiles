@@ -197,6 +197,9 @@ function M.setup_user_commands()
                 new_client_id = vim.lsp.start(client_config, { bufnr = bufnr })
             end
         end
+        if new_client_id == nil then
+            new_client_id = vim.lsp.start(client_config)
+        end
         vim.notify(
             string.format(
                 'Restarted LSP %s. Old client id was %s. New client id is %s',
@@ -294,9 +297,6 @@ function M.enable()
             local client = vim.lsp.get_client_by_id(event.data.client_id)
             if client == nil then return end
 
-            --Setup keymap
-            require('myconfig.lsp.keymaps').setup_lsp_keymaps(event.buf, client)
-
             --Disable lsp for large files. The buffer variable is_big_file
             --is set by a BufReadPre autocommand in y autocmd.lua file
             if vim.b[event.buf].is_big_file == true then
@@ -338,7 +338,25 @@ function M.enable()
                 -- Enable native completion.
                 if require('myconfig.config').use_native_completion then
                     vim.lsp.completion.enable(true, client.id, event.buf, {
-                        autotrigger = true,
+                        -- Disabled autotrigger because I want to handle it myself
+                        -- so it will trigger on all characters not just the
+                        -- LSP `triggerCharacters
+                        autotrigger = false,
+                    })
+
+                    --Auto trigger on each keypress
+                    -- TODO:
+                    --  1: add a way to toggle this
+                    --  2: add debounce logic
+                    local group = vim.api.nvim_create_augroup(
+                        string.format('my.lsp.completion_%d', event.buf),
+                        { clear = true }
+                    )
+
+                    vim.api.nvim_create_autocmd('InsertCharPre', {
+                        group = group,
+                        buffer = event.buf,
+                        callback = function() vim.lsp.completion.get() end,
                     })
 
                     -- require('myconfig.lsp.completion.omnifunc')

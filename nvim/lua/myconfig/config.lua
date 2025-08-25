@@ -41,6 +41,7 @@ local M = {
 
     ---@type boolean
     use_extui = true,
+    -- use_extui = false,
 }
 
 return M

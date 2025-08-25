@@ -18,6 +18,37 @@ vim.keymap.set(
 )
 
 -------------------------------------------------------------------------------
+---LSP keymaps
+require('myconfig.lsp.keymaps').setup_lsp_keymaps()
+
+local function do_open(uri, open_func)
+    local cmd, err = open_func(uri)
+    local rv = cmd and cmd:wait(1000) or nil
+    if cmd and rv and rv.code ~= 0 then
+        err = ('vim.ui.open: command %s (%d): %s'):format(
+            (rv.code == 124 and 'timeout' or 'failed'),
+            rv.code,
+            vim.inspect(cmd.cmd)
+        )
+    end
+    return err
+end
+
+vim.keymap.set({ 'n' }, 'gx', function()
+    local link_uri = require('myconfig.lsp.lsplinks').get_link_at_cursor()
+    if link_uri ~= nil then
+        local err = do_open(link_uri, require('myconfig.lsp.lsplinks').open)
+        if err then vim.notify(err, vim.log.levels.ERROR) end
+    end
+    for _, url in ipairs(require('vim.ui')._get_urls()) do
+        local err = do_open(url, vim.ui.open)
+        if err then vim.notify(err, vim.log.levels.ERROR) end
+    end
+end, {
+    desc = 'Custom Remap: Open lsp links if exists. Otherwise, fallback to default neovim functionality for open link',
+})
+
+-------------------------------------------------------------------------------
 ---Terminal keymaps
 ---
 

@@ -12,9 +12,7 @@ local function feedkeys(keys)
 end
 
 ---Sets keymaps for the lsp buffer
----@param bufnr integer
----@param client vim.lsp.Client
-function M.setup_lsp_keymaps(bufnr, client)
+function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'K', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.hover').hover()
@@ -22,7 +20,6 @@ function M.setup_lsp_keymaps(bufnr, client)
             vim.lsp.buf.hover()
         end
     end, {
-        buffer = bufnr,
         desc = [[LSP: Displays hover information about the symbol under the cursor in a floating window. Calling the function twice will jump into the floating window.]],
     })
     vim.keymap.set('n', 'gd', function()
@@ -37,7 +34,6 @@ function M.setup_lsp_keymaps(bufnr, client)
             vim.lsp.buf.definition()
         end
     end, {
-        buffer = bufnr,
         desc = 'LSP: Jumps to the definition of the symbol under the cursor.',
     })
     vim.keymap.set('n', 'gD', function()
@@ -47,7 +43,6 @@ function M.setup_lsp_keymaps(bufnr, client)
             vim.lsp.buf.declaration()
         end
     end, {
-        buffer = bufnr,
         desc = 'LSP: Jumps to the declaration of the symbol under the cursor.',
     })
     vim.keymap.set('n', 'gi', function()
@@ -60,7 +55,6 @@ function M.setup_lsp_keymaps(bufnr, client)
             vim.lsp.buf.implementation()
         end
     end, {
-        buffer = bufnr,
         desc = 'LSP: Lists all the implementations for the symbol under the cursor in the quickfix window.',
     })
     vim.keymap.set('n', 'go', function()
@@ -73,7 +67,6 @@ function M.setup_lsp_keymaps(bufnr, client)
             vim.lsp.buf.type_definition()
         end
     end, {
-        buffer = bufnr,
         desc = 'LSP: Jumps to the definition of the type of the symbol under the cursor.',
     })
 
@@ -87,17 +80,14 @@ function M.setup_lsp_keymaps(bufnr, client)
             vim.lsp.buf.references()
         end
     end, {
-        buffer = bufnr,
         desc = 'Remap LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
     })
 
     vim.keymap.set('n', 'gs', function() vim.lsp.buf.signature_help() end, {
-        buffer = bufnr,
         desc = 'LSP: Displays signature information about the symbol under the cursor in a floating window.',
     })
     vim.keymap.set('i', '<C-S>', function() vim.lsp.buf.signature_help() end, {
         --TODO think I like this better than cmp signature_help
-        buffer = bufnr,
         desc = 'Remap LSP: Displays signature information about the symbol under the cursor in a floating window.',
     })
 
@@ -109,7 +99,6 @@ function M.setup_lsp_keymaps(bufnr, client)
             vim.lsp.buf.rename()
         end
     end, {
-        buffer = bufnr,
         desc = 'Remap LSP: Renames all references to the symbol under the cursor.',
     })
 
@@ -119,7 +108,6 @@ function M.setup_lsp_keymaps(bufnr, client)
         'gra',
         function() vim.lsp.buf.code_action() end,
         {
-            buffer = bufnr,
             desc = 'Remap LSP: Selects a code action available at the current cursor position.',
         }
     )
@@ -129,13 +117,11 @@ function M.setup_lsp_keymaps(bufnr, client)
         '<F3>',
         function() require('tiny-code-action').code_action({}) end,
         {
-            buffer = bufnr,
             desc = 'LSP - Actions Preview: Code action preview menu',
         }
     )
 
     vim.keymap.set('n', 'gl', function() vim.diagnostic.open_float() end, {
-        buffer = bufnr,
         desc = 'LSP Diagnostic: Show diagnostics in a floating window.',
     })
 
@@ -143,20 +129,8 @@ function M.setup_lsp_keymaps(bufnr, client)
         'n',
         '<leader>lr',
         function() require('myconfig.lsp.codelens').run() end,
-        { desc = 'LSP: Run Codelens', buffer = bufnr }
+        { desc = 'LSP: Run Codelens' }
     )
-
-    if
-        client:supports_method(
-            vim.lsp.protocol.Methods.textDocument_documentLink
-        )
-    then
-        -- TODO reevaluate how I remap the gx key there might be better options
-        vim.keymap.set('n', 'gx', require('myconfig.lsp.lsplinks').gx, {
-            desc = 'LSP Remap: Open lsp links if exists. Otherwise, fallback to default neovim functionality for open link',
-            buffer = bufnr,
-        })
-    end
 
     if require('myconfig.config').use_native_completion then
         --Note I previously used the following cmp confirm behavior for <CR>
