@@ -330,6 +330,9 @@ vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
         then
             vim.bo[args.buf].readonly = true
             vim.bo[args.buf].modifiable = false
+            require('myconfig.formatter').properties.set_buffer_autoformat_disabled(
+                true
+            )
         end
     end,
 })
