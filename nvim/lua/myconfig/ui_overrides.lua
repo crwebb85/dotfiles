@@ -1,5 +1,6 @@
 local default_select = vim.ui.select
 local default_open = vim.ui.open
+local default_fs_root = vim.fs.root
 
 local M = {}
 
@@ -213,7 +214,25 @@ function M.get_select_function()
     end
 end
 
+function M.fs_root(source, marker)
+    local root_path = default_fs_root(source, marker)
+    if root_path == nil then return nil end
+    --I have an issue where diffview creates a buffer with root path of '.'
+    if root_path == '.' or root_path == './' or root_path == '/.' then
+        -- vim.print('override root path')
+        root_path = assert(vim.uv.cwd())
+    end
+
+    -- vim.print('unnormalized: ' .. root_path)
+    local normalized_root_path = vim.fs.normalize(root_path)
+    -- vim.print('normalized: ' .. normalized_root_path)
+    if require('myconfig.utils.path').is_directory(normalized_root_path) then
+        return vim.fs.abspath(normalized_root_path)
+    end
+end
+
 vim.ui.select = M.get_select_function()
 vim.ui.open = M.open
 
+vim.fs.root = M.fs_root
 return M
