@@ -1449,7 +1449,7 @@ local function telescope_find_hurl(current_hurl_args, callback)
     local opts = {}
     pickers
         .new(opts, {
-            prompt_title = 'Path to env',
+            prompt_title = 'Path to hurl file',
             finder = finders.new_oneshot_job({
                 'rg',
                 '--files',
