@@ -1,5 +1,7 @@
 local config = require('myconfig.config')
 
+--TODO add something custom similar to https://github.com/petertriho/cmp-git
+
 local luasnip_plugin = {
     'L3MON4D3/LuaSnip',
     lazy = true,
@@ -54,9 +56,8 @@ local completion_plugins = {
         'hrsh7th/nvim-cmp',
         lazy = true,
         config = function(_, _)
-            local cmp = require('cmp')
             --Monkey patch the functions that plugins depend on
-            cmp.register_source = function(_, _) end
+            require('cmp').register_source = function(_, _) end
         end,
     },
     {
@@ -73,13 +74,6 @@ local completion_plugins = {
         -- dev = true,
         config = true,
     },
-    {
-        'petertriho/cmp-git', -- Provides info about git repo
-        lazy = true,
-        ft = 'gitcommit',
-        dependencies = { 'nvim-lua/plenary.nvim' },
-    },
-
     --Including these plugins so that they stay in my lock file even when I have them disabled
     --remove once I remove nvim-cmp
     { 'hrsh7th/cmp-cmdline', lazy = true },
@@ -102,12 +96,6 @@ if not config.use_native_completion then
                 { 'hrsh7th/cmp-cmdline' },
                 { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
                 { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
-                {
-                    'petertriho/cmp-git', -- Provides info about git repo
-                    lazy = true,
-                    ft = 'gitcommit',
-                    dependencies = { 'nvim-lua/plenary.nvim' },
-                },
             },
 
             config = function()
@@ -171,103 +159,6 @@ if not config.use_native_completion then
                     }),
                 }
 
-                local buffer_mappings = {
-                    ['<Down>'] = {
-                        i = cmp.mapping.select_next_item({
-                            behavior = 'select',
-                        }),
-                    },
-                    ['<Up>'] = {
-                        i = cmp.mapping.select_prev_item({
-                            behavior = 'select',
-                        }),
-                    },
-                    --Toggle showing completion menu
-                    ['<C-e>'] = cmp.mapping({
-                        i = function()
-                            if cmp.visible() then
-                                cmp.abort()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    }),
-                    -- `Enter` key to confirm completion
-                    ['<CR>'] = cmp.mapping({
-                        i = function(fallback)
-                            if cmp.visible() and cmp.get_active_entry() then
-                                ---setting the undolevels creates a new undo break
-                                ---so by setting it to itself I can create an undo break
-                                ---without side effects just before a comfirming a completion.
-                                -- Use <c-u> in insert mode to undo the completion
-                                vim.cmd([[let &g:undolevels = &g:undolevels]])
-                                cmp.confirm({
-                                    behavior = cmp.ConfirmBehavior.Insert,
-                                    select = false,
-                                })
-                            else
-                                fallback()
-                            end
-                        end,
-                    }),
-                    ['<c-y>'] = cmp.mapping({
-                        i = function(fallback)
-                            if cmp.visible() and cmp.get_active_entry() then
-                                ---setting the undolevels creates a new undo break
-                                ---so by setting it to itself I can create an undo break
-                                ---without side effects just before a comfirming a completion.
-                                -- Use <c-u> in insert mode to undo the completion
-                                vim.cmd([[let &g:undolevels = &g:undolevels]])
-                                cmp.confirm({
-                                    behavior = cmp.ConfirmBehavior.Replace,
-                                    select = false,
-                                })
-                            else
-                                fallback()
-                            end
-                        end,
-                    }),
-                    ['<C-t>'] = cmp.mapping(function()
-                        if cmp.visible_docs() then
-                            cmp.close_docs()
-                        else
-                            cmp.open_docs()
-                        end
-                    end, { 'i', 's' }),
-                    -- Scroll up and down in the completion documentation
-                    ['<C-u>'] = cmp.mapping(function(falback)
-                        if cmp.visible() then
-                            cmp.mapping.scroll_docs(-4)
-                        else
-                            falback()
-                        end
-                    end, { 'i', 's' }),
-                    ['<C-d>'] = cmp.mapping(function(falback)
-                        if cmp.visible() then
-                            cmp.mapping.scroll_docs(4)
-                        else
-                            falback()
-                        end
-                    end, { 'i', 's' }),
-                    ['<C-n>'] = cmp.mapping(function(fallback)
-                        local luasnip = require('luasnip')
-                        if luasnip.expand_or_jumpable() then
-                            luasnip.expand_or_jump()
-                        else
-                            fallback()
-                        end
-                    end, { 'i', 's' }),
-
-                    ['<C-p>'] = cmp.mapping(function(fallback)
-                        local luasnip = require('luasnip')
-
-                        if luasnip.jumpable(-1) then
-                            luasnip.jump(-1)
-                        else
-                            fallback()
-                        end
-                    end, { 'i', 's' }),
-                }
                 cmp.setup({
                     sources = cmp.config.sources({
                         { name = 'nvim_lsp' },
@@ -296,7 +187,7 @@ if not config.use_native_completion then
                             },
                         }),
                     },
-                    mapping = buffer_mappings,
+                    mapping = {}, --Clear default keymaps for buffer completion
                 })
 
                 cmp.setup.filetype('gitcommit', {

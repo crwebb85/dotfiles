@@ -266,6 +266,53 @@ function M.setup_user_commands()
         nargs = 1,
         desc = 'Stops the LSP',
     })
+
+    vim.api.nvim_create_user_command('LspDetach', function(args)
+        local bufnr = vim.api.nvim_get_current_buf()
+        local arg = args.fargs[1]
+        local hi, lo = string.find(arg, '^%s*%d+')
+        if hi == nil then
+            vim.notify('No client id specified', vim.log.levels.WARN)
+            return
+        end
+        local client_id_string = string.sub(arg, hi, lo)
+        local client_id = tonumber(client_id_string)
+
+        if client_id == nil then
+            vim.notify('Client id not valid', vim.log.levels.WARN)
+            return
+        end
+
+        local client = vim.lsp.get_client_by_id(client_id)
+
+        if client == nil then
+            vim.notify(
+                string.format(
+                    'Could not find client for client id %s',
+                    client_id
+                ),
+                vim.log.levels.WARN
+            )
+            return
+        end
+
+        vim.lsp.buf_detach_client(bufnr, client.id)
+    end, {
+        complete = function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            local completion_items = {}
+            --Unlike LspStop we only want to see the clients that are actively attached to the
+            --buffer
+            for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+                local completion_item =
+                    string.format('%s %s', client.id, client.name)
+                table.insert(completion_items, completion_item)
+            end
+            return completion_items
+        end,
+        nargs = 1,
+        desc = 'Stops the LSP',
+    })
 end
 
 ---
@@ -329,43 +376,23 @@ function M.enable()
 
             if
                 client:supports_method(
-                    vim.lsp.protocol.Methods.textDocument_completion
+                    vim.lsp.protocol.Methods.textDocument_codeAction
                 )
             then
                 -- Enable lightbulb
                 require('myconfig.lsp.lightbulb').enable()
+            end
 
-                -- Enable native completion.
-                if require('myconfig.config').use_native_completion then
-                    vim.lsp.completion.enable(true, client.id, event.buf, {
-                        -- Disabled autotrigger because I want to handle it myself
-                        -- so it will trigger on all characters not just the
-                        -- LSP `triggerCharacters
-                        autotrigger = false,
-                    })
-
-                    --Auto trigger on each keypress
-                    -- TODO:
-                    --  1: add a way to toggle this
-                    --  2: add debounce logic
-                    local group = vim.api.nvim_create_augroup(
-                        string.format('my.lsp.completion_%d', event.buf),
-                        { clear = true }
-                    )
-
-                    vim.api.nvim_create_autocmd('InsertCharPre', {
-                        group = group,
-                        buffer = event.buf,
-                        callback = function() vim.lsp.completion.get() end,
-                    })
-
-                    -- require('myconfig.lsp.completion.omnifunc')
-                    -- vim.bo[event.buf].omnifunc = 'v:lua.MyOmnifunc'
-
-                    require('myconfig.lsp.completion.documentation').show_complete_documentation(
-                        event.buf
-                    )
-                end
+            if
+                client:supports_method(
+                    vim.lsp.protocol.Methods.textDocument_completion
+                )
+            then
+                require('myconfig.lsp.completion.completion').enable(
+                    true,
+                    client.id,
+                    event.buf
+                )
             end
 
             if client:supports_method('textDocument/documentColor') then
@@ -375,16 +402,19 @@ function M.enable()
     })
 
     if require('myconfig.config').use_native_completion then
-        vim.api.nvim_create_autocmd('FileType', {
-            group = vim.api.nvim_create_augroup(
-                'native_completion',
-                { clear = true }
-            ),
-            pattern = '*',
-            callback = function(_)
-                require('myconfig.lsp.completion.cmp').start_cmp_lsp()
-            end,
-        })
+        -- TODO currently disabling this because it is two hard to find
+        -- snippits because of buffer completion results since there is no
+        -- way to sort the completion items yet
+        -- vim.api.nvim_create_autocmd('FileType', {
+        --     group = vim.api.nvim_create_augroup(
+        --         'native_completion',
+        --         { clear = true }
+        --     ),
+        --     pattern = '*',
+        --     callback = function(_)
+        --         require('myconfig.lsp.completion.cmp').start_cmp_lsp()
+        --     end,
+        -- })
     else
         vim.api.nvim_create_autocmd('InsertEnter', {
             group = vim.api.nvim_create_augroup(

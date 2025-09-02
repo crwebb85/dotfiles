@@ -1,5 +1,15 @@
 local M = {}
 
+---Run default keymap rather than the remapping
+---@param keys string
+function M.feedkeys(keys)
+    vim.api.nvim_feedkeys(
+        vim.api.nvim_replace_termcodes(keys, true, false, true),
+        'n',
+        true
+    )
+end
+
 -------------------------------------------------------------------------------
 ---Dot repeat
 

@@ -1,5 +1,6 @@
 local config = require('myconfig.config')
 local maputils = require('myconfig.utils.mapping')
+local feedkeys = maputils.feedkeys
 
 vim.g.mapleader = ' '
 
@@ -46,6 +47,335 @@ vim.keymap.set({ 'n' }, 'gx', function()
     end
 end, {
     desc = 'Custom Remap: Open lsp links if exists. Otherwise, fallback to default neovim functionality for open link',
+})
+
+-------------------------------------------------------------------------------
+---Completion
+
+local function pumvisible() return tonumber(vim.fn.pumvisible()) ~= 0 end
+
+local function is_completion_menu_visible()
+    if require('myconfig.config').use_native_completion then
+        return pumvisible()
+    else
+        return require('cmp').visible()
+    end
+end
+
+local function is_entry_active()
+    if require('myconfig.config').use_native_completion then
+        return pumvisible()
+            and vim.fn.complete_info({ 'selected' }).selected >= 0
+    else
+        local cmp = require('cmp')
+        return cmp.visible() and cmp.get_active_entry()
+    end
+end
+
+local function confirm_entry(replace)
+    if require('myconfig.config').use_native_completion then
+        --TODO replicate cmps replace functionality when replace is true
+        feedkeys('<C-y>')
+    else
+        local cmp = require('cmp')
+        local behavior = replace and cmp.ConfirmBehavior.Replace
+            or cmp.ConfirmBehavior.Insert
+        cmp.confirm({
+            behavior = behavior,
+            select = false,
+        })
+    end
+end
+
+local function is_docs_visible()
+    if require('myconfig.config').use_native_completion then
+        --TODO: Not the most robust since it doesn't actually check if the documentation is visible
+        return not require('myconfig.lsp.completion.documentation').is_documentation_disabled()
+    else
+        return require('cmp').visible_docs()
+    end
+end
+
+-- Keymap notes from :help ins-completion
+-- |i_CTRL-X_CTRL-D|	CTRL-X CTRL-D	complete defined identifiers
+-- |i_CTRL-X_CTRL-E|	CTRL-X CTRL-E	scroll up
+-- |i_CTRL-X_CTRL-F|	CTRL-X CTRL-F	complete file names
+-- |i_CTRL-X_CTRL-I|	CTRL-X CTRL-I	complete identifiers
+-- |i_CTRL-X_CTRL-K|	CTRL-X CTRL-K	complete identifiers from dictionary
+-- |i_CTRL-X_CTRL-L|	CTRL-X CTRL-L	complete whole lines
+-- |i_CTRL-X_CTRL-N|	CTRL-X CTRL-N	next completion
+-- |i_CTRL-X_CTRL-O|	CTRL-X CTRL-O	omni completion
+-- |i_CTRL-X_CTRL-P|	CTRL-X CTRL-P	previous completion
+-- |i_CTRL-X_CTRL-R|	CTRL-X CTRL-R	complete contents from registers
+-- |i_CTRL-X_CTRL-S|	CTRL-X CTRL-S	spelling suggestions
+-- |i_CTRL-X_CTRL-T|	CTRL-X CTRL-T	complete identifiers from thesaurus
+-- |i_CTRL-X_CTRL-Y|	CTRL-X CTRL-Y	scroll down
+-- |i_CTRL-X_CTRL-U|	CTRL-X CTRL-U	complete with 'completefunc'
+-- |i_CTRL-X_CTRL-V|	CTRL-X CTRL-V	complete like in : command line
+-- |i_CTRL-X_CTRL-Z|	CTRL-X CTRL-Z	stop completion, keeping the text as-is
+-- |i_CTRL-X_CTRL-]|	CTRL-X CTRL-]	complete tags
+-- |i_CTRL-X_s|		CTRL-X s	spelling suggestions
+--
+-- commands in completion mode (see |popupmenu-keys|)
+--
+-- |complete_CTRL-E| CTRL-E	stop completion and go back to original text
+-- |complete_CTRL-Y| CTRL-Y	accept selected match and stop completion
+--         CTRL-L		insert one character from the current match
+--         <CR>		insert currently selected match
+--         <BS>		delete one character and redo search
+--         CTRL-H		same as <BS>
+--         <Up>		select the previous match
+--         <Down>		select the next match
+--         <PageUp>	select a match several entries back
+--         <PageDown>	select a match several entries forward
+--         other		stop completion and insert the typed character
+--
+
+vim.keymap.set({ 'i' }, '<UP>', function()
+    if require('myconfig.config').use_native_completion then
+        feedkeys('<UP>')
+    else
+        local select_prev = require('cmp').mapping.select_prev_item({
+            behavior = 'select',
+        })
+        select_prev(function() end)
+    end
+end, {
+    desc = 'Custom Remap: Select previous completion item',
+})
+
+vim.keymap.set('i', '<DOWN>', function()
+    if require('myconfig.config').use_native_completion then
+        feedkeys('<DOWN>')
+    else
+        local select_next = require('cmp').mapping.select_next_item({
+            behavior = 'select',
+        })
+        select_next(function() end)
+    end
+end, {
+    desc = 'Custom Remap: Select next completion item',
+})
+
+--TODO the following keymaps don't work in `ic` mode because <C-p> and <C-n> are hardcoded
+--in the vim C code and cannot be remapped until issue https://github.com/vim/vim/issues/16880
+--is resolved as a result I can't have my snippet logic work as `ic` mode 90% of the
+--time this keymap will be ran when using native completion
+vim.keymap.set({ 'i', 's' }, '<C-p>', function()
+    -- local luasnip = require('luasnip')
+    -- if is_entry_active() then
+    --     feedkeys('<C-p>')
+    -- elseif luasnip.jumpable(-1) then
+    --     luasnip.jump(-1)
+    -- elseif vim.snippet.active({ direction = -1 }) then
+    --     vim.snippet.jump(-1)
+    -- elseif require('myconfig.config').use_native_completion then
+    --     feedkeys('<C-p>')
+    -- else
+    --     local select_prev = require('cmp').mapping.select_prev_item({
+    --         behavior = 'select',
+    --     })
+    --     select_prev(function() end)
+    -- end
+
+    if require('myconfig.config').use_native_completion then
+        feedkeys('<C-p>')
+    else
+        local select_prev = require('cmp').mapping.select_prev_item({
+            behavior = 'select',
+        })
+        select_prev(function() end)
+    end
+end, {
+    -- desc = 'Custom Remap: Jump to previous snippet location or fallback to previous completion item',
+    desc = 'Custom Remap: Jump to previous completion item',
+})
+
+--TODO the following keymaps don't work in `ic` mode because <C-p> and <C-n> are hardcoded
+--in the vim C code and cannot be remapped until issue https://github.com/vim/vim/issues/16880
+--is resolved as a result I can't have my snippet logic work as `ic` mode 90% of the
+--time this keymap will be ran when using native completion
+vim.keymap.set({ 'i', 's' }, '<C-n>', function()
+    -- local luasnip = require('luasnip')
+    -- if is_entry_active() then
+    --     feedkeys('<C-n>')
+    -- elseif luasnip.expand_or_jumpable() then
+    --     luasnip.expand_or_jump()
+    -- elseif vim.snippet.active({ direction = 1 }) then
+    --     vim.snippet.jump(1)
+    -- elseif require('myconfig.config').use_native_completion then
+    --     feedkeys('<C-n>')
+    -- else
+    --     local select_next = require('cmp').mapping.select_next_item({
+    --         behavior = 'select',
+    --     })
+    --     select_next(function() end)
+    -- end
+    if require('myconfig.config').use_native_completion then
+        feedkeys('<C-n>')
+    else
+        local select_next = require('cmp').mapping.select_next_item({
+            behavior = 'select',
+        })
+        select_next(function() end)
+    end
+end, {
+    -- desc = 'Custom Remap: Jump to next snippet location or fallback to next completion item',
+    desc = 'Custom Remap: Jump to next completion item',
+})
+
+vim.keymap.set({ 'i', 's' }, '<C-h>', function()
+    local luasnip = require('luasnip')
+    if luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+    elseif vim.snippet.active({ direction = -1 }) then
+        vim.snippet.jump(-1)
+    end
+end, {
+    desc = 'Custom: Jump to previous snippet location',
+})
+
+vim.keymap.set({ 'i', 's' }, '<C-l>', function()
+    local luasnip = require('luasnip')
+    if luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+    elseif vim.snippet.active({ direction = 1 }) then
+        vim.snippet.jump(1)
+    end
+end, {
+    desc = 'Custom: Jump to next snippet location',
+})
+
+vim.keymap.set('i', '<CR>', function()
+    if is_entry_active() then
+        ---setting the undolevels creates a new undo break
+        ---so by setting it to itself I can create an undo break
+        ---without side effects just before a comfirming a completion.
+        -- Use <c-u> in insert mode to undo the completion
+        vim.cmd([[let &g:undolevels = &g:undolevels]])
+        confirm_entry()
+    else
+        feedkeys('<CR>') --Fallback to default keymap (aka insert a newline)
+        -- 						*i_CTRL-M* *i_<CR>*
+        -- <CR> or CTRL-M	Begin new line.
+    end
+end, {
+    desc = 'Custom Remap: Select active completion item or fallback',
+})
+
+vim.keymap.set('i', '<C-y>', function()
+    if is_entry_active() then
+        ---setting the undolevels creates a new undo break
+        ---so by setting it to itself I can create an undo break
+        ---without side effects just before a comfirming a completion.
+        -- Use <c-u> in insert mode to undo the completion
+        vim.cmd([[let &g:undolevels = &g:undolevels]])
+        --I verified that feedkeys in my <CR> mapping does not call this remapping
+        --so I don't have to worry about this recursively getting called
+        confirm_entry(true)
+    else
+        feedkeys('<C-y') -- Fallback to default keymap
+        -- 						*i_CTRL-Y*
+        -- CTRL-Y		Insert the character which is above the cursor.
+        -- 		Note that for CTRL-E and CTRL-Y 'textwidth' is not used, to be
+        -- 		able to copy characters from a long line.
+    end
+end, {
+    desc = 'Custom Remap: Select active completion item or fallback',
+})
+
+--TODO fix for cmp
+vim.keymap.set('i', '<C-e>', function()
+    --TODO may want to also toggle my autocmd that automatically opens
+    --the completion menu on each character typed
+    if is_completion_menu_visible() then
+        --Close completion menu
+        require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled =
+            false
+
+        if not require('myconfig.config').use_native_completion then
+            require('cmp').abort()
+        else
+            feedkeys('<C-e>') --Close completion menu
+        end
+    else
+        require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled =
+            true
+
+        if not require('myconfig.config').use_native_completion then
+            require('cmp').complete()
+            --TODO One difference that may be desirable is that cmp automatically
+            --reenables showing documentation window while my native completion doesn't
+            --currently do so
+        elseif vim.bo.omnifunc == '' then
+            feedkeys('<C-x><C-n>') --Triggers buffer completion
+        else
+            -- vim.lsp.completion.get()
+            feedkeys('<C-x><C-o>') --Triggers vim.bo.omnifunc which is normally lsp completion
+        end
+    end
+end, { desc = 'Custom Remap: Toggle completion window' })
+
+vim.keymap.set({ 'i', 's' }, '<C-u>', function()
+    if is_docs_visible() then
+        if require('myconfig.config').use_native_completion then
+            require('myconfig.lsp.completion.documentation').scroll_docs(-4)
+        else
+            require('cmp').mapping.scroll_docs(-4)
+        end
+    else
+        feedkeys('<C-u>') -- Fallback to default keymap that deletes text to the left
+        -- 						*i_CTRL-U*
+        -- CTRL-U		Delete all entered characters before the cursor in the current
+        -- 		line.  If there are no newly entered characters and
+        -- 		'backspace' is not empty, delete all characters before the
+        -- 		cursor in the current line.
+        -- 		If C-indenting is enabled the indent will be adjusted if the
+        -- 		line becomes blank.
+        -- 		See |i_backspacing| about joining lines.
+        -- 						*i_CTRL-U-default*
+        -- 		By default, sets a new undo point before deleting.
+        -- 		|default-mappings|
+    end
+end, {
+    desc = 'Custom Remap: Scroll up documentation window or fallback',
+})
+
+vim.keymap.set({ 'i', 's' }, '<C-d>', function()
+    if is_docs_visible() then
+        if require('myconfig.config').use_native_completion then
+            require('myconfig.lsp.completion.documentation').scroll_docs(4)
+        else
+            require('cmp').mapping.scroll_docs(4)
+        end
+    else
+        feedkeys('<C-d>') -- Default to default keymap of deleting text to the right
+        -- 						*i_CTRL-D*
+        -- CTRL-D		Delete one shiftwidth of indent at the start of the current
+        -- 		line.  The indent is always rounded to a 'shiftwidth'.
+    end
+end, {
+    desc = 'Custom Remap: Scroll down documentation window when visiblie or fallback',
+})
+
+vim.keymap.set({ 'i', 's' }, '<C-t>', function()
+    if require('myconfig.config').use_native_completion then
+        local is_hidden =
+            require('myconfig.lsp.completion.documentation').is_documentation_disabled()
+        require('myconfig.lsp.completion.documentation').hide_docs(
+            not is_hidden
+        )
+    else
+        local cmp = require('cmp')
+        if cmp.visible_docs() then
+            cmp.close_docs()
+        else
+            cmp.open_docs()
+        end
+    end
+end, {
+    desc = 'Custom Remap: Toggle the completion docs',
+    --This replaces the keymap that adds one indent to the beginning of the line
 })
 
 -------------------------------------------------------------------------------
