@@ -292,8 +292,9 @@ vim.keymap.set('i', '<C-e>', function()
         --Close completion menu
         require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled =
             false
-
-        if not require('myconfig.config').use_native_completion then
+        if pumvisible() then
+            feedkeys('<C-e>') --Close completion menu
+        elseif not require('myconfig.config').use_native_completion then
             require('cmp').abort()
         else
             feedkeys('<C-e>') --Close completion menu
