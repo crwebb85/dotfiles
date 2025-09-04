@@ -322,7 +322,8 @@ vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
             string.lower(vim.fs.normalize(vim.api.nvim_buf_get_name(args.buf)))
 
         if
-            READONLY_LIBRARY_DIR_PATTERN:match(name) ~= nil
+            require('myconfig.utils.misc').string_starts_with(name, 'diffview:') --TODO doesn't work yet for diffview
+            or READONLY_LIBRARY_DIR_PATTERN:match(name) ~= nil
             or (LAZY_PLUGIN_FILEPATH_PATTERN ~= nil and LAZY_PLUGIN_FILEPATH_PATTERN:match(
                 name
             ) ~= nil)

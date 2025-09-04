@@ -229,6 +229,9 @@ function M.fs_root(source, marker)
     if require('myconfig.utils.path').is_directory(normalized_root_path) then
         return vim.fs.abspath(normalized_root_path)
     end
+
+    vim.notify(string.format('fs_root non-file root_path %s', root_path))
+    return root_path
 end
 
 vim.ui.select = M.get_select_function()

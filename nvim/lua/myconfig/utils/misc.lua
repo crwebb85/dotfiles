@@ -1,5 +1,9 @@
 local M = {}
 
+function M.string_starts_with(s, prefix)
+    return string.sub(s, 1, string.len(prefix)) == prefix
+end
+
 ---Get the get default git branch name
 ---@return string
 function M.get_default_branch_name()
