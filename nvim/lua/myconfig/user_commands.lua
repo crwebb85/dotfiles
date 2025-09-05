@@ -1392,34 +1392,46 @@ local function telescope_find_env(current_hurl_args, callback)
     local actions = require('telescope.actions')
     local state = require('telescope.actions.state')
     local pickers = require('telescope.pickers')
-    local finders = require('telescope.finders')
+    local make_entry_from_string =
+        require('telescope.make_entry').gen_from_string({})
     local opts = {}
     pickers
         .new(opts, {
             prompt_title = 'Path to env',
-            finder = finders.new_oneshot_job({
-                'rg',
-                '--files',
-                '--hidden',
-                '--ignore-vcs', -- So that ripgrep won't ignore gitignore files
+            finder = require('myconfig.my_telescope_utils').new_oneshot_job_with_extra_entries(
+                {
+                    'rg',
+                    '--files',
+                    '--hidden',
+                    '--ignore-vcs', -- So that ripgrep won't ignore gitignore files
 
-                '--glob',
-                '!node_modules',
-                '--glob',
-                '!venv',
-                '--glob',
-                '!.venv',
+                    '--glob',
+                    '!node_modules',
+                    '--glob',
+                    '!venv',
+                    '--glob',
+                    '!.venv',
 
-                '--glob',
-                '*.env',
-            }, {}),
+                    '--glob',
+                    '*.env',
+                },
+                {
+                    results = {
+                        make_entry_from_string(''), --We use an empty string entry denote not using an env file when running hurl
+                    },
+                }
+            ),
             sorter = conf.generic_sorter(opts),
             attach_mappings = function(buffer_number)
+                local canceled = true
                 local updated_hurl_args = vim.deepcopy(current_hurl_args)
                 actions.select_default:replace(function()
                     local status, err = pcall(function()
                         local selection = state.get_selected_entry()
                         if selection == nil then return end
+
+                        canceled = false
+                        if selection[1] == '' then return end
 
                         updated_hurl_args.env_path =
                             vim.fs.abspath(selection[1])
@@ -1429,7 +1441,16 @@ local function telescope_find_env(current_hurl_args, callback)
                 end)
 
                 actions.close:enhance({
-                    post = function() callback(updated_hurl_args) end,
+                    post = function()
+                        if canceled then
+                            vim.notify(
+                                'Canceling hurl command because env picker was exited without selection',
+                                vim.log.levels.WARN
+                            )
+                            return
+                        end
+                        callback(updated_hurl_args)
+                    end,
                 })
                 return true
             end,
@@ -1450,6 +1471,7 @@ local function telescope_find_hurl(current_hurl_args, callback)
     pickers
         .new(opts, {
             prompt_title = 'Path to hurl file',
+
             finder = finders.new_oneshot_job({
                 'rg',
                 '--files',
