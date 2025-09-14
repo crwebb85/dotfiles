@@ -194,6 +194,8 @@ end
 ---@field mode string | table | nil keymap modes (overrides the default modes if defined)
 ---@field backward string|function
 ---@field forward string|function
+---@field backward_repeat string|function|nil (default: value of backward field)
+---@field forward_repeat string|function|nil (default: value of forward field)
 ---@field desc MyListNavigatorDesc?
 ---@field opts vim.keymap.set.Opts?
 
@@ -260,6 +262,20 @@ function MyOperations:navigator(args)
         { 'string', 'function' },
         false
     )
+
+    vim.validate(
+        'args.default.backward_repeat',
+        args.default.backward_repeat,
+        { 'string', 'function' },
+        true
+    )
+    vim.validate(
+        'args.default.forward_repeat',
+        args.default.forward_repeat,
+        { 'string', 'function' },
+        true
+    )
+
     vim.validate(
         'args.default.desc',
         args.default.desc,
@@ -305,33 +321,40 @@ function MyOperations:navigator(args)
     local function set_callbacks(isLastCallbackExtreme)
         self.isLastCallbackExtreme = isLastCallbackExtreme
         self._repeat_backward_callback = function()
-            if type(args.default.backward) == 'string' then
-                vim.cmd(args.default.backward)
+            local backward = args.default.backward_repeat
+                or args.default.backward
+            if type(backward) == 'string' then
+                vim.cmd(backward)
             else
-                args.default.backward()
+                backward()
             end
         end
         self._repeat_forward_callback = function()
-            if type(args.default.forward) == 'string' then
-                vim.cmd(args.default.forward)
+            local forward = args.default.forward_repeat or args.default.forward
+            if type(forward) == 'string' then
+                vim.cmd(forward)
             else
-                args.default.forward()
+                forward()
             end
         end
         if args.extreme ~= nil then
             self._repeat_extreme_backward_callback = function()
-                if type(args.extreme.backward) == 'string' then
-                    vim.cmd(args.extreme.backward)
+                local extreme_backward = args.extreme.backward_repeat
+                    or args.extreme.backward
+                if type(extreme_backward) == 'string' then
+                    vim.cmd(extreme_backward)
                 else
-                    args.extreme.backward()
+                    extreme_backward()
                 end
             end
 
             self._repeat_extreme_forward_callback = function()
-                if type(args.extreme.forward) == 'string' then
-                    vim.cmd(args.extreme.forward)
+                local extreme_forward = args.extreme.forward_repeat
+                    or args.extreme.forward
+                if type(extreme_forward) == 'string' then
+                    vim.cmd(extreme_forward)
                 else
-                    args.extreme.forward()
+                    extreme_forward()
                 end
             end
         else
@@ -344,22 +367,15 @@ function MyOperations:navigator(args)
         end
     end
 
-    local backward = function()
-        set_callbacks(false)
-        M.smart_nav(args.default.backward)
-    end
-
-    local forward = function()
-        set_callbacks(false)
-        M.smart_nav(args.default.forward)
-    end
-
     local default_keymap_mode = args.default.mode or self._opts.mode
     default_keymap_opts.desc = process_desc(args.default.desc, 1)
     vim.keymap.set(
         default_keymap_mode,
         self._opts.backward_key .. args.default.key,
-        backward,
+        function()
+            set_callbacks(false)
+            M.smart_nav(args.default.backward)
+        end,
         default_keymap_opts
     )
 
@@ -367,7 +383,10 @@ function MyOperations:navigator(args)
     vim.keymap.set(
         default_keymap_mode,
         self._opts.forward_key .. args.default.key,
-        forward,
+        function()
+            set_callbacks(false)
+            M.smart_nav(args.default.forward)
+        end,
         default_keymap_opts
     )
 
@@ -375,22 +394,15 @@ function MyOperations:navigator(args)
         local extreme_keymap_opts =
             vim.tbl_deep_extend('keep', {}, args.extreme.opts or {})
 
-        local extreme_backward = function()
-            set_callbacks(true)
-            M.smart_nav(args.extreme.backward)
-        end
-
-        local extreme_forward = function()
-            set_callbacks(true)
-            M.smart_nav(args.extreme.forward)
-        end
-
         local extreme_keymap_mode = args.default.mode or self._opts.mode
         extreme_keymap_opts.desc = process_desc(args.extreme.desc, 1)
         vim.keymap.set(
             extreme_keymap_mode,
             self._opts.backward_key .. args.extreme.key,
-            extreme_backward,
+            function()
+                set_callbacks(true)
+                M.smart_nav(args.default.backward)
+            end,
             extreme_keymap_opts
         )
 
@@ -398,7 +410,10 @@ function MyOperations:navigator(args)
         vim.keymap.set(
             extreme_keymap_mode,
             self._opts.forward_key .. args.extreme.key,
-            extreme_forward,
+            function()
+                set_callbacks(true)
+                M.smart_nav(args.default.forward)
+            end,
             extreme_keymap_opts
         )
     end

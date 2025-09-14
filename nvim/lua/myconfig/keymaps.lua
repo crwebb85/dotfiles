@@ -713,6 +713,11 @@ vim.keymap.set('n', '<leader>vok', function() add_lines('above') end, {
     desc = 'Custom: add blank line(s) above the current line',
 })
 
+local my_lsp_location_navigator =
+    require('myconfig.lsp.locations').create_lsp_locations_navigator({
+        namespace = 'my_default_lsp_location_navigator',
+    })
+
 local myoperations = maputils
     .operations({
 
@@ -1615,6 +1620,236 @@ local myoperations = maputils
                 )
             end,
             desc = 'Custom: jump to the {previous|next} type cast end',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'grr',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').references
+                )
+                my_lsp_location_navigator:jump('prev')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').references
+                )
+                my_lsp_location_navigator:jump('next')
+            end,
+            backward_repeat = function() my_lsp_location_navigator:jump('prev') end,
+            forward_repeat = function() my_lsp_location_navigator:jump('next') end,
+            desc = 'Custom: jump to {previous|next} LSP reference',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'Grr',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').references
+                )
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').references
+                )
+                my_lsp_location_navigator:jump('last')
+            end,
+            backward_repeat = function()
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward_repeat = function() my_lsp_location_navigator:jump('last') end,
+            desc = 'Custom: jump to {first|last} LSP reference',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'gd',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').definition
+                )
+                my_lsp_location_navigator:jump('prev')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').definition
+                )
+                my_lsp_location_navigator:jump('next')
+            end,
+            backward_repeat = function() my_lsp_location_navigator:jump('prev') end,
+            forward_repeat = function() my_lsp_location_navigator:jump('next') end,
+            desc = 'Custom: jump to {previous|next} LSP definition',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'Gd',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').definition
+                )
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').definition
+                )
+                my_lsp_location_navigator:jump('last')
+            end,
+            backward_repeat = function()
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward_repeat = function() my_lsp_location_navigator:jump('last') end,
+            desc = 'Custom: jump to {first|last} LSP definition',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'gD',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').declaration
+                )
+                my_lsp_location_navigator:jump('prev')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').declaration
+                )
+                my_lsp_location_navigator:jump('next')
+            end,
+            backward_repeat = function() my_lsp_location_navigator:jump('prev') end,
+            forward_repeat = function() my_lsp_location_navigator:jump('next') end,
+            desc = 'Custom: jump to {previous|next} LSP declaration',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'GD',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').declaration
+                )
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').declaration
+                )
+                my_lsp_location_navigator:jump('last')
+            end,
+            backward_repeat = function()
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward_repeat = function() my_lsp_location_navigator:jump('last') end,
+            desc = 'Custom: jump to {first|last} LSP declaration',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'gi',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').implementation
+                )
+                my_lsp_location_navigator:jump('prev')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').implementation
+                )
+                my_lsp_location_navigator:jump('next')
+            end,
+            backward_repeat = function() my_lsp_location_navigator:jump('prev') end,
+            forward_repeat = function() my_lsp_location_navigator:jump('next') end,
+            desc = 'Custom: jump to {previous|next} LSP implementation',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'Gi',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').implementation
+                )
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').implementation
+                )
+                my_lsp_location_navigator:jump('last')
+            end,
+            backward_repeat = function()
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward_repeat = function() my_lsp_location_navigator:jump('last') end,
+            desc = 'Custom: jump to {first|last} LSP implementation',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'gd',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').type_definition
+                )
+                my_lsp_location_navigator:jump('prev')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').type_definition
+                )
+                my_lsp_location_navigator:jump('next')
+            end,
+            backward_repeat = function() my_lsp_location_navigator:jump('prev') end,
+            forward_repeat = function() my_lsp_location_navigator:jump('next') end,
+            desc = 'Custom: jump to {previous|next} LSP type definition',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'Gd',
+            mode = { 'n' },
+            backward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').type_definition
+                )
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward = function()
+                my_lsp_location_navigator:init(
+                    require('myconfig.lsp.locations').type_definition
+                )
+                my_lsp_location_navigator:jump('last')
+            end,
+            backward_repeat = function()
+                my_lsp_location_navigator:jump('first')
+            end,
+            forward_repeat = function() my_lsp_location_navigator:jump('last') end,
+            desc = 'Custom: jump to {first|last} LSP type definition',
             opts = {},
         },
     })
