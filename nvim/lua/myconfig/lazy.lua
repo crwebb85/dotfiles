@@ -933,7 +933,7 @@ require('lazy').setup({
                 end,
             })
         end,
-        dependencies = { 'echasnovski/mini.icons' },
+        dependencies = { 'nvim-mini/mini.icons' },
         opts = {
             default_file_explorer = true,
             delete_to_trash = true,
@@ -2666,7 +2666,7 @@ require('lazy').setup({
             'mfussenegger/nvim-dap-python', --optional
             'nvim-telescope/telescope.nvim',
         },
-        branch = 'regexp', -- This is the regexp branch, use this for the new version
+        branch = 'main',
         config = function() require('venv-selector').setup({}) end,
         --My old setup but haven't retested since upgrading to this newer version
         -- config = function(_, _)
