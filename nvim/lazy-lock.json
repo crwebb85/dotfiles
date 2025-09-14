@@ -57,7 +57,7 @@
   "treesj": { "branch": "main", "commit": "925b506eadd9b465e6e577bb684d86e9863a2e21" },
   "undotree": { "branch": "master", "commit": "fe9a9d0645f0f5532360b5e5f5c550d7bb4f1869" },
   "unnest.nvim": { "branch": "main", "commit": "3328e33c022e3720635976f82b8b0eb1240fc53e" },
-  "venv-selector.nvim": { "branch": "regexp", "commit": "d2326e7433fdeb10f7d0d1237c18b91b353f9f8b" },
+  "venv-selector.nvim": { "branch": "main", "commit": "4550d0b5a80757caf5ced9658b2d9d171b5c02d8" },
   "vim-fugitive": { "branch": "master", "commit": "96c1009fcf8ce60161cc938d149dd5a66d570756" },
   "wezterm-types": { "branch": "main", "commit": "e1084ee3e9e9ef9da94aa9a876c2a79ab3660cbc" },
   "wezterm.nvim": { "branch": "main", "commit": "032c33b621b96cc7228955b4352b48141c482098" },
