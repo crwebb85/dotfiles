@@ -1902,16 +1902,11 @@ require('lazy').setup({
             'antoinemadec/FixCursorHold.nvim',
             'nvim-treesitter/nvim-treesitter',
             -- adapters
+            -- TODO replace neotest-rust because it is archived
             'rouge8/neotest-rust',
             'nvim-neotest/neotest-python',
-            'Issafalcon/neotest-dotnet',
-            -- {
-            --     --Using my fork until the PR https://github.com/Issafalcon/neotest-dotnet/pull/123/files
-            --     --from BurkeStrange is merged into in
-            --     'crwebb85/neotest-dotnet',
-            --     -- 'Issafalcon/neotest-dotnet',
-            --     -- dev = true,
-            -- },
+            'nsidorenco/neotest-vstest',
+            -- 'Issafalcon/neotest-dotnet',
         },
         lazy = true,
         cmd = 'Neotest',
@@ -1980,34 +1975,51 @@ require('lazy').setup({
                         -- args = { '--no-capture' },
                         -- dap_adapter = 'lldb',
                     }),
-                    require('neotest-dotnet')({
-                        dap = {
-                            -- Extra arguments for nvim-dap configuration
-                            -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
-                            args = { justMyCode = false },
-                            -- Enter the name of your dap adapter, the default value is netcoredbg
-                            adapter_name = 'netcoredbg',
+                    require('neotest-vstest')({
+                        -- Path to dotnet sdk path.
+                        -- Used in cases where the sdk path cannot be auto discovered.
+                        -- sdk_path = "/usr/local/dotnet/sdk/9.0.101/",
+                        sdk_path = 'C:\\Program Files\\dotnet\\sdk',
+
+                        -- table is passed directly to DAP when debugging tests.
+                        dap_settings = {
+                            type = 'netcoredbg',
                         },
-                        dotnet_additional_args = {
-                            '--logger "console;verbosity=detailed"',
-                        },
-                        -- Let the test-discovery know about your custom attributes (otherwise tests will not be picked up)
-                        -- Note: Only custom attributes for non-parameterized tests should be added here. See the support note about parameterized tests
-                        -- custom_attributes = {
-                        --     xunit = { 'MyCustomFactAttribute' },
-                        --     nunit = { 'MyCustomTestAttribute' },
-                        --     mstest = { 'MyCustomTestMethodAttribute' },
-                        -- },
-                        -- Provide any additional "dotnet test" CLI commands here. These will be applied to ALL test runs performed via neotest. These need to be a table of strings, ideally with one key-value pair per item.
-                        -- dotnet_additional_args = {
-                        --     '--verbosity detailed',
-                        -- },
-                        -- Tell neotest-dotnet to use either solution (requires .sln file) or project (requires .csproj or .fsproj file) as project root
-                        -- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
-                        --       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
-                        -- discovery_root = 'project', -- Default
-                        discovery_root = 'solution',
+
+                        -- If multiple solutions exists the adapter will ask you to choose one.
+                        -- If you have a different heuristic for choosing a solution you can provide a function here.
+                        -- solution_selector = function(solutions)
+                        --     return nil -- return the solution you want to use or nil to let the adapter choose.
+                        -- end,
                     }),
+                    -- require('neotest-dotnet')({
+                    --     dap = {
+                    --         -- Extra arguments for nvim-dap configuration
+                    --         -- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
+                    --         args = { justMyCode = false },
+                    --         -- Enter the name of your dap adapter, the default value is netcoredbg
+                    --         adapter_name = 'netcoredbg',
+                    --     },
+                    --     dotnet_additional_args = {
+                    --         '--logger "console;verbosity=detailed"',
+                    --     },
+                    --     -- Let the test-discovery know about your custom attributes (otherwise tests will not be picked up)
+                    --     -- Note: Only custom attributes for non-parameterized tests should be added here. See the support note about parameterized tests
+                    --     -- custom_attributes = {
+                    --     --     xunit = { 'MyCustomFactAttribute' },
+                    --     --     nunit = { 'MyCustomTestAttribute' },
+                    --     --     mstest = { 'MyCustomTestMethodAttribute' },
+                    --     -- },
+                    --     -- Provide any additional "dotnet test" CLI commands here. These will be applied to ALL test runs performed via neotest. These need to be a table of strings, ideally with one key-value pair per item.
+                    --     -- dotnet_additional_args = {
+                    --     --     '--verbosity detailed',
+                    --     -- },
+                    --     -- Tell neotest-dotnet to use either solution (requires .sln file) or project (requires .csproj or .fsproj file) as project root
+                    --     -- Note: If neovim is opened from the solution root, using the 'project' setting may sometimes find all nested projects, however,
+                    --     --       to locate all test projects in the solution more reliably (if a .sln file is present) then 'solution' is better.
+                    --     -- discovery_root = 'project', -- Default
+                    --     discovery_root = 'solution',
+                    -- }),
                 },
                 icons = {
                     child_indent = get_icon('neotest_child_indent'),
