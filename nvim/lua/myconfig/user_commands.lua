@@ -501,6 +501,80 @@ vim.api.nvim_create_user_command(
     }
 )
 
+vim.api.nvim_create_user_command('QFBreakpoints', function(_)
+    local DAP_QUICKFIX_TITLE = 'DAP Breakpoints'
+    local DAP_QUICKFIX_CONTEXT = DAP_QUICKFIX_TITLE
+    local qf_list =
+        require('dap.breakpoints').to_qf_list(require('dap.breakpoints').get())
+    local current_qflist_title = vim.fn.getqflist({ title = 1 }).title
+    local action = ' '
+    if current_qflist_title == DAP_QUICKFIX_TITLE then action = 'r' end
+    vim.fn.setqflist({}, action, {
+        items = qf_list,
+        context = { DAP_QUICKFIX_CONTEXT },
+        title = DAP_QUICKFIX_TITLE,
+    })
+    if #qf_list == 0 then
+        vim.api.notify('No breakpoints set!', vim.log.levels.INFO)
+    else
+        vim.api.nvim_command('copen')
+    end
+end, {
+    desc = 'Populate quickfix list with the breakpoints',
+})
+
+vim.api.nvim_create_user_command('LocBreakpoints', function(_)
+    local list_nr = 0
+    local DAP_QUICKFIX_TITLE = 'DAP Breakpoints'
+    local DAP_QUICKFIX_CONTEXT = DAP_QUICKFIX_TITLE
+    local qf_list =
+        require('dap.breakpoints').to_qf_list(require('dap.breakpoints').get())
+    local current_qflist_title = vim.fn.getloclist(list_nr, { title = 1 }).title
+    local action = ' '
+    if current_qflist_title == DAP_QUICKFIX_TITLE then action = 'r' end
+    vim.fn.setloclist(list_nr, {}, action, {
+        items = qf_list,
+        context = { DAP_QUICKFIX_CONTEXT },
+        title = DAP_QUICKFIX_TITLE,
+    })
+    if #qf_list == 0 then
+        vim.api.notify('No breakpoints set!', vim.log.levels.INFO)
+    else
+        vim.api.nvim_command('lopen')
+    end
+end, {
+    desc = 'Populate location list with the breakpoints',
+})
+
+vim.api.nvim_create_user_command('QFAddCursor', function(_)
+    local item = {
+        bufnr = vim.api.nvim_get_current_buf(),
+        lnum = vim.fn.line('.'),
+        text = vim.fn.getline('.'),
+        col = vim.fn.col('.'),
+    }
+    local items = vim.fn.getqflist()
+    table.insert(items, item)
+    vim.fn.setqflist({}, 'u', { items = items })
+end, {
+    desc = 'Adds the cursor to the quickfix list',
+})
+
+vim.api.nvim_create_user_command('LocAddCursor', function(_)
+    local list_nr = 0
+    local item = {
+        bufnr = vim.api.nvim_get_current_buf(),
+        lnum = vim.fn.line('.'),
+        text = vim.fn.getline('.'),
+        col = vim.fn.col('.'),
+    }
+    local items = vim.fn.getloclist(list_nr)
+    table.insert(items, item)
+    vim.fn.setloclist(list_nr, {}, 'u', { items = items })
+end, {
+    desc = 'Adds the cursor to the location list',
+})
+
 vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
     if args.args == 'ERROR' then
         vim.diagnostic.setqflist({
