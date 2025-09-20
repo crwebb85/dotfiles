@@ -1913,17 +1913,25 @@ require('lazy').setup({
         keys = {
             {
                 '<leader>tr',
-                function() require('neotest').run.run() end,
+                function() require('neotest').run.run({}) end,
                 desc = 'Neotest: Run the nearest test',
             },
             {
                 '<leader>tc',
-                function() require('neotest').run.run(vim.fn.expand('%')) end,
+                function()
+                    require('neotest').run.run({
+                        vim.fn.expand('%'),
+                    })
+                end,
                 desc = 'Neotest: Run the current file',
             },
             {
                 '<leader>tm',
-                function() require('neotest').run.run(vim.fn.getcwd()) end,
+                function()
+                    require('neotest').run.run({
+                        vim.fn.getcwd(),
+                    })
+                end,
                 desc = 'Neotest: Run all tests in cwd',
             },
             {
@@ -1938,7 +1946,7 @@ require('lazy').setup({
                 desc = 'Neotest: Debug the nearest test',
             },
             {
-                '<leader>ts',
+                '<leader>tq',
                 function() require('neotest').run.stop() end,
                 desc = 'Neotest: Stop the nearest test',
             },
@@ -1947,20 +1955,38 @@ require('lazy').setup({
                 function() require('neotest').run.attach() end,
                 desc = 'Neotest: Attach to the nearest test',
             },
-
             {
-                '<leader>to',
-                '<cmd>Neotest summary<CR>',
+                '<leader>ts',
+                function() require('neotest').summary.toggle() end,
                 mode = 'n',
                 desc = 'Neotest: Toggle Summary',
+            },
+            {
+                '<leader>tp',
+                function() require('neotest').output_panel.toggle() end,
+                mode = 'n',
+                desc = 'Neotest: toggle output-panel',
+            },
+            {
+                '<leader>to',
+                function() require('neotest').myoutput.open() end,
+                mode = 'n',
+                desc = 'Neotest: toggle output floating window',
             },
         },
         config = function(_, _)
             ---@type neotest.Config
             local opts = {
                 dap = false, --I will manually enable so that dap can be lazy loaded
+                -- putting custom consumers here is need to properly initialize
+                -- the consumer and adds it to the neotest metatable so that
+                -- custom consumers can be used like `require('neotest').myoutput.open()`
+                --
+                -- Note: it does not add them to the Neotest user command
+                -- but monkey patching could be used to replace some sub-commands
                 consumers = {
                     overseer = require('neotest.consumers.overseer'),
+                    myoutput = require('neotest.consumers.myoutput'),
                 },
                 -- quickfix = {
                 --     --disabling adding to the quickfix because it was nuking my custom problem matcher that extracting file locations from stacktraces.

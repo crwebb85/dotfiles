@@ -2356,9 +2356,6 @@ local myoperations = maputils
             opts = {},
         },
     })
-    -- passed: string = passed,
-    -- failed: string = failed,
-    -- skipped: string = skipped,
     :navigator({
         --visual mode: stays within buffer so visual mode would be useful
         default = {
