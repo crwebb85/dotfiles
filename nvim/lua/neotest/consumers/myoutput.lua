@@ -20,32 +20,18 @@ local function open_output(result, opts)
     end
     local buf = nio.api.nvim_create_buf(false, true)
 
-    local chan = lib.ui.open_term(buf)
-
     short_opened = opts.short
-    -- See https://github.com/neovim/neovim/issues/14557
-    local dos_newlines = string.find(output, '\r\n') ~= nil
-    nio.api.nvim_chan_send(
-        chan,
-        dos_newlines and output or output:gsub('\n', '\r\n')
-    )
 
-    -- TODO: For some reason, NeoVim fills the buffer with empty lines
+    local normalized_output = output:gsub('\r\n', '\n'):gsub('\r', '\n')
     vim.bo[buf].modifiable = true
-    vim.api.nvim_buf_set_lines(buf, 0, -1, false, {})
+    vim.api.nvim_buf_set_lines(
+        buf,
+        0,
+        -1,
+        false,
+        vim.split(normalized_output, '\n')
+    )
     vim.bo[buf].modifiable = false
-
-    nio.sleep(10) -- Wait for chan to send
-    nio.api.nvim_create_autocmd('TermEnter', {
-        buffer = buf,
-        callback = function()
-            vim.api.nvim_feedkeys(
-                vim.api.nvim_replace_termcodes('<C-\\><C-N>', true, true, true),
-                'n',
-                false
-            )
-        end,
-    })
 
     local lines = nio.api.nvim_buf_get_lines(buf, 0, -1, false)
     local width, height = 80, #lines
@@ -57,11 +43,6 @@ local function open_output(result, opts)
         if line_length > width then width = line_length end
     end
 
-    local on_close = function()
-        pcall(vim.fn.chanclose, chan)
-        win = nil
-    end
-
     opts.open_win = opts.open_win
         or function(win_opts)
             local float = lib.ui.float.open({
@@ -70,7 +51,6 @@ local function open_output(result, opts)
                 buffer = buf,
                 auto_close = opts.auto_close,
             })
-            float:listen('close', on_close)
             return float.win_id
         end
 
@@ -79,10 +59,6 @@ local function open_output(result, opts)
     win = opts.open_win({ width = width, height = height })
         or vim.api.nvim_get_current_win()
 
-    vim.api.nvim_create_autocmd('WinClosed', {
-        pattern = tostring(win),
-        callback = on_close,
-    })
     vim.api.nvim_win_set_buf(win, buf)
 
     if opts.enter then
@@ -98,7 +74,7 @@ end
 local neotest = {}
 
 ---@class neotest.consumers.myoutput
--- ---@field open fun(opts?: neotest.consumers.output.OpenArgs)
+---@field open fun(opts?: neotest.consumers.output.OpenArgs)
 
 --- A consumer that displays the output of test results.
 -- ---@type neotest.consumers.myoutput
