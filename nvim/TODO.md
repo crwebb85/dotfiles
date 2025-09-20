@@ -173,6 +173,7 @@ the workaround is to make sure the plugin is loaded
   - [ ] add location list as an option for overseer output
   - [ ] integrate overseer with neotest
   - [ ] add buffer and path completion to Grep and GrepAdd commands
+  - [ ] command to output neotest output panel (has ft "neotest-output-panel") to qflist (need to find longest column and concat lines with the same length)
 - [ ] SQL
   - [ ] tsql treesitter
   - [ ] tsql formatter
@@ -223,7 +224,10 @@ the workaround is to make sure the plugin is loaded
   - [ ] add html formatter
 - [ ] Movement/TextObjects keymaps
   - [ ] re-evaluate keymaps after upgrading to nightly based on keymaps added in https://github.com/neovim/neovim/commit/bb7604eddafb31cd38261a220243762ee013273a
-  - [ ] add ]r and [r for navigating lsp references
+  - [x] add ]grr and [grr and other keymaps for lsp location methods
+    - [ ] make them macro safe
+    - [ ] fix race condition when ran too quickly
+    - [ ] fix mark code action plugin
   - [x] add a substitute operation that uses text objects for pasting similar to [substitute.nvim](https://github.com/gbprod/substitute.nvim)
   - [ ] add keymap for next/previous partial word for navigating within snake-case and camel-case variables similar to [chrisgrieser/nvim-spider](https://github.com/chrisgrieser/nvim-spider)
   - [ ] maybe use some prefix like g for my navigation keymaps to move the cursor to the end
@@ -371,3 +375,21 @@ the workaround is to make sure the plugin is loaded
 - https://eza.rocks/
 - https://pandoc.org/
 - https://github.com/Wilfred/difftastic
+
+## debug lsp
+
+If `start_config` is called (from `C:\nvim-win64\share\nvim\runtime\lua\vim\lsp.lua`) and `config.root == nil` the lsp client root will be cwd
+
+- my `.config` dir creates two `lua_ls` clients `~\Documents\.config` for when I open diffview lua file (due to the empty buffer file)
+- I think diffiew only creates the base_dir of . when it errors displaying the diff
+
+```
+Failed to create diff buffer: ':0:HelloWorldTest/a_really_deep/very_nested/file_structure_that_needs_many_characters_and_takes_up_a_ton_of_line_space/TestFile1WithAReallyLongNameWithManyCharacters.cs'
+watch files callback base_dir /.
+watch files callback base_dir /.
+start_config for bufnr 43 with root .
+start_config for bufnr 62 with root nil
+```
+
+fix lua_ls snippet for --- to auto fill doc types
+fix forward back snippet keymap not conflict with forward and back completion keymap

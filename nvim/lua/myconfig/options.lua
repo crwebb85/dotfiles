@@ -143,6 +143,9 @@ vim.filetype.add({
 -- Error format for nuget restore:
 -- helloworld\helloworld.csproj : warning NU1901: Package 'my.helloworld' 1.0.0 has a known low severity vulnerability
 vim.opt.errorformat:append([[%f:\ %tarning\ %m]])
+--dotnet tests often output filenames in the form C:\Users\crweb\Documents\poc\hello-world-dotnet-console\HelloWorldTestNunit\UnitTest1.cs:line 19
+vim.opt.errorformat:append([[%f:line\ %l]])
+-- vim.opt.errorformat:append([[%f:line\ %l:%c]])
 -- vim.opt.errorformat:append([[Source:\ %f:%m]])
 local is_nerd_font_enabled = require('myconfig.config').nerd_font_enabled
 vim.diagnostic.config({

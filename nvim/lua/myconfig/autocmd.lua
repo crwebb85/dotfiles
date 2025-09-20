@@ -73,36 +73,36 @@ vim.api.nvim_create_autocmd('TermOpen', {
             vim.wo[0][0].colorcolumn = ''
             vim.wo[0][0].fillchars = 'eob: ,lastline:…'
             vim.wo[0][0].listchars = 'extends:…,tab:  '
-            vim.keymap.set('n', 'gf', function()
-                local terminal_manager =
-                    require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
-                        args.buf
-                    )
-                if terminal_manager == nil then return end
-
-                local cfile = vim.fn.expand('<cfile>')
-                local path = vim.fn.findfile(cfile, '**')
-                if path == '' then path = vim.fn.finddir(cfile, '**') end
-
-                if path == '' then
-                    vim.notify(
-                        'No file/directory under cursor',
-                        vim.log.levels.WARN
-                    )
-                else
-                    local window_manager = terminal_manager:get_window_manager()
-                    if
-                        window_manager
-                        and window_manager.position == 'float'
-                    then
-                        terminal_manager:hide()
-                    end
-                    vim.schedule(function() require('oil').open(path) end)
-                end
-            end, {
-                buffer = args.buf,
-                desc = 'Custom Remap: Go to file under cursor (terminal edition)',
-            })
+            -- vim.keymap.set('n', 'gf', function()
+            --     local terminal_manager =
+            --         require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
+            --             args.buf
+            --         )
+            --     if terminal_manager == nil then return end
+            --
+            --     local cfile = vim.fn.expand('<cfile>')
+            --     local path = vim.fn.findfile(cfile, '**')
+            --     if path == '' then path = vim.fn.finddir(cfile, '**') end
+            --
+            --     if path == '' then
+            --         vim.notify(
+            --             'No file/directory under cursor',
+            --             vim.log.levels.WARN
+            --         )
+            --     else
+            --         local window_manager = terminal_manager:get_window_manager()
+            --         if
+            --             window_manager
+            --             and window_manager.position == 'float'
+            --         then
+            --             terminal_manager:hide()
+            --         end
+            --         vim.schedule(function() require('oil').open(path) end)
+            --     end
+            -- end, {
+            --     buffer = args.buf,
+            --     desc = 'Custom Remap: Go to file under cursor (terminal edition)',
+            -- })
             vim.keymap.set('t', '<esc>', function()
                 local terminal_manager =
                     require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(

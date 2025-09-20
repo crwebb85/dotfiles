@@ -18,6 +18,514 @@ vim.keymap.set(
     { desc = 'Customized Remap: Remapped to <nop> to disable this keybinging' }
 )
 
+---Finds the start and end index of a substring in another string for a given
+---known index that is known to be within the matched string.
+---If a match is not found around the known index then (nil, nil) will be returned
+---@param s string
+---@param search string
+---@param known_index integer
+---@return integer? start_index
+---@return integer? end_index
+local function string_find_for_inner_index(s, search, known_index)
+    ---@type integer?
+    local first = 0
+    ---@type integer?
+    local last = nil
+    -- local first, last = 0
+    while first ~= nil and first <= #s do
+        first, last = s:find(search, first + 1, true)
+        if
+            first ~= nil
+            and last ~= nil
+            and first <= known_index
+            and known_index <= last
+        then
+            return first, last
+        end
+    end
+    return nil, nil
+end
+
+local function get_cfile()
+    local line = vim.api.nvim_get_current_line()
+    local col = vim.fn.col('.')
+    assert(col > 0)
+
+    local cfile = vim.fn.expand('<cfile>')
+    if string.sub(line, col, col) == ':' then
+        col = col + 1 -- handles a bug where file names with the prefix 'C:\' will only return characters after the colon
+    end
+    local start_index, end_index = string_find_for_inner_index(line, cfile, col)
+    -- There is a wierd bug for <cfile> where files with windows drive letters
+    -- may be incorrect if the colon is followed by a single backslash if the
+    -- cursor is after the colon
+    -- For example:
+    --C:\Users\crweb\Documents\.config\nvim\test.md --cursor after colon-> \Users\crweb\Documents\.config\nvim\test.md
+    --
+    if start_index == nil then return cfile, start_index, end_index end
+
+    if
+        string.len(cfile) > 0
+        and string.sub(cfile, 1, 1) == '\\'
+        and start_index > 2
+    then
+        local drive_prefix = string.sub(line, start_index - 2, start_index - 1)
+        -- vim.print(drive_prefix)
+        cfile = table.concat({ drive_prefix, cfile })
+        start_index = start_index - 2
+    end
+    assert(cfile == string.sub(line, start_index, end_index))
+    return cfile, start_index, end_index
+end
+
+-- local filename, filename_start_index, filename_end_index = get_cfile()
+-- print(filename, filename_start_index, filename_end_index)
+
+---@type integer?
+local scratch_bufnr = nil
+
+local function get_gf_location()
+    --determine gF position
+    -- 1. get current cursor and bufnr
+    -- 2. do gF
+    -- 3. if error is not E447 then throw
+    -- 3.a if error is E447 and there are lines following current line then do "%join!
+    -- 4. get current line number and filename
+    -- 5. move cursor up, or down based on where there are available lines (note gF does not change the column)
+    -- 6. go back cursor and bufnr in step 1
+    -- 7. do gF
+    -- 8. get current line number and filename
+    -- 9. if filename changed between step 4 and step 8 throw an error
+    -- 10: if line number from step 4 and step 8 are the same then we know gF sets the line number
+    -- 11:   try to determine column number
+    -- 11.a: run get_cfile
+    -- 11.b if cfile is not the same as filename from step 4 then return {cfile, linenumber, nil}
+    -- 11.c use vim.fn.getqflist to get column
+
+    -- 1. get current cursor and bufnr
+    local bufnr = vim.api.nvim_get_current_buf()
+    local cursor = vim.api.nvim_win_get_cursor(0)
+
+    local lnum = vim.fn.line('.')
+    local col = vim.fn.col('.')
+
+    local trailing_count = 2
+    local lines = vim.api.nvim_buf_get_lines(
+        bufnr,
+        lnum - 1,
+        lnum + trailing_count,
+        false
+    )
+
+    if scratch_bufnr == nil or not vim.api.nvim_buf_is_valid(scratch_bufnr) then
+        scratch_bufnr = vim.api.nvim_create_buf(false, true)
+        -- vim.print(string.format('scratch_bufnr: %s', scratch_bufnr))
+    end
+
+    local gf_bufnr, gf_filename, gf_line, gf_col = vim._with(
+        { buf = scratch_bufnr },
+        function()
+            -- 2. do gF
+            vim.api.nvim_buf_set_lines(scratch_bufnr, 0, 0, false, { lines[1] })
+            vim.api.nvim_win_set_cursor(0, { 1, cursor[2] })
+            local cfile_filename, cfile_start_index, cfile_end_index =
+                get_cfile()
+
+            local ok, err = pcall(vim.cmd.normal, { 'gF', bang = true })
+            if not ok and err and err:find('E447') then
+                -- 3.a if error is E447 and there are lines following current line then do "%join!
+                local joined_lines = table.concat(lines, '')
+                vim.api.nvim_buf_set_lines(
+                    scratch_bufnr,
+                    0,
+                    0,
+                    false,
+                    { joined_lines }
+                )
+                -- vim.print(
+                --     vim.api.nvim_buf_get_lines(scratch_bufnr, 0, 0, false)
+                -- )
+                vim.api.nvim_win_set_cursor(0, { 1, cursor[2] })
+                cfile_filename, cfile_start_index, cfile_end_index = get_cfile()
+
+                local ok2, err2 = pcall(vim.cmd.normal, { 'gF', bang = true })
+                if not ok2 and err2 ~= nil then error(err2) end
+            elseif not ok then
+                -- 3. if error is not E447 then throw
+                error(err or 'something went wrong')
+            end
+
+            -- We should now be at the new location if it didn't error but we will assert that just in case
+            local new_bufnr = vim.api.nvim_get_current_buf()
+            assert(scratch_bufnr ~= new_bufnr)
+            -- 4. get current line number and filename
+            local new_lnum_on_first_gf = vim.fn.line('.')
+            local new_filename_on_first_gf =
+                vim.api.nvim_buf_get_name(new_bufnr)
+
+            local new_cursor_on_first_gf = vim.api.nvim_win_get_cursor(0)
+            assert(new_cursor_on_first_gf[1] > 0)
+
+            -- 5. move cursor up, or down based on where there are available lines (note gF does not change the column)
+            local new_bufnr_lines =
+                vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)
+            if new_cursor_on_first_gf[1] == 1 and #new_bufnr_lines == 2 then
+                vim.api.nvim_win_set_cursor(
+                    0,
+                    { new_cursor_on_first_gf[1] + 1, new_cursor_on_first_gf[2] }
+                )
+            elseif new_cursor_on_first_gf[1] ~= 1 then
+                vim.api.nvim_win_set_cursor(
+                    0,
+                    { new_cursor_on_first_gf[1] - 1, new_cursor_on_first_gf[2] }
+                )
+            end
+
+            -- 6. go back cursor and bufnr in step 1
+            vim.api.nvim_set_current_buf(bufnr)
+            vim.api.nvim_win_set_cursor(0, cursor)
+
+            -- 7. do gF
+            vim.cmd.normal({ 'gF', bang = true })
+
+            -- 8. get current line number and filename
+            local new_lnum_on_second_gf = vim.fn.line('.')
+            local new_filename_on_second_gf =
+                vim.api.nvim_buf_get_name(new_bufnr)
+            local new_cursor_on_second_gf = vim.api.nvim_win_get_cursor(0)
+
+            -- 9. if filename changed between step 4 and step 8 throw an error
+            assert(new_filename_on_first_gf == new_filename_on_second_gf)
+
+            -- 10: if line number from step 4 and step 8 are the same then we know gF sets the line number
+            local ret_lnum = new_lnum_on_first_gf
+            if new_lnum_on_second_gf ~= new_lnum_on_first_gf then
+                ret_lnum = nil
+                -- vim.print('new_lnum_on_second_gf ~= new_lnum_on_first_gf')
+                -- return new_bufnr, new_filename_on_first_gf, nil, nil
+            end
+
+            -- 11.a: run get_cfile
+            -- local cfile_filename, cfile_start_index, cfile_end_index =
+            --     get_cfile()
+
+            -- 11.b if cfile is not the same as filename from step 4 then return {cfile, linenumber, nil}
+            if
+                vim.fs.normalize(cfile_filename)
+                ~= vim.fs.normalize(new_filename_on_first_gf)
+            then
+                -- vim.print('cfile_filename ~= new_filename_on_first_gf')
+                -- vim.print(
+                --     string.format(
+                --         '"%s" ~= "%s"',
+                --         vim.fs.normalize(cfile_filename),
+                --         vim.fs.normalize(new_filename_on_first_gf)
+                --     )
+                -- )
+                return new_bufnr,
+                    new_filename_on_first_gf,
+                    new_lnum_on_first_gf,
+                    nil
+            end
+
+            -- 11.c use vim.fn.getqflist to get column
+            local lines_to_find_column_for =
+                vim.api.nvim_buf_get_lines(scratch_bufnr, 0, 1, false)
+            -- vim.print(lines_to_find_column_for)
+            local items = vim.fn.getqflist({
+                lines = lines_to_find_column_for,
+            }).items
+            local ret_col = nil
+            local ret_bufnr = new_bufnr
+            if #items > 0 then
+                -- {
+                --   bufnr = 24,
+                --   col = 0,
+                --   end_col = 0,
+                --   end_lnum = 0,
+                --   lnum = 34,
+                --   module = "",
+                --   nr = -1,
+                --   pattern = "",
+                --   text = "",
+                --   type = "",
+                --   valid = 1,
+                --   vcol = 0
+                -- }
+                -- vim.print(items[1])
+                vim.print(items[1].bufnr)
+                -- Note: errorformat might incorrectly extract the filename
+                -- so we won't use the bufnr returned by getqflist since it is often
+                -- garbage in stack traces
+                -- vim.print(vim.api.nvim_buf_get_name(items[1].bufnr))
+
+                -- ret_bufnr = items[1].bufnr
+                ret_lnum = items[1].lnum
+                ret_col = items[1].col
+            end
+            -- vim.print('hi')
+            -- vim.print(items)
+
+            return ret_bufnr, new_filename_on_first_gf, ret_lnum, ret_col
+        end
+    )
+
+    return gf_bufnr, gf_filename, gf_line, gf_col
+end
+
+local function smart_open_buf(dest_bufnr, callback)
+    local current_bufnr = vim.api.nvim_get_current_buf()
+    local current_winid = vim.api.nvim_get_current_win()
+    local current_tabid = vim.api.nvim_get_current_tabpage()
+    -- We don't need to do anything if we swap to the same buffer
+    if dest_bufnr == current_bufnr then
+        callback()
+        return
+    end
+
+    -- Find another window to swap to
+    local dest_winid ---@type number?
+    for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(current_tabid)) do
+        local win_bufnr = vim.api.nvim_win_get_buf(winid)
+        local is_float = vim.api.nvim_win_get_config(winid).zindex ~= nil
+        if win_bufnr == dest_bufnr and winid ~= current_winid then
+            dest_winid = winid
+            break
+        elseif
+            dest_winid == nil
+            and winid ~= current_winid
+            and vim.api.nvim_win_is_valid(winid)
+            and not is_float
+            and vim.bo[win_bufnr].buftype == ''
+        then
+            dest_winid = winid
+        end
+    end
+
+    if dest_winid == nil and vim.bo[current_bufnr].buftype == '' then
+        dest_winid = current_winid
+    end
+    if dest_winid ~= nil then
+        vim.api.nvim_win_set_buf(current_winid, current_bufnr)
+        vim.api.nvim_win_set_buf(dest_winid, dest_bufnr)
+        vim.api.nvim_set_current_win(dest_winid)
+        vim.cmd.stopinsert()
+    else
+        vim.api.nvim_win_call(current_winid, function()
+            vim.cmd.stopinsert()
+
+            local win_config = {
+                split = 'above',
+                win = -1,
+            }
+
+            local position = 'bottom'
+
+            local terminal_manager =
+                require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
+                    current_bufnr
+                )
+
+            if terminal_manager ~= nil then
+                local window_manager = terminal_manager:get_window_manager()
+                if window_manager and window_manager.position == 'float' then
+                    position = window_manager.position
+                end
+            end
+
+            if position == 'top' then
+                win_config.split = 'below'
+            elseif position == 'right' then
+                win_config.split = 'left'
+            elseif position == 'bottom' then
+                win_config.split = 'above'
+            elseif position == 'left' then
+                win_config.split = 'right'
+            end
+
+            vim.api.nvim_open_win(dest_bufnr, true, win_config)
+
+            vim.api.nvim_win_set_buf(current_winid, current_bufnr)
+        end)
+    end
+    callback()
+end
+
+if config.use_experimental_gf then
+    vim.keymap.set('n', 'gf', function()
+        local bufnr, filename, lnum, col = get_gf_location()
+        print(bufnr, filename, lnum, col)
+        smart_open_buf(bufnr, function()
+            vim.api.nvim_win_set_buf(0, bufnr)
+            local cursor = vim.api.nvim_win_get_cursor(0)
+            if lnum ~= nil then cursor[1] = lnum end
+            if col ~= nil then cursor[2] = col end
+            vim.api.nvim_win_set_cursor(0, cursor)
+
+            local terminal_manager =
+                require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
+                    bufnr
+                )
+
+            if terminal_manager ~= nil then
+                local window_manager = terminal_manager:get_window_manager()
+                if window_manager and window_manager.position == 'float' then
+                    terminal_manager:hide()
+                end
+            end
+        end)
+    end, {
+        desc = 'Custom Remap: Go to file or open telescope picker at parent folder',
+    })
+
+    --
+    -- vim.keymap.set('n', 'gf', function()
+    --     local previous_winfixbuf = vim.wo.winfixbuf
+    --     if vim.bo.buftype == 'terminal' then vim.wo.winfixbuf = true end
+    --
+    --     local ok, err = pcall(vim.cmd.normal, { 'gf', bang = true })
+    --
+    --     if vim.bo.buftype == 'terminal' then
+    --         vim.wo.winfixbuf = previous_winfixbuf
+    --     end
+    --
+    --     if ok then
+    --         local terminal_manager =
+    --             require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
+    --                 vim.api.nvim_get_current_buf()
+    --             )
+    --
+    --         if terminal_manager ~= nil then
+    --             local window_manager = terminal_manager:get_window_manager()
+    --             if window_manager and window_manager.position == 'float' then
+    --                 terminal_manager:hide()
+    --             end
+    --         end
+    --     elseif err and err:find('E447') then
+    --         vim.print(err)
+    --         vim.print('hi')
+    --     else
+    --         error(err, 1)
+    --     end
+    --
+    --     -- if terminal_manager == nil then return end
+    -- end, {
+    --     desc = 'Custom Remap: Go to file or open telescope picker at parent folder',
+    -- })
+    -- local function get_item_at_cursor()
+    --     local bufnr = vim.api.nvim_get_current_buf()
+    --     local lnum = vim.fn.line('.')
+    --     local col = vim.fn.col('.')
+    --
+    --     -- retrict this to just 8 lines above and below the cursor
+    --     local leading_count = 2
+    --     local trailing_count = 2
+    --     local line = vim.api.nvim_buf_get_lines(bufnr, lnum, lnum, true)
+    --     local leading_lines = vim.api.nvim_buf_get_lines(
+    --         bufnr,
+    --         lnum - leading_count + 1,
+    --         lnum - 1,
+    --         true
+    --     )
+    --     local trailing_lines = vim.api.nvim_buf_get_lines(
+    --         bufnr,
+    --         lnum + 1,
+    --         lnum + trailing_count + 1,
+    --         true
+    --     )
+    --
+    --     local line = vim.api.nvim_get_current_line()
+    --     -- local modified_lines = {}
+    --     -- local cursor_column_offset_per_modified_line = {}
+    --
+    --     -- { {
+    --     --     bufnr = 199,
+    --     --     col = 0,
+    --     --     end_col = 0,
+    --     --     end_lnum = 0,
+    --     --     lnum = 34,
+    --     --     module = "",
+    --     --     nr = -1,
+    --     --     pattern = "",
+    --     --     text = "",
+    --     --     type = "",
+    --     --     valid = 1,
+    --     --     vcol = 0
+    --     --   } }
+    --     -- local items = vim.fn.getqflist({
+    --     --     lines = {
+    --     --         [[C:\Users\crweb\Documents\poc\hello-world-dotnet-console\HelloWorldTestNunit\UnitTest1.cs:line 34]],
+    --     --     },
+    --     -- }).items
+    --     --
+    --
+    --     -- local items = vim.fn.getqflist({ lines = { [[C:\Users\crweb\Documents\poc\hello-world-dotnet-console\HelloWorldTestNunit\UnitTest1.cs:line 32 C:\Users\crweb\Documents\poc\hello-world-dotnet-console\HelloWorldTestNunit\UnitTest1.cs:line 34]], }, }).items
+    --
+    --     -- since errorformat finds first match on a line we need to find start of cfile
+    --     -- then search towards left for first whitespace or qoute and strip the text
+    --
+    --     local items = vim.fn.getqflist({ lines = { line } }).items
+    --     lnum = 1
+    --     for i, item in ipairs(items) do
+    --         local lnum_matches = (item.lnum == lnum and item.end_lnum == nil)
+    --             or (item.lnum <= lnum and lnum <= item.end_lnum)
+    --         local col_matches = (
+    --             (item.col == col and item.end_col == nil)
+    --             or (item.col <= col and col <= item.end_col)
+    --         )
+    --         if lnum_matches and col_matches then return items[i] end
+    --     end
+    --
+    --     --TODO if the item is not found we will concat lines with and without trimming whitespace till we get a match
+    --     for i, item in ipairs(items) do
+    --         local lnum_matches = (item.lnum == lnum and item.end_lnum == nil)
+    --             or (item.lnum <= lnum and lnum <= item.end_lnum)
+    --         local col_matches = (
+    --             (item.col == col and item.end_col == nil)
+    --             or (item.col <= col and col <= item.end_col)
+    --         )
+    --         if lnum_matches and col_matches then return items[i] end
+    --     end
+    --     return nil
+    -- end
+    --
+    -- vim.keymap.set('n', 'gF', function()
+    --     local prev_bufnr = vim.api.nvim_get_current_buf()
+    --     local prev_win = vim.api.nvim_get_current_win()
+    --     local item = get_item_at_cursor()
+    --
+    --     -- local ok, err = pcall(vim.cmd.normal, { 'gF', bang = true })
+    --
+    --     local new_bufnr = vim.api.nvim_get_current_buf()
+    --     if prev_bufnr ~= new_bufnr and vim.bo[prev_bufnr].buftype == 'terminal' then
+    --         vim.api.nvim_win_set_buf(prev_win, prev_bufnr)
+    --     end
+    --
+    --     if ok then
+    --         local terminal_manager =
+    --             require('myconfig.terminal.terminal').get_terminal_manager_by_bufnr(
+    --                 vim.api.nvim_get_current_buf()
+    --             )
+    --
+    --         if terminal_manager ~= nil then
+    --             local window_manager = terminal_manager:get_window_manager()
+    --             if window_manager and window_manager.position == 'float' then
+    --                 terminal_manager:hide()
+    --             end
+    --         end
+    --     elseif err and err:find('E447') then
+    --         vim.print(err)
+    --         vim.print('hi')
+    --     else
+    --         error(err, 1)
+    --     end
+    --
+    --     -- if terminal_manager == nil then return end
+    -- end, {
+    --     desc = 'Custom Remap: Go to file or open telescope picker at parent folder',
+    -- })
+end
+
 -------------------------------------------------------------------------------
 ---LSP keymaps
 require('myconfig.lsp.keymaps').setup_lsp_keymaps()

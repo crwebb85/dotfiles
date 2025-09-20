@@ -20,7 +20,7 @@ local M = {
         -- 'debugpy',
         -- 'markdown-oxide',
         -- 'lua-language-server',
-        -- 'emmylua_ls',
+        'emmylua_ls',
     },
 
     enable_render_markdown = true,
@@ -42,6 +42,9 @@ local M = {
     ---@type boolean
     use_extui = true,
     -- use_extui = false,
+
+    ---@type boolean
+    use_experimental_gf = true,
 }
 
 return M

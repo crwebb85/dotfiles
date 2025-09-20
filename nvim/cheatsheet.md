@@ -29,6 +29,7 @@ Use \t instead of spaces when typing tab
 - `:tab split` opens current buffer in new tab page (unlike `:tab sb` this works for non-file buffers
 - `g<` keymap shows messages from external commands like `!ls` or `Git push`
 - `@:` runs the last command and `@@` repeats just like how it repeats macros (colon is the registor that stores the last command so you can use it like a macro)
+- `gF` is better than `gf` it actually goes to the line number (uses errorformat option to determine line number)
 
 # Useful command
 
