@@ -2132,7 +2132,6 @@ local myoperations = maputils
         },
     })
     :navigator({
-        --visual mode: stays within buffer so visual mode would be useful
         default = {
             key = 'grr',
             mode = { 'n' },
@@ -2178,7 +2177,6 @@ local myoperations = maputils
         },
     })
     :navigator({
-        --visual mode: stays within buffer so visual mode would be useful
         default = {
             key = 'gd',
             mode = { 'n' },
@@ -2224,7 +2222,6 @@ local myoperations = maputils
         },
     })
     :navigator({
-        --visual mode: stays within buffer so visual mode would be useful
         default = {
             key = 'gD',
             mode = { 'n' },
@@ -2270,7 +2267,6 @@ local myoperations = maputils
         },
     })
     :navigator({
-        --visual mode: stays within buffer so visual mode would be useful
         default = {
             key = 'gi',
             mode = { 'n' },
@@ -2316,7 +2312,6 @@ local myoperations = maputils
         },
     })
     :navigator({
-        --visual mode: stays within buffer so visual mode would be useful
         default = {
             key = 'gd',
             mode = { 'n' },
@@ -2358,6 +2353,107 @@ local myoperations = maputils
             end,
             forward_repeat = function() my_lsp_location_navigator:jump('last') end,
             desc = 'Custom: jump to {first|last} LSP type definition',
+            opts = {},
+        },
+    })
+    -- passed: string = passed,
+    -- failed: string = failed,
+    -- skipped: string = skipped,
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            --TODO implement my own jump consumer that automatically opens the output window
+            --TODO implement my own output consumer which has an a position argument (so I can do first and last)
+            key = 'vtt',
+            mode = { 'n', 'v' },
+            backward = function() require('neotest').jump.prev() end,
+            forward = function()
+                require('neotest').jump.next()
+
+                -- require('neotest').output.open()
+            end,
+            desc = 'Custom: jump to {previous|next} test case',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'vtT',
+            mode = { 'n' },
+            backward = function() error('unimplemented') end,
+            forward = function() error('unimplemented') end,
+            desc = 'Custom: jump to {first|last} test case',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'vtf',
+            mode = { 'n', 'v' },
+            backward = function()
+                require('neotest').jump.prev({ status = 'failed' })
+            end,
+            forward = function()
+                require('neotest').jump.next({ status = 'failed' })
+            end,
+            desc = 'Custom: jump to {previous|next} test case',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'vtF',
+            mode = { 'n' },
+            backward = function() error('unimplemented') end,
+            forward = function() error('unimplemented') end,
+            desc = 'Custom: jump to {first|last} failed test case',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'vtp',
+            mode = { 'n', 'v' },
+            backward = function()
+                require('neotest').jump.prev({ status = 'passed' })
+            end,
+            forward = function()
+                require('neotest').jump.next({ status = 'passed' })
+            end,
+            desc = 'Custom: jump to {previous|next} passed test case',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'vtP',
+            mode = { 'n' },
+            backward = function() error('unimplemented') end,
+            forward = function() error('unimplemented') end,
+            desc = 'Custom: jump to {first|last} passed test case',
+            opts = {},
+        },
+    })
+    :navigator({
+        --visual mode: stays within buffer so visual mode would be useful
+        default = {
+            key = 'vts',
+            mode = { 'n', 'v' },
+            backward = function()
+                require('neotest').jump.prev({ status = 'skipped' })
+            end,
+            forward = function()
+                require('neotest').jump.next({ status = 'skipped' })
+            end,
+            desc = 'Custom: jump to {previous|next} skipped test case',
+            construct_callbacks = true,
+            opts = {},
+        },
+        extreme = {
+            key = 'vtS',
+            mode = { 'n' },
+            backward = function() error('unimplemented') end,
+            forward = function() error('unimplemented') end,
+            desc = 'Custom: jump to {first|last} skipped test case',
             opts = {},
         },
     })
