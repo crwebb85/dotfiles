@@ -1963,7 +1963,7 @@ require('lazy').setup({
             },
             {
                 '<leader>tp',
-                function() require('neotest').output_panel.toggle() end,
+                function() require('neotest').myoutput_panel.toggle() end,
                 mode = 'n',
                 desc = 'Neotest: toggle output-panel',
             },
@@ -1985,8 +1985,10 @@ require('lazy').setup({
                 -- Note: it does not add them to the Neotest user command
                 -- but monkey patching could be used to replace some sub-commands
                 consumers = {
-                    overseer = require('neotest.consumers.overseer'),
                     myoutput = require('neotest.consumers.myoutput'),
+                    myoutput_panel = require(
+                        'neotest.consumers.myoutput_panel'
+                    ),
                 },
                 -- quickfix = {
                 --     --disabling adding to the quickfix because it was nuking my custom problem matcher that extracting file locations from stacktraces.

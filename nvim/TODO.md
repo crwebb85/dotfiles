@@ -43,6 +43,9 @@
 - when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
   Both the end_of_line and charset will cause the error.
 - fix non-navigation treesitter keymaps
+- my telescope pickers don't work for opening selection split, vertical split, new tab
+- telescope doesn't let me use the home key and the left arrow key wraps to the last character
+- my completion window is visible in the telescope prompt
 
 ```editorconfig
 root = true
@@ -390,6 +393,3 @@ watch files callback base_dir /.
 start_config for bufnr 43 with root .
 start_config for bufnr 62 with root nil
 ```
-
-fix lua_ls snippet for --- to auto fill doc types
-fix forward back snippet keymap not conflict with forward and back completion keymap

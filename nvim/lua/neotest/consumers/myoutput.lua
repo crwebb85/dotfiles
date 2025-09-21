@@ -129,7 +129,7 @@ end
 
 --- Open the output of a test result
 --- ```vim
----   lua require("neotest").output.open({ enter = true })
+---   lua require("neotest").myoutput.open({ enter = true })
 --- ```
 ---@param opts? neotest.consumers.output.OpenArgs
 function neotest.myoutput.open(opts)
