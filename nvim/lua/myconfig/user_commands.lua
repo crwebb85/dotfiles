@@ -1938,4 +1938,175 @@ vim.api.nvim_create_user_command(
     }
 )
 
+-------------------------------------------------------------------------------
+--- Set CD, LCD, or TCD
+
+vim.api.nvim_create_user_command('CdRoot', function(args)
+    local root_search = args.fargs[1]
+    if root_search == nil then root_search = '.git' end
+    local bufname = vim.api.nvim_buf_get_name(0)
+
+    local source_path = nil
+    if vim.uv.fs_stat(bufname) ~= nil then
+        source_path = bufname
+    elseif bufname:match('^oil:') then
+        source_path = require('oil').get_current_dir(0)
+    end
+
+    if source_path == nil then
+        vim.notify(
+            string.format(
+                'Could not determine source path from bufnr name %s',
+                bufname
+            ),
+            vim.log.levels.WARN
+        )
+        return
+    end
+
+    --TODO handle searches like '%.csproj$'
+    local root = vim.fs.root(source_path, root_search)
+    if root == nil then
+        vim.notify(
+            string.format(
+                'No root of %s found for source path %s',
+                root_search,
+                source_path
+            ),
+            vim.log.levels.WARN
+        )
+        return
+    end
+
+    if
+        vim.fn.confirm(
+            string.format('Do you want to change cd to the path?\n %s', root),
+            '&yes\n&no',
+            2
+        ) == 1
+    then
+        vim.cmd.cd(root)
+        vim.notify(
+            string.format('Changed cd to the path %s', root),
+            vim.log.levels.INFO
+        )
+    end
+end, {
+    complete = function() return { '.git' } end,
+    nargs = '?', --TODO add multiple root markers to search
+    desc = 'Sets cd to the root directory of the buffer based on the root marker (default: .git)',
+})
+
+vim.api.nvim_create_user_command('LcdRoot', function(args)
+    local root_search = args.fargs[1]
+    if root_search == nil then root_search = '.git' end
+    local bufname = vim.api.nvim_buf_get_name(0)
+
+    local source_path = nil
+    if vim.uv.fs_stat(bufname) ~= nil then
+        source_path = bufname
+    elseif bufname:match('^oil:') then
+        source_path = require('oil').get_current_dir(0)
+    end
+
+    if source_path == nil then
+        vim.notify(
+            string.format(
+                'Could not determine source path from bufnr name %s',
+                bufname
+            ),
+            vim.log.levels.WARN
+        )
+        return
+    end
+
+    --TODO handle searches like '%.csproj$'
+    local root = vim.fs.root(source_path, root_search)
+    if root == nil then
+        vim.notify(
+            string.format(
+                'No root of %s found for source path %s',
+                root_search,
+                source_path
+            ),
+            vim.log.levels.WARN
+        )
+        return
+    end
+
+    if
+        vim.fn.confirm(
+            string.format('Do you want to change lcd to the path?\n %s', root),
+            '&yes\n&no',
+            2
+        ) == 1
+    then
+        vim.cmd.lcd(root)
+        vim.notify(
+            string.format('Changed lcd to the path %s', root),
+            vim.log.levels.INFO
+        )
+    end
+end, {
+    complete = function() return { '.git' } end,
+    nargs = '?', --TODO add multiple root markers to search
+    desc = 'Sets lcd to the root directory of the buffer based on the root marker (default: .git)',
+})
+
+vim.api.nvim_create_user_command('TcdRoot', function(args)
+    local root_search = args.fargs[1]
+    if root_search == nil then root_search = '.git' end
+    local bufname = vim.api.nvim_buf_get_name(0)
+
+    local source_path = nil
+    if vim.uv.fs_stat(bufname) ~= nil then
+        source_path = bufname
+    elseif bufname:match('^oil:') then
+        source_path = require('oil').get_current_dir(0)
+    end
+
+    if source_path == nil then
+        vim.notify(
+            string.format(
+                'Could not determine source path from bufnr name %s',
+                bufname
+            ),
+            vim.log.levels.WARN
+        )
+        return
+    end
+
+    --TODO handle searches like '%.csproj$'
+    local root = vim.fs.root(source_path, root_search)
+    if root == nil then
+        vim.notify(
+            string.format(
+                'No root of %s found for source path %s',
+                root_search,
+                source_path
+            ),
+            vim.log.levels.WARN
+        )
+        return
+    end
+
+    if
+        vim.fn.confirm(
+            string.format('Do you want to change tcd to the path?\n %s', root),
+            '&yes\n&no',
+            2
+        ) == 1
+    then
+        vim.cmd.tcd(root)
+        vim.notify(
+            string.format('Changed tcd to the path %s', root),
+            vim.log.levels.INFO
+        )
+    end
+end, {
+    complete = function() return { '.git' } end,
+    nargs = '?', --TODO add multiple root markers to search
+    desc = 'Sets tcd to the root directory of the buffer based on the root marker (default: .git)',
+})
+
 return M
