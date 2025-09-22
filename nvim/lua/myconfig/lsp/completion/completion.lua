@@ -27,13 +27,20 @@ function M.enable(enable, client_id, bufnr)
             string.format('my.lsp.completion_%d', bufnr),
             { clear = true }
         )
-
+        if vim.bo.filetype == 'TelescopePrompt' then
+            --TODO probably move this to a filetype autocmd
+            vim.b[bufnr].no_completion_auto_trigger = true
+        end
         vim.api.nvim_create_autocmd('InsertCharPre', {
             group = group,
             buffer = bufnr,
             callback = function()
                 if
-                    require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled
+                    -- guarding against state 'm' prevent this from running in dot-repeats
+                    -- which as the feedkeys had a weird sideeffect of clearing the repeat
+                    vim.fn.state('m') ~= 'm'
+                    and require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled
+                    and not vim.b[bufnr].no_completion_auto_trigger
                 then
                     if vim.bo.omnifunc == '' then
                         feedkeys('<C-x><C-n>') --Triggers buffer completion
