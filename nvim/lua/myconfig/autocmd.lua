@@ -1,6 +1,24 @@
 local config = require('myconfig.config')
 
 -------------------------------------------------------------------------------
+---Treesitter
+
+---Enable treesitter highlights
+vim.api.nvim_create_autocmd('FileType', {
+    callback = function(args)
+        -- enable treesitter highlighting
+        local lang = vim.treesitter.language.get_lang(args.match)
+        if lang == nil then return end
+        if
+            vim.treesitter.language.add(lang) -- check if parser exists
+            and vim.treesitter.query.get_files(lang, 'highlights', nil) -- check if highlight queries exist
+        then
+            vim.treesitter.start()
+        end
+    end,
+})
+
+-------------------------------------------------------------------------------
 --- Temporarily highlight text selection that was yanked
 vim.api.nvim_create_autocmd('TextYankPost', {
     group = vim.api.nvim_create_augroup('yank_group', { clear = true }),
