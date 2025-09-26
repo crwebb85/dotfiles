@@ -157,8 +157,20 @@ require('lazy').setup({
             {
                 '<leader>gd',
                 function()
-                    if next(require('diffview.lib').views) == nil then
+                    local diffview = nil
+                    for _, view in ipairs(require('diffview.lib').views) do
+                        if view.class.__name == 'DiffView' then
+                            diffview = view
+                            break
+                        end
+                    end
+
+                    if diffview == nil then
                         require('diffview').open({})
+                    elseif
+                        diffview.tabpage ~= vim.api.nvim_get_current_tabpage()
+                    then
+                        vim.api.nvim_set_current_tabpage(diffview.tabpage)
                     else
                         require('diffview').close()
                     end
