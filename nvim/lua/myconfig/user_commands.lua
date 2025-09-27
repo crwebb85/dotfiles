@@ -1998,6 +1998,16 @@ end, {
 })
 
 vim.api.nvim_create_user_command('LcdRoot', function(args)
+    if args.bang then
+        local global_cwd = vim.fn.getcwd(-1) -- Fetches tab current directory
+        vim.cmd.lcd(global_cwd)
+        vim.notify(
+            string.format('Changed lcd to back to tcd %s', global_cwd),
+            vim.log.levels.INFO
+        )
+        return
+    end
+
     local root_search = args.fargs[1]
     if root_search == nil then root_search = '.git' end
     local bufname = vim.api.nvim_buf_get_name(0)
@@ -2050,10 +2060,21 @@ vim.api.nvim_create_user_command('LcdRoot', function(args)
 end, {
     complete = function() return { '.git' } end,
     nargs = '?', --TODO add multiple root markers to search
-    desc = 'Sets lcd to the root directory of the buffer based on the root marker (default: .git)',
+    bang = true,
+    desc = 'Sets lcd to the root directory of the buffer based on the root marker (default: .git). Bang resets lcd back to value of tcd',
 })
 
 vim.api.nvim_create_user_command('TcdRoot', function(args)
+    if args.bang then
+        local global_cwd = vim.fn.getcwd(-1, -1) -- Fetches global current directory
+        vim.cmd.tcd(global_cwd)
+        vim.notify(
+            string.format('Changed tcd back to cwd of %s', global_cwd),
+            vim.log.levels.INFO
+        )
+        return
+    end
+
     local root_search = args.fargs[1]
     if root_search == nil then root_search = '.git' end
     local bufname = vim.api.nvim_buf_get_name(0)
@@ -2106,7 +2127,8 @@ vim.api.nvim_create_user_command('TcdRoot', function(args)
 end, {
     complete = function() return { '.git' } end,
     nargs = '?', --TODO add multiple root markers to search
-    desc = 'Sets tcd to the root directory of the buffer based on the root marker (default: .git)',
+    bang = true,
+    desc = 'Sets tcd to the root directory of the buffer based on the root marker (default: .git). Bang resets tcd back to value of cd',
 })
 
 return M
