@@ -174,7 +174,11 @@ local init = function()
         end
 
         if #qf_results > 0 then
-            nio.fn.setqflist(qf_results)
+            nio.fn.setqflist(
+                {},
+                'u',
+                { title = 'Neotest Results', items = qf_results }
+            )
             vim.cmd.doautocmd('QuickFixCmdPost')
             if my_neotest_quickfix_config.open then
                 if type(my_neotest_quickfix_config.open) == 'function' then
