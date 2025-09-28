@@ -693,18 +693,19 @@ require('lazy').setup({
             require('telescope').load_extension('projects')
             require('telescope').load_extension('poc')
 
-            -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
-            -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged
-            vim.api.nvim_create_autocmd('User', {
-                pattern = 'TelescopeFindPre',
-                callback = function()
-                    vim.o.winborder = 'none'
-                    vim.api.nvim_create_autocmd('WinLeave', {
-                        once = true,
-                        callback = function() vim.o.winborder = 'rounded' end,
-                    })
-                end,
-            })
+            -- I believe the hotfix below is no longer needed becauseht the plenary PR was merged
+            -- -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
+            -- -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged
+            -- vim.api.nvim_create_autocmd('User', {
+            --     pattern = 'TelescopeFindPre',
+            --     callback = function()
+            --         vim.o.winborder = 'none'
+            --         vim.api.nvim_create_autocmd('WinLeave', {
+            --             once = true,
+            --             callback = function() vim.o.winborder = 'rounded' end,
+            --         })
+            --     end,
+            -- })
         end,
     },
 
