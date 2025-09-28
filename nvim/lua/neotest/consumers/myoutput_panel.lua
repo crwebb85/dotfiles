@@ -66,20 +66,26 @@ local init = function(client)
             end
         end
 
+        --Clear output panel
+        vim.schedule(function()
+            local bufnr = panel.win:buffer()
+            vim.bo[bufnr].modifiable = true
+            nio.api.nvim_buf_set_lines(bufnr, -0, -1, false, {})
+            vim.bo[bufnr].modifiable = false
+        end)
+
+        --TODO sort the results like I do with the QF list
         for file, _ in pairs(files_to_read) do
             local output = lib.files.read(file)
             local normalized_output = output:gsub('\r\n', '\n'):gsub('\r', '\n')
+            local output_lines = vim.split(normalized_output, '\n')
+            table.insert(output_lines, '--------')
+            table.insert(output_lines, '')
 
             vim.schedule(function()
                 local bufnr = panel.win:buffer()
                 vim.bo[bufnr].modifiable = true
-                nio.api.nvim_buf_set_lines(
-                    bufnr,
-                    -1,
-                    -1,
-                    false,
-                    vim.split(normalized_output, '\n')
-                )
+                nio.api.nvim_buf_set_lines(bufnr, -1, -1, false, output_lines)
                 vim.bo[bufnr].modifiable = false
             end)
         end
