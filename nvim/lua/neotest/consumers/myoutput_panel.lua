@@ -8,9 +8,29 @@
 ---       because you can't use the `gf` and `gF` keymaps on them
 
 require('neotest') -- Make sure neotest is setup before using this consumer
-local lib = require('neotest.lib')
 local nio = require('nio')
-local OutputPanel = require('neotest.consumers.output_panel.panel')
+local config = require('neotest.config')
+local lib = require('neotest.lib')
+
+---@class neotest.MyOutputPanel
+---@field client neotest.Client
+---@field win neotest.PersistentWindow
+---@private
+local OutputPanel = {}
+
+function OutputPanel:new(client)
+    self.__index = self
+    return setmetatable({
+        client = client,
+        win = lib.persistent_window.panel({
+            name = 'My Neotest Output Panel',
+            open = config.output_panel.open,
+            bufopts = {
+                filetype = 'myneotest-output-panel',
+            },
+        }),
+    }, self)
+end
 
 ---@private
 ---@type neotest.OutputPanel
@@ -25,7 +45,7 @@ neotest.myoutput_panel = {}
 ---@param client neotest.Client
 ---@private
 local init = function(client)
-    panel = OutputPanel(client)
+    panel = OutputPanel:new(client)
 
     ---@param results table<string, neotest.Result>
     client.listeners.results = function(adapter_id, results, partial)

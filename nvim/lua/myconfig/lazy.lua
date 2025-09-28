@@ -2000,12 +2000,26 @@ require('lazy').setup({
                     myoutput_panel = require(
                         'neotest.consumers.myoutput_panel'
                     ),
+                    myquickfix = require('neotest.consumers.myquickfix'),
                 },
-                -- quickfix = {
-                --     --disabling adding to the quickfix because it was nuking my custom problem matcher that extracting file locations from stacktraces.
-                --     --I can see wanting this functionality back so may need to think of a workaround
-                --     enabled = false,
-                -- },
+                custom_consumer_config = {
+                    myquickfix = {
+                        open = true,
+                        problem_matcher = {
+                            pattern = {
+                                -- "vim_regexp": "^%s+at%s(.*)%sin%s(.+%.cs):line%s([0-9]+)%s*$",
+                                regexp = '^\\s+at\\s(.*)\\sin\\s(.+\\.cs):line\\s([0-9]+)\\s*$',
+                                message = 1,
+                                file = 2,
+                                line = 3,
+                            },
+                        },
+                    },
+                },
+                quickfix = {
+                    --disabling default quickfix consumer because I'm going to use my own
+                    enabled = false,
+                },
                 adapters = {
                     require('neotest-python')({
                         dap = { justMyCode = false },
@@ -2939,7 +2953,7 @@ require('lazy').setup({
                         --source program or from line wrapping. When that happens it becomes impossible
                         --to parse things like file paths from the terminal output. To fix this we
                         --disable fetching the output from the terminal.
-                        --The trade of is we loose ansi color sequences so all output will display
+                        --The trade off is we loose ansi color sequences so all output will display
                         --without color.
                         'jobstart',
                         use_terminal = false,
