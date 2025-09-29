@@ -889,7 +889,7 @@ end, {
 
 -------------------------------------------------------------------------------
 --- Command completion
----
+
 vim.keymap.set('c', '<Tab>', '<C-n>', {
     desc = 'Custom Ex completion: Select next item',
 })
@@ -920,6 +920,13 @@ vim.keymap.set('c', '<Space>', function()
     require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
 end, {
     desc = 'Custom remap Ex completion: Space but also keep completion menu open',
+})
+
+vim.keymap.set('c', '<C-e>', function()
+    require('myconfig.utils.mapping').feedkeys('<C-e>') -- clears completionion text (basically an undo)
+    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+end, {
+    desc = 'Custom remap Ex completion: Clears completion selection',
 })
 
 -------------------------------------------------------------------------------
