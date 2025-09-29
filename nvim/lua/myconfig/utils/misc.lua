@@ -266,4 +266,95 @@ function M.get_text_selection(opts)
     })
 end
 
+---Like vim.fn.matchfuzzy but will return the inputed list back if results are empty
+---
+--- If {list} is a list of strings, then returns a |List| with all
+--- the strings in {list} that fuzzy match {str}. The strings in
+--- the returned list are sorted based on the matching score.
+---
+--- The optional {dict} argument always supports the following
+--- items:
+---     matchseq  When this item is present return only matches
+---     that contain the characters in {str} in the
+---     given sequence.
+---     limit  Maximum number of matches in {list} to be
+---     returned.  Zero means no limit.
+---
+--- If {list} is a list of dictionaries, then the optional {dict}
+--- argument supports the following additional items:
+---     key    Key of the item which is fuzzy matched against
+---     {str}. The value of this item should be a
+---     string.
+---     text_cb  |Funcref| that will be called for every item
+---     in {list} to get the text for fuzzy matching.
+---     This should accept a dictionary item as the
+---     argument and return the text for that item to
+---     use for fuzzy matching.
+---
+--- {str} is treated as a literal string and regular expression
+--- matching is NOT supported.  The maximum supported {str} length
+--- is 256.
+---
+--- When {str} has multiple words each separated by white space,
+--- then the list of strings that have all the words is returned.
+---
+--- If there are no matching strings or there is an error, then an
+--- empty list is returned. If length of {str} is greater than
+--- 256, then returns an empty list.
+---
+--- When {limit} is given, matchfuzzy() will find up to this
+--- number of matches in {list} and return them in sorted order.
+---
+--- Refer to |fuzzy-matching| for more information about fuzzy
+--- matching strings.
+---
+--- Example: >vim
+---    echo matchfuzzy(["clay", "crow"], "cay")
+--- <results in ["clay"]. >vim
+---    echo getbufinfo()->map({_, v -> v.name})->matchfuzzy("ndl")
+--- <results in a list of buffer names fuzzy matching "ndl". >vim
+---    echo getbufinfo()->matchfuzzy("ndl", {'key' : 'name'})
+--- <results in a list of buffer information dicts with buffer
+--- names fuzzy matching "ndl". >vim
+---    echo getbufinfo()->matchfuzzy("spl",
+---         \ {'text_cb' : {v -> v.name}})
+--- <results in a list of buffer information dicts with buffer
+--- names fuzzy matching "spl". >vim
+---    echo v:oldfiles->matchfuzzy("test")
+--- <results in a list of file names fuzzy matching "test". >vim
+---    let l = readfile("buffer.c")->matchfuzzy("str")
+--- <results in a list of lines in "buffer.c" fuzzy matching "str". >vim
+---    echo ['one two', 'two one']->matchfuzzy('two one')
+--- <results in `['two one', 'one two']` . >vim
+---    echo ['one two', 'two one']->matchfuzzy('two one',
+---         \ {'matchseq': 1})
+--- <results in `['two one']`.
+---
+--- @param list any[]
+--- @param str string
+--- @param dict? table
+--- @return any
+function M.matchfuzzy(list, str, dict)
+    local result
+    --TODO I can't figure out why this code freaks out if I don't
+    --first check the dict value like this
+    if dict then
+        result = vim.fn.matchfuzzy(list, str, dict)
+    else
+        result = vim.fn.matchfuzzy(list, str)
+    end
+    if #result == 0 then return list end
+    return result
+end
+
+---Used to convert a user command argument completion menu into
+---a fuzzy completion menu
+---@param func fun(ArgLead: string, CmdLine: string, CursorPos: number): string[] | nil
+---@return function
+function M.make_fuzzy_completion(func)
+    return function(ArgLead, CmdLine, CursorPos)
+        local items = func(ArgLead, CmdLine, CursorPos)
+        return M.matchfuzzy(items or {}, ArgLead)
+    end
+end
 return M

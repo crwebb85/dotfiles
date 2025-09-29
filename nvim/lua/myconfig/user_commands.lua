@@ -2,6 +2,8 @@ local Set = require('myconfig.utils.datastructure').Set
 local format_properties = require('myconfig.formatter').properties
 local Path = require('myconfig.utils.path')
 local config = require('myconfig.config')
+local make_fuzzy_completion =
+    require('myconfig.utils.misc').make_fuzzy_completion
 local M = {}
 
 -------------------------------------------------------------------------------
@@ -248,7 +250,9 @@ vim.api.nvim_create_user_command('FormatterTimeout', function(args)
     end
     format_properties.set_formatting_timeout(timeout)
 end, {
-    complete = function() return { '500', '1000', '2000', '3000', '5000' } end,
+    complete = make_fuzzy_completion(
+        function() return { '500', '1000', '2000', '3000', '5000' } end
+    ),
     nargs = 1,
     desc = 'Sets the formatter timeout in milliseconds',
 })
@@ -336,7 +340,7 @@ vim.api.nvim_create_user_command('FormatterProjectToggle', function(args)
         new_disabled_formatters_list
     )
 end, {
-    complete = get_project_formatter_names,
+    complete = make_fuzzy_completion(get_project_formatter_names),
     nargs = '+', --Any number of arguments greater than zero
     desc = 'Disabled formatters by name project wide.',
 })
@@ -394,7 +398,7 @@ vim.api.nvim_create_user_command('FormatterBufferToggle', function(args)
         bufnr
     )
 end, {
-    complete = get_project_formatter_names,
+    complete = make_fuzzy_completion(get_project_formatter_names),
     nargs = '+', --Any number of arguments greater than zero
     desc = 'Disabled formatters by name project wide.',
 })
@@ -409,7 +413,7 @@ vim.api.nvim_create_user_command(
         format_properties.set_buffer_lsp_format_strategy(strategy, bufnr)
     end,
     {
-        complete = function()
+        complete = make_fuzzy_completion(function()
             local strategies = {}
             for strategy_name, _ in
                 pairs(format_properties.LspFormatStrategyEnums)
@@ -417,7 +421,7 @@ vim.api.nvim_create_user_command(
                 table.insert(strategies, strategy_name)
             end
             return strategies
-        end,
+        end),
         nargs = 1,
         desc = 'Sets the lsp format strategy for the buffer',
     }
@@ -434,7 +438,7 @@ vim.api.nvim_create_user_command(
         format_properties.set_filetype_lsp_format_strategy(filetype, strategy)
     end,
     {
-        complete = function()
+        complete = make_fuzzy_completion(function()
             local strategies = {}
             for strategy_name, _ in
                 pairs(format_properties.LspFormatStrategyEnums)
@@ -442,7 +446,7 @@ vim.api.nvim_create_user_command(
                 table.insert(strategies, strategy_name)
             end
             return strategies
-        end,
+        end),
         nargs = 1,
         desc = 'Sets the formatter filetype lsp format strategy',
     }
@@ -633,7 +637,9 @@ vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
     end
 end, {
     desc = 'Adds lsp diagnostic to the Quickfix list',
-    complete = function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end,
+    complete = make_fuzzy_completion(
+        function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
+    ),
     nargs = '?',
 })
 
@@ -695,14 +701,9 @@ vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
     end
 end, {
     desc = 'Adds lsp diagnostic to the Quickfix list',
-    complete = function()
-        return {
-            'ERROR',
-            'WARN',
-            'HINT',
-            'INFO',
-        }
-    end,
+    complete = make_fuzzy_completion(
+        function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
+    ),
     nargs = '?',
 })
 
@@ -899,7 +900,7 @@ vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
     vim.fn.setqflist({}, ' ', { items = items, title = query_group })
 end, {
     nargs = '+',
-    complete = function(_, text, _)
+    complete = make_fuzzy_completion(function(_, text, _)
         --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
@@ -924,7 +925,7 @@ end, {
             'injections',
             'locals',
         }
-    end,
+    end),
 })
 
 vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
@@ -971,7 +972,7 @@ vim.api.nvim_create_user_command('TSGotoNext', function(params)
 end, {
     bang = true,
     nargs = '+',
-    complete = function(_, text, _)
+    complete = make_fuzzy_completion(function(_, text, _)
         --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
@@ -997,7 +998,7 @@ end, {
             return query.captures
         end
         return {}
-    end,
+    end),
     desc = 'Go to the treesitter capture group. The first param is the query group and the second param is the capture name. Bang puts the cursor at the end of the capture group.',
 })
 
@@ -1025,7 +1026,7 @@ vim.api.nvim_create_user_command('TSGotoPrevious', function(params)
 end, {
     bang = true,
     nargs = '+',
-    complete = function(_, text, _)
+    complete = make_fuzzy_completion(function(_, text, _)
         --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
@@ -1051,7 +1052,7 @@ end, {
             return query.captures
         end
         return {}
-    end,
+    end),
     desc = 'Go to the previous treesitter capture group. The first param is the query group and the second param is the capture name. Bang puts the cursor at the end of the capture group.',
 })
 
@@ -1071,7 +1072,7 @@ vim.api.nvim_create_user_command('TSSwapNext', function(params)
     )
 end, {
     nargs = '+',
-    complete = function(_, text, _)
+    complete = make_fuzzy_completion(function(_, text, _)
         --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
@@ -1097,7 +1098,7 @@ end, {
             return query.captures
         end
         return {}
-    end,
+    end),
     desc = 'Swap the next treesitter capture group. The first param is the query group and the second param is the capture name.',
 })
 
@@ -1117,7 +1118,7 @@ vim.api.nvim_create_user_command('TSSwapPrevious', function(params)
     )
 end, {
     nargs = '+',
-    complete = function(_, text, _)
+    complete = make_fuzzy_completion(function(_, text, _)
         --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
@@ -1143,7 +1144,7 @@ end, {
             return query.captures
         end
         return {}
-    end,
+    end),
     desc = 'Swap the previous treesitter capture group. The first param is the query group and the second param is the capture name.',
 })
 
@@ -1163,7 +1164,7 @@ vim.api.nvim_create_user_command('TSSelect', function(params)
     )
 end, {
     nargs = '+',
-    complete = function(_, text, _)
+    complete = make_fuzzy_completion(function(_, text, _)
         --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
         --second argumet is the text up to the cursor
         --third argument is the index of the cursor
@@ -1189,7 +1190,7 @@ end, {
             return query.captures
         end
         return {}
-    end,
+    end),
     desc = 'Select treesitter capture group. The first param is the query group and the second param is the capture name.',
 })
 
@@ -1882,7 +1883,7 @@ vim.api.nvim_create_user_command('ConvertLineEndings', function(params)
 end, {
     nargs = 1,
     bang = true,
-    complete = function() return { 'lf', 'crlf' } end,
+    complete = make_fuzzy_completion(function() return { 'lf', 'crlf' } end),
 })
 
 -- based on https://vim.fandom.com/wiki/Remove_unwanted_empty_lines
@@ -1992,7 +1993,7 @@ vim.api.nvim_create_user_command('CdRoot', function(args)
         )
     end
 end, {
-    complete = function() return { '.git' } end,
+    complete = make_fuzzy_completion(function() return { '.git' } end),
     nargs = '?', --TODO add multiple root markers to search
     desc = 'Sets cd to the root directory of the buffer based on the root marker (default: .git)',
 })
@@ -2058,7 +2059,7 @@ vim.api.nvim_create_user_command('LcdRoot', function(args)
         )
     end
 end, {
-    complete = function() return { '.git' } end,
+    complete = make_fuzzy_completion(function() return { '.git' } end),
     nargs = '?', --TODO add multiple root markers to search
     bang = true,
     desc = 'Sets lcd to the root directory of the buffer based on the root marker (default: .git). Bang resets lcd back to value of tcd',
@@ -2125,7 +2126,7 @@ vim.api.nvim_create_user_command('TcdRoot', function(args)
         )
     end
 end, {
-    complete = function() return { '.git' } end,
+    complete = make_fuzzy_completion(function() return { '.git' } end),
     nargs = '?', --TODO add multiple root markers to search
     bang = true,
     desc = 'Sets tcd to the root directory of the buffer based on the root marker (default: .git). Bang resets tcd back to value of cd',

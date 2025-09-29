@@ -888,6 +888,41 @@ end, {
 })
 
 -------------------------------------------------------------------------------
+--- Command completion
+---
+vim.keymap.set('c', '<Tab>', '<C-n>', {
+    desc = 'Custom Ex completion: Select next item',
+})
+
+vim.keymap.set('c', '<Left>', function()
+    require('myconfig.utils.mapping').feedkeys('<Space><BS><Left>')
+    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+end, {
+    desc = 'Custom remap Ex completion: Move cursor left',
+})
+
+vim.keymap.set('c', '<Right>', function()
+    require('myconfig.utils.mapping').feedkeys('<Space><BS><Right>')
+    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+end, {
+    desc = 'Custom remap Ex completion: Move cursor right',
+})
+
+vim.keymap.set('c', '<BS>', function()
+    require('myconfig.utils.mapping').feedkeys('<BS>')
+    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+end, {
+    desc = 'Custom remap Ex completion: Backspace but also keep completion menu open',
+})
+
+vim.keymap.set('c', '<Space>', function()
+    require('myconfig.utils.mapping').feedkeys('<Space>')
+    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+end, {
+    desc = 'Custom remap Ex completion: Space but also keep completion menu open',
+})
+
+-------------------------------------------------------------------------------
 ---Terminal keymaps
 ---
 

@@ -117,14 +117,20 @@ if config.use_native_completion then
 else
     vim.o.completeopt = 'menu,menuone,noinsert,noselect,fuzzy'
 end
+
+-------------------------------------------------------------------------------
+--- Ex command completion
+vim.o.wildmode = 'noselect'
+vim.o.wildoptions = 'pum,fuzzy' -- makes ex-command completion fuzzy matching
+
 -------------------------------------------------------------------------------
 --- Search and replace
+
 vim.o.inccommand = 'split' -- shows search in replace changes in a preview window
 vim.o.hlsearch = false
 vim.o.incsearch = true
 vim.o.wildignore =
     '*/node_modules/**,*/.git/**,*/venv/**,*/.venv/**,*/obj/**,*/bin/**'
-vim.opt.wildoptions:append('fuzzy') -- makes ex-command completion fuzzy matching
 vim.o.grepprg =
     [[rg --glob "!.git" --glob "!venv" --glob "!.venv" --no-heading --vimgrep --follow $*]]
 -- [[rg --glob "!.git" --no-heading --vimgrep --follow $*]]

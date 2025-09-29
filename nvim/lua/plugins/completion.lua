@@ -101,64 +101,6 @@ if not config.use_native_completion then
             config = function()
                 local cmp = require('cmp')
 
-                local cmdline_mappings = {
-                    ['<C-z>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<Tab>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<S-Tab>'] = {
-                        c = function()
-                            if cmp.visible() then
-                                cmp.select_prev_item()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    },
-                    ['<C-n>'] = {
-                        c = function(fallback)
-                            if cmp.visible() then
-                                cmp.select_next_item()
-                            else
-                                fallback()
-                            end
-                        end,
-                    },
-                    ['<C-p>'] = {
-                        c = function(fallback)
-                            if cmp.visible() then
-                                cmp.select_prev_item()
-                            else
-                                fallback()
-                            end
-                        end,
-                    },
-                    --Toggle showing completion menu
-                    ['<C-e>'] = cmp.mapping({
-                        c = function()
-                            if cmp.visible() then
-                                cmp.close()
-                            else
-                                cmp.complete()
-                            end
-                        end,
-                    }),
-                }
-
                 cmp.setup({
                     sources = cmp.config.sources({
                         { name = 'nvim_lsp' },
@@ -195,23 +137,6 @@ if not config.use_native_completion then
                         { name = 'git' },
                         { name = 'luasnip' },
                         { name = 'buffer', keyword_length = 5 },
-                    }),
-                })
-
-                -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-                cmp.setup.cmdline({ '/', '?' }, {
-                    mapping = cmdline_mappings,
-                    sources = {
-                        { name = 'buffer', keyword_length = 3 },
-                    },
-                })
-
-                -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-                cmp.setup.cmdline(':', {
-                    mapping = cmdline_mappings,
-                    sources = cmp.config.sources({
-                        { name = 'path' },
-                        { name = 'cmdline' },
                     }),
                 })
             end,

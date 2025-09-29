@@ -596,3 +596,14 @@ vim.api.nvim_create_autocmd('RecordingLeave', {
 --         end)
 --     end,
 -- })
+--
+
+-------------------------------------------------------------------------------
+---Command completion
+local show_wild_menu_group =
+    vim.api.nvim_create_augroup('show_wild_menu_group', {})
+vim.api.nvim_create_autocmd('CmdlineChanged', {
+    pattern = { ':', '/', '?' },
+    group = show_wild_menu_group,
+    callback = function() vim.fn.wildtrigger() end,
+})
