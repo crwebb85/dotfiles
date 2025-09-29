@@ -13,17 +13,9 @@ local M = {
     ---@type string
     MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP = 'mycustomtextobjects',
 
-    ---@type string[] list of mason programs that I don't want to automatically install on the machine I am running neovim on
-    exclude_mason_install = {
-        -- 'gopls',
-        -- 'ruff-lsp',
-        -- 'debugpy',
-        -- 'markdown-oxide',
-        -- 'lua-language-server',
-        'emmylua_ls',
-    },
-
+    ---@type boolean
     enable_render_markdown = true,
+    -- enable_render_markdown = false,
 
     dev_plugins_path = 'C:\\Users\\crweb\\Documents\\projects\\',
 
@@ -45,6 +37,51 @@ local M = {
 
     ---@type boolean
     use_experimental_gf = true,
+    -- use_experimental_gf = false,
+
+    ---@type string[] list of mason programs that I don't want to automatically install on the machine I am running neovim on
+    exclude_mason_install = {
+        -- 'gopls',
+        -- 'ruff-lsp',
+        -- 'debugpy',
+        -- 'markdown-oxide',
+        -- 'lua-language-server',
+        'emmylua_ls',
+    },
+
+    ---@type string[]
+    treesiter_ensure_installed = {
+        'c',
+        'lua',
+        'vim',
+        'vimdoc',
+        'markdown',
+
+        'markdown_inline',
+        'diff',
+        'javascript',
+        'typescript',
+        'tsx',
+        'css',
+        'json',
+        'jsonc',
+        'html',
+        'xml',
+        'yaml',
+        'rust',
+        'query',
+        'python',
+        'toml',
+        'regex',
+        'c_sharp',
+        'hurl',
+        'powershell',
+        'git_config',
+        'git_rebase',
+        'gitattributes',
+        'gitcommit',
+        'gitignore',
+    },
 }
 
 return M

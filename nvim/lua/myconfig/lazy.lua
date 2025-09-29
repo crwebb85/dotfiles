@@ -1583,64 +1583,17 @@ require('lazy').setup({
     -- Treesitter Parsers and Parser Utils
     {
         'nvim-treesitter/nvim-treesitter',
-        -- lazy = true,
-        -- event = 'VeryLazy',
         branch = 'main',
-        build = ':TSUpdate',
         config = function()
-            local nvim_treesitter = require('nvim-treesitter')
-            local ensure_installed = {
-                'c',
-                'lua',
-                'vim',
-                'vimdoc',
-                'markdown',
+            --TODO detect when there is an available query for a filetype that isn't in my ensure installed
 
-                'markdown_inline',
-                'diff',
-                'javascript',
-                'typescript',
-                'tsx',
-                'css',
-                'json',
-                'jsonc',
-                'html',
-                'xml',
-                'yaml',
-                'rust',
-                'query',
-                'python',
-                'toml',
-                'regex',
-                'c_sharp',
-                'hurl',
-                'powershell',
-                'git_config',
-                'git_rebase',
-                'gitattributes',
-                'gitcommit',
-                'gitignore',
-                --TODO detect when there is an available query for a filetype that isn't in my ensure installed
-            }
-
-            local installed_parsers = nvim_treesitter.get_installed()
-            local installed_parsers_set = require(
-                'myconfig.utils.datastructure'
-            ).dumb_set(installed_parsers)
-            local parsers_to_install = {}
-            for _, parser_name in ipairs(ensure_installed) do
-                if installed_parsers_set[parser_name] == nil then
-                    table.insert(parsers_to_install, parser_name)
-                end
-            end
-
-            if #parsers_to_install > 0 then
-                vim.notify(
-                    'parsers to install:' .. vim.inspect(parsers_to_install),
-                    vim.log.levels.INFO
+            -- Make sure we are not running in headless or embedded mode
+            local is_ui_visible = #vim.api.nvim_list_uis() > 0
+            if is_ui_visible then
+                local ensure_installed = config.treesiter_ensure_installed
+                require('myconfig.treesitter').prompt_install_missing_and_update(
+                    ensure_installed
                 )
-                nvim_treesitter.install(parsers_to_install)
-                --:wait(300000)
             end
 
             local custom_csharp_queries = [[
