@@ -1,3 +1,6 @@
+local make_fuzzy_completion =
+    require('myconfig.utils.misc').make_fuzzy_completion
+
 local M = {}
 
 --TODO debounce refreshing the cache
@@ -146,7 +149,7 @@ function M.setup_user_commands()
             end
         end
     end, {
-        complete = get_configured_lsp_names,
+        complete = make_fuzzy_completion(get_configured_lsp_names),
         nargs = 1,
         desc = 'LSP: Enables the LSP',
     })
@@ -210,7 +213,7 @@ function M.setup_user_commands()
             vim.log.levels.INFO
         )
     end, {
-        complete = function()
+        complete = make_fuzzy_completion(function()
             local completion_items = {}
             for _, client in ipairs(vim.lsp.get_clients()) do
                 local completion_item =
@@ -218,7 +221,7 @@ function M.setup_user_commands()
                 table.insert(completion_items, completion_item)
             end
             return completion_items
-        end,
+        end),
         nargs = 1,
         desc = 'LSP: Restarts the LSP',
     })
@@ -254,7 +257,7 @@ function M.setup_user_commands()
         vim.lsp.enable(client.name, false) --TODO this actually stops all lsps with that name. What we really want is to disable for a specific root
         client:stop()
     end, {
-        complete = function()
+        complete = make_fuzzy_completion(function()
             local completion_items = {}
             for _, client in ipairs(vim.lsp.get_clients()) do
                 local completion_item =
@@ -262,7 +265,7 @@ function M.setup_user_commands()
                 table.insert(completion_items, completion_item)
             end
             return completion_items
-        end,
+        end),
         nargs = 1,
         desc = 'Stops the LSP',
     })
@@ -298,7 +301,7 @@ function M.setup_user_commands()
 
         vim.lsp.buf_detach_client(bufnr, client.id)
     end, {
-        complete = function()
+        complete = make_fuzzy_completion(function()
             local bufnr = vim.api.nvim_get_current_buf()
             local completion_items = {}
             --Unlike LspStop we only want to see the clients that are actively attached to the
@@ -309,7 +312,7 @@ function M.setup_user_commands()
                 table.insert(completion_items, completion_item)
             end
             return completion_items
-        end,
+        end),
         nargs = 1,
         desc = 'Stops the LSP',
     })
