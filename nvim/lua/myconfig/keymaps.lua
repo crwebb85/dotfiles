@@ -896,35 +896,68 @@ vim.keymap.set('c', '<Tab>', '<C-n>', {
 
 vim.keymap.set('c', '<Left>', function()
     require('myconfig.utils.mapping').feedkeys('<Space><BS><Left>')
-    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    vim.fn.wildtrigger() -- open the wildmenu
+    -- wild trigger seems to work but if it doesn't the reddit post
+    -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    -- explains the work around of using feedkeys on <C-Z> to open it. I found
+    -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
+    -- when the usercommand doesn't define a completion function
+    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
 end, {
     desc = 'Custom remap Ex completion: Move cursor left',
 })
 
 vim.keymap.set('c', '<Right>', function()
     require('myconfig.utils.mapping').feedkeys('<Space><BS><Right>')
-    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    vim.fn.wildtrigger() -- open the wildmenu
+    -- wild trigger seems to work but if it doesn't the reddit post
+    -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    -- explains the work around of using feedkeys on <C-Z> to open it. I found
+    -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
+    -- when the usercommand doesn't define a completion function
+    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
 end, {
     desc = 'Custom remap Ex completion: Move cursor right',
 })
 
 vim.keymap.set('c', '<BS>', function()
     require('myconfig.utils.mapping').feedkeys('<BS>')
-    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    vim.fn.wildtrigger() -- open the wildmenu
+    -- wild trigger seems to work but if it doesn't the reddit post
+    -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    -- explains the work around of using feedkeys on <C-Z> to open it. I found
+    -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
+    -- when the usercommand doesn't define a completion function
+    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
 end, {
     desc = 'Custom remap Ex completion: Backspace but also keep completion menu open',
 })
 
 vim.keymap.set('c', '<Space>', function()
     require('myconfig.utils.mapping').feedkeys('<Space>')
-    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    vim.fn.wildtrigger() -- open the wildmenu
+    -- wild trigger seems to work but if it doesn't the reddit post
+    -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    -- explains the work around of using feedkeys on <C-Z> to open it. I found
+    -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
+    -- when the usercommand doesn't define a completion function
+    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
 end, {
     desc = 'Custom remap Ex completion: Space but also keep completion menu open',
 })
 
 vim.keymap.set('c', '<C-e>', function()
+    local is_wild_menu_open = vim.fn.wildmenumode() == 1
     require('myconfig.utils.mapping').feedkeys('<C-e>') -- clears completionion text (basically an undo)
-    require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    -- Note: I can't use vim.fn.wildtrigger() after <C-e> it just doesn't open
+    -- the completion menu I'm not sure if it's a bug but we just have to live
+    -- using feedkeys <C-Z> instead
+    if is_wild_menu_open then
+        --reopen the wild menu afte <C-e> closed it. We only reopen if it was
+        --already open since <C-Z> will enter ^Z into the commandline if there
+        --is no completion items
+        require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    end
 end, {
     desc = 'Custom remap Ex completion: Clears completion selection',
 })
