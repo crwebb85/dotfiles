@@ -1,0 +1,407 @@
+local M = {}
+
+---@class my.fn.quickfixtextfunc.info
+---@field end_idx integer
+---@field id integer
+---@field quickfix integer
+---@field start_idx integer
+---@field winid integer
+
+---My custom type definition for
+---what vim.fn.getloclist and vim.fn.getqflist
+---return when specifing which fields to select
+---@class my.fn.getlist.result
+---the total number of changes made to the list |quickfix-changedtick|
+---@field changetick? integer
+---the |quickfix-context|
+---@field context? string
+---the filewinid for the location list
+---only used by the location list (I can't find any
+---way to get this to return anything but 0.) No idea
+---what this is
+---@field filewinid integer
+---See |quickfix-ID|;
+---@field id? integer
+---See |quickfix-index|
+---@field idx? integer idx
+---quickfix list entries
+---(Note: filename field of entry will always be nil)
+---@field items? vim.quickfix.entry[]
+---The quickfix number
+---@field nr? integer
+---number of the buffer displayed in the quickfix window. Returns 0 if the
+---quickfix buffer is not present. See |quickfix-buffer|.
+---@field qfbufnr? integer
+---the function used to display the quickfix text
+---@field quickfixtextfunc? string | fun(info: my.fn.quickfixtextfunc.info) : string[]
+---number of entries in the quickfix list
+---@field size? integer
+---the list title |quickfix-title|
+---@field title? string
+---the quickfix |window-ID| for the current tab.
+---@field winid? number
+
+---My custom type definition for the `what` parameter in
+---vim.fn.getloclist and vim.fn.getqflist
+---@class my.fn.setlist.what
+---changedtick get the total number of changes made to the list |quickfix-changedtick|
+---@field changetick? number
+---get the |quickfix-context|
+---@field context? number
+---get the  filewinid for the location list
+---only used when fetching the location list (I can't find any
+---way to create a location list with a value other than 0) No idea
+---what this is.
+---@field filewinid number
+---errorformat to used when parsing "lines".
+---(TODO see what is returned when 'errorformat' option value was used to create the list)
+---@field efm? string
+---get information for the quickfix list with |quickfix-ID|; zero means the id
+---for the current list or the list specified by "nr"
+---@field id? number
+---Get information for the quickfix entry at this index in the list specified
+---by "id" or "nr". If set to zero, then uses the current entry. See |quickfix-index|
+---@field idx? number idx
+---quickfix list entries
+---@field items? number | vim.quickfix.entry[]
+---parse a list of lines using 'efm' and return the resulting entries.
+---Only a |List| type is accepted. The current quickfix list is not modified.
+---See |quickfix-parse|.
+---@field lines? string[]
+---get information for this quickfix list; zero means the current quickfix list
+---and "$" means the last quickfix list
+---@field nr? number | string
+---number of the buffer displayed in the quickfix window. Returns 0 if the
+---quickfix buffer is not present. See |quickfix-buffer|.
+---@field qfbufnr? number
+---number of entries in the quickfix list
+---@field size? number
+---get the list title |quickfix-title|
+---@field title? number
+---get the quickfix |window-ID| for the current tab. Returns 0 if the quickfix
+---window is not open in the current tab
+---@field winid? number
+---all of the above quickfix properties
+---@field all? number
+
+---@class GetListInfoFieldSelection
+---changedtick get the total number of changes made to the list |quickfix-changedtick|
+---@field changetick? boolean
+---get the |quickfix-context|
+---@field context? boolean
+---get the  filewinid for the location list
+---only used when fetching the location list (I can't find any
+---way to create a location list with a value other than 0) No idea
+---what this is.
+---@field filewinid boolean
+---quickfix list entries
+---@field items? boolean
+---number of the buffer displayed in the quickfix window. Returns nil if the
+---quickfix buffer is not present. See |quickfix-buffer|.
+---@field qfbufnr? boolean
+---number of entries in the quickfix list
+---@field size? boolean
+---get the list title |quickfix-title|
+---@field title? boolean
+---get the quickfix |window-ID| for the current tab. Returns nil if the quickfix
+---window is not open in the current tab
+---@field winid? boolean
+
+---@class GetListInfoOpts
+---@field selection? GetListInfoFieldSelection
+---get information for the quickfix list with |quickfix-ID|; zero means the id
+---for the current list or the list specified by "nr"
+---@field id? number
+---Get information for the quickfix entry at this index in the list specified
+---by "id" or "nr". If set to zero, then uses the current entry. See |quickfix-index|
+---@field idx? number
+---get information for this quickfix list; zero means the current quickfix list
+---and "$" means the last quickfix list
+---@field nr? number | string
+
+---@class GetListEntriesOpts
+---get information for the quickfix list with |quickfix-ID|; zero means the id
+---for the current list or the list specified by "nr"
+---@field id? number
+---Get information for the quickfix entry at this index in the list specified
+---by "id" or "nr". If set to zero, then uses the current entry. See |quickfix-index|
+---@field idx? number
+---get information for this quickfix list; zero means the current quickfix list
+---and "$" means the last quickfix list
+---@field nr? number | string
+
+---Get all the fields for the the quickfix/location list info
+---@param winnr? integer the window number or the |window-ID|. When {win} is zero the current window's location list is used. When nil the quickfix list is used.
+---@param opts? GetListEntriesOpts the list opts
+---@return my.fn.getlist.result? result
+function M.get_all_list_info(winnr, opts)
+    opts = opts or {}
+    local result
+    if type(winnr) == 'number' then
+        ---@type my.fn.getlist.result
+        result = vim.fn.getloclist(winnr, {
+            id = opts.id,
+            idx = opts.idx,
+            nr = opts.nr,
+            all = 1,
+        })
+    else
+        ---@type my.fn.getlist.result
+        result = vim.fn.getqflist({
+            id = opts.id,
+            idx = opts.idx,
+            nr = opts.nr,
+            all = 1,
+        })
+    end
+    if result.id == 0 then
+        ---if id is nil that means the quickfix list doesn't exist
+        ---for the specified win, id, or nr
+        return nil
+    end
+    return result
+end
+
+---Get the quickfix/location list entries
+---@param winnr? integer the window number or the |window-ID|. When {win} is zero
+---@param opts? GetListEntriesOpts the list opts
+---the current window's location list is used. When nil the quickfix list is used.
+---@return vim.quickfix.entry[] | nil entries nil if no list specified by win, id, and nr exists (Note: filename field will always be nil)
+function M.get_list_entries(winnr, opts)
+    opts = opts or {}
+    local result
+    if type(winnr) == 'number' then
+        ---@type my.fn.getlist.result
+        result = vim.fn.getloclist(winnr, {
+            id = opts.id or 0, -- or zero so that id will be returned back
+            idx = opts.idx,
+            nr = opts.nr,
+            items = 0, -- zero means select items
+        })
+    else
+        ---@type my.fn.getlist.result
+        result = vim.fn.getqflist({
+            id = opts.id or 0, -- or zero so that id will be returned back
+            idx = opts.idx,
+            nr = opts.nr,
+            items = 0, -- zero means select items
+        })
+    end
+    if result.id == 0 then
+        ---if id is nil that means the quickfix list doesn't exist
+        ---for the specified win, id, or nr
+        return nil
+    end
+
+    if result.items == nil then
+        error('Invalid assumption: qf/loc list should have an items list')
+    end
+
+    return result.items
+end
+
+---Converts the the opts from the more convenient lua api to the vimscript compatible
+---what object
+---@param opts? GetListInfoOpts
+---@return my.fn.setlist.what
+local function map_get_list_info_opts_to_what(opts)
+    if opts == nil then return { all = 1 } end
+
+    ---@type my.fn.setlist.what
+    local what = {}
+
+    if opts.id ~= nil then what.id = opts.id end
+
+    if opts.idx ~= nil then what.idx = opts.idx end
+
+    if opts.nr ~= nil then what.nr = opts.nr end
+
+    ---Field selectors
+    local selection = opts.selection
+    if selection == nil then
+        what.all = 0
+        return what
+    end
+
+    local select_all = true
+
+    if selection.changetick then
+        what.changetick = 0
+        select_all = false
+    end
+
+    if selection.context then
+        what.context = 0
+        select_all = false
+    end
+
+    if selection.filewinid then
+        what.filewinid = 0
+        select_all = false
+    end
+
+    if selection.items then
+        what.items = 0
+        select_all = false
+    end
+
+    if selection.qfbufnr then
+        what.qfbufnr = 0
+        select_all = false
+    end
+
+    if selection.size then
+        what.size = 0
+        select_all = false
+    end
+
+    if selection.title then
+        what.title = 0
+        select_all = false
+    end
+
+    if selection.winid then
+        what.winid = 0
+        select_all = false
+    end
+
+    if select_all then what.all = 0 end
+
+    return what
+end
+
+---Checks if the list specified by opts exists
+---@param winnr? integer the window number or the |window-ID|. When {win} is zero the current window's location list is used. When nil the quickfix list is used.
+---@param opts? GetListInfoOpts when nil or opts.selection == nil or opts.selection has no selected fields return all properties
+---@return boolean exists
+function M.is_list_exist(winnr, opts)
+    opts = opts or {}
+    local result
+    if type(winnr) == 'number' then
+        ---@type my.fn.getlist.result
+        result = vim.fn.getloclist(winnr, {
+            id = opts.id or 0, -- or zero so that id will be returned back
+            nr = opts.nr,
+        })
+    else
+        ---@type my.fn.getlist.result
+        result = vim.fn.getqflist({
+            id = opts.id or 0, -- or zero so that id will be returned back
+            nr = opts.nr,
+        })
+    end
+    if result.id == 0 then
+        return false
+    else
+        return true
+    end
+end
+
+---gets the quickfix list or location list properties
+---@param winnr? integer the window number or the |window-ID|. When {win} is zero the current window's location list is used. When nil the quickfix list is used.
+---@param opts? GetListInfoOpts when nil or opts.selection == nil or opts.selection has no selected fields return all properties
+---@return my.fn.getlist.result? result nil if no list specified by win, id, and nr exists
+function M.get_list_info(winnr, opts)
+    opts = opts or {}
+
+    if not M.is_list_exist(winnr, { id = opts.id, nr = opts.nr }) then
+        return nil
+    end
+
+    local what = map_get_list_info_opts_to_what(opts)
+
+    local result
+    if type(winnr) == 'number' then
+        ---@type my.fn.getlist.result
+        result = vim.fn.getloclist(winnr, what)
+    else
+        ---@type my.fn.getlist.result
+        result = vim.fn.getqflist(what)
+    end
+
+    --TODO use vim.validate to validate assumptions
+    if result == nil then
+        error(
+            'Assumption failed. getqflist and getloclist should not return nil'
+        )
+    end
+
+    return result
+end
+
+---Create/replace/add to the quickfix list.
+---@param action string
+---@param winnr? integer the window number or the |window-ID|. When {win} is zero the current window's location list is used. When nil the quickfix list is used.
+---@param what vim.fn.setqflist.what
+---@return integer
+function M.set_list(winnr, action, what)
+    if winnr == nil then
+        return vim.fn.setqflist({}, action, what)
+    else
+        return vim.fn.setloclist(winnr, {}, action, what)
+    end
+end
+
+---set the location or quickfix list with diagnostics
+---@param winnr? integer the window number or the |window-ID|. When {win} is zero the current window's location list is used. When nil the quickfix list is used.
+---@param opts vim.diagnostic.setqflist.Opts
+function M.set_diagnostic_list(winnr, opts)
+    if winnr == nil then
+        vim.diagnostic.setqflist(opts)
+    else
+        ---@type vim.diagnostic.setloclist.Opts
+        ---@diagnostic disable-next-line: assign-type-mismatch
+        local loc_opts = vim.deepcopy(opts)
+        loc_opts.winnr = winnr
+        vim.diagnostic.setloclist(loc_opts)
+    end
+end
+
+---expands the multiline entry text with lines below entry
+---@param entries vim.quickfix.entry[]
+---@return vim.quickfix.entry[]
+M.expand_multiline_text_entries = function(entries)
+    local expanded_entries = {}
+    local idx = 0
+    for _, entry in ipairs(entries) do
+        if
+            type(entry.user_data) == 'table'
+            and entry.user_data.is_multiline_display
+        then
+            --skip existing multiline dipslayed entries because we will
+            --regenerate them
+        elseif entry.text and string.find(entry.text, '\n') ~= nil then
+            table.insert(expanded_entries, entry)
+            idx = idx + 1
+
+            local lines = vim.split(entry.text, '\n')
+            for _, line in ipairs(lines) do
+                local text_entry = {
+                    text = line,
+                    valid = 0,
+                    user_data = {
+                        is_multiline_display = true,
+                        multiline_display_idx = idx,
+                    },
+                }
+                table.insert(expanded_entries, text_entry)
+            end
+            idx = idx + #lines
+        else
+            table.insert(expanded_entries, entry)
+            idx = idx + 1
+        end
+    end
+    return expanded_entries
+end
+
+---@param winnr? integer the window number or the |window-ID|. When {win} is zero the current window's location list is used. When nil the quickfix list is used.
+---@param opts? GetListEntriesOpts when nil or opts.selection == nil or opts.selection has no selected fields return all properties
+M.expand_multiline_text_in_list = function(winnr, opts)
+    local entries = M.get_list_entries(winnr, opts)
+    if entries == nil then return end
+    local expanded_entries = M.expand_multiline_text_entries(entries)
+    M.set_list(winnr, 'u', { items = expanded_entries })
+end
+
+return M

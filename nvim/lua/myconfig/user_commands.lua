@@ -580,61 +580,26 @@ end, {
 })
 
 vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
+    local severity = nil
     if args.args == 'ERROR' then
-        vim.diagnostic.setqflist({
-            severity = vim.diagnostic.severity.ERROR,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.ERROR
     elseif args.args == 'WARN' then
-        vim.diagnostic.setqflist({
-            severity = vim.diagnostic.severity.WARN,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.WARN
     elseif args.args == 'HINT' then
-        vim.diagnostic.setqflist({
-            severity = vim.diagnostic.severity.HINT,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.HINT
     elseif args.args == 'INFO' then
-        vim.diagnostic.setqflist({
-            severity = vim.diagnostic.severity.INFO,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
-    else
-        vim.diagnostic.setqflist({
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.INFO
     end
+    require('myconfig.quickfix.api').set_diagnostic_list(nil, {
+        severity = severity,
+        format = function(diagnostic)
+            return string.format(
+                '(%s) %s',
+                diagnostic.source or '',
+                diagnostic.message
+            )
+        end,
+    })
 end, {
     desc = 'Adds lsp diagnostic to the Quickfix list',
     complete = make_fuzzy_completion(
@@ -644,61 +609,26 @@ end, {
 })
 
 vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
+    local severity = nil
     if args.args == 'ERROR' then
-        vim.diagnostic.setloclist({
-            severity = vim.diagnostic.severity.ERROR,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.ERROR
     elseif args.args == 'WARN' then
-        vim.diagnostic.setloclist({
-            severity = vim.diagnostic.severity.WARN,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.WARN
     elseif args.args == 'HINT' then
-        vim.diagnostic.setloclist({
-            severity = vim.diagnostic.severity.HINT,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.HINT
     elseif args.args == 'INFO' then
-        vim.diagnostic.setloclist({
-            severity = vim.diagnostic.severity.INFO,
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
-    else
-        vim.diagnostic.setloclist({
-            format = function(diagnostic)
-                return string.format(
-                    '(%s) %s',
-                    diagnostic.source or '',
-                    diagnostic.message
-                )
-            end,
-        })
+        severity = vim.diagnostic.severity.INFO
     end
+    require('myconfig.quickfix.api').set_diagnostic_list(0, {
+        severity = severity,
+        format = function(diagnostic)
+            return string.format(
+                '(%s) %s',
+                diagnostic.source or '',
+                diagnostic.message
+            )
+        end,
+    })
 end, {
     desc = 'Adds lsp diagnostic to the Quickfix list',
     complete = make_fuzzy_completion(
