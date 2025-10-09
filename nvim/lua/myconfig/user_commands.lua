@@ -1872,6 +1872,10 @@ vim.api.nvim_create_user_command(
 -------------------------------------------------------------------------------
 --- Set CD, LCD, or TCD
 
+local complete_root = make_fuzzy_completion(
+    function() return { '.git', '.editorconfig', 'nvim/' } end
+)
+
 vim.api.nvim_create_user_command('CdRoot', function(args)
     local root_search = args.fargs[1]
     if root_search == nil then root_search = '.git' end
@@ -1923,7 +1927,7 @@ vim.api.nvim_create_user_command('CdRoot', function(args)
         )
     end
 end, {
-    complete = make_fuzzy_completion(function() return { '.git' } end),
+    complete = complete_root,
     nargs = '?', --TODO add multiple root markers to search
     desc = 'Sets cd to the root directory of the buffer based on the root marker (default: .git)',
 })
@@ -1989,7 +1993,7 @@ vim.api.nvim_create_user_command('LcdRoot', function(args)
         )
     end
 end, {
-    complete = make_fuzzy_completion(function() return { '.git' } end),
+    complete = complete_root,
     nargs = '?', --TODO add multiple root markers to search
     bang = true,
     desc = 'Sets lcd to the root directory of the buffer based on the root marker (default: .git). Bang resets lcd back to value of tcd',
@@ -2056,7 +2060,7 @@ vim.api.nvim_create_user_command('TcdRoot', function(args)
         )
     end
 end, {
-    complete = make_fuzzy_completion(function() return { '.git' } end),
+    complete = complete_root,
     nargs = '?', --TODO add multiple root markers to search
     bang = true,
     desc = 'Sets tcd to the root directory of the buffer based on the root marker (default: .git). Bang resets tcd back to value of cd',
