@@ -1,14 +1,5 @@
 local M = {}
 
----@param keys string
-local function feedkeys(keys)
-    vim.api.nvim_feedkeys(
-        vim.api.nvim_replace_termcodes(keys, true, false, true),
-        'n',
-        true
-    )
-end
-
 function M.enable(enable, client_id, bufnr)
     -- Enable native completion.
     if require('myconfig.config').use_native_completion then
@@ -43,10 +34,32 @@ function M.enable(enable, client_id, bufnr)
                     and not vim.b[bufnr].no_completion_auto_trigger
                 then
                     if vim.bo.omnifunc == '' then
-                        feedkeys('<C-x><C-n>') --Triggers buffer completion
+                        --Triggers buffer completion
+                        vim.api.nvim_feedkeys(
+                            vim.api.nvim_replace_termcodes(
+                                '<C-x><C-n>',
+                                true,
+                                false,
+                                true
+                            ),
+                            'n',
+                            true
+                        )
                     else
-                        -- vim.lsp.completion.get()
-                        feedkeys('<C-x><C-o>') --Triggers vim.bo.omnifunc which is normally lsp completion
+                        --Can't remember why I stopped using the function vim.lsp.completion.get()
+
+                        --Triggers vim.bo.omnifunc which is normally lsp completion
+                        feedkeys('<C-x><C-o>')
+                        vim.api.nvim_feedkeys(
+                            vim.api.nvim_replace_termcodes(
+                                '<C-x><C-o>',
+                                true,
+                                false,
+                                true
+                            ),
+                            'n',
+                            true
+                        )
                     end
                 end
             end,

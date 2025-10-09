@@ -1,6 +1,5 @@
 local config = require('myconfig.config')
 local maputils = require('myconfig.utils.mapping')
-local feedkeys = maputils.feedkeys
 
 vim.g.mapleader = ' '
 
@@ -70,7 +69,6 @@ local function get_cfile()
         and start_index > 2
     then
         local drive_prefix = string.sub(line, start_index - 2, start_index - 1)
-        -- vim.print(drive_prefix)
         cfile = table.concat({ drive_prefix, cfile })
         start_index = start_index - 2
     end
@@ -119,7 +117,6 @@ local function get_gf_location()
 
     if scratch_bufnr == nil or not vim.api.nvim_buf_is_valid(scratch_bufnr) then
         scratch_bufnr = vim.api.nvim_create_buf(false, true)
-        -- vim.print(string.format('scratch_bufnr: %s', scratch_bufnr))
     end
 
     local gf_bufnr, gf_filename, gf_line, gf_col = vim._with(
@@ -142,9 +139,6 @@ local function get_gf_location()
                     false,
                     { joined_lines }
                 )
-                -- vim.print(
-                --     vim.api.nvim_buf_get_lines(scratch_bufnr, 0, 0, false)
-                -- )
                 vim.api.nvim_win_set_cursor(0, { 1, cursor[2] })
                 cfile_filename, cfile_start_index, cfile_end_index = get_cfile()
 
@@ -201,7 +195,6 @@ local function get_gf_location()
             local ret_lnum = new_lnum_on_first_gf
             if new_lnum_on_second_gf ~= new_lnum_on_first_gf then
                 ret_lnum = nil
-                -- vim.print('new_lnum_on_second_gf ~= new_lnum_on_first_gf')
                 -- return new_bufnr, new_filename_on_first_gf, nil, nil
             end
 
@@ -214,14 +207,6 @@ local function get_gf_location()
                 vim.fs.normalize(cfile_filename)
                 ~= vim.fs.normalize(new_filename_on_first_gf)
             then
-                -- vim.print('cfile_filename ~= new_filename_on_first_gf')
-                -- vim.print(
-                --     string.format(
-                --         '"%s" ~= "%s"',
-                --         vim.fs.normalize(cfile_filename),
-                --         vim.fs.normalize(new_filename_on_first_gf)
-                --     )
-                -- )
                 return new_bufnr,
                     new_filename_on_first_gf,
                     new_lnum_on_first_gf,
@@ -231,7 +216,6 @@ local function get_gf_location()
             -- 11.c use vim.fn.getqflist to get column
             local lines_to_find_column_for =
                 vim.api.nvim_buf_get_lines(scratch_bufnr, 0, 1, false)
-            -- vim.print(lines_to_find_column_for)
             local items = vim.fn.getqflist({
                 lines = lines_to_find_column_for,
             }).items
@@ -252,19 +236,14 @@ local function get_gf_location()
                 --   valid = 1,
                 --   vcol = 0
                 -- }
-                -- vim.print(items[1])
-                vim.print(items[1].bufnr)
                 -- Note: errorformat might incorrectly extract the filename
                 -- so we won't use the bufnr returned by getqflist since it is often
                 -- garbage in stack traces
-                -- vim.print(vim.api.nvim_buf_get_name(items[1].bufnr))
 
                 -- ret_bufnr = items[1].bufnr
                 ret_lnum = items[1].lnum
                 ret_col = items[1].col
             end
-            -- vim.print('hi')
-            -- vim.print(items)
 
             return ret_bufnr, new_filename_on_first_gf, ret_lnum, ret_col
         end
@@ -402,8 +381,7 @@ if config.use_experimental_gf then
     --             end
     --         end
     --     elseif err and err:find('E447') then
-    --         vim.print(err)
-    --         vim.print('hi')
+    --         vim.notify(err)
     --     else
     --         error(err, 1)
     --     end
@@ -514,8 +492,7 @@ if config.use_experimental_gf then
     --             end
     --         end
     --     elseif err and err:find('E447') then
-    --         vim.print(err)
-    --         vim.print('hi')
+    --         vim.notify(err)
     --     else
     --         error(err, 1)
     --     end
@@ -583,7 +560,7 @@ end
 local function confirm_entry(replace)
     if require('myconfig.config').use_native_completion then
         --TODO replicate cmps replace functionality when replace is true
-        feedkeys('<C-y>')
+        return '<C-y>'
     else
         local cmp = require('cmp')
         local behavior = replace and cmp.ConfirmBehavior.Replace
@@ -592,6 +569,7 @@ local function confirm_entry(replace)
             behavior = behavior,
             select = false,
         })
+        return ''
     end
 end
 
@@ -640,8 +618,17 @@ end
 --
 
 vim.keymap.set({ 'i' }, '<UP>', function()
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     if require('myconfig.config').use_native_completion then
-        feedkeys('<UP>')
+        return '<UP>'
     else
         local select_prev = require('cmp').mapping.select_prev_item({
             behavior = 'select',
@@ -650,35 +637,57 @@ vim.keymap.set({ 'i' }, '<UP>', function()
     end
 end, {
     desc = 'Custom Remap: Select previous completion item',
+    expr = true,
 })
 
 vim.keymap.set('i', '<DOWN>', function()
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     if require('myconfig.config').use_native_completion then
-        feedkeys('<DOWN>')
+        return '<DOWN>'
     else
         local select_next = require('cmp').mapping.select_next_item({
             behavior = 'select',
         })
         select_next(function() end)
+        return ''
     end
 end, {
     desc = 'Custom Remap: Select next completion item',
+    expr = true,
 })
 
---TODO the following keymaps don't work in `ic` mode because <C-p> and <C-n> are hardcoded
---in the vim C code and cannot be remapped until issue https://github.com/vim/vim/issues/16880
---is resolved as a result I can't have my snippet logic work as `ic` mode 90% of the
---time this keymap will be ran when using native completion
 vim.keymap.set({ 'i', 's' }, '<C-p>', function()
+    --TODO the following commented version of this keymap keymap doesn't work
+    --in `ic` mode because <C-p> and <C-n> are hardcoded
+    --in the vim C code and cannot be remapped until issue https://github.com/vim/vim/issues/16880
+    --is resolved as a result I can't have my snippet logic work since 90% of the
+    --the completion mode is `ic` which won't call this keymap
+    --
     -- local luasnip = require('luasnip')
     -- if is_entry_active() then
-    --     feedkeys('<C-p>')
+    --     vim.api.nvim_feedkeys(
+    --         vim.api.nvim_replace_termcodes('<C-p>', true, false, true),
+    --         'n', --Note probably not the best mode
+    --         true
+    --     )
     -- elseif luasnip.jumpable(-1) then
     --     luasnip.jump(-1)
     -- elseif vim.snippet.active({ direction = -1 }) then
     --     vim.snippet.jump(-1)
     -- elseif require('myconfig.config').use_native_completion then
-    --     feedkeys('<C-p>')
+    --     vim.api.nvim_feedkeys(
+    --         vim.api.nvim_replace_termcodes('<C-p>', true, false, true),
+    --         'n', --Note probably not the best mode
+    --         true
+    --     )
     -- else
     --     local select_prev = require('cmp').mapping.select_prev_item({
     --         behavior = 'select',
@@ -686,50 +695,83 @@ vim.keymap.set({ 'i', 's' }, '<C-p>', function()
     --     select_prev(function() end)
     -- end
 
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     if require('myconfig.config').use_native_completion then
-        feedkeys('<C-p>')
+        return '<C-p>'
     else
         local select_prev = require('cmp').mapping.select_prev_item({
             behavior = 'select',
         })
         select_prev(function() end)
+        return ''
     end
 end, {
     -- desc = 'Custom Remap: Jump to previous snippet location or fallback to previous completion item',
     desc = 'Custom Remap: Jump to previous completion item',
+    expr = true,
 })
 
---TODO the following keymaps don't work in `ic` mode because <C-p> and <C-n> are hardcoded
---in the vim C code and cannot be remapped until issue https://github.com/vim/vim/issues/16880
---is resolved as a result I can't have my snippet logic work as `ic` mode 90% of the
---time this keymap will be ran when using native completion
 vim.keymap.set({ 'i', 's' }, '<C-n>', function()
+    --TODO the following commented version of this keymap keymap doesn't work
+    --in `ic` mode because <C-p> and <C-n> are hardcoded
+    --in the vim C code and cannot be remapped until issue https://github.com/vim/vim/issues/16880
+    --is resolved as a result I can't have my snippet logic work since 90% of the
+    --the completion mode is `ic` which won't call this keymap
+    --
     -- local luasnip = require('luasnip')
     -- if is_entry_active() then
-    --     feedkeys('<C-n>')
+    --     vim.api.nvim_feedkeys(
+    --         vim.api.nvim_replace_termcodes('<C-n>', true, false, true),
+    --         'n', --Note probably not the best mode
+    --         true
+    --     )
     -- elseif luasnip.expand_or_jumpable() then
     --     luasnip.expand_or_jump()
     -- elseif vim.snippet.active({ direction = 1 }) then
     --     vim.snippet.jump(1)
     -- elseif require('myconfig.config').use_native_completion then
-    --     feedkeys('<C-n>')
+    --     vim.api.nvim_feedkeys(
+    --         vim.api.nvim_replace_termcodes('<C-n>', true, false, true),
+    --         'n', --Note probably not the best mode
+    --         true
+    --     )
     -- else
     --     local select_next = require('cmp').mapping.select_next_item({
     --         behavior = 'select',
     --     })
     --     select_next(function() end)
     -- end
+
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     if require('myconfig.config').use_native_completion then
-        feedkeys('<C-n>')
+        return '<C-n>'
     else
         local select_next = require('cmp').mapping.select_next_item({
             behavior = 'select',
         })
         select_next(function() end)
+        return ''
     end
 end, {
     -- desc = 'Custom Remap: Jump to next snippet location or fallback to next completion item',
     desc = 'Custom Remap: Jump to next completion item',
+    expr = true,
 })
 
 vim.keymap.set({ 'i', 's' }, '<C-h>', function()
@@ -755,34 +797,40 @@ end, {
 })
 
 vim.keymap.set('i', '<CR>', function()
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
     if is_entry_active() then
         ---setting the undolevels creates a new undo break
         ---so by setting it to itself I can create an undo break
         ---without side effects just before a comfirming a completion.
         -- Use <c-u> in insert mode to undo the completion
         vim.cmd([[let &g:undolevels = &g:undolevels]])
-        confirm_entry()
+        return confirm_entry()
     else
-        feedkeys('<CR>') --Fallback to default keymap (aka insert a newline)
+        return '<CR>'
         -- 						*i_CTRL-M* *i_<CR>*
         -- <CR> or CTRL-M	Begin new line.
     end
 end, {
     desc = 'Custom Remap: Select active completion item or fallback',
+    expr = true,
 })
 
 vim.keymap.set('i', '<C-y>', function()
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
     if is_entry_active() then
         ---setting the undolevels creates a new undo break
         ---so by setting it to itself I can create an undo break
         ---without side effects just before a comfirming a completion.
         -- Use <c-u> in insert mode to undo the completion
         vim.cmd([[let &g:undolevels = &g:undolevels]])
-        --I verified that feedkeys in my <CR> mapping does not call this remapping
-        --so I don't have to worry about this recursively getting called
-        confirm_entry(true)
+        return confirm_entry(true)
     else
-        feedkeys('<C-y') -- Fallback to default keymap
+        return '<C-y>' -- Fallback to default keymap
         -- 						*i_CTRL-Y*
         -- CTRL-Y		Insert the character which is above the cursor.
         -- 		Note that for CTRL-E and CTRL-Y 'textwidth' is not used, to be
@@ -790,22 +838,30 @@ vim.keymap.set('i', '<C-y>', function()
     end
 end, {
     desc = 'Custom Remap: Select active completion item or fallback',
+    expr = true,
 })
 
---TODO fix for cmp
 vim.keymap.set('i', '<C-e>', function()
-    --TODO may want to also toggle my autocmd that automatically opens
-    --the completion menu on each character typed
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     if is_completion_menu_visible() then
         --Close completion menu
         require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled =
             false
         if pumvisible() then
-            feedkeys('<C-e>') --Close completion menu
+            return '<C-e>' --Close completion menu
         elseif not require('myconfig.config').use_native_completion then
             require('cmp').abort()
+            return ''
         else
-            feedkeys('<C-e>') --Close completion menu
+            return '<C-e>' --Close completion menu
         end
     else
         require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled =
@@ -813,27 +869,41 @@ vim.keymap.set('i', '<C-e>', function()
 
         if not require('myconfig.config').use_native_completion then
             require('cmp').complete()
+            return ''
             --TODO One difference that may be desirable is that cmp automatically
             --reenables showing documentation window while my native completion doesn't
             --currently do so
         elseif vim.bo.omnifunc == '' then
-            feedkeys('<C-x><C-n>') --Triggers buffer completion
+            return '<C-x><C-n>' --Triggers buffer completion
         else
             -- vim.lsp.completion.get()
-            feedkeys('<C-x><C-o>') --Triggers vim.bo.omnifunc which is normally lsp completion
+            return '<C-x><C-o>' --Triggers vim.bo.omnifunc which is normally lsp completion
         end
     end
-end, { desc = 'Custom Remap: Toggle completion window' })
+end, {
+    desc = 'Custom Remap: Toggle completion window',
+    expr = true,
+})
 
 vim.keymap.set({ 'i', 's' }, '<C-u>', function()
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     if is_docs_visible() then
         if require('myconfig.config').use_native_completion then
             require('myconfig.lsp.completion.documentation').scroll_docs(-4)
         else
             require('cmp').mapping.scroll_docs(-4)
         end
+        return ''
     else
-        feedkeys('<C-u>') -- Fallback to default keymap that deletes text to the left
+        return '<C-u>' -- Fallback to default keymap that deletes text to the left
         -- 						*i_CTRL-U*
         -- CTRL-U		Delete all entered characters before the cursor in the current
         -- 		line.  If there are no newly entered characters and
@@ -848,23 +918,35 @@ vim.keymap.set({ 'i', 's' }, '<C-u>', function()
     end
 end, {
     desc = 'Custom Remap: Scroll up documentation window or fallback',
+    expr = true,
 })
 
 vim.keymap.set({ 'i', 's' }, '<C-d>', function()
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     if is_docs_visible() then
         if require('myconfig.config').use_native_completion then
             require('myconfig.lsp.completion.documentation').scroll_docs(4)
         else
             require('cmp').mapping.scroll_docs(4)
         end
+        return ''
     else
-        feedkeys('<C-d>') -- Default to default keymap of deleting text to the right
+        return '<C-d>' -- Default to default keymap of deleting text to the right
         -- 						*i_CTRL-D*
         -- CTRL-D		Delete one shiftwidth of indent at the start of the current
         -- 		line.  The indent is always rounded to a 'shiftwidth'.
     end
 end, {
     desc = 'Custom Remap: Scroll down documentation window when visiblie or fallback',
+    expr = true,
 })
 
 vim.keymap.set({ 'i', 's' }, '<C-t>', function()
@@ -895,71 +977,123 @@ vim.keymap.set('c', '<Tab>', '<C-n>', {
 })
 
 vim.keymap.set('c', '<Left>', function()
-    require('myconfig.utils.mapping').feedkeys('<Space><BS><Left>')
-    vim.fn.wildtrigger() -- open the wildmenu
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     -- wild trigger seems to work but if it doesn't the reddit post
     -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-    -- explains the work around of using feedkeys on <C-Z> to open it. I found
-    -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
+    -- explains the work around of using nvim_feedkeys on <C-Z> to open it. I found
+    -- that calling nvim_feedkeys on <C-Z> causes issues for typing user command arguments
     -- when the usercommand doesn't define a completion function
-    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    vim.schedule(function()
+        vim.fn.wildtrigger() -- open the wildmenu
+    end)
+    return '<Space><BS><Left>'
 end, {
     desc = 'Custom remap Ex completion: Move cursor left',
+    expr = true,
 })
 
 vim.keymap.set('c', '<Right>', function()
-    require('myconfig.utils.mapping').feedkeys('<Space><BS><Right>')
-    vim.fn.wildtrigger() -- open the wildmenu
-    -- wild trigger seems to work but if it doesn't the reddit post
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
+    -- Also wild trigger seems to work but if it doesn't the reddit post
     -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-    -- explains the work around of using feedkeys on <C-Z> to open it. I found
-    -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
+    -- explains the work around of using nvim_feedkeys on <C-Z> to open it. I found
+    -- that calling nvim_feedkeys on <C-Z> causes issues for typing user command arguments
     -- when the usercommand doesn't define a completion function
-    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    vim.schedule(function()
+        vim.fn.wildtrigger() -- open the wildmenu
+    end)
+    return '<Space><BS><Right>'
 end, {
     desc = 'Custom remap Ex completion: Move cursor right',
+    expr = true,
 })
 
 vim.keymap.set('c', '<BS>', function()
-    require('myconfig.utils.mapping').feedkeys('<BS>')
-    vim.fn.wildtrigger() -- open the wildmenu
-    -- wild trigger seems to work but if it doesn't the reddit post
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
+    -- Also wild trigger seems to work but if it doesn't the reddit post
     -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
     -- explains the work around of using feedkeys on <C-Z> to open it. I found
     -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
     -- when the usercommand doesn't define a completion function
-    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    vim.schedule(function()
+        vim.fn.wildtrigger() -- open the wildmenu
+    end)
+    return '<BS>'
 end, {
     desc = 'Custom remap Ex completion: Backspace but also keep completion menu open',
+    expr = true,
 })
 
 vim.keymap.set('c', '<Space>', function()
-    require('myconfig.utils.mapping').feedkeys('<Space>')
-    vim.fn.wildtrigger() -- open the wildmenu
-    -- wild trigger seems to work but if it doesn't the reddit post
-    -- https://www.reddit.com/r/neovim/comments/1nh3dnx/commandline_completion_as_you_type/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-    -- explains the work around of using feedkeys on <C-Z> to open it. I found
-    -- that calling feedkeys on <C-Z> causes issues for typing user command arguments
-    -- when the usercommand doesn't define a completion function
-    -- require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
+    vim.schedule(function()
+        vim.fn.wildtrigger() -- open the wildmenu
+    end)
+    return '<Space>'
 end, {
     desc = 'Custom remap Ex completion: Space but also keep completion menu open',
+    expr = true,
 })
 
 vim.keymap.set('c', '<C-e>', function()
+    --I switched from vim.api.nvim_feedkeys to an expr keymap to fix issues with macros
+    --where I could record a macro just fine but replaying it would skip the
+    --keymap that feedkeys was supposed to call
+    --If i find I need to change back to using feedkeys refer to
+    --https://www.reddit.com/r/neovim/comments/1o1hx82/comment/nigq6jm/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+    --for information about which mode to use
+
+    --TODO evaluated if this keymap should have macro specific logic
+
     local is_wild_menu_open = vim.fn.wildmenumode() == 1
-    require('myconfig.utils.mapping').feedkeys('<C-e>') -- clears completionion text (basically an undo)
+    -- '<C-e>' clears completionion text (basically an undo)
     -- Note: I can't use vim.fn.wildtrigger() after <C-e> it just doesn't open
     -- the completion menu I'm not sure if it's a bug but we just have to live
-    -- using feedkeys <C-Z> instead
+    -- using the <C-Z> instead and all its quirks
     if is_wild_menu_open then
-        --reopen the wild menu afte <C-e> closed it. We only reopen if it was
-        --already open since <C-Z> will enter ^Z into the commandline if there
+        --Clear selected completion item with <C-e> and then reopen the wild menu
+        --with <C-Z>. We only reopen if it was already open since <C-Z> will
+        --enter ^Z into the commandline if there
         --is no completion items
-        require('myconfig.utils.mapping').feedkeys('<C-Z>') -- open the wildmenu
+        return '<C-e><C-Z>'
+    else
+        return '<C-e>'
     end
 end, {
     desc = 'Custom remap Ex completion: Clears completion selection',
+    expr = true,
 })
 
 -------------------------------------------------------------------------------
