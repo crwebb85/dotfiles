@@ -96,6 +96,32 @@ stack traceback:
 	...nvim-data/lazy/telescope.nvim/lua/telescope/mappings.lua:293: in function <...nvim-data/lazy/telescope.nvim/lua/telescope/mappings.lua:292>
 ```
 
+- bug sometimes happens during completion (was using extui and native completion)
+  After the bug happens the `-- Insert --` text that displays over the Ex command line
+  will stay stuck above it preventing you from seeing the Ex commands you are typing.
+  I found no way to clear that text and when it happens i have to create a new tab and
+  close the old tab. Seems to be caused by vim.api.nvim\_\_redraw({ buf = ev.buf, statusline = true })
+  which is somehow commonly triggered by a neovim autocmd for DiagnosticChanged.
+  Somehow selecting a completion item triggers the autocmd.
+
+```
+Lua: ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: E565: Not allowed to change text or change window
+stack traceback:
+	[C]: in function 'nvim_buf_set_text'
+	...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: in function 'set_virttext'
+	...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:424: in function 'handler'
+	C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:44: in function 'ui_callback'
+	C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:89: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:82>
+	[C]: in function 'nvim__redraw'
+	C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2916: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2914>
+	[C]: in function 'nvim_exec_autocmds'
+	C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2610: in function 'reset'
+	C:/nvim-win64/share/nvim/runtime/lua/vim/lsp/client.lua:1262: in function '_on_detach'
+	C:\nvim-win64\sha
+Error in "msg_showmode" UI event handler (ns=nvim._ext_ui):
+
+```
+
 the workaround is to make sure the plugin is loaded
 
 ### TODO and Workflows that need improvements
