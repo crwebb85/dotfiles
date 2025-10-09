@@ -45,7 +45,8 @@ function M.preview_quickfix_list(winnr)
     local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
     local item_id = row
 
-    local items = api.get_list_entries(winnr, {
+    local items = api.get_list_entries({
+        winnr = winnr,
         id = 0,
         idx = item_id,
     })

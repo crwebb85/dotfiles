@@ -590,7 +590,8 @@ vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
     elseif args.args == 'INFO' then
         severity = vim.diagnostic.severity.INFO
     end
-    require('myconfig.quickfix.api').set_diagnostic_list(nil, {
+    require('myconfig.quickfix.api').set_diagnostic_list({
+        winnr = nil,
         severity = severity,
         format = function(diagnostic)
             return string.format(
@@ -608,6 +609,45 @@ end, {
     nargs = '?',
 })
 
+vim.api.nvim_create_user_command('QFLspDiagnosticsContext', function(args)
+    local severity = nil
+    if args.args == 'ERROR' then
+        severity = vim.diagnostic.severity.ERROR
+    elseif args.args == 'WARN' then
+        severity = vim.diagnostic.severity.WARN
+    elseif args.args == 'HINT' then
+        severity = vim.diagnostic.severity.HINT
+    elseif args.args == 'INFO' then
+        severity = vim.diagnostic.severity.INFO
+    end
+    require('myconfig.quickfix.api').set_diagnostic_list({
+        winnr = nil,
+        severity = severity,
+        format = function(diagnostic)
+            local namespaces = vim.api.nvim_get_namespaces()
+            local namespace_name = ''
+            for name, id in pairs(namespaces) do
+                if id == diagnostic.namespace then
+                    namespace_name = name
+                    break
+                end
+            end
+            return string.format(
+                '(%s) (Bufnr:%s) %s',
+                namespace_name or '',
+                diagnostic.bufnr or '',
+                diagnostic.message
+            )
+        end,
+    })
+end, {
+    desc = 'Adds lsp diagnostic to the Quickfix list with extra context',
+    complete = make_fuzzy_completion(
+        function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
+    ),
+    nargs = '?',
+})
+
 vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
     local severity = nil
     if args.args == 'ERROR' then
@@ -619,7 +659,8 @@ vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
     elseif args.args == 'INFO' then
         severity = vim.diagnostic.severity.INFO
     end
-    require('myconfig.quickfix.api').set_diagnostic_list(0, {
+    require('myconfig.quickfix.api').set_diagnostic_list({
+        winnr = 0,
         severity = severity,
         format = function(diagnostic)
             return string.format(
