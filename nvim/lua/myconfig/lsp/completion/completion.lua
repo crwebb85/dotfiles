@@ -49,7 +49,6 @@ function M.enable(enable, client_id, bufnr)
                         --Can't remember why I stopped using the function vim.lsp.completion.get()
 
                         --Triggers vim.bo.omnifunc which is normally lsp completion
-                        feedkeys('<C-x><C-o>')
                         vim.api.nvim_feedkeys(
                             vim.api.nvim_replace_termcodes(
                                 '<C-x><C-o>',
