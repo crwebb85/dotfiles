@@ -306,7 +306,7 @@ end
 ---Checks if the list specified by opts exists
 ---@param opts? GetListInfoOpts when nil or opts.selection == nil or opts.selection has no selected fields return all properties
 ---@return boolean exists
-function M.is_list_exist(opts)
+function M.is_existing_list(opts)
     opts = opts or {}
     local result
     if type(opts.winnr) == 'number' then
@@ -336,7 +336,11 @@ function M.get_list_info(opts)
     opts = opts or {}
 
     if
-        not M.is_list_exist({ winnr = opts.winnr, id = opts.id, nr = opts.nr })
+        not M.is_existing_list({
+            winnr = opts.winnr,
+            id = opts.id,
+            nr = opts.nr,
+        })
     then
         return nil
     end
