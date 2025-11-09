@@ -620,7 +620,39 @@ end, {
     bar = true,
 })
 
+vim.api.nvim_create_user_command('QFNewList', function(args)
+    ---@type string?
+    local title = vim.trim(args.args)
+    if title == '' then title = nil end
+
+    require('myconfig.quickfix').operations.create_new_list({
+        title = title,
+    })
+end, {
+    desc = 'Creates a new empty QF list with the given name',
+    nargs = 1,
+    bar = true,
+})
+
+vim.api.nvim_create_user_command('LocNewList', function(args)
+    ---@type string?
+    local title = vim.trim(args.args)
+    if title == '' then title = nil end
+
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.create_new_list({
+        filewin = filewinid,
+        title = title,
+    })
+end, {
+    desc = 'Creates a new empty location list with the given name',
+    nargs = 1,
+    bar = true,
+})
+
 vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
+    --TODO allow selecting multiple severities
     local severity = nil
     if args.args == 'ERROR' then
         severity = vim.diagnostic.severity.ERROR

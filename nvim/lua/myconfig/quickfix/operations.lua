@@ -31,6 +31,12 @@ local M = {}
 ---the current window's location list is used. When nil the quickfix list is used.
 ---@field filewin? integer
 
+---@class CreateNewListOpts
+---the window number or the |window-ID| the list is for. When {win} is zero
+---the current window's location list is used. When nil the quickfix list is used.
+---@field filewin? integer
+---@field title? string (Default: 'No name')
+
 ---@class SetTreesitterCaptureListOpts
 ---the window number or the |window-ID| the list is for. When {win} is zero
 ---the current window's location list is used. When nil the quickfix list is used.
@@ -77,7 +83,7 @@ function M.filter_valid_list_entries(opts)
         filter_func = function(item) return item.valid == 0 end
     end
 
-    local entries = require('myconfig.quickfix.entries').filter_entries({
+    entries = require('myconfig.quickfix.entries').filter_entries({
         entries = entries,
         filter = filter_func,
     })
@@ -255,6 +261,17 @@ function M.set_treesitter_capture_list(opts)
     if #entries == 0 then
         vim.notify('No captures set!', vim.log.levels.INFO)
     end
+end
+
+---@param opts? CreateNewListOpts
+function M.create_new_list(opts)
+    opts = opts or {}
+    local title = opts.title or 'No Name'
+
+    api.set_list(opts.filewin, ' ', {
+        items = {},
+        title = title,
+    })
 end
 
 return M
