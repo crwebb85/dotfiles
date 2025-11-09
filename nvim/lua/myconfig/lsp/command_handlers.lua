@@ -112,8 +112,9 @@ local function debug_command(args, rust_debug_adapter)
             cwd = args.workspaceRoot,
             on_exit = function(j, code)
                 if code and code > 0 then
-                    utils.scheduled_error(
-                        'An error occured while compiling. Please fix all compilation issues and try again.'
+                    utils.scheduled_notify(
+                        'An error occured while compiling. Please fix all compilation issues and try again.',
+                        vim.log.levels.ERROR
                     )
                     return
                 end

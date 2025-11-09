@@ -10,9 +10,6 @@
 
 local nio = require('nio')
 local config = require('neotest.config')
-local parser = require('overseer.parser')
-local problem_matcher = require('overseer.template.vscode.problem_matcher')
-local lib = require('neotest.lib')
 
 local neotest = {}
 
@@ -31,45 +28,6 @@ local client
 ---@field problem_matcher? table An overseer problem matcher
 ---@field precalculated_vars? table
 
----Creates a parser based on the configuration
----based on https://github.com/stevearc/overseer.nvim/blob/fe7b2f9ba263e150ab36474dfc810217b8cf7400/lua/overseer/component/on_output_parse.lua?plain=1#L36-L97
----@param qf_config MyNeotestQuickfixConfig?
----@return overseer.Parser?
-local function resolve_parser(qf_config)
-    if qf_config == nil then return nil end
-
-    if qf_config.parser and qf_config.problem_matcher then
-        lib.notify(
-            "cannot specify both 'parser' and 'problem_matcher'",
-            vim.log.levels.ERROR
-        )
-        return nil
-    elseif not qf_config.parser and not qf_config.problem_matcher then
-        return nil
-    end
-    ---@type table?
-    local parser_defn = qf_config.parser
-    if qf_config.problem_matcher then
-        local pm =
-            problem_matcher.resolve_problem_matcher(qf_config.problem_matcher)
-        if pm then
-            parser_defn = problem_matcher.get_parser_from_problem_matcher(
-                pm,
-                qf_config.precalculated_vars
-            )
-            if parser_defn then parser_defn = { diagnostics = parser_defn } end
-        end
-    end
-    if not parser_defn then
-        vim.notify('no parser_defn', vim.log.levels.ERROR)
-        return nil
-    end
-
-    local resolved_parser = parser.new(parser_defn)
-
-    return resolved_parser
-end
-
 local init = function()
     ---@param results table<string, neotest.Result>
     client.listeners.results = function(adapter_id, results, partial)
@@ -83,7 +41,12 @@ local init = function()
 
         if partial then return end
 
-        local resolved_parser = resolve_parser(my_neotest_quickfix_config)
+        local resolved_parser =
+            require('myconfig.quickfix.api').resolve_overseer_parser({
+                parser = my_neotest_quickfix_config.parser,
+                problem_matcher = my_neotest_quickfix_config.problem_matcher,
+                precalculated_vars = my_neotest_quickfix_config.precalculated_vars,
+            })
 
         local tree = assert(client:get_position(nil, { adapter = adapter_id }))
 
@@ -140,33 +103,18 @@ local init = function()
 
             local message_lines = failed_test_qf_result.user_data.test_result.message
                 or ''
-            local normalized_message_lines =
-                message_lines:gsub('\r\n', '\n'):gsub('\r', '\n')
-            local split_message_lines =
-                vim.split(normalized_message_lines, '\n')
 
-            local append_stacktrace = false
-            local items = {}
-            if resolved_parser then
-                resolved_parser:reset()
-                resolved_parser:ingest(split_message_lines)
-                local result = resolved_parser:get_result()
-                --Note overseer has some extra logic to update the item file paths
-                --to use different relative paths based on param options that im not doing
-                --yet. May do it if I find I need it
-                --https://github.com/stevearc/overseer.nvim/blob/fe7b2f9ba263e150ab36474dfc810217b8cf7400/lua/overseer/component/on_output_parse.lua?plain=1#L66-L73
-                items = result.diagnostics or {}
-                append_stacktrace = true
-            else
-                items = vim.fn.getqflist({
-                    lines = split_message_lines,
-                }).items
-            end
+            local append_stacktrace = resolved_parser ~= nil
+            local items, sanitized_lines =
+                require('myconfig.quickfix.api').parse_list_entries({
+                    lines = message_lines,
+                    parser = resolved_parser,
+                })
             for _, item in ipairs(items) do
                 table.insert(qf_results, item)
             end
             if append_stacktrace then
-                for _, line in ipairs(split_message_lines) do
+                for _, line in ipairs(sanitized_lines) do
                     table.insert(qf_results, { text = line, valid = 0 })
                 end
             end

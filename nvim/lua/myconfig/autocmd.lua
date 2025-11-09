@@ -607,3 +607,53 @@ vim.api.nvim_create_autocmd('CmdlineChanged', {
     group = show_wild_menu_group,
     callback = function() vim.fn.wildtrigger() end,
 })
+
+-------------------------------------------------------------------------------
+---Used to record information about the quickfix to help me debug bugs in the
+---quickfix native api when the buffer changes
+local record_qf_info_group =
+    vim.api.nvim_create_augroup('record_qf_info_group', {})
+vim.api.nvim_create_autocmd({ 'WinNew' }, {
+    group = record_qf_info_group,
+    callback = function(_)
+        local possible_qfwinid = vim.api.nvim_get_current_win()
+        vim.schedule(function()
+            if not vim.api.nvim_win_is_valid(possible_qfwinid) then return end
+
+            local possible_qfbufnr = vim.api.nvim_win_get_buf(possible_qfwinid)
+            if not vim.bo[possible_qfbufnr].filetype == 'qf' then return end
+            local qfbufnr = possible_qfbufnr
+
+            local wininfo = vim.fn.getwininfo(possible_qfwinid)[1]
+            if wininfo.quickfix == 0 then return end
+            local qfwinid = possible_qfwinid
+
+            local filewinid = nil
+            local listtype = nil
+            if wininfo.loclist == 1 then
+                local possible_filewinid = vim.fn.getloclist(possible_qfwinid, {
+                    filewinid = 0,
+                }).filewinid
+                if possible_filewinid ~= 0 then
+                    filewinid = possible_filewinid
+                end
+                listtype = 'loclist'
+                vim.b[qfbufnr].my_quickfix_list_info = {
+                    filewinid = filewinid,
+                    listtype = listtype,
+                }
+            else
+                listtype = 'quickfix'
+                vim.b[qfbufnr].my_quickfix_list_info = {
+                    listtype = listtype,
+                }
+            end
+            vim.w.my_quickfix_list_info = {
+                filewinid = filewinid,
+                qfwinid = qfwinid,
+                qfbufnr = qfbufnr,
+                listtype = listtype,
+            }
+        end)
+    end,
+})

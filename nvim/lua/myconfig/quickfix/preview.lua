@@ -46,7 +46,7 @@ function M.preview_quickfix_list(winnr)
     local item_id = row
 
     local items = api.get_list_entries({
-        winnr = winnr,
+        filewin = winnr,
         id = 0,
         idx = item_id,
     })

@@ -41,10 +41,18 @@ function M.resize(amount, split_vertical)
     vim.cmd(cmd)
 end
 
----Schedule an error notification
----@param err any
-function M.scheduled_error(err)
-    vim.schedule(function() vim.notify(err, vim.log.levels.ERROR) end)
+--- Scheduled wrapper around vim.notify
+---
+--- Displays a notification to the user.
+---
+--- This function can be overridden by plugins to display notifications using
+--- a custom provider (such as the system notification provider). By default,
+--- writes to |:messages|.
+---@param msg string Content of the notification to show to the user.
+---@param level integer|nil One of the values from |vim.log.levels|.
+---@param opts table|nil Optional parameters. Unused by default.
+function M.schedule_notify(msg, level, opts)
+    vim.schedule(function() return vim.notify(msg, level, opts) end)
 end
 
 ---validates the value is a valid position (intended to be used with vim.validate)

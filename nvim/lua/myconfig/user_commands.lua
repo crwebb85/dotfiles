@@ -453,130 +453,171 @@ vim.api.nvim_create_user_command(
 )
 
 -------------------------------------------------------------------------------
----Quickfix and Location list
+---Quickfix and Location list modification
 
-vim.cmd([[
-    function! RemoveDuplicateLocListFiles()
-        let a = getloclist(0)
-        let file = {}
-        let result = []
-        for entry in a
-            if !has_key(file, entry.bufnr)
-                call add(result, entry)
-                let file[entry.bufnr]=1
-            endif
-        endfor
-        if !empty(result)
-            call setloclist(0, result, 'r')
-        endif
-    endfu
-]])
-
-vim.api.nvim_create_user_command(
-    'LocRemoveDuplicateFiles',
-    function(_) vim.fn['RemoveDuplicateLocListFiles']() end,
-    {
-        desc = 'Removes duplicate files from Loc List',
-    }
-)
-
-vim.cmd([[
-    function! RemoveDuplicateQFListFiles()
-        let a = getqflist()
-        let file = {}
-        let result = []
-        for entry in a
-            if !has_key(file, entry.bufnr)
-                call add(result, entry)
-                let file[entry.bufnr] = 1
-            endif
-        endfor
-        if !empty(result)
-            call setqflist(result, 'r')
-        endif
-    endfu
-]])
-
-vim.api.nvim_create_user_command(
-    'QFRemoveDuplicateFiles',
-    function(_) vim.fn['RemoveDuplicateQFListFiles']() end,
-    {
-        desc = 'Removes duplicate files from Quick Fix List',
-    }
-)
-
-vim.api.nvim_create_user_command('QFBreakpoints', function(_)
-    local DAP_QUICKFIX_TITLE = 'DAP Breakpoints'
-    local DAP_QUICKFIX_CONTEXT = DAP_QUICKFIX_TITLE
-    local qf_list =
-        require('dap.breakpoints').to_qf_list(require('dap.breakpoints').get())
-    local current_qflist_title = vim.fn.getqflist({ title = 1 }).title
-    local action = ' '
-    if current_qflist_title == DAP_QUICKFIX_TITLE then action = 'r' end
-    vim.fn.setqflist({}, action, {
-        items = qf_list,
-        context = { DAP_QUICKFIX_CONTEXT },
-        title = DAP_QUICKFIX_TITLE,
+vim.api.nvim_create_user_command('LocRemoveDuplicateBuffers', function(_)
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.dedupe({
+        filewin = filewinid,
+        mode = 'buffer',
     })
-    if #qf_list == 0 then
-        vim.api.notify('No breakpoints set!', vim.log.levels.INFO)
-    else
-        vim.api.nvim_command('copen')
-    end
 end, {
-    desc = 'Populate quickfix list with the breakpoints',
+    desc = 'Removes duplicate files from Loc List',
+    bar = true,
 })
+
+vim.api.nvim_create_user_command(
+    'QFRemoveDuplicateBuffers',
+    function(_)
+        require('myconfig.quickfix').operations.dedupe({ mode = 'buffer' })
+    end,
+    {
+        desc = 'Expands multiline text fields as invalid entries below the valid entry for better readability',
+        bar = true,
+    }
+)
+
+vim.api.nvim_create_user_command(
+    'QFFilterValid',
+    function(params)
+        require('myconfig.quickfix').operations.filter_valid_list_entries({
+            inverse = params.bang or false,
+        })
+    end,
+    {
+        desc = 'Filters for only valid list items (bang reverses filter)',
+        bang = true,
+        bar = true,
+    }
+)
+
+vim.api.nvim_create_user_command('LocFilterValid', function(params)
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.filter_valid_list_entries({
+        filewin = filewinid,
+        inverse = params.bang or false,
+    })
+end, {
+    desc = 'Filters for only valid list items (bang reverses filter)',
+    bang = true,
+    bar = true,
+})
+
+vim.api.nvim_create_user_command(
+    'QFExpandText',
+    function(_) require('myconfig.quickfix').operations.expand_multiline_text() end,
+    {
+        desc = 'Expands multiline text fields as invalid entries below the valid entry for better readability',
+        bar = true,
+    }
+)
+
+vim.api.nvim_create_user_command('LocExpandText', function(_)
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.expand_multiline_text({
+        filewin = filewinid,
+    })
+end, {
+    desc = 'Removes duplicate files from Loc List',
+    bar = true,
+})
+
+vim.api.nvim_create_user_command(
+    'QFAddCursor',
+    function(_)
+        require('myconfig.quickfix').operations.add_cursor_from_command({})
+    end,
+    {
+        desc = 'Adds the cursor to the quickfix list',
+        bar = true,
+    }
+)
+
+vim.api.nvim_create_user_command(
+    'LocAddCursor',
+    function(_)
+        require('myconfig.quickfix').operations.add_cursor_from_command({
+            filewin = 0,
+        })
+    end,
+    {
+        desc = 'Adds the cursor to the location list',
+        bar = true,
+    }
+)
+
+vim.api.nvim_create_user_command('QFToLoc', function(_)
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.copy_list(
+        { filewin = nil },
+        { filewin = filewinid }
+    )
+end, {
+    desc = 'Copies QF list to Loc list',
+    bar = true,
+})
+
+vim.api.nvim_create_user_command('QFToLocAdd', function(_)
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.copy_list(
+        { filewin = nil },
+        { filewin = filewinid },
+        { mode = 'append' }
+    )
+end, {
+    desc = 'Appends items from QF list to end of Loc list',
+})
+
+vim.api.nvim_create_user_command('LocToQF', function(_)
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.copy_list(
+        { filewin = filewinid },
+        { filewin = nil }
+    )
+end, {
+    desc = 'Copies Loc list to QF list',
+    bar = true,
+})
+
+vim.api.nvim_create_user_command('LocToQFAdd', function(_)
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.copy_list(
+        { filewin = filewinid },
+        { filewin = nil },
+        { mode = 'append' }
+    )
+end, {
+    desc = 'Appends items from Loc list to end of QF list',
+})
+
+-------------------------------------------------------------------------------
+---Quickfix and Location list creation
+
+vim.api.nvim_create_user_command(
+    'QFBreakpoints',
+    function(_) require('myconfig.quickfix').operations.set_breakpoints_list({}) end,
+    {
+        desc = 'Populate quickfix list with the breakpoints',
+        bar = true,
+    }
+)
 
 vim.api.nvim_create_user_command('LocBreakpoints', function(_)
-    local list_nr = 0
-    local DAP_QUICKFIX_TITLE = 'DAP Breakpoints'
-    local DAP_QUICKFIX_CONTEXT = DAP_QUICKFIX_TITLE
-    local qf_list =
-        require('dap.breakpoints').to_qf_list(require('dap.breakpoints').get())
-    local current_qflist_title = vim.fn.getloclist(list_nr, { title = 1 }).title
-    local action = ' '
-    if current_qflist_title == DAP_QUICKFIX_TITLE then action = 'r' end
-    vim.fn.setloclist(list_nr, {}, action, {
-        items = qf_list,
-        context = { DAP_QUICKFIX_CONTEXT },
-        title = DAP_QUICKFIX_TITLE,
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.set_breakpoints_list({
+        filewin = filewinid,
     })
-    if #qf_list == 0 then
-        vim.api.notify('No breakpoints set!', vim.log.levels.INFO)
-    else
-        vim.api.nvim_command('lopen')
-    end
 end, {
     desc = 'Populate location list with the breakpoints',
-})
-
-vim.api.nvim_create_user_command('QFAddCursor', function(_)
-    local item = {
-        bufnr = vim.api.nvim_get_current_buf(),
-        lnum = vim.fn.line('.'),
-        text = vim.fn.getline('.'),
-        col = vim.fn.col('.'),
-    }
-    local items = vim.fn.getqflist()
-    table.insert(items, item)
-    vim.fn.setqflist({}, 'u', { items = items })
-end, {
-    desc = 'Adds the cursor to the quickfix list',
-})
-
-vim.api.nvim_create_user_command('LocAddCursor', function(_)
-    local list_nr = 0
-    local item = {
-        bufnr = vim.api.nvim_get_current_buf(),
-        lnum = vim.fn.line('.'),
-        text = vim.fn.getline('.'),
-        col = vim.fn.col('.'),
-    }
-    local items = vim.fn.getloclist(list_nr)
-    table.insert(items, item)
-    vim.fn.setloclist(list_nr, {}, 'u', { items = items })
-end, {
-    desc = 'Adds the cursor to the location list',
+    bar = true,
 })
 
 vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
@@ -590,9 +631,10 @@ vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
     elseif args.args == 'INFO' then
         severity = vim.diagnostic.severity.INFO
     end
-    require('myconfig.quickfix.api').set_diagnostic_list({
-        winnr = nil,
+    require('myconfig.quickfix').operations.set_diagnostic_list({
+        filewin = nil,
         severity = severity,
+        open = false, -- So I can chain command together
         format = function(diagnostic)
             return string.format(
                 '(%s) %s',
@@ -607,6 +649,7 @@ end, {
         function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
     ),
     nargs = '?',
+    bar = true,
 })
 
 vim.api.nvim_create_user_command('QFLspDiagnosticsContext', function(args)
@@ -620,9 +663,10 @@ vim.api.nvim_create_user_command('QFLspDiagnosticsContext', function(args)
     elseif args.args == 'INFO' then
         severity = vim.diagnostic.severity.INFO
     end
-    require('myconfig.quickfix.api').set_diagnostic_list({
-        winnr = nil,
+    require('myconfig.quickfix').operations.set_diagnostic_list({
+        filewin = nil,
         severity = severity,
+        open = false, -- So I can chain command together
         format = function(diagnostic)
             local namespaces = vim.api.nvim_get_namespaces()
             local namespace_name = ''
@@ -646,6 +690,7 @@ end, {
         function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
     ),
     nargs = '?',
+    bar = true,
 })
 
 vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
@@ -659,9 +704,13 @@ vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
     elseif args.args == 'INFO' then
         severity = vim.diagnostic.severity.INFO
     end
-    require('myconfig.quickfix.api').set_diagnostic_list({
-        winnr = 0,
+
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.set_diagnostic_list({
+        filewin = filewinid,
         severity = severity,
+        open = false, -- So I can chain command together
         format = function(diagnostic)
             return string.format(
                 '(%s) %s',
@@ -676,39 +725,8 @@ end, {
         function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
     ),
     nargs = '?',
+    bar = true,
 })
-
-vim.api.nvim_create_user_command(
-    'QFToLoc',
-    function(_)
-        vim.cmd(
-            [[call setloclist(0, [], ' ', {'items': get(getqflist({'items': 1}), 'items')})]]
-        )
-    end,
-    {
-        desc = 'Copies QF list to Loc list',
-    }
-)
-
-vim.api.nvim_create_user_command('QFToLocAdd', function(_)
-    local items = vim.fn.getqflist()
-    local action = 'a' -- add to existing list
-    vim.fn.setloclist(0, {}, action, { items = items })
-end, {
-    desc = 'Appends items from QF list to end of Loc list',
-})
-
-vim.api.nvim_create_user_command(
-    'LocToQF',
-    function(_)
-        vim.cmd(
-            [[call setqflist([], ' ', {'items': get(getloclist(0, {'items': 1}), 'items')})]]
-        )
-    end,
-    {
-        desc = 'Copies QF list to Loc list',
-    }
-)
 
 ---Add items to the quickfix list based on the treesitter query defined inside
 ---the opened treesitter query editor window. (Use :QueryEdit to open the query
@@ -784,6 +802,7 @@ vim.api.nvim_create_user_command('QFRunTSQueryFromQueryEditor', function(params)
     vim.fn.setqflist({}, ' ', { items = items })
 end, {
     nargs = '*',
+    bar = true,
 })
 --[[
 (class_declaration
@@ -802,110 +821,90 @@ end, {
 )
 ]]
 
-vim.api.nvim_create_user_command('QFRunTSQuery', function(params)
+local complete_treesitter_capture = make_fuzzy_completion(function(_, text, _)
+    --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
+    --second argumet is the text up to the cursor
+    --third argument is the index of the cursor
+    local words = vim.split(text, '%s+')
+    if #words > 2 then
+        local base_bufnr = vim.api.nvim_win_get_buf(0)
+
+        local lang =
+            vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
+        local query_group = words[2]
+        local ok_query, query =
+            pcall(vim.treesitter.query.get, lang, query_group)
+        if not ok_query or query == nil then return end
+        return query.captures
+    end
+
+    return {
+        config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
+        'textobjects',
+        'folds',
+        'highlights',
+        'injections',
+        'locals',
+    }
+end)
+
+vim.api.nvim_create_user_command('QFTreesitterCapture', function(params)
     if #params.fargs < 2 then
         vim.notify(
-            'Must supply at least 2 arguments. The first must be the treesitter group. Followed a capture name or list of capture names to match on.'
+            'Must supply at least 2 arguments. The first must be the treesitter group. Followed one or more capture names to match on.'
         )
         return
     end
     local query_group = params.fargs[1]
 
-    local capture_names_set = Set:new({})
+    local capture_names = {}
     for i, capture_name in ipairs(params.fargs) do
         if i ~= 1 then
             --we skip the first argument because it is the treesitter group not a capture name
-            capture_names_set:insert(capture_name)
+            table.insert(capture_names, capture_name)
         end
     end
 
-    local base_bufnr = vim.api.nvim_win_get_buf(0)
-    local base_buf_name = vim.api.nvim_buf_get_name(base_bufnr)
-
-    local lang = vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
-    local parser = vim.treesitter.get_parser(base_bufnr, lang)
-    if parser == nil then error('No treesitter parser') end
-
-    local ok_query, query = pcall(vim.treesitter.query.get, lang, query_group)
-    if not ok_query or query == nil then return end
-
-    local items = {}
-
-    for capture, captured_node, _, _ in
-        query:iter_captures(parser:trees()[1]:root(), base_bufnr)
-    do
-        local capture_name = query.captures[capture]
-        if
-            capture_names_set.size ~= 0 and capture_names_set:has(capture_name)
-        then
-            local lnum, col, end_lnum, end_col = captured_node:range()
-
-            local text = vim.api.nvim_buf_get_text(
-                base_bufnr,
-                lnum,
-                col,
-                end_lnum,
-                end_col,
-                {}
-            )
-            local line_text = vim.trim(vim.fn.getline(lnum + 1))
-
-            local item = {
-                filename = base_buf_name,
-                lnum = lnum + 1,
-                end_lnum = end_lnum + 1,
-                col = col + 1,
-                end_col = end_col,
-                text = string.format(
-                    'Query:%s  Node:%s  Line:%s',
-                    capture_name,
-                    vim.trim(text[1]),
-                    line_text
-                ),
-                valid = 1,
-            }
-            table.insert(items, item)
-            -- TODO remove duplicates
-        end
-    end
-    vim.fn.setqflist({}, ' ', { items = items, title = query_group })
+    require('myconfig.quickfix').operations.set_treesitter_capture_list({
+        query_group = query_group,
+        capture_names = capture_names,
+    })
 end, {
     nargs = '+',
-    complete = make_fuzzy_completion(function(_, text, _)
-        --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
-        --second argumet is the text up to the cursor
-        --third argument is the index of the cursor
-        local words = vim.split(text, '%s+')
-        if #words > 2 then
-            local base_bufnr = vim.api.nvim_win_get_buf(0)
-
-            local lang =
-                vim.treesitter.language.get_lang(vim.bo[base_bufnr].filetype)
-            local query_group = words[2]
-            local ok_query, query =
-                pcall(vim.treesitter.query.get, lang, query_group)
-            if not ok_query or query == nil then return end
-            return query.captures
-        end
-
-        return {
-            config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
-            'textobjects',
-            'folds',
-            'highlights',
-            'injections',
-            'locals',
-        }
-    end),
+    bar = true,
+    desc = 'Sets the QF list with the treesitter captures',
+    complete = complete_treesitter_capture,
 })
 
-vim.api.nvim_create_user_command('QFRemoveInvalid', function(_)
-    local items = vim.fn.getqflist()
-    items = vim.tbl_filter(function(item) return item.valid == 1 end, items)
-    vim.fn.setqflist({}, ' ', { items = items })
-    vim.cmd('copen')
+vim.api.nvim_create_user_command('LocTreesitterCapture', function(params)
+    if #params.fargs < 2 then
+        vim.notify(
+            'Must supply at least 2 arguments. The first must be the treesitter group. Followed one or more capture names to match on.'
+        )
+        return
+    end
+    local query_group = params.fargs[1]
+
+    local capture_names = {}
+    for i, capture_name in ipairs(params.fargs) do
+        if i ~= 1 then
+            --we skip the first argument because it is the treesitter group not a capture name
+            table.insert(capture_names, capture_name)
+        end
+    end
+
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.set_treesitter_capture_list({
+        filewin = filewinid,
+        query_group = query_group,
+        capture_names = capture_names,
+    })
 end, {
-    desc = 'Remove invalid quickfix items',
+    nargs = '+',
+    bar = true,
+    desc = 'Sets the Loc list with the treesitter captures',
+    complete = complete_treesitter_capture,
 })
 
 -------------------------------------------------------------------------------
