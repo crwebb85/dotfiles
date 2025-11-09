@@ -651,18 +651,24 @@ end, {
     bar = true,
 })
 
+local DIAGNOSTIC_SEVERITIES = {}
+for severity, _ in pairs(vim.diagnostic.severity) do
+    table.insert(DIAGNOSTIC_SEVERITIES, severity)
+end
+
 vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
-    --TODO allow selecting multiple severities
-    local severity = nil
-    if args.args == 'ERROR' then
-        severity = vim.diagnostic.severity.ERROR
-    elseif args.args == 'WARN' then
-        severity = vim.diagnostic.severity.WARN
-    elseif args.args == 'HINT' then
-        severity = vim.diagnostic.severity.HINT
-    elseif args.args == 'INFO' then
-        severity = vim.diagnostic.severity.INFO
+    local severity = {}
+    for _, severity_string in ipairs(args.fargs) do
+        if vim.diagnostic.severity[severity_string] == nil then
+            vim.notify(
+                string.format('Invalid argument %s', severity_string),
+                vim.log.levels.WARN
+            )
+        else
+            table.insert(severity, vim.diagnostic.severity[severity_string])
+        end
     end
+    if #severity == 0 then severity = nil end
     require('myconfig.quickfix').operations.set_diagnostic_list({
         filewin = nil,
         severity = severity,
@@ -678,23 +684,25 @@ vim.api.nvim_create_user_command('QFLspDiagnostics', function(args)
 end, {
     desc = 'Adds lsp diagnostic to the Quickfix list',
     complete = make_fuzzy_completion(
-        function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
+        function() return DIAGNOSTIC_SEVERITIES end
     ),
-    nargs = '?',
+    nargs = '*',
     bar = true,
 })
 
 vim.api.nvim_create_user_command('QFLspDiagnosticsContext', function(args)
-    local severity = nil
-    if args.args == 'ERROR' then
-        severity = vim.diagnostic.severity.ERROR
-    elseif args.args == 'WARN' then
-        severity = vim.diagnostic.severity.WARN
-    elseif args.args == 'HINT' then
-        severity = vim.diagnostic.severity.HINT
-    elseif args.args == 'INFO' then
-        severity = vim.diagnostic.severity.INFO
+    local severity = {}
+    for _, severity_string in ipairs(args.fargs) do
+        if vim.diagnostic.severity[severity_string] == nil then
+            vim.notify(
+                string.format('Invalid argument %s', severity_string),
+                vim.log.levels.WARN
+            )
+        else
+            table.insert(severity, vim.diagnostic.severity[severity_string])
+        end
     end
+    if #severity == 0 then severity = nil end
     require('myconfig.quickfix').operations.set_diagnostic_list({
         filewin = nil,
         severity = severity,
@@ -719,23 +727,25 @@ vim.api.nvim_create_user_command('QFLspDiagnosticsContext', function(args)
 end, {
     desc = 'Adds lsp diagnostic to the Quickfix list with extra context',
     complete = make_fuzzy_completion(
-        function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
+        function() return DIAGNOSTIC_SEVERITIES end
     ),
-    nargs = '?',
+    nargs = '*',
     bar = true,
 })
 
 vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
-    local severity = nil
-    if args.args == 'ERROR' then
-        severity = vim.diagnostic.severity.ERROR
-    elseif args.args == 'WARN' then
-        severity = vim.diagnostic.severity.WARN
-    elseif args.args == 'HINT' then
-        severity = vim.diagnostic.severity.HINT
-    elseif args.args == 'INFO' then
-        severity = vim.diagnostic.severity.INFO
+    local severity = {}
+    for _, severity_string in ipairs(args.fargs) do
+        if vim.diagnostic.severity[severity_string] == nil then
+            vim.notify(
+                string.format('Invalid argument %s', severity_string),
+                vim.log.levels.WARN
+            )
+        else
+            table.insert(severity, vim.diagnostic.severity[severity_string])
+        end
     end
+    if #severity == 0 then severity = nil end
 
     local filewinid =
         require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
@@ -752,11 +762,57 @@ vim.api.nvim_create_user_command('LocLspDiagnostics', function(args)
         end,
     })
 end, {
-    desc = 'Adds lsp diagnostic to the Quickfix list',
+    desc = 'Adds lsp diagnostic to the location list',
     complete = make_fuzzy_completion(
-        function() return { 'ERROR', 'WARN', 'HINT', 'INFO' } end
+        function() return DIAGNOSTIC_SEVERITIES end
     ),
-    nargs = '?',
+    nargs = '*',
+    bar = true,
+})
+
+vim.api.nvim_create_user_command('LocLspDiagnosticsContext', function(args)
+    local severity = {}
+    for _, severity_string in ipairs(args.fargs) do
+        if vim.diagnostic.severity[severity_string] == nil then
+            vim.notify(
+                string.format('Invalid argument %s', severity_string),
+                vim.log.levels.WARN
+            )
+        else
+            table.insert(severity, vim.diagnostic.severity[severity_string])
+        end
+    end
+    if #severity == 0 then severity = nil end
+
+    local filewinid =
+        require('myconfig.quickfix').api.determine_filewinid_for_user_command(0)
+    require('myconfig.quickfix').operations.set_diagnostic_list({
+        filewin = filewinid,
+        severity = severity,
+        open = false, -- So I can chain command together
+        format = function(diagnostic)
+            local namespaces = vim.api.nvim_get_namespaces()
+            local namespace_name = ''
+            for name, id in pairs(namespaces) do
+                if id == diagnostic.namespace then
+                    namespace_name = name
+                    break
+                end
+            end
+            return string.format(
+                '(%s) (Bufnr:%s) %s',
+                namespace_name or '',
+                diagnostic.bufnr or '',
+                diagnostic.message
+            )
+        end,
+    })
+end, {
+    desc = 'Adds lsp diagnostic to the location list with extra context',
+    complete = make_fuzzy_completion(
+        function() return DIAGNOSTIC_SEVERITIES end
+    ),
+    nargs = '*',
     bar = true,
 })
 
