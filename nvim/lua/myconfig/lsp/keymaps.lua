@@ -82,9 +82,9 @@ function M.setup_lsp_keymaps()
 
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_definition()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_definition()
+        elseif vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_definition()
         elseif
             #vim.lsp.get_clients({
                 bufnr = 0,
@@ -121,9 +121,9 @@ function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'gi', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_implementation()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_implementation()
+        elseif vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_implementation()
         elseif
             #vim.lsp.get_clients({
                 bufnr = 0,
@@ -142,9 +142,9 @@ function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'go', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_type_definition()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_type_definition()
+        elseif vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_type_definition()
         elseif
             #vim.lsp.get_clients({
                 bufnr = 0,
@@ -164,9 +164,9 @@ function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'grr', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').list_references()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_references()
+        elseif vim.bo.filetype == 'cs' then
+            --I should probably be checking for if client is omnisharp but this is good enough
+            require('omnisharp_extended').lsp_references()
         elseif
             #vim.lsp.get_clients({
                 bufnr = 0,
