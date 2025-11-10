@@ -2976,3 +2976,4 @@ require('lazy').setup({
 })
 
 vim.cmd.packadd('cfilter')
+vim.cmd.packadd('nvim.difftool')

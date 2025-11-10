@@ -258,6 +258,17 @@ function Invoke-FuzzyProjectLocation() {
         }
     }
 
+    # Note: MYWORKSPACE is a custom environment variable I will add
+    # if I need to store my projects/poc's on a different drive and not in my
+    # documents folder
+    $MyWorkspacePath = $env:MYWORKSPACE
+    if ($null -ne $MyWorkspacePath -and $(Test-Path -Path "$MyWorkspacePath" -PathType Any)) { 
+        $SearchPath = [System.IO.Path]::Combine($MyWorkspacePath, "projects")
+        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPath -notin $SearchPaths) {
+            $SearchPaths += $SearchPath
+        }
+    }
+
     $PossiblePaths = Get-ChildItem $SearchPaths -Directory -ErrorAction Ignore  | Select-Object FullName
 
 
@@ -299,6 +310,17 @@ function Invoke-FuzzySetProofOfConceptLocation() {
         $SecondaryMyDocumentsPath = [System.IO.Path]::Combine($UserProfilePath, "documents")
 
         $SearchPath = [System.IO.Path]::Combine($SecondaryMyDocumentsPath, "poc")
+        if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPath -notin $SearchPaths) {
+            $SearchPaths += $SearchPath
+        }
+    }
+
+    # Note: MYWORKSPACE is a custom environment variable I will add
+    # if I need to store my projects/poc's on a different drive and not in my
+    # documents folder
+    $MyWorkspacePath = $env:MYWORKSPACE
+    if ($null -ne $MyWorkspacePath -and $(Test-Path -Path "$MyWorkspacePath" -PathType Any)) { 
+        $SearchPath = [System.IO.Path]::Combine($MyWorkspacePath, "poc")
         if ($(Test-Path -Path "$SearchPath" -PathType Any) -and $SearchPath -notin $SearchPaths) {
             $SearchPaths += $SearchPath
         }

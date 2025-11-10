@@ -2,6 +2,8 @@
 ;run `git config --list --show-origin`
 ;This configuration file should be loaded if the XDG_CONFIG_HOME environment
 ;variable is set to this repo path
+;
+;TODO figure out difftool changes https://www.reddit.com/r/neovim/comments/1o4eo6s/new_difftool_command_added_to_neovim/?share_id=NVTCt3Fyg4gCfqtwsL--x&utm_content=1&utm_medium=android_app&utm_name=androidcss&utm_source=share&utm_term=14
 
 [core]
 	editor = nvim

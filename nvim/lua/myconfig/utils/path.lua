@@ -119,6 +119,16 @@ function M.get_project_paths()
             vim.fs.joinpath(user_profile_path, 'documents', 'projects')
         search_path = vim.fs.abspath(vim.fs.normalize(search_path))
         table.insert(project_search_paths, search_path)
+
+        --Note: MYWORKSPACE is a custom environment variable I will add
+        --if I need to store my projects/poc's on a different drive and not in my
+        --documents folder
+        local workspace_path = vim.fs.normalize('$MYWORKSPACE')
+        if workspace_path ~= '$MYWORKSPACE' then
+            search_path = vim.fs.joinpath(workspace_path, 'projects')
+            search_path = vim.fs.abspath(vim.fs.normalize(search_path))
+            table.insert(project_search_paths, search_path)
+        end
     else
         error("TODO: Implement get_projects_paths for other  OS's")
     end
@@ -175,6 +185,16 @@ function M.get_poc_paths()
         search_path = vim.fs.joinpath(user_profile_path, 'documents', 'poc')
         search_path = vim.fs.abspath(vim.fs.normalize(search_path))
         table.insert(poc_search_paths, search_path)
+
+        --Note: MYWORKSPACE is a custom environment variable I will add
+        --if I need to store my projects/poc's on a different drive and not in my
+        --documents folder
+        local workspace_path = vim.fs.normalize('$MYWORKSPACE')
+        if workspace_path ~= '$MYWORKSPACE' then
+            search_path = vim.fs.joinpath(workspace_path, 'poc')
+            search_path = vim.fs.abspath(vim.fs.normalize(search_path))
+            table.insert(poc_search_paths, search_path)
+        end
     else
         error("TODO: Implement get_pocs_paths for other  OS's")
     end
