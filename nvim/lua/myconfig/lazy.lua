@@ -909,7 +909,9 @@ require('lazy').setup({
     },
 
     {
-        'stevearc/oil.nvim',
+        -- 'stevearc/oil.nvim',
+        'crwebb85/oil.nvim',
+        -- dev = true,
         cmd = { 'Oil' },
         keys = {
             {
