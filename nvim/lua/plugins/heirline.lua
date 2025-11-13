@@ -727,12 +727,15 @@ local config = function()
 
     local FileName = {
         provider = function(self)
-            local filename = vim.fn.fnamemodify(self.filename, ':~:.')
-            if filename == '' then return '' end
-            if not conditions.width_percent_below(#filename, 1) then
-                filename = vim.fn.pathshorten(filename)
-            end
-            return filename
+            --TODO temporarily going to display the exact filename
+            --to help debug my fixes to oil.nvim
+            -- local filename = vim.fn.fnamemodify(self.filename, ':~:.')
+            -- if filename == '' then return '' end
+            -- if not conditions.width_percent_below(#filename, 1) then
+            --     filename = vim.fn.pathshorten(filename)
+            -- end
+            -- return filename
+            return self.filename
         end,
         hl = { fg = filename_foreground_color, bold = true },
     }
