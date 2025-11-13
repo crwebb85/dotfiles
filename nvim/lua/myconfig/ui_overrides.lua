@@ -235,7 +235,7 @@ function M.fs_root(source, marker)
 end
 
 vim.ui.select = M.get_select_function()
-vim.ui.open = M.open
-
-vim.fs.root = M.fs_root
+-- vim.ui.open = M.open
+--
+-- vim.fs.root = M.fs_root
 return M
