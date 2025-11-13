@@ -269,7 +269,8 @@ function Invoke-FuzzyProjectLocation() {
         }
     }
 
-    $PossiblePaths = Get-ChildItem $SearchPaths -Directory -ErrorAction Ignore  | Select-Object FullName
+    $PossiblePaths = @()
+    $PossiblePaths += @(Get-ChildItem $SearchPaths -Directory -ErrorAction Ignore  | Select-Object FullName)
 
 
     # Add my dotfiles to the searchable list (for quick selection)
@@ -326,7 +327,8 @@ function Invoke-FuzzySetProofOfConceptLocation() {
         }
     }
 
-    $PossiblePaths = Get-ChildItem $SearchPaths -Directory -ErrorAction Ignore  | Select-Object FullName
+    $PossiblePaths = @()
+    $PossiblePaths += @(Get-ChildItem $SearchPaths -Directory -ErrorAction Ignore  | Select-Object FullName)
 
     # Add the poc parent directories to the searchable list (to make creating new poc's easier)
     $PossiblePaths += $SearchPaths
