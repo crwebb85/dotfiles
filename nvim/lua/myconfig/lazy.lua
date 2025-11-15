@@ -2431,13 +2431,9 @@ require('lazy').setup({
         opts = {
             library = {
                 { path = 'wezterm-types', mods = { 'wezterm' } },
-                -- See the configuration section for more details
-                -- Load luvit types when the `vim.uv` word is found
-                { path = 'luvit-meta/library', words = { 'vim%.uv' } },
             },
         },
     },
-    { 'Bilal2453/luvit-meta', lazy = true }, -- optional `vim.uv` lua typings
     { 'justinsgithub/wezterm-types', lazy = true }, -- optional wezterm lua types
     -- Helps configure which json and yaml schemas to use for the corresponding lsp
     -- Catalog of general schemas: https://www.schemastore.org/api/json/catalog.json
