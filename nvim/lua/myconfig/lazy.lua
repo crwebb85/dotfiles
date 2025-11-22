@@ -1093,7 +1093,9 @@ require('lazy').setup({
                 -- I may need to adjust these numbers so the delays feel right but that is how to make it work
                 -- with that said descriptions aren't necessary correct and it still
                 -- doesn't behave exactly like it used to
-                delay = vim.o.timeoutlen,
+
+                -- delay = vim.o.timeoutlen,
+                delay = 1000,
             }
             ---@type wk.Opts
             opts = vim.tbl_deep_extend('keep', opts, default_opts)
