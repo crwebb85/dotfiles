@@ -240,4 +240,37 @@ vim.ui.select = M.get_select_function()
 -- vim.ui.open = M.open
 --
 -- vim.fs.root = M.fs_root
+
+-------------------------------------------------------------------------------
+---Override autocmds
+
+-- Fix error that occurs when the completion documentation window is closed
+-- Error in "msg_showmode" UI event handler (ns=nvim._ext_ui):
+-- Lua: ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: E565: Not allowed to change text or change window
+-- stack traceback:
+-- 	[C]: in function 'nvim_buf_set_text'
+-- 	...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: in function 'set_virttext'
+-- 	...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:424: in function 'handler'
+-- 	C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:44: in function 'ui_callback'
+-- 	C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:92: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:85>
+-- 	[C]: in function 'nvim__redraw'
+-- 	C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2932: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2930>
+-- 	[C]: in function 'nvim_exec_autocmds'
+-- 	C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2615: in function 'reset'
+-- 	C:/nvim-win64/share/nvim/runtime/lua/vim/lsp/client.lua:1277: in function '_on_detach'
+-- 	C:\nvim-win64\sha
+--
+-- 	The fix was to just schedule the redraw
+vim.api.nvim_create_autocmd('DiagnosticChanged', {
+    group = vim.api.nvim_create_augroup('nvim.diagnostic.status', {}),
+    callback = function(ev)
+        vim.schedule(function()
+            if vim.api.nvim_buf_is_loaded(ev.buf) then
+                vim.api.nvim__redraw({ buf = ev.buf, statusline = true })
+            end
+        end)
+    end,
+    desc = 'diagnostics component for the statusline',
+})
+
 return M
