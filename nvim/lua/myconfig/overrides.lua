@@ -234,6 +234,8 @@ function M.fs_root(source, marker)
     return root_path
 end
 
+-------------------------------------------------------------------------------
+---Override functions
 vim.ui.select = M.get_select_function()
 -- vim.ui.open = M.open
 --
