@@ -176,13 +176,30 @@ vim.diagnostic.config({
 vim.o.termguicolors = true
 
 if vim.fn.has('win32') == 1 then
+    -- vim.o.shell = vim.fn.executable('pwsh') == 1 and 'pwsh' or 'powershell'
+    -- vim.o.shellcmdflag =
+    --     '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::Default;'
+    -- vim.o.shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait'
+    -- vim.o.shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'
+    -- vim.o.shellquote = ''
+    -- vim.o.shellxquote = ''
+
+    -- https://github.com/neovim/neovim/issues/32921
     vim.o.shell = vim.fn.executable('pwsh') == 1 and 'pwsh' or 'powershell'
-    vim.o.shellcmdflag =
-        '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::Default;'
-    vim.o.shellredir = '-RedirectStandardOutput %s -NoNewWindow -Wait'
-    vim.o.shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'
-    vim.o.shellquote = ''
-    vim.o.shellxquote = ''
+    vim.cmd([[
+	   set noshelltemp
+	   let &shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command '
+	   let &shellcmdflag .= '[Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();'
+	   let &shellcmdflag .= '$PSDefaultParameterValues[''Out-File:Encoding'']=''utf8'';'
+	   let &shellpipe  = '> %s 2>&1'
+	   set shellquote= shellxquote=
+    ]])
+    if vim.fn.executable('pwsh') == 1 then
+        vim.cmd([[
+            let &shellcmdflag .= '$PSStyle.OutputRendering = ''PlainText'';'
+            let $__SuppressAnsiEscapeSequences = 1
+        ]])
+    end
 end
 
 -------------------------------------------------------------------------------
