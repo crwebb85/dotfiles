@@ -48,18 +48,18 @@ local luasnip_plugin = {
 }
 
 local completion_plugins = {
-    {
-        --This is only used so that I don't have to create cmp file for monkey patching
-        --cmp utilities when using cmp-buffer in native completion
-        --TODO once I have fully converted to native completion consider
-        --removing this
-        'hrsh7th/nvim-cmp',
-        lazy = true,
-        config = function(_, _)
-            --Monkey patch the functions that plugins depend on
-            require('cmp').register_source = function(_, _) end
-        end,
-    },
+    -- {
+    --     --This is only used so that I don't have to create cmp file for monkey patching
+    --     --cmp utilities when using cmp-buffer in native completion
+    --     --TODO once I have fully converted to native completion consider
+    --     --removing this
+    --     'hrsh7th/nvim-cmp',
+    --     lazy = true,
+    --     config = function(_, _)
+    --         --Monkey patch the functions that plugins depend on
+    --         require('cmp').register_source = function(_, _) end
+    --     end,
+    -- },
     {
         -- Completion for words in buffer
         'hrsh7th/cmp-buffer',
@@ -76,82 +76,82 @@ local completion_plugins = {
     },
     --Including these plugins so that they stay in my lock file even when I have them disabled
     --remove once I remove nvim-cmp
-    { 'hrsh7th/cmp-cmdline', lazy = true },
-    { 'hrsh7th/cmp-nvim-lsp-signature-help', lazy = true },
-    { 'hrsh7th/cmp-path', lazy = true },
-    { 'saadparwaiz1/cmp_luasnip', lazy = true },
-    { 'onsails/lspkind.nvim', lazy = true },
+    -- { 'hrsh7th/cmp-cmdline', lazy = true },
+    -- { 'hrsh7th/cmp-nvim-lsp-signature-help', lazy = true },
+    -- { 'hrsh7th/cmp-path', lazy = true },
+    -- { 'saadparwaiz1/cmp_luasnip', lazy = true },
+    -- { 'onsails/lspkind.nvim', lazy = true },
 }
-if not config.use_native_completion then
-    completion_plugins = {
-        {
-            'hrsh7th/nvim-cmp',
-            lazy = true,
-            event = { 'InsertEnter', 'CmdlineEnter' },
-            dependencies = {
-                { 'L3MON4D3/LuaSnip' },
-                { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
-                { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
-                { 'hrsh7th/cmp-path' }, -- Completion for file paths
-                { 'hrsh7th/cmp-cmdline' },
-                { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
-                { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
-            },
-
-            config = function()
-                local cmp = require('cmp')
-
-                cmp.setup({
-                    sources = cmp.config.sources({
-                        { name = 'nvim_lsp' },
-                        { name = 'nvim_lsp_signature_help' },
-                        { name = 'nvim_lua' },
-                        { name = 'luasnip' },
-                        { name = 'buffer', keyword_length = 5 },
-                        { name = 'path' },
-                    }),
-                    snippet = {
-                        expand = function(args)
-                            require('luasnip').lsp_expand(args.body)
-                        end,
-                    },
-                    formatting = {
-                        format = require('lspkind').cmp_format({
-                            with_text = true,
-                            menu = {
-                                buffer = '[buf]',
-                                nvim_lsp = '[LSP]',
-                                path = '[path]',
-                                luasnip = '[snip]',
-                                git = '[git]',
-                                cmdline = '[cmd]',
-                                nvim_lsp_signature_help = '[info]',
-                            },
-                        }),
-                    },
-                    mapping = {}, --Clear default keymaps for buffer completion
-                })
-
-                cmp.setup.filetype('gitcommit', {
-                    sources = cmp.config.sources({
-                        { name = 'git' },
-                        { name = 'luasnip' },
-                        { name = 'buffer', keyword_length = 5 },
-                    }),
-                })
-            end,
-        },
-
-        {
-            --This is only here so that it stays in my lazy lock file even when Im not using it because I am using cmp
-            'crwebb85/luasnip-lsp-server.nvim',
-            dependencies = {
-                { 'L3MON4D3/LuaSnip' },
-            },
-            lazy = true,
-        },
-        luasnip_plugin,
-    }
-end
+-- if not config.use_native_completion then
+--     completion_plugins = {
+--         {
+--             'hrsh7th/nvim-cmp',
+--             lazy = true,
+--             event = { 'InsertEnter', 'CmdlineEnter' },
+--             dependencies = {
+--                 { 'L3MON4D3/LuaSnip' },
+--                 { 'saadparwaiz1/cmp_luasnip' }, -- Completion for snippets
+--                 { 'hrsh7th/cmp-buffer' }, -- Completion for words in buffer
+--                 { 'hrsh7th/cmp-path' }, -- Completion for file paths
+--                 { 'hrsh7th/cmp-cmdline' },
+--                 { 'hrsh7th/cmp-nvim-lsp-signature-help' }, -- Provides signature info while typing function parameters
+--                 { 'onsails/lspkind.nvim' }, -- Helps format the cmp selection items
+--             },
+--
+--             config = function()
+--                 local cmp = require('cmp')
+--
+--                 cmp.setup({
+--                     sources = cmp.config.sources({
+--                         { name = 'nvim_lsp' },
+--                         { name = 'nvim_lsp_signature_help' },
+--                         { name = 'nvim_lua' },
+--                         { name = 'luasnip' },
+--                         { name = 'buffer', keyword_length = 5 },
+--                         { name = 'path' },
+--                     }),
+--                     snippet = {
+--                         expand = function(args)
+--                             require('luasnip').lsp_expand(args.body)
+--                         end,
+--                     },
+--                     formatting = {
+--                         format = require('lspkind').cmp_format({
+--                             with_text = true,
+--                             menu = {
+--                                 buffer = '[buf]',
+--                                 nvim_lsp = '[LSP]',
+--                                 path = '[path]',
+--                                 luasnip = '[snip]',
+--                                 git = '[git]',
+--                                 cmdline = '[cmd]',
+--                                 nvim_lsp_signature_help = '[info]',
+--                             },
+--                         }),
+--                     },
+--                     mapping = {}, --Clear default keymaps for buffer completion
+--                 })
+--
+--                 cmp.setup.filetype('gitcommit', {
+--                     sources = cmp.config.sources({
+--                         { name = 'git' },
+--                         { name = 'luasnip' },
+--                         { name = 'buffer', keyword_length = 5 },
+--                     }),
+--                 })
+--             end,
+--         },
+--
+--         {
+--             --This is only here so that it stays in my lazy lock file even when Im not using it because I am using cmp
+--             'crwebb85/luasnip-lsp-server.nvim',
+--             dependencies = {
+--                 { 'L3MON4D3/LuaSnip' },
+--             },
+--             lazy = true,
+--         },
+--         luasnip_plugin,
+--     }
+-- end
 
 return completion_plugins

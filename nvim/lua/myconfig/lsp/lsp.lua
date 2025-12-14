@@ -403,80 +403,11 @@ function M.enable()
             end
         end,
     })
-
-    if require('myconfig.config').use_native_completion then
-        -- TODO currently disabling this because it is two hard to find
-        -- snippits because of buffer completion results since there is no
-        -- way to sort the completion items yet
-        -- vim.api.nvim_create_autocmd('FileType', {
-        --     group = vim.api.nvim_create_augroup(
-        --         'native_completion',
-        --         { clear = true }
-        --     ),
-        --     pattern = '*',
-        --     callback = function(_)
-        --         require('myconfig.lsp.completion.cmp').start_cmp_lsp()
-        --     end,
-        -- })
-    else
-        vim.api.nvim_create_autocmd('InsertEnter', {
-            group = vim.api.nvim_create_augroup(
-                'cmp_nvim_lsp',
-                { clear = true }
-            ),
-            pattern = '*',
-            callback = function()
-                require('myconfig.lsp.completion.cmp_nvim_lsp').enable_cmp_completion()
-            end,
-        })
-    end
 end
 
 ---Get the augmented lsp capabilities based on I have implemented in my config
 ---@return lsp.ClientCapabilities
 function M.get_additional_default_capabilities()
-    local cmp_default_capabilities = {
-        textDocument = {
-            completion = {
-                completionItem = {
-                    commitCharactersSupport = true,
-                    deprecatedSupport = true,
-                    insertReplaceSupport = true,
-                    insertTextModeSupport = {
-                        valueSet = { 1, 2 },
-                    },
-                    labelDetailsSupport = true,
-                    preselectSupport = true,
-                    resolveSupport = {
-                        properties = {
-                            'documentation',
-                            'additionalTextEdits',
-                            'insertTextFormat',
-                            'insertTextMode',
-                            'command',
-                        },
-                    },
-                    snippetSupport = true,
-                    tagSupport = {
-                        valueSet = { 1 },
-                    },
-                },
-                completionList = {
-                    itemDefaults = {
-                        'commitCharacters',
-                        'editRange',
-                        'insertTextFormat',
-                        'insertTextMode',
-                        'data',
-                    },
-                },
-                contextSupport = true,
-                dynamicRegistration = false,
-                insertTextMode = 1,
-            },
-        },
-    }
-
     local document_link_capabilities = {
         textDocument = {
             documentLink = {
@@ -484,12 +415,9 @@ function M.get_additional_default_capabilities()
             },
         },
     }
-    local capabilities = vim.tbl_deep_extend(
-        'force',
-        require('myconfig.config').use_native_completion and {}
-            or cmp_default_capabilities,
-        document_link_capabilities
-    )
+    local capabilities =
+        vim.tbl_deep_extend('force', {}, document_link_capabilities)
+
     return capabilities
 end
 

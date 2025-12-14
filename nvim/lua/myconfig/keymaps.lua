@@ -539,47 +539,20 @@ end, {
 
 local function pumvisible() return tonumber(vim.fn.pumvisible()) ~= 0 end
 
-local function is_completion_menu_visible()
-    if require('myconfig.config').use_native_completion then
-        return pumvisible()
-    else
-        return require('cmp').visible()
-    end
-end
+local function is_completion_menu_visible() return pumvisible() end
 
 local function is_entry_active()
-    if require('myconfig.config').use_native_completion then
-        return pumvisible()
-            and vim.fn.complete_info({ 'selected' }).selected >= 0
-    else
-        local cmp = require('cmp')
-        return cmp.visible() and cmp.get_active_entry()
-    end
+    return pumvisible() and vim.fn.complete_info({ 'selected' }).selected >= 0
 end
 
 local function confirm_entry(replace)
-    if require('myconfig.config').use_native_completion then
-        --TODO replicate cmps replace functionality when replace is true
-        return '<C-y>'
-    else
-        local cmp = require('cmp')
-        local behavior = replace and cmp.ConfirmBehavior.Replace
-            or cmp.ConfirmBehavior.Insert
-        cmp.confirm({
-            behavior = behavior,
-            select = false,
-        })
-        return ''
-    end
+    --TODO replicate cmps replace functionality when replace is true
+    return '<C-y>'
 end
 
 local function is_docs_visible()
-    if require('myconfig.config').use_native_completion then
-        --TODO: Not the most robust since it doesn't actually check if the documentation is visible
-        return not require('myconfig.lsp.completion.documentation').is_documentation_disabled()
-    else
-        return require('cmp').visible_docs()
-    end
+    --TODO: Not the most robust since it doesn't actually check if the documentation is visible
+    return not require('myconfig.lsp.completion.documentation').is_documentation_disabled()
 end
 
 -- Keymap notes from :help ins-completion
@@ -626,15 +599,7 @@ vim.keymap.set({ 'i' }, '<UP>', function()
     --for information about which mode to use
 
     --TODO evaluated if this keymap should have macro specific logic
-
-    if require('myconfig.config').use_native_completion then
-        return '<UP>'
-    else
-        local select_prev = require('cmp').mapping.select_prev_item({
-            behavior = 'select',
-        })
-        select_prev(function() end)
-    end
+    return '<UP>'
 end, {
     desc = 'Custom Remap: Select previous completion item',
     expr = true,
@@ -650,15 +615,7 @@ vim.keymap.set('i', '<DOWN>', function()
 
     --TODO evaluated if this keymap should have macro specific logic
 
-    if require('myconfig.config').use_native_completion then
-        return '<DOWN>'
-    else
-        local select_next = require('cmp').mapping.select_next_item({
-            behavior = 'select',
-        })
-        select_next(function() end)
-        return ''
-    end
+    return '<DOWN>'
 end, {
     desc = 'Custom Remap: Select next completion item',
     expr = true,
@@ -704,15 +661,7 @@ vim.keymap.set({ 'i', 's' }, '<C-p>', function()
 
     --TODO evaluated if this keymap should have macro specific logic
 
-    if require('myconfig.config').use_native_completion then
-        return '<C-p>'
-    else
-        local select_prev = require('cmp').mapping.select_prev_item({
-            behavior = 'select',
-        })
-        select_prev(function() end)
-        return ''
-    end
+    return '<C-p>'
 end, {
     -- desc = 'Custom Remap: Jump to previous snippet location or fallback to previous completion item',
     desc = 'Custom Remap: Jump to previous completion item',
@@ -759,15 +708,7 @@ vim.keymap.set({ 'i', 's' }, '<C-n>', function()
 
     --TODO evaluated if this keymap should have macro specific logic
 
-    if require('myconfig.config').use_native_completion then
-        return '<C-n>'
-    else
-        local select_next = require('cmp').mapping.select_next_item({
-            behavior = 'select',
-        })
-        select_next(function() end)
-        return ''
-    end
+    return '<C-n>'
 end, {
     -- desc = 'Custom Remap: Jump to next snippet location or fallback to next completion item',
     desc = 'Custom Remap: Jump to next completion item',
@@ -857,9 +798,6 @@ vim.keymap.set('i', '<C-e>', function()
             false
         if pumvisible() then
             return '<C-e>' --Close completion menu
-        elseif not require('myconfig.config').use_native_completion then
-            require('cmp').abort()
-            return ''
         else
             return '<C-e>' --Close completion menu
         end
@@ -867,13 +805,7 @@ vim.keymap.set('i', '<C-e>', function()
         require('myconfig.lsp.completion.completion_state').completion_auto_trigger_enabled =
             true
 
-        if not require('myconfig.config').use_native_completion then
-            require('cmp').complete()
-            return ''
-            --TODO One difference that may be desirable is that cmp automatically
-            --reenables showing documentation window while my native completion doesn't
-            --currently do so
-        elseif vim.bo.omnifunc == '' then
+        if vim.bo.omnifunc == '' then
             return '<C-x><C-n>' --Triggers buffer completion
         else
             -- vim.lsp.completion.get()
@@ -896,11 +828,7 @@ vim.keymap.set({ 'i', 's' }, '<C-u>', function()
     --TODO evaluated if this keymap should have macro specific logic
 
     if is_docs_visible() then
-        if require('myconfig.config').use_native_completion then
-            require('myconfig.lsp.completion.documentation').scroll_docs(-4)
-        else
-            require('cmp').mapping.scroll_docs(-4)
-        end
+        require('myconfig.lsp.completion.documentation').scroll_docs(-4)
         return ''
     else
         return '<C-u>' -- Fallback to default keymap that deletes text to the left
@@ -932,11 +860,7 @@ vim.keymap.set({ 'i', 's' }, '<C-d>', function()
     --TODO evaluated if this keymap should have macro specific logic
 
     if is_docs_visible() then
-        if require('myconfig.config').use_native_completion then
-            require('myconfig.lsp.completion.documentation').scroll_docs(4)
-        else
-            require('cmp').mapping.scroll_docs(4)
-        end
+        require('myconfig.lsp.completion.documentation').scroll_docs(4)
         return ''
     else
         return '<C-d>' -- Default to default keymap of deleting text to the right
@@ -950,20 +874,9 @@ end, {
 })
 
 vim.keymap.set({ 'i', 's' }, '<C-t>', function()
-    if require('myconfig.config').use_native_completion then
-        local is_hidden =
-            require('myconfig.lsp.completion.documentation').is_documentation_disabled()
-        require('myconfig.lsp.completion.documentation').hide_docs(
-            not is_hidden
-        )
-    else
-        local cmp = require('cmp')
-        if cmp.visible_docs() then
-            cmp.close_docs()
-        else
-            cmp.open_docs()
-        end
-    end
+    local is_hidden =
+        require('myconfig.lsp.completion.documentation').is_documentation_disabled()
+    require('myconfig.lsp.completion.documentation').hide_docs(not is_hidden)
 end, {
     desc = 'Custom Remap: Toggle the completion docs',
     --This replaces the keymap that adds one indent to the beginning of the line
