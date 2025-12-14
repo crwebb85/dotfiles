@@ -13,7 +13,11 @@ local function get_preview_type()
     local type = nil
     local options = vim.opt.completeopt:get()
     for _, option in ipairs(options) do
-        if option == 'popup' then return 'popup' end
+        if option == 'popup' then
+            -- we return early for the popup option but not the 'preview' option
+            -- because the popup option takes priority if both are in the list
+            return 'popup'
+        end
         if option == 'preview' then type = 'preview' end
     end
     return type
@@ -48,17 +52,30 @@ local function get_preview_info()
     return complete_info
 end
 
-function M.hide_docs(is_hidden)
+local previous_preview_type = nil
+
+---hides the documentation or unhides if false
+---@param hide boolean
+function M.hide_docs(hide)
     local complete_info = get_preview_info()
-    if is_hidden then
-        vim.opt.completeopt:remove('popup')
+    -- vim.print(complete_info)
+    if hide then
+        local preview_type = get_preview_type()
+        if preview_type ~= nil then
+            previous_preview_type = preview_type
+            vim.opt.completeopt:remove(preview_type)
+        end
         -- -- vim.print(complete_info)
         -- -- vim.print(vim.bo[complete_info.preview_bufnr].bufhidden)
-        if complete_info.preview_winid ~= nil then
+        if
+            complete_info.preview_winid ~= nil
+            and vim.api.nvim_win_is_valid(complete_info.preview_winid)
+        then
             vim.api.nvim_win_hide(complete_info.preview_winid)
         end
     else
-        vim.opt.completeopt:append('popup')
+        local preview_type = previous_preview_type or 'popup'
+        vim.opt.completeopt:append(preview_type)
         local items = vim.fn.complete_info({ 'items' }).items
         -- vim.print(complete_info)
         if 0 <= complete_info.selected then
@@ -247,12 +264,12 @@ function M.set_documentation(completion_item)
 
     local is_resolve_support = true --TODO actually check for resolve support
     if not is_resolve_support then return end
-    client.request(
+    client:request(
         vim.lsp.protocol.Methods.completionItem_resolve,
         lsp_completion_item,
         function(err, result, _)
             if err ~= nil then
-                vim.print(err)
+                vim.notify(vim.inspect(err), vim.log.levels.ERROR)
                 return
             end
             local documentation = result and result.documentation
