@@ -1072,7 +1072,6 @@ require('lazy').setup({
 
     {
         'max397574/better-escape.nvim',
-        -- config = true,
         opts = {
             -- i for insert
             i = {
