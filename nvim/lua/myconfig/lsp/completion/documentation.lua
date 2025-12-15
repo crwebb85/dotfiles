@@ -52,6 +52,18 @@ local function get_preview_info()
     return complete_info
 end
 
+---Checks if the documentation window is visible
+---@return boolean
+function M.is_docs_visible()
+    local info = get_preview_info()
+    if M.is_documentation_disabled() or info == nil then return false end
+    return info.preview_winid ~= nil
+        and vim.api.nvim_win_is_valid(info.preview_winid)
+        and info.preview_bufnr ~= nil
+        and vim.api.nvim_buf_is_valid(info.preview_bufnr)
+        and vim.api.nvim_buf_is_loaded(info.preview_bufnr)
+end
+
 local previous_preview_type = nil
 
 ---hides the documentation or unhides if false

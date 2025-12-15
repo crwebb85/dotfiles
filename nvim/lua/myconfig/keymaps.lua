@@ -550,11 +550,6 @@ local function confirm_entry(replace)
     return '<C-y>'
 end
 
-local function is_docs_visible()
-    --TODO: Not the most robust since it doesn't actually check if the documentation is visible
-    return not require('myconfig.lsp.completion.documentation').is_documentation_disabled()
-end
-
 -- Keymap notes from :help ins-completion
 -- |i_CTRL-X_CTRL-D|	CTRL-X CTRL-D	complete defined identifiers
 -- |i_CTRL-X_CTRL-E|	CTRL-X CTRL-E	scroll up
@@ -826,9 +821,9 @@ vim.keymap.set({ 'i', 's' }, '<C-u>', function()
     --for information about which mode to use
 
     --TODO evaluated if this keymap should have macro specific logic
-
-    if is_docs_visible() then
-        require('myconfig.lsp.completion.documentation').scroll_docs(-4)
+    local docs = require('myconfig.lsp.completion.documentation')
+    if docs.is_docs_visible() then
+        docs.scroll_docs(-4)
         return ''
     else
         return '<C-u>' -- Fallback to default keymap that deletes text to the left
@@ -859,8 +854,9 @@ vim.keymap.set({ 'i', 's' }, '<C-d>', function()
 
     --TODO evaluated if this keymap should have macro specific logic
 
-    if is_docs_visible() then
-        require('myconfig.lsp.completion.documentation').scroll_docs(4)
+    local docs = require('myconfig.lsp.completion.documentation')
+    if docs.is_docs_visible() then
+        docs.scroll_docs(4)
         return ''
     else
         return '<C-d>' -- Default to default keymap of deleting text to the right
