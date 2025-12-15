@@ -237,8 +237,13 @@ end
 -------------------------------------------------------------------------------
 ---Override functions
 vim.ui.select = M.get_select_function()
--- vim.ui.open = M.open
---
+
+-- Issue https://github.com/neovim/neovim/issues/36293 was supposed to fix
+-- opening windows explorer for folders but the merged fix seems to close the open
+-- explorer the second try open it and then prevents you from opening the folder again
+-- TODO create a new ticket
+vim.ui.open = M.open
+
 -- vim.fs.root = M.fs_root
 
 -------------------------------------------------------------------------------
