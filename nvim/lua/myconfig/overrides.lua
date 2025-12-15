@@ -234,6 +234,42 @@ function M.fs_root(source, marker)
     return root_path
 end
 
+function M.override_lspconfig_root_pattern()
+    local default_root_pattern = require('lspconfig.util').root_pattern
+
+    ---@diagnostic disable-next-line: duplicate-set-field
+    require('lspconfig.util').root_pattern = function(...)
+        local pattern_func = default_root_pattern(...)
+        return function(start_path)
+            local path
+            if
+                require('myconfig.utils.misc').string_starts_with(
+                    start_path,
+                    'diffview:'
+                )
+            then
+                -- vim.print('starts with diffview')
+                path = assert(vim.uv.cwd())
+            else
+                path = pattern_func(start_path)
+            end
+            if path == '.' or path == './' or path == '/.' then
+                path = assert(vim.uv.cwd())
+            end
+
+            local normalized_root_path = vim.fs.normalize(path)
+            if
+                require('myconfig.utils.path').is_directory(
+                    normalized_root_path
+                )
+            then
+                return vim.fs.abspath(normalized_root_path)
+            end
+            return path
+        end
+    end
+end
+
 -------------------------------------------------------------------------------
 ---Override functions
 vim.ui.select = M.get_select_function()
