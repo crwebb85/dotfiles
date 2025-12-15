@@ -1070,6 +1070,40 @@ require('lazy').setup({
         lazy = true,
     },
 
+    {
+        'max397574/better-escape.nvim',
+        -- config = true,
+        opts = {
+            -- i for insert
+            i = {
+                j = {
+                    -- These can all also be functions
+                    k = '<Esc>',
+                },
+            },
+            c = {
+                j = {
+                    k = '<C-c>',
+                },
+            },
+            t = {
+                j = {
+                    k = '<C-\\><C-n>',
+                },
+            },
+            v = {
+                j = {
+                    k = '<Esc>',
+                },
+            },
+            s = {
+                j = {
+                    k = '<Esc>',
+                },
+            },
+        },
+        config = function(opts) require('better_escape').setup(opts) end,
+    },
     -- Keymap suggestions
     {
         'folke/which-key.nvim',
