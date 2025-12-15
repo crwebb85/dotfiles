@@ -1,3 +1,5 @@
+# From https://github.com/kelleyma49/PSFzf
+
 param(
     [parameter(Position=0,Mandatory=$false)][string]$PSReadlineChordProvider = 'Ctrl+t',
     [parameter(Position=1,Mandatory=$false)][string]$PSReadlineChordReverseHistory = 'Ctrl+r',
@@ -131,24 +133,6 @@ function Set-PsFzfOption{
         [switch]
         $GitKeyBindings,
         [switch]
-        $EnableAliasFuzzyEdit,
-        [switch]
-        $EnableAliasFuzzyFasd,
-        [switch]
-        $EnableAliasFuzzyHistory,
-        [switch]
-        $EnableAliasFuzzyKillProcess,
-        [switch]
-        $EnableAliasFuzzySetLocation,
-        [switch]
-        $EnableAliasFuzzyScoop,
-        [switch]
-        $EnableAliasFuzzySetEverything,
-        [switch]
-        $EnableAliasFuzzyZLocation,
-        [switch]
-        $EnableAliasFuzzyGitStatus,
-        [switch]
         $EnableFd,
         [ScriptBlock]
         $AltCCommand
@@ -175,35 +159,6 @@ function Set-PsFzfOption{
         }
     }
 
-    if ($EnableAliasFuzzyEdit) 			{
-        SetPsFzfAlias "fe"      Invoke-FuzzyEdit
-    }
-    if ($EnableAliasFuzzyFasd) 			{
-        SetPsFzfAlias "ff"      Invoke-FuzzyFasd
-    }
-    if ($EnableAliasFuzzyHistory) 		{
-        SetPsFzfAlias "fh"      Invoke-FuzzyHistory 
-    }
-    if ($EnableAliasFuzzyKillProcess) 	{
-        SetPsFzfAlias "fkill"   Invoke-FuzzyKillProcess 
-    }
-    if ($EnableAliasFuzzySetLocation) 	{
-        SetPsFzfAlias "fd"      Invoke-FuzzySetLocation 
-    }
-    if ($EnableAliasFuzzyZLocation) 	{
-        SetPsFzfAlias "fz"      Invoke-FuzzyZLocation 
-    }
-    if ($EnableAliasFuzzyGitStatus) 	{
-        SetPsFzfAlias "fgs"     Invoke-FuzzyGitStatus 
-    }
-    if ($EnableAliasFuzzyScoop) 	{
-        SetPsFzfAlias "fs"     Invoke-FuzzyScoop 
-    }
-    if ($EnableAliasFuzzySetEverything) {
-        if (${function:Set-LocationFuzzyEverything}) {
-            SetPsFzfAlias "cde" Set-LocationFuzzyEverything
-        }
-    }
     if ($PSBoundParameters.ContainsKey('EnableFd')) {
         $script:UseFd = $EnableFd
     }

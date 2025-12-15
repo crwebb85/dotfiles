@@ -1,3 +1,4 @@
+# File mostly from https://github.com/kelleyma49/PSFzf 
 
 $script:GitKeyHandlers = @()
 
@@ -82,12 +83,6 @@ function SetGitKeyBindings($enable) {
             Write-Error "Failed to register git key bindings - PSReadLine module not loaded"
             return
         }
-    }
-}
-
-function RemoveGitKeyBindings() {
-    $script:GitKeyHandlers | ForEach-Object {
-        Remove-PSReadLineKeyHandler -Chord $_
     }
 }
 

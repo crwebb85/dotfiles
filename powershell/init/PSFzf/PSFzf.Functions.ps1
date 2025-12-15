@@ -1,33 +1,4 @@
-#.ExternalHelp PSFzf.psm1-help.xml
-
-$addedAliases = @()
-
-function script:SetPsFzfAlias {
-    param($Name, $Function)
-
-    New-Alias -Name $Name -Scope Global -Value $Function -ErrorAction Ignore
-    $addedAliases += $Name
-}
-function script:SetPsFzfAliasCheck {
-    param($Name, $Function)
-
-    # prevent Get-Command from loading PSFzf
-    $script:PSModuleAutoLoadingPreferencePrev = $PSModuleAutoLoadingPreference
-    $PSModuleAutoLoadingPreference = 'None'
-
-    if (-not (Get-Command -Name $Name -ErrorAction Ignore)) {
-        SetPsFzfAlias $Name $Function
-    }
-
-    # restore module auto loading
-    $PSModuleAutoLoadingPreference = $script:PSModuleAutoLoadingPreferencePrev
-}
-
-function script:RemovePsFzfAliases {
-    $addedAliases | ForEach-Object {
-        Remove-Item -Path Alias:$_
-    }
-}
+# File mostly from https://github.com/kelleyma49/PSFzf 
 
 function Get-EditorLaunch() {
     param($FileList, $LineNum = 0)
@@ -135,27 +106,6 @@ function Invoke-FuzzyEdit() {
     }
 }
 
-
-#.ExternalHelp PSFzf.psm1-help.xml
-function Invoke-FuzzyFasd() {
-    $result = $null
-    try {
-        if (Get-Command Get-Frecents -ErrorAction Ignore) {
-            Get-Frecents | ForEach-Object { $_.FullPath } | Invoke-Fzf -ReverseInput -NoSort | ForEach-Object { $result = $_ }
-        } elseif (Get-Command fasd -ErrorAction Ignore) {
-            fasd -l | Invoke-Fzf -ReverseInput -NoSort | ForEach-Object { $result = $_ }
-        }
-    } catch {
-
-    }
-    if ($null -ne $result) {
-        # use cd in case it's aliased to something else:
-        cd $result
-    }
-}
-
-
-#.ExternalHelp PSFzf.psm1-help.xml
 function Invoke-FuzzyHistory() {
     if (Get-Command Get-PSReadLineOption -ErrorAction Ignore) {
         $result = Get-Content (Get-PSReadLineOption).HistorySavePath | Invoke-Fzf -Reverse -Scheme history
@@ -167,7 +117,6 @@ function Invoke-FuzzyHistory() {
         Invoke-Expression "$result" -Verbose
     }
 }
-
 
 # needs to match helpers/GetProcessesList.ps1
 function GetProcessesList() {
@@ -345,72 +294,6 @@ function Invoke-FuzzySetProofOfConceptLocation() {
     }
 }
 
-if ((-not $IsLinux) -and (-not $IsMacOS)) {
-    #.ExternalHelp PSFzf.psm1-help.xml
-    function Set-LocationFuzzyEverything() {
-        param($Directory = $null)
-        if ($null -eq $Directory) {
-            $Directory = $PWD.ProviderPath
-            $Global = $False
-        } else {
-            $Global = $True
-        }
-        $result = $null
-        try {
-            Search-Everything -Global:$Global -PathInclude $Directory -FolderInclude @('') | Invoke-Fzf | ForEach-Object { $result = $_ }
-        } catch {
-
-        }
-        if ($null -ne $result) {
-            # use cd in case it's aliased to something else:
-            cd $result
-        }
-    }
-}
-
-#.ExternalHelp PSFzf.psm1-help.xml
-function Invoke-FuzzyZLocation() {
-    $result = $null
-    try {
-        (Get-ZLocation).GetEnumerator() | Sort-Object { $_.Value } -Descending | ForEach-Object { $_.Key } | Invoke-Fzf -NoSort | ForEach-Object { $result = $_ }
-    } catch {
-
-    }
-    if ($null -ne $result) {
-        # use cd in case it's aliased to something else:
-        cd $result
-    }
-}
-
-
-#.ExternalHelp PSFzf.psm1-help.xml
-function Invoke-FuzzyScoop() {
-    param(
-        [string]$subcommand = "install",
-        [string]$subcommandflags = ""
-    )
-
-    $result = $null
-    $scoopexists = Get-Command scoop -ErrorAction Ignore
-    if ($scoopexists) {
-        $apps = New-Object System.Collections.ArrayList
-        Get-ChildItem "$(Split-Path $scoopexists.Path)\..\buckets" | ForEach-Object {
-            $bucket = $_.Name
-            Get-ChildItem "$($_.FullName)\bucket" | ForEach-Object {
-                $apps.Add($bucket + '/' + ($_.Name -replace '.json', '')) > $null
-            }
-        }
-
-        $result = $apps | Invoke-Fzf -Header "Scoop Applications" -Multi -Preview "scoop info {}" -PreviewWindow wrap
-    }
-
-    if ($null -ne $result) {
-        Invoke-Expression "scoop $subcommand $($result -join ' ') $subcommandflags"
-    }
-}
-
-
-#.ExternalHelp PSFzf.psm1-help.xml
 function Invoke-FuzzyGitStatus() {
     Invoke-PsFzfGitFiles
 }
@@ -463,19 +346,3 @@ function Invoke-PsFzfRipgrep() {
     }
 }
 
-function Enable-PsFzfAliases() {
-    # set aliases:
-    if (-not $DisableAliases) {
-        SetPsFzfAliasCheck "fe"      Invoke-FuzzyEdit
-        SetPsFzfAliasCheck "fh"      Invoke-FuzzyHistory
-        SetPsFzfAliasCheck "ff"      Invoke-FuzzyFasd
-        SetPsFzfAliasCheck "fkill"   Invoke-FuzzyKillProcess
-        SetPsFzfAliasCheck "fd"      Invoke-FuzzySetLocation
-        if (${function:Set-LocationFuzzyEverything}) {
-            SetPsFzfAliasCheck "cde" Set-LocationFuzzyEverything
-        }
-        SetPsFzfAliasCheck "fz"      Invoke-FuzzyZLocation
-        SetPsFzfAliasCheck "fs"      Invoke-FuzzyScoop
-        SetPsFzfAliasCheck "fgs"     Invoke-FuzzyGitStatus
-    }
-}

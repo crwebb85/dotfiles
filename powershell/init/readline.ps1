@@ -34,6 +34,8 @@ if (Get-Command "fzf.exe" -ErrorAction SilentlyContinue) {
     Set-PsFzfOption -TabExpansion
 } 
 
+Set-PsFzfOption -GitKeyBindings
+
 Set-Alias -Name keymaps -Value Get-PSReadLineKeyHandler
 
 # Searching for commands with up/down arrow is really handy.  The
