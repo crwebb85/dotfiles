@@ -17,6 +17,15 @@ vim.keymap.set(
     { desc = 'Customized Remap: Remapped to <nop> to disable this keybinging' }
 )
 
+vim.keymap.set(
+    -- { 'n', 'v', 'i' }, --commented because I don't like the delay on insert mode
+    { 'n', 'v' },
+    -- '<C-;>', -- Doesn't work on wezterm
+    '<leader><leader>;',
+    '<ESC><ESC>:',
+    { desc = 'Custom Keymap: Go into command mode' }
+)
+
 ---Finds the start and end index of a substring in another string for a given
 ---known index that is known to be within the matched string.
 ---If a match is not found around the known index then (nil, nil) will be returned
