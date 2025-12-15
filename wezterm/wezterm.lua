@@ -58,7 +58,7 @@ local keys = {
 	{ key = "K", mods = "CTRL", action = act.ClearScrollback("ScrollbackOnly") },
 	-- { key = "L", mods = "CTRL", action = act.ShowDebugOverlay },
 	{ key = "M", mods = "CTRL", action = act.Hide },
-	{ key = "N", mods = "CTRL", action = act.SpawnWindow },
+	-- { key = "N", mods = "CTRL", action = act.SpawnWindow },
 	{ key = "P", mods = "CTRL", action = act.ActivateCommandPalette },
 	{ key = "R", mods = "CTRL", action = act.ReloadConfiguration },
 	{ key = "T", mods = "CTRL", action = act.ShowLauncher },
