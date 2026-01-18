@@ -1624,6 +1624,18 @@ require('lazy').setup({
         config = function()
             --TODO detect when there is an available query for a filetype that isn't in my ensure installed
 
+            vim.api.nvim_create_autocmd('User', {
+                pattern = 'TSUpdate',
+                callback = function()
+                    -- Make jsonc parser have the same as the json parser
+                    -- since the json parser also supports comments (I think
+                    -- this will probably download the parser twice
+                    -- but I don't really care)
+                    require('nvim-treesitter.parsers').jsonc =
+                        require('nvim-treesitter.parsers').json
+                end,
+            })
+
             -- Make sure we are not running in headless or embedded mode
             local is_ui_visible = #vim.api.nvim_list_uis() > 0
             if is_ui_visible then
