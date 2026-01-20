@@ -18,6 +18,9 @@ local function get_progress_bufnr()
         progress_bufnr == nil or not vim.api.nvim_buf_is_valid(progress_bufnr)
     then
         progress_bufnr = vim.api.nvim_create_buf(false, true)
+        --TODO some how the  vim.bo[progress_bufnr].buftype is switching from
+        --'nofile' to '' and I don't see an obvious reason why so I assume another
+        --autocmd is accidentally modifying the option
     end
     return progress_bufnr
 end
