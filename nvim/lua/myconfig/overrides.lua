@@ -270,6 +270,31 @@ function M.override_lspconfig_root_pattern()
     end
 end
 
+local sysname = vim.uv.os_uname().sysname:lower()
+local iswin = not not (sysname:find('windows') or sysname:find('mingw'))
+local os_sep = iswin and '\\' or '/'
+
+---@param path string
+---@return string
+local function normalized_path_seperators(path)
+    local leading_slashes, rem = path:match('^([\\/]*)(.*)$')
+    ---@type string
+    local normalized_rem = rem:gsub('[\\/]+', os_sep)
+    local normalized_leading = ''
+    if #leading_slashes >= 2 then
+        normalized_leading = os_sep .. os_sep
+    elseif #leading_slashes == 1 then
+        normalized_leading = os_sep
+    end
+    return string.format('%s%s', normalized_leading, normalized_rem)
+end
+
+function M.joinpath(...)
+    local path = table.concat({ ... }, '/')
+    path = normalized_path_seperators(path)
+    return (path:gsub('\\', '/'))
+end
+
 -------------------------------------------------------------------------------
 ---Override functions
 vim.ui.select = M.get_select_function()
@@ -280,7 +305,8 @@ vim.ui.select = M.get_select_function()
 -- TODO create a new ticket
 vim.ui.open = M.open
 
--- vim.fs.root = M.fs_root
+vim.fs.joinpath = M.joinpath
+vim.fs.root = M.fs_root
 
 -------------------------------------------------------------------------------
 ---Override autocmds

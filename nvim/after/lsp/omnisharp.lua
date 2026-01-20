@@ -9,4 +9,15 @@ return {
         'utf-8',
         '--languageserver',
     },
+    root_dir = function(bufnr, on_dir)
+        local fname = vim.api.nvim_buf_get(bufnr)
+        local util = require('lspconfig.util')
+        local root = util.root_pattern('*.sln')(fname)
+            or util.root_pattern('*.csproj')(fname)
+            or util.root_pattern('omnisharp.json')(fname)
+            or util.root_pattern('function.json')(fname)
+
+        root = root:gsub('/', '\\')
+        on_dir(root)
+    end,
 }
