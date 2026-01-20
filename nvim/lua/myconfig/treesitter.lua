@@ -37,6 +37,7 @@ local function get_installed_revision(lang)
         config.get_install_dir('parser-info'),
         lang .. '.revision'
     )
+
     return util.read_file(lang_file)
 end
 
@@ -97,6 +98,45 @@ function M.get_uninstalled(ensure_installed)
         end
     end
     return parsers_to_install
+end
+
+function M.print_important_paths_for_debuging_treesitter()
+    vim.notify(
+        vim.inspect({
+            revisions = require('nvim-treesitter.config').get_install_dir(
+                'parser-info'
+            ),
+            nvim_treesitter_queries = require('nvim-treesitter.config').get_install_dir(
+                'queries'
+            ),
+            nvim_treesitter_install = require('nvim-treesitter.install').get_package_path(
+                'runtime',
+                'queries'
+            ),
+            nvim_treesitter_parsers = require('nvim-treesitter.config').get_install_dir(
+                'parser'
+            ),
+        }),
+        vim.log.levels.INFO
+    )
+end
+
+function M.set_jsonc_parser_to_be_json_parser()
+    -- Important: You would think if I set the jsonc parser equal to the json
+    -- parser I wouldn't need to do it in the User autocmd but for some reason
+    -- not having the autocmd causes the jsonc parser to never be installed however
+    -- I also need to set jsonc value before my code that checks if parsers are installed
+    -- otherwise that code won't know where to look for it. As a result I need to set it
+    -- in both places. This is weird but I don't care to investigate any farther
+    require('nvim-treesitter.parsers').jsonc =
+        require('nvim-treesitter.parsers').json
+    vim.api.nvim_create_autocmd('User', {
+        pattern = 'TSUpdate',
+        callback = function()
+            require('nvim-treesitter.parsers').jsonc =
+                require('nvim-treesitter.parsers').json
+        end,
+    })
 end
 
 ---Prompts the user if they would like to install the parsers that have not
