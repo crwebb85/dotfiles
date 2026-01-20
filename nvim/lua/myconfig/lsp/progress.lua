@@ -64,8 +64,13 @@ local function get_lsp_progress_msg()
 end
 
 local function log_progress_display_vars()
-    local display_winid = winid
-    if winid == nil then display_winid = 'nil' end
+    ---@type integer | string
+    local display_winid
+    if winid == nil then
+        display_winid = 'nil'
+    else
+        display_winid = winid
+    end
     local progress_tabpage = nil
     if winid ~= nil and vim.api.nvim_win_is_valid(winid) then
         progress_tabpage = vim.api.nvim_win_get_tabpage(winid)
