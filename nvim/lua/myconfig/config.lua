@@ -60,7 +60,6 @@ local M = {
         'tsx',
         'css',
         'json',
-        'jsonc',
         'html',
         'xml',
         'yaml',

@@ -1,1 +1,5 @@
-; inherits: json
+[
+  (pair)
+  (object)
+  (array)
+] @fold

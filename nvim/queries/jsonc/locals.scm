@@ -1,1 +1,4 @@
-; inherits: json
+[
+  (object)
+  (array)
+] @local.scope

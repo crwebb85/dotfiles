@@ -201,6 +201,27 @@ function M.prompt_install_missing_and_update(ensure_installed)
             end
             vim.notify('Finished updating parsers', vim.log.levels.INFO)
         end
+
+        -- Use the json parser for jsonc filetypes if it is installed
+        local task_set_jsonc_parser = a.async(function()
+            local json_parser_file = vim.fs.joinpath(
+                require('nvim-treesitter.config').get_install_dir('parser'),
+                'json.so'
+            )
+            if
+                require('myconfig.utils.path').is_existing_file(
+                    json_parser_file
+                )
+            then
+                vim.treesitter.language.add(
+                    'jsonc',
+                    { path = json_parser_file, symbol_name = 'json' }
+                )
+            end
+        end)
+        do
+            a.await(task_set_jsonc_parser)
+        end
     end)
 end
 
