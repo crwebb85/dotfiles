@@ -2999,25 +2999,25 @@ require('lazy').setup({
             -- },
         },
         opts = {
-            strategy = config.use_overseer_strategy_hack
-                    and {
-                        --Old versions of windows/powershell won't emit all the characters needed
-                        --to determine if the line feed at the end of the line was from the
-                        --source program or from line wrapping. When that happens it becomes impossible
-                        --to parse things like file paths from the terminal output. To fix this we
-                        --disable fetching the output from the terminal.
-                        --The trade off is we loose ansi color sequences so all output will display
-                        --without color.
-                        'jobstart',
-                        use_terminal = false,
-                    }
-                or 'terminal',
-            task_list = {
-                direction = 'bottom',
-                min_height = 25,
-                max_height = 25,
-                default_detail = 1,
+            output = {
+                --Old versions of windows/powershell won't emit all the characters needed
+                --to determine if the line feed at the end of the line was from the
+                --source program or from line wrapping. When that happens it becomes impossible
+                --to parse things like file paths from the terminal output. To fix this we
+                --disable fetching the output from the terminal.
+                --The trade off is we loose ansi color sequences so all output will display
+                --without color.
+                --Note: this used to be for the deprecated strategy field
+                --but after updating overseer I think this needs to go here now.
+                --TODO test if this is still needed.
+                use_terminal = not config.use_overseer_strategy_hack,
             },
+            -- task_list = {
+            --     direction = 'bottom',
+            --     min_height = 25,
+            --     max_height = 25,
+            --     default_detail = 1,
+            -- },
             templates = {
                 'builtin',
                 'hurl.hurl_run',
@@ -3029,6 +3029,7 @@ require('lazy').setup({
                     {
                         'on_output_parse',
                         parser = {
+                            --TODO  this might not be working anymore after updating overseer
                             diagnostics = {
                                 {
                                     'extract',

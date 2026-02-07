@@ -135,7 +135,7 @@ local M = {}
 
 ---@class ResolveOverseerParserOpts
 ---An overseer parser https://github.com/stevearc/overseer.nvim/blob/master/doc/reference.md#parsers
----@field parser? table
+---@field parser? overseer.OutputParser
 ---An overseer problem matcher
 ---@field problem_matcher? table
 ---An values used by overseer problem matcher
@@ -149,7 +149,7 @@ local M = {}
 ---errorformat to used when parsing "lines". (default vim.o.errorformat)
 ---@field efm? string
 ---An overseer parser to parse the lines with. Cannot be used if efm is defined
----@field parser? overseer.Parser
+---@field parser? overseer.OutputParser
 
 ---@param win? integer winid or winnr or 0 for current win. (Default: 0)
 ---@return integer? winid the winid or nil if invalid winid was supplied
@@ -342,12 +342,12 @@ end
 ---Creates a parser based on the configuration
 ---based on https://github.com/stevearc/overseer.nvim/blob/fe7b2f9ba263e150ab36474dfc810217b8cf7400/lua/overseer/component/on_output_parse.lua?plain=1#L36-L97
 ---@param opts ResolveOverseerParserOpts?
----@return overseer.Parser?
+---@return overseer.OutputParser?
 function M.resolve_overseer_parser(opts)
     if opts == nil then return nil end
 
-    local problem_matcher = require('overseer.template.vscode.problem_matcher')
-    local parser = require('overseer.parser')
+    local problem_matcher = require('overseer.vscode.problem_matcher')
+    -- local parser = require('overseer.parser')
 
     if opts.parser and opts.problem_matcher then
         misc.notify(
@@ -358,7 +358,7 @@ function M.resolve_overseer_parser(opts)
     elseif not opts.parser and not opts.problem_matcher then
         return nil
     end
-    ---@type table?
+    ---@type overseer.OutputParser?
     local parser_defn = opts.parser
     if opts.problem_matcher then
         local pm = problem_matcher.resolve_problem_matcher(opts.problem_matcher)
@@ -367,7 +367,6 @@ function M.resolve_overseer_parser(opts)
                 pm,
                 opts.precalculated_vars
             )
-            if parser_defn then parser_defn = { diagnostics = parser_defn } end
         end
     end
     if not parser_defn then
@@ -375,9 +374,7 @@ function M.resolve_overseer_parser(opts)
         return nil
     end
 
-    local resolved_parser = parser.new(parser_defn)
-
-    return resolved_parser
+    return parser_defn
 end
 
 ---Parses the lines into quickfix list entries
@@ -407,7 +404,9 @@ function M.parse_list_entries(opts)
 
     if opts.parser ~= nil then
         opts.parser:reset()
-        opts.parser:ingest(lines)
+        for _, line in ipairs(lines) do
+            opts.parser:parse(line)
+        end
         local result = opts.parser:get_result()
         --Note overseer has some extra logic to update the item file paths
         --to use different relative paths based on param options that im not doing
@@ -584,6 +583,6 @@ function M.close_list_window(opts)
     end
 end
 
-function M.toggle_list_window(opts) end
+function M.toggle_list_window(opts) error('not yet implemented') end
 
 return M
