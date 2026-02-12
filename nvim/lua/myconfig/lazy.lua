@@ -1073,6 +1073,10 @@ require('lazy').setup({
     {
         'max397574/better-escape.nvim',
         opts = {
+            -- NOTE:
+            -- `jk` keymap sucks for escaping visual mode because going down with
+            -- `j` and then overshooting so you use `k` is extremely common
+
             -- i for insert
             i = {
                 j = {
@@ -1090,11 +1094,7 @@ require('lazy').setup({
                     k = '<C-\\><C-n>',
                 },
             },
-            v = {
-                j = {
-                    k = '<Esc>',
-                },
-            },
+
             s = {
                 j = {
                     k = '<Esc>',
