@@ -6,9 +6,14 @@ $psfzfConfigPath = Get-ChildItem $PSScriptRoot\init\PSFzf\PSFzf.ps1 | Select-Obj
 Write-Output "Sourcing $psfzfConfigPath"
 . "$psfzfConfigPath"
 
+$readlineFunctionsPath = Get-ChildItem $PSScriptRoot\init\functions.ps1 | Select-Object -ExpandProperty FullName
+Write-Output "Sourcing $readlineFunctionsPath"
+. "$readlineFunctionsPath"
+
 $readlineConfigPath = Get-ChildItem $PSScriptRoot\init\readline.ps1 | Select-Object -ExpandProperty FullName
 Write-Output "Sourcing $readlineConfigPath"
 . "$readlineConfigPath"
+
 
 Set-Alias -Name zp -Value Invoke-FuzzyProjectLocation
 Set-Alias -Name zc -Value Invoke-FuzzySetProofOfConceptLocation 

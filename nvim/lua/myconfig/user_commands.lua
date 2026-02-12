@@ -7,6 +7,18 @@ local make_fuzzy_completion =
 local M = {}
 
 -------------------------------------------------------------------------------
+-- Setup
+
+vim.api.nvim_create_user_command(
+    'MyUpdateRemotePlugins',
+    function() require('myconfig.notebook.notebook').my_update_remote_plugins() end,
+    {
+        nargs = 0,
+        desc = 'UpdateRemotePlugins does not work on windows so this correctly updates it for molten-nvim plugin (may screw up other plugins)',
+    }
+)
+
+-------------------------------------------------------------------------------
 -- Scratch
 
 vim.api.nvim_create_user_command(

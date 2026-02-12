@@ -2443,13 +2443,46 @@ require('lazy').setup({
         ft = 'python',
         dependencies = 'mfussenegger/nvim-dap',
         config = function()
+            local function find_venv_python_executable(venv_dir)
+                local candidates = {
+                    vim.fn.has('unix') == 1
+                        and vim.fs.joinpath(venv_dir, 'bin', 'python'),
+                    -- MSYS2
+                    vim.fn.has('win32') == 1
+                        and vim.fs.joinpath(venv_dir, 'bin', 'python.exe'),
+                    -- Stock Windows
+                    vim.fn.has('win32') == 1
+                        and vim.fs.joinpath(venv_dir, 'Scripts', 'python.exe'),
+                }
+
+                for _, candidate in ipairs(candidates) do
+                    if
+                        candidate
+                        and vim.fn.executable(vim.fs.normalize(candidate))
+                            == 1
+                    then
+                        return candidate
+                    end
+                end
+                return nil
+            end
             -- configures debugpy
             -- uses the debugypy installation by mason
-            local debugpy_package =
-                require('mason-registry').get_package('debugpy')
-            local debugpyPythonPackagePath = debugpy_package:get_install_path()
-            local debugpyPythonPath = debugpyPythonPackagePath
-                .. '/venv/bin/python3'
+            local data_path = vim.fn.stdpath('data')
+            if data_path == nil then
+                error('data path was nil but a string was expected')
+            elseif type(data_path) == 'table' then
+                error('data path was an array but a string was expected')
+            end
+
+            local venv_path = vim.fs.joinpath(
+                data_path,
+                'mason',
+                'packages',
+                'debugby',
+                'venv'
+            )
+            local debugpyPythonPath = find_venv_python_executable(venv_path)
             require('dap-python').setup(debugpyPythonPath, {})
         end,
     },
@@ -2458,35 +2491,29 @@ require('lazy').setup({
     --- LSP's and more
 
     {
+        'quarto-dev/quarto-nvim',
+        dependencies = {
+            'jmbuhr/otter.nvim',
+            'nvim-treesitter/nvim-treesitter',
+        },
+        config = function(_, _) require('quarto').setup() end,
+    },
+    {
         'benlubas/molten-nvim',
         version = '^1.0.0',
         -- build = ':UpdateRemotePlugins',
+        build = function()
+            require('myconfig.notebook.notebook').my_update_remote_plugins()
+        end,
         dependencies = 'willothy/wezterm.nvim',
-        lazy = true,
-        keys = {
-            {
-                '<leader>ip',
-                function()
-                    local venv = os.getenv('VIRTUAL_ENV')
-                        or os.getenv('CONDA_PREFIX')
-                    vim.print(venv)
-                    if venv ~= nil then
-                        -- in the form of /home/benlubas/.virtualenvs/VENV_NAME
-                        venv = string.match(venv, '/.+/(.+)')
-                        vim.cmd(('MoltenInit %s'):format(venv))
-                    else
-                        vim.cmd('MoltenInit python3')
-                    end
-                end,
-
-                desc = 'Initialize Molten for python3',
-                silent = true,
-            },
-        },
         init = function()
-            vim.g.molten_auto_open_output = false -- cannot be true if molten_image_provider = "wezterm"
+            require('myconfig.notebook.notebook').setup_python_remote_plugin()
+            require('myconfig.notebook.notebook').setup_keymaps()
+            require('myconfig.notebook.jupytext').setup({})
+            -- vim.g.molten_auto_open_output = false -- cannot be true if molten_image_provider = "wezterm"
+            vim.g.molten_auto_open_output = true -- cannot be true if molten_image_provider = "wezterm"
             vim.g.molten_output_show_more = true
-            vim.g.molten_image_provider = 'wezterm'
+            -- vim.g.molten_image_provider = 'wezterm'
             vim.g.molten_output_virt_lines = true
             vim.g.molten_split_direction = 'right' --direction of the output window, options are "right", "left", "top", "bottom"
             vim.g.molten_split_size = 40 --(0-100) % size of the screen dedicated to the output window
@@ -2494,8 +2521,12 @@ require('lazy').setup({
             vim.g.molten_use_border_highlights = true
             vim.g.molten_virt_lines_off_by_1 = true
             vim.g.molten_auto_image_popup = false
+
+            --TODO add lsp support https://github.com/benlubas/.dotfiles/blob/ff6d9ab00b4aba86ba6608027d561fbe1909ee07/nvim/lua/plugins/lsp.lua#L119
+            --TODO add image support
+            --TODO cleanup keymaps
+            --TODO refactor find venv executables to a single place
         end,
-        -- config = true,
     },
     {
         'folke/lazydev.nvim',
@@ -2777,7 +2808,8 @@ require('lazy').setup({
     {
         'linux-cultist/venv-selector.nvim',
         lazy = true,
-        ft = 'python',
+        ft = { 'python' },
+        event = { 'BufEnter *.ipynb' },
         dependencies = {
             'neovim/nvim-lspconfig',
             'mfussenegger/nvim-dap',
@@ -2885,12 +2917,12 @@ require('lazy').setup({
                     sh = require('myconfig.formatter').get_buffer_enabled_formatter_list,
                 },
                 formatters = {
-                    ---@type conform.FileFormatterConfig
+                    ---@type conform.FormatterConfigOverride
                     xmlformat = {
                         command = 'xmlformat',
                         args = { '--selfclose', '-' },
                     },
-                    ---@type conform.FileFormatterConfig
+                    ---@type conform.FormatterConfigOverride
                     prettierxml = {
                         command = 'npm',
                         args = {

@@ -2584,12 +2584,8 @@ local myoperations = maputils
 
 maputils
     .operations({
-        --TODO broken because of https://github.com/neovim/neovim/issues/36660
-        -- backward_key = '<C-h>',
-        -- forward_key = '<C-l>',
-
-        backward_key = '<M-h>',
-        forward_key = '<M-l>',
+        backward_key = '<C-h>',
+        forward_key = '<C-l>',
         mode = { 'n', 'x' }, --Add some check so that non-visual visual mode keymaps don't get repeated
     })
     :navigator({
@@ -2616,12 +2612,8 @@ maputils
 
 maputils
     .operations({
-        --TODO broken because of https://github.com/neovim/neovim/issues/36660
-        -- backward_key = '<leader><C-h>',
-        -- forward_key = '<leader><C-l>',
-
-        backward_key = '<leader><M-h>',
-        forward_key = '<leader><M-l>',
+        backward_key = '<leader><C-h>',
+        forward_key = '<leader><C-l>',
         mode = { 'n' },
     })
     :navigator({
