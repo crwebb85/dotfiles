@@ -76,6 +76,7 @@ local M = {
         'gitattributes',
         'gitcommit',
         'gitignore',
+        'apex',
     },
 }
 

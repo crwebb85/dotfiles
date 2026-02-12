@@ -2689,6 +2689,7 @@ require('lazy').setup({
                 ['powershell-editor-services'] = 'powershell_es', -- powershell
                 ['lemminx'] = 'lemminx', -- xml
                 ['sqls'] = 'sqls', -- sql
+                ['apex-language-server'] = 'apex_ls', -- salesforce apex
 
                 -- Formatters
                 'stylua', -- Formatter for lua files
