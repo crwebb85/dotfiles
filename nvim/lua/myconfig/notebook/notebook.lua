@@ -118,10 +118,6 @@ function M.setup_python_remote_plugin()
         )
         return
     else
-        vim.notify(
-            string.format('Configured vim.g.python3_host_prog=%s', venv_python),
-            vim.log.levels.INFO
-        )
         vim.g.python3_host_prog = venv_python
     end
 end

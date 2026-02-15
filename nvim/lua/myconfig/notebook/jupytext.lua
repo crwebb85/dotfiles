@@ -4,6 +4,7 @@ local M = {}
 local function get_jupytext_path() return vim.g.jupytext_jupytext end
 
 -- Get the filetype that should be set for the buffer after loading ipynb file
+---@diagnostic disable-next-line: unused-local
 function M.get_filetype(ipynb_file, format, metadata)
     if format == 'markdown' then
         return format
@@ -39,7 +40,6 @@ M.opts = {
     -- jupytext = 'jupytext',
     format = 'markdown',
     update = true,
-    filetype = M.get_filetype,
     sync_patterns = { '*.md', '*.py', '*.jl', '*.R', '*.Rmd', '*.qmd' },
     autosync = true,
     handle_url_schemes = true,
@@ -69,7 +69,7 @@ local function find_jupytext_executable(venv_dir)
     return nil
 end
 
-M.setup = function(opts)
+M.setup = function()
     local config_env = os.getenv('XDG_CONFIG_HOME')
     if config_env == nil then
         error('cannot find XDG_CONFIG_HOME environment variable')
@@ -81,9 +81,6 @@ M.setup = function(opts)
 
     local jupytext_path = find_jupytext_executable(jupytext_venv_directory)
     if jupytext_path ~= nil then
-        vim.notify(
-            string.format('setting vim.g.jupytext_jupytext=%s', jupytext_path)
-        )
         vim.g.jupytext_jupytext = jupytext_path
     else
         vim.notify(
@@ -283,10 +280,7 @@ M.setup = function(opts)
                     else
                         vim.notify(proc.stderr, vim.log.levels.ERROR)
                     end
-                    local filetype = M.opts.filetype
-                    if type(filetype) == 'function' then
-                        filetype = filetype(url, format, metadata)
-                    end
+                    local filetype = M.get_filetype(url, format, metadata)
                     vim.api.nvim_set_option_value(
                         'filetype',
                         filetype,
@@ -342,7 +336,7 @@ M.setup = function(opts)
                         local proc = vim.system(cmd):wait()
                         if proc.code == 0 then
                             M.sync(temp_ipynb_file, false, paired_formats)
-                            json_lines = M.read_file(temp_ipynb_file, true)
+                            json_lines = M.read_file_lines(temp_ipynb_file)
                             vim.api.nvim_buf_set_lines(
                                 bufnr,
                                 0,
@@ -381,7 +375,7 @@ M.setup = function(opts)
                         )
                         local tempfile =
                             vim.fs.joinpath(tempdir, bufnr .. '.buffer')
-                        local lines = M.read_file(tempfile, true)
+                        local lines = M.read_file_lines(tempfile)
                         vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
                         vim.api.nvim_set_option_value(
                             'modified',
@@ -431,10 +425,10 @@ function M.open_notebook(ipynb_file, bufnr)
     if source_file and autosync then M.sync(source_file) end
     local json_lines = {}
     if source_file == nil then
-        json_lines = M.read_file(M.default_new_template(), true)
+        json_lines = M.read_file_lines(M.default_new_template())
     else
         local success, _json_lines = pcall(
-            function() return M.read_file(ipynb_file, true) end
+            function() return M.read_file_lines(ipynb_file) end
         )
         if success then json_lines = _json_lines end
     end
@@ -463,10 +457,7 @@ function M.open_notebook(ipynb_file, bufnr)
             vim.notify(proc.stderr, vim.log.levels.ERROR)
         end
     end
-    local filetype = M.opts.filetype
-    if type(filetype) == 'function' then
-        filetype = filetype(source_file, format, metadata)
-    end
+    local filetype = M.get_filetype(source_file, format, metadata)
     vim.api.nvim_set_option_value('filetype', filetype, { buf = bufnr })
     vim.api.nvim_set_option_value('modified', false, { buf = bufnr })
     vim.notify(
@@ -558,7 +549,7 @@ function M.write_notebook(ipynb_file, metadata, bufnr)
             local msg = '"' .. ipynb_file .. '"'
             if target_is_new then msg = msg .. ' [New]' end
             msg = msg .. ' ' .. #lines .. 'L via jupytext [w]'
-            vim.notify(msg, vim.log.levels.INFO)
+            vim.schedule(function() vim.notify(msg, vim.log.levels.INFO) end)
             if write_in_place or has_cpo_plus then
                 M.schedule(async_write, function()
                     vim.api.nvim_set_option_value(
@@ -630,21 +621,26 @@ function M.get_metadata(json_lines)
     return json_data.metadata
 end
 
--- Get the content of the file as a multiline string or an array of lines
-function M.read_file(file, as_lines)
-    if as_lines then
-        local lines = {}
-        for line in io.lines(file) do
-            table.insert(lines, line)
-        end
-        return lines
-    else
-        local fh = io.open(file, 'r')
-        if not fh then error('Could not open file: ' .. file) end
-        local content = fh:read('*all')
-        fh:close()
-        return content
+---Get the content of the file as a multiline string
+---@param filepath string
+---@return string
+function M.read_file(filepath)
+    local fh = io.open(filepath, 'r')
+    if not fh then error('Could not open file: ' .. filepath) end
+    local content = fh:read('*all')
+    fh:close()
+    return content
+end
+
+--- Get the content of the file as an array of lines
+---@param filepath string
+---@return string[]
+function M.read_file_lines(filepath)
+    local lines = {}
+    for line in io.lines(filepath) do
+        table.insert(lines, line)
     end
+    return lines
 end
 
 -- Get the json in the file as a Lua table (for debugging)
