@@ -1073,11 +1073,11 @@ require('lazy').setup({
     {
         'max397574/better-escape.nvim',
         opts = {
+            default_mappings = false, -- setting this to false removes all the default mappings
             -- NOTE:
             -- `jk` keymap sucks for escaping visual mode because going down with
             -- `j` and then overshooting so you use `k` is extremely common
 
-            -- i for insert
             i = {
                 j = {
                     -- These can all also be functions
@@ -1101,7 +1101,6 @@ require('lazy').setup({
                 },
             },
         },
-        config = function(opts) require('better_escape').setup(opts) end,
     },
     -- Keymap suggestions
     {
