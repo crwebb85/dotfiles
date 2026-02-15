@@ -2918,6 +2918,69 @@ require('lazy').setup({
                     sh = require('myconfig.formatter').get_buffer_enabled_formatter_list,
                 },
                 formatters = {
+                    ruff = {
+                        command = 'C:/Users/crweb/AppData/Local/nvim-data/mason/packages/ruff/venv/Scripts/ruff.exe',
+                        args = {
+                            'format',
+                            '--force-exclude',
+                            '--stdin-filename',
+                            '$FILENAME',
+                        },
+                    },
+                    ---@type conform.FormatterConfigOverride
+                    injected = {
+                        options = {
+                            ignore_errors = true, -- useful for preventing a single bad block from failing the whole file format
+                            lang_to_formatters = {
+                                lua = { 'stylua' },
+                                python = { 'ruff' },
+                                typescript = { 'prettierd' },
+                                javascript = { 'prettierd' },
+                                typescriptreact = { 'prettierd' },
+                                javascriptreact = { 'prettierd' },
+                                css = { 'prettierd' },
+                                yaml = { 'prettierd' },
+                                json = { 'prettierd' },
+                                jsonc = { 'prettierd' },
+                                json5 = { 'prettierd' },
+                                xml = { 'prettierxml' },
+                                graphql = { 'prettierd' },
+                                sh = { 'shfmt' },
+                                c = { 'clang-format' },
+                            },
+                        },
+                    },
+                    ---@type conform.FormatterConfigOverride
+                    prettierd = {
+                        args = function(_, ctx)
+                            if
+                                ctx.buf ~= nil
+                                and vim.api.nvim_buf_is_valid(ctx.buf)
+                                and vim.bo[ctx.buf].filetype == 'markdown'
+                            then
+                                -- the prettierd config doesn't have options for ft_parsers like prettier does
+                                -- at the time of writing this
+                                -- TODO maybe create a PR to fix this
+                                return {
+                                    '$FILENAME',
+                                    '--parser=markdown',
+                                }
+                            end
+                            return { '$FILENAME' }
+                        end,
+                    },
+                    prettier = {
+                        options = {
+                            -- Use a specific prettier parser for a filetype
+                            -- Otherwise, prettier will try to infer the parser from the file name
+                            ft_parsers = {
+                                markdown = 'markdown', -- So that ipynb files converted to markdown with jupytext get formatted
+                            },
+                            ext_parsers = {
+                                -- qmd = "markdown",
+                            },
+                        },
+                    },
                     ---@type conform.FormatterConfigOverride
                     xmlformat = {
                         command = 'xmlformat',

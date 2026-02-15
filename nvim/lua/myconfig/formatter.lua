@@ -33,8 +33,7 @@ local function setup()
     ---@type { [string]: string[] }
     local default_formatters = {
         lua = { 'stylua' },
-        -- first use isort and then black
-        python = { 'isort', 'black' },
+        python = { 'ruff' },
         typescript = { 'prettierd' },
         javascript = { 'prettierd' },
         typescriptreact = { 'prettierd' },
@@ -49,10 +48,12 @@ local function setup()
         -- ansible lsp, and prettier formatting TODO set up autocmd to detect ansible
         ['yaml.ansible'] = { 'prettierd' },
         -- "inject" is a "special" formatter from conform.nvim, which
-        -- formats treesitter-injected code. In effect, hits will make
-        -- conform.nvim format any python codeblocks inside a markdown file.
-        markdown = { 'prettierd', 'injected' },
-        -- xml = { 'xmlformat' },
+        -- formats treesitter-injected code. For example, conform.nvim will format
+        -- any python codeblocks inside a markdown file.
+        -- **Important** using prettier not prettierd because prettierd some
+        -- reason can't handle frontmatter yaml at the top of a markdown file
+        -- this may change in the future
+        markdown = { 'prettier', 'injected' },
         xml = { 'prettierxml' },
         graphql = { 'prettierd' },
         sh = { 'shfmt' },
