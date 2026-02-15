@@ -2871,15 +2871,11 @@ require('lazy').setup({
 
     ---------------------------------------------------------------------------
     --- Formatter
-
-    -- Formatting client: conform.nvim
-    -- - Formatting is triggered via `<leader>f`, but also automatically on save
     {
         'stevearc/conform.nvim',
         event = 'BufWritePre', -- load the plugin before saving
         keys = {
             {
-                -- '<leader>f',
                 'grf',
                 function()
                     local params =
