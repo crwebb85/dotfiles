@@ -2500,15 +2500,16 @@ require('lazy').setup({
     {
         'benlubas/molten-nvim',
         version = '^1.0.0',
-        -- build = ':UpdateRemotePlugins',
+        lazy = true,
+        event = 'VeryLazy',
         build = function()
             require('myconfig.notebook.notebook').my_update_remote_plugins()
         end,
         dependencies = 'willothy/wezterm.nvim',
-        init = function()
+        config = function()
             require('myconfig.notebook.notebook').setup_python_remote_plugin()
             require('myconfig.notebook.notebook').setup_keymaps()
-            require('myconfig.notebook.jupytext').setup({})
+            require('myconfig.notebook.jupytext').setup()
             -- vim.g.molten_auto_open_output = false -- cannot be true if molten_image_provider = "wezterm"
             vim.g.molten_auto_open_output = true -- cannot be true if molten_image_provider = "wezterm"
             vim.g.molten_output_show_more = true
