@@ -1917,7 +1917,11 @@ require('lazy').setup({
         keys = {
             {
                 '<leader>tr',
-                function() require('neotest').run.run({}) end,
+                function()
+                    require('neotest').run.run({
+                        suite = false,
+                    })
+                end,
                 desc = 'Neotest: Run the nearest test',
             },
             {
@@ -1925,6 +1929,7 @@ require('lazy').setup({
                 function()
                     require('neotest').run.run({
                         vim.fn.expand('%'),
+                        suite = false,
                     })
                 end,
                 desc = 'Neotest: Run the current file',
@@ -1934,6 +1939,7 @@ require('lazy').setup({
                 function()
                     require('neotest').run.run({
                         vim.fn.getcwd(),
+                        suite = false,
                     })
                 end,
                 desc = 'Neotest: Run all tests in cwd',
@@ -1944,7 +1950,7 @@ require('lazy').setup({
                     require('myconfig.dap').shellslash_hack()
                     require('neotest').run.run({
                         strategy = 'dap',
-                        suite = false, --TODO haven't tested if this needs to be false or true
+                        suite = false,
                     })
                 end,
                 desc = 'Neotest: Debug the nearest test',
