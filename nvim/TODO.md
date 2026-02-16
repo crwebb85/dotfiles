@@ -18,84 +18,57 @@
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
 - make file buffers not in current directory slightly redder
 - look into overseer docker templates https://github.com/LoricAndre/dotfiles/blob/main/dot_config/nvim/lua/overseer/template/docker/build.lua
-- clean up powershell profile
-- add powershell fzf shortcut to search for projects
-- add a powershell fzf shortcut to search for poc's
-- add telescope picker to search for projects (automatically set lcd on splits)
-- add telescope picker shortcut to search for poc's (automatically set lcd on splits)
+- have seperate keymaps for surround that adds spaces instead of adding them by default to `([{`
+- add smart operator to select in quotes that works with any quote and markdown code blocks
+- fix default markdown tabs length to match formatter
+- fix omnisharp range semantic tokens
+- finish PR for oil.nvim
+- there are bugs in comment.nvim for detecting the current injected
+  treesitter context powershell in markdown codeblock doesn't work. Also
+  issue https://github.com/numToStr/Comment.nvim/issues/511
 
 ### Bugs
 
-- spelling errors highlight as red squigly line in neovim does not display when using wezterm. It does display in powershell
-- `<leader>gd` does not open git diff tab if the tab is already open
 - when in wezterm and I open my `nvim ./` from my .config directory then new wezterm tab the cwd will be .config/nvim instead of .config
 - 'gC' keymap doesn't invert correctly when comments have nested comments
 - fix my_on_output_quickfix.lua file as invalid characters added are added to
   the begining of items when using tail = true and append = true at the same time
-  (this has been confirmed to happen with my GrepAdd command)
-- fix python formatters
-- Bug heirline: new upstaged files say main the git branch and new files staged preview doesn't show git branch
+  (this has been confirmed to happen with my GrepAdd command my temporary fix is to set tail to false)
 - my keymap for running neotest on files marks succeeded test as failed if any test failed in the file
   on old versions of windows (but works correctly on windows 11)
 - overseer hurl opens the quickfix window in all tabs not just the tab that was I used to run the overseer command
 - when going into a big file (only tested when using gd (goto definition)) the first line gets added to the jump list
-- something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
 - when using a editorconfig file my code that replaces netrw with oil will throw an error saying the buffer is unmodified.
   Both the end_of_line and charset will cause the error.
-- fix non-navigation treesitter keymaps
+
+  ```editorconfig
+  root = true
+
+  [*]
+  end_of_line = lf
+  charset = utf-8
+  ```
+
+  The error message
+
+  ```log
+  Error executing vim.schedule lua callback: ...b/AppData/Local/nvim-data/lazy/oil.nvim/lua/oil/init.lua:385: Vim:E37: No write since last change (add ! to override)
+  stack traceback:
+      [C]: in function 'edit'
+      ...b/AppData/Local/nvim-data/lazy/oil.nvim/lua/oil/init.lua:385: in function 'open'
+      .config\nvim/lua/config/lazy.lua:942: in function <.config\nvim/lua/config/lazy.lua:932>
+  ```
+
 - my telescope pickers don't work for opening selection split, vertical split, new tab
-- telescope doesn't let me use the home key and the left arrow key wraps to the last character
-- my completion window is visible in the telescope prompt
 
-```editorconfig
-root = true
+### Bugs I don't think are happening anymore
 
-[*]
-end_of_line = lf
-charset = utf-8
-```
-
-The error message
-
-```log
-Error executing vim.schedule lua callback: ...b/AppData/Local/nvim-data/lazy/oil.nvim/lua/oil/init.lua:385: Vim:E37: No write since last change (add ! to override)
-stack traceback:
-	[C]: in function 'edit'
-	...b/AppData/Local/nvim-data/lazy/oil.nvim/lua/oil/init.lua:385: in function 'open'
-	.config\nvim/lua/config/lazy.lua:942: in function <.config\nvim/lua/config/lazy.lua:932>
-```
+- something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
 
 ### Neovim bugs
 
 - redraw cmd and lazyredraw option now clear the selection messages so it was preventing me seeing which code actions I could pick
 - regression: LspStop no longer clears diagnostics
-
-```lua
-
-            {
-                '<leader>tc',
-                function() require('neotest').run.run(vim.fn.expand('%')) end,
-                desc = 'Neotest: Run the current file',
-            },
-
-```
-
-- Bug Telescope: plugin documentation now shows up in Telescope even if not yet loaded.
-  When you select it in telescope you will get the following error:
-
-```
-
-E5108: Error executing lua: vim/_editor.lua:439: nvim_exec2(): Vim(help):E661: Sorry, no 'en' help for Overseer
-stack traceback:
-	[C]: in function 'nvim_exec2'
-	vim/_editor.lua:439: in function 'cmd'
-	...lazy/telescope.nvim/lua/telescope/builtin/__internal.lua:806: in function 'run_replace_or_original'
-	...im-data/lazy/telescope.nvim/lua/telescope/actions/mt.lua:65: in function 'run_replace_or_original'
-	...im-data/lazy/telescope.nvim/lua/telescope/actions/mt.lua:65: in function 'select_default'
-	C:\Users\crweb\Documents\.config\nvim/lua/config/lazy.lua:617: in function 'key_func'
-	...nvim-data/lazy/telescope.nvim/lua/telescope/mappings.lua:293: in function <...nvim-data/lazy/telescope.nvim/lua/telescope/mappings.lua:292>
-```
-
 - bug sometimes happens during completion (was using extui and native completion)
   After the bug happens the `-- Insert --` text that displays over the Ex command line
   will stay stuck above it preventing you from seeing the Ex commands you are typing.
@@ -104,25 +77,23 @@ stack traceback:
   which is somehow commonly triggered by a neovim autocmd for DiagnosticChanged.
   Somehow selecting a completion item triggers the autocmd.
 
-```
-Lua: ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: E565: Not allowed to change text or change window
-stack traceback:
-	[C]: in function 'nvim_buf_set_text'
-	...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: in function 'set_virttext'
-	...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:424: in function 'handler'
-	C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:44: in function 'ui_callback'
-	C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:89: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:82>
-	[C]: in function 'nvim__redraw'
-	C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2916: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2914>
-	[C]: in function 'nvim_exec_autocmds'
-	C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2610: in function 'reset'
-	C:/nvim-win64/share/nvim/runtime/lua/vim/lsp/client.lua:1262: in function '_on_detach'
-	C:\nvim-win64\sha
-Error in "msg_showmode" UI event handler (ns=nvim._ext_ui):
+  ```
+  Lua: ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: E565: Not allowed to change text or change window
+  stack traceback:
+      [C]: in function 'nvim_buf_set_text'
+      ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: in function 'set_virttext'
+      ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:424: in function 'handler'
+      C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:44: in function 'ui_callback'
+      C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:89: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:82>
+      [C]: in function 'nvim__redraw'
+      C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2916: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2914>
+      [C]: in function 'nvim_exec_autocmds'
+      C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2610: in function 'reset'
+      C:/nvim-win64/share/nvim/runtime/lua/vim/lsp/client.lua:1262: in function '_on_detach'
+      C:\nvim-win64\sha
+  Error in "msg_showmode" UI event handler (ns=nvim._ext_ui):
 
-```
-
-the workaround is to make sure the plugin is loaded
+  ```
 
 ### TODO and Workflows that need improvements
 
@@ -134,7 +105,7 @@ the workaround is to make sure the plugin is loaded
        at the exact spot it needs to run. (i.e. PreSet, Set, PreConfig, Config, PreLsp, PostLsp)
     3. Create a .nvim.lua skeleton file with the autocommands templates prepopulated
 - [ ] lsp
-  - [ ] keymaps like grr should notify when the no results were found
+  - [ ] keymaps like grr should notify when no results were found
   - [ ] try a newer dotnet lsp
   - [ ] create a way to disable/enable lsp's and formatters on a project level using .nvim.lua file
   - [ ] add debugger for older dotnet projects
@@ -276,7 +247,7 @@ the workaround is to make sure the plugin is loaded
       - operate over text around comment when single line comment
       - operate over text around comment when multiple single line comment
       - operate over text around comment block comments
-  - [ ] I want to improve my indent text objec igi and agi based on [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
+  - [ ] I want to improve my indent text object igi and agi based on [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
   - [ ] modify visual and around keymaps to extend current selection (some care may be needed for how to handle whitespace)
   - [ ] text objexts I want to try out [chrisgrieser/nvim-various-textobjs](https://github.com/chrisgrieser/nvim-various-textobjs)
   - [ ] try out [matze/vim-move](https://github.com/matze/vim-move)
@@ -339,6 +310,7 @@ the workaround is to make sure the plugin is loaded
 
 ### Interesting Articles/Posts:
 
+- [Wezterm config help](https://gilbertsanchez.com/posts/my-terminal-wezterm/)
 - https://gist.github.com/lucasecdb/2baf6d328a10d7fea9ec085d868923a0
 - [Find and replace custom keymaps](https://www.reddit.com/r/neovim/comments/18dvpe1/wanted_to_share_a_small_and_simple_mapping_for/?utm_medium=android_app&utm_source=share)
 - [Moving text blocks plugins](https://www.reddit.com/r/neovim/comments/18dk9bp/alternative_to_vimtextmanip_plugin_move_selected/?utm_medium=android_app&utm_source=share)
