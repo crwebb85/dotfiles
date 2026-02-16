@@ -88,6 +88,11 @@ local function log_progress_display_vars()
         isDone = isDone,
         progress_message = get_lsp_progress_msg(),
     }
+    if progress_bufnr ~= nil then
+        status.bufype = vim.bo[progress_bufnr].buftype
+        status.modified = vim.bo[progress_bufnr].modified
+        status.modifiable = vim.bo[progress_bufnr].modifiable
+    end
     vim.notify(vim.inspect(status), vim.log.levels.INFO)
 end
 
