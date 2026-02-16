@@ -108,6 +108,10 @@ require('lazy').setup({
     {
         'sindrets/diffview.nvim',
         lazy = true,
+        cmd = {
+            'DiffviewOpen',
+            'DiffviewClose',
+        },
         config = function()
             local actions = require('diffview.actions')
             local diffview_keymaps = {
