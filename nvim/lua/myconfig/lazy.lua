@@ -1307,6 +1307,7 @@ require('lazy').setup({
     {
         'numToStr/Comment.nvim',
         lazy = true,
+        event = 'VeryLazy',
         keys = {
             {
                 'gc',
@@ -1329,7 +1330,10 @@ require('lazy').setup({
             },
         },
         opts = {},
-        config = true,
+        config = function(_, opts)
+            require('Comment').setup(opts)
+            require('Comment.ft').set('ps1', { '#%s', '<#%s#>' })
+        end,
     },
 
     -- Adds motions to wrap text in quotes/brackets/tags/etc
