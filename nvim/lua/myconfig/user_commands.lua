@@ -939,7 +939,6 @@ local complete_treesitter_capture = make_fuzzy_completion(function(_, text, _)
     end
 
     return {
-        config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
         'textobjects',
         'folds',
         'highlights',
@@ -1049,7 +1048,6 @@ end, {
         local words = vim.split(text, '%s+')
         if #words <= 2 then
             return {
-                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
                 'textobjects',
                 'folds',
                 'highlights',
@@ -1103,7 +1101,6 @@ end, {
         local words = vim.split(text, '%s+')
         if #words <= 2 then
             return {
-                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
                 'textobjects',
                 'folds',
                 'highlights',
@@ -1149,7 +1146,6 @@ end, {
         local words = vim.split(text, '%s+')
         if #words <= 2 then
             return {
-                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
                 'textobjects',
                 'folds',
                 'highlights',
@@ -1195,7 +1191,6 @@ end, {
         local words = vim.split(text, '%s+')
         if #words <= 2 then
             return {
-                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
                 'textobjects',
                 'folds',
                 'highlights',
@@ -1241,7 +1236,6 @@ end, {
         local words = vim.split(text, '%s+')
         if #words <= 2 then
             return {
-                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
                 'textobjects',
                 'folds',
                 'highlights',

@@ -1405,13 +1405,6 @@ local myoperations = maputils
             desc = 'Custom: Run the "{cpfile|cnfile}" command',
             opts = {},
         },
-        extreme = {
-            key = '<leader><C-q>',
-            backward = 'cfirst',
-            forward = 'clast',
-            desc = 'Custom: Run the "{cfirst|clast}" command',
-            opts = {},
-        },
     })
     :navigator({
         --visual mode: can navigate to a new buffer but visual mode is probably otherwise useful
@@ -1439,13 +1432,6 @@ local myoperations = maputils
             backward = 'lpfile',
             forward = 'lnfile',
             desc = 'Custom: Run the "{lpfile|lnfile}" command',
-            opts = {},
-        },
-        extreme = {
-            key = '<leader><C-l>',
-            backward = 'lfirst',
-            forward = 'llast',
-            desc = 'Custom: Run the "{lfirst|llast}" command',
             opts = {},
         },
     })
@@ -2183,36 +2169,36 @@ local myoperations = maputils
     :navigator({
         --visual mode: stays within buffer so visual mode would be useful
         default = {
-            key = 'gmn',
+            key = 'vmn',
             mode = { 'n', 'x' },
             backward = function()
                 require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@function_declaration_name.inner',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             forward = function()
                 require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@function_declaration_name.inner',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             desc = 'Custom: jump to the {previous|next} function name start',
             opts = {},
         },
         extreme = {
-            key = 'gmN',
+            key = 'vmN',
             mode = { 'n', 'x' },
             backward = function()
                 require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@function_declaration_name.inner',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             forward = function()
                 require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@function_declaration_name.inner',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             desc = 'Custom: jump to the {previous|next} function name end',
@@ -2222,36 +2208,36 @@ local myoperations = maputils
     :navigator({
         --visual mode: stays within buffer so visual mode would be useful
         default = {
-            key = 'gt',
+            key = 'vc',
             mode = { 'n', 'x' },
             backward = function()
                 require('nvim-treesitter-textobjects.move').goto_previous_start(
                     '@cast.outer',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             forward = function()
                 require('nvim-treesitter-textobjects.move').goto_next_start(
                     '@cast.outer',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             desc = 'Custom: jump to the {previous|next} type cast start',
             opts = {},
         },
         extreme = {
-            key = 'gT',
+            key = 'vC',
             mode = { 'n', 'x' },
             backward = function()
                 require('nvim-treesitter-textobjects.move').goto_previous_end(
                     '@cast.outer',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             forward = function()
                 require('nvim-treesitter-textobjects.move').goto_next_end(
                     '@cast.outer',
-                    config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+                    'textobjects'
                 )
             end,
             desc = 'Custom: jump to the {previous|next} type cast end',
@@ -2891,7 +2877,7 @@ vim.keymap.set(
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@cast.outer',
-            config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+            'textobjects'
         )
     end,
     {
@@ -2906,7 +2892,7 @@ vim.keymap.set(
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@cast.inner',
-            config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP
+            'textobjects'
         )
     end,
     {

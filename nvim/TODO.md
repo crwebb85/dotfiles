@@ -26,9 +26,13 @@
 - there are bugs in comment.nvim for detecting the current injected
   treesitter context powershell in markdown codeblock doesn't work. Also
   issue https://github.com/numToStr/Comment.nvim/issues/511
+- make treesitter selection keymaps use same namespaces as treesitter navigation keymaps
 
 ### Bugs
 
+- goto_previous_end and goto_next_end are not working. They are taking me to the start
+  `require('nvim-treesitter-textobjects.move').goto_previous_end( '@cast.outer', 'textobjects')` and
+  `require('nvim-treesitter-textobjects.move').goto_next_end( '@cast.outer', 'textobjects')`
 - when in wezterm and I open my `nvim ./` from my .config directory then new wezterm tab the cwd will be .config/nvim instead of .config
 - 'gC' keymap doesn't invert correctly when comments have nested comments
 - fix my_on_output_quickfix.lua file as invalid characters added are added to

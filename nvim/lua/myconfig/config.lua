@@ -10,9 +10,6 @@ local M = {
     ---@type uinteger
     bigfile_filesize = 2, --MB
 
-    ---@type string
-    MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP = 'mycustomtextobjects',
-
     ---@type boolean
     enable_render_markdown = true,
     -- enable_render_markdown = false,

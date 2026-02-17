@@ -1161,9 +1161,24 @@ require('lazy').setup({
                     group = 'Next git hunk mappings',
                 },
                 {
+                    '[H',
+                    mode = { 'x', 'n' },
+                    group = 'Prev git hunk extreme mappings',
+                },
+                {
+                    ']H',
+                    mode = { 'x', 'n' },
+                    group = 'Next git hunk extreme mappings',
+                },
+                {
                     '[d',
                     mode = { 'x', 'n' },
                     group = 'Prev diagnostics mappings',
+                },
+                {
+                    ']d',
+                    mode = { 'x', 'n' },
+                    group = 'Next diagnostics mappings',
                 },
                 {
                     '[D',
@@ -1174,6 +1189,72 @@ require('lazy').setup({
                     ']D',
                     mode = { 'x', 'n' },
                     group = 'Next diagnostics extreme mappings',
+                },
+
+                {
+                    '[g',
+                    mode = { 'x', 'n' },
+                    group = 'Prev lsp/comment navigation mappings',
+                },
+                {
+                    ']g',
+                    mode = { 'x', 'n' },
+                    group = 'Next lsp/comment navigation mappings',
+                },
+                {
+                    '[gr',
+                    mode = { 'x', 'n' },
+                    group = 'Prev lsp reference navigation mappings',
+                },
+                {
+                    ']gr',
+                    mode = { 'x', 'n' },
+                    group = 'Next lsp reference navigation mappings',
+                },
+
+                {
+                    '[v',
+                    mode = { 'x', 'n' },
+                    group = 'Prev misc mappings (parameters, tests, function names, casts)',
+                },
+                {
+                    ']v',
+                    mode = { 'x', 'n' },
+                    group = 'Next misc mappings (parameters, tests, function names, casts)',
+                },
+                {
+                    '[vm',
+                    mode = { 'x', 'n' },
+                    group = 'Prev function name mappings',
+                },
+                {
+                    ']vm',
+                    mode = { 'x', 'n' },
+                    group = 'Next function name mappings',
+                },
+
+                {
+                    '[vt',
+                    mode = { 'x', 'n' },
+                    group = 'Prev  tests mappings',
+                },
+                {
+                    ']vt',
+                    mode = { 'x', 'n' },
+                    group = 'Next tests mappings',
+                },
+
+                {
+                    --TODO clean these up so that they work for all my navigation mappings
+                    ']w',
+                    mode = { 'x', 'n' },
+                    group = 'Multicursor navigation',
+                },
+                {
+                    --TODO clean these up so that they work for all my navigation mappings
+                    '[w',
+                    mode = { 'x', 'n' },
+                    group = 'Multicursor navigation',
                 },
                 {
                     '<leader>x',
@@ -1642,69 +1723,6 @@ require('lazy').setup({
                     ensure_installed
                 )
             end
-
-            local custom_csharp_queries = [[
-                (cast_expression
-                  (
-                    "(" @cast.outer
-                    .
-                    type: (_)  @cast.inner
-                    .
-                    ")" @cast.outer 
-                  ) 
-                )
-
-                (method_declaration
-                    name: (_) @function_declaration_name.inner)
-
-                (constructor_declaration
-                    name: (_) @function_declaration_name.inner)
-            ]]
-            local custom_lua_queries = [[
-              ; function M.is_dict() ... end
-                  (function_declaration
-                    name: (dot_index_expression
-                      field: (_) @function_declaration_name.inner
-                    )
-                  )
-
-              ;local is_dict = function() ... end
-              local_declaration: (variable_declaration
-                (assignment_statement
-                  (variable_list
-                    name: (identifier) @function_declaration_name.inner )
-                  (expression_list
-                    value: (function_definition))
-                )
-              )
-
-              ; M.is_dict = function() ... end
-              (assignment_statement
-                (variable_list
-                  name: (dot_index_expression
-                      field: (_) @function_declaration_name.inner))
-                (expression_list
-                  value: (function_definition))
-                )
-
-              ; local function is_dict() ... end
-              local_declaration: (function_declaration
-                name: (identifier) @function_declaration_name.inner
-              )
-
-
-            ]]
-            vim.treesitter.query.set(
-                'c_sharp',
-                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
-                custom_csharp_queries
-            )
-
-            vim.treesitter.query.set(
-                'lua',
-                config.MY_CUSTOM_TREESITTER_TEXTOBJECT_GROUP,
-                custom_lua_queries
-            )
         end,
     },
     {
