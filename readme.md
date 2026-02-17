@@ -116,7 +116,11 @@ git pull
 
 # If treesitter.nvim fails to install parsers on some machines, I sometimes edit
 # the curl request so I need to stash it before restoring plugins
-git -C "$env:USERPROFILE\AppData\Local\nvim-data\lazy\nvim-treesitter" stash
+$treesitterPath = "$env:USERPROFILE\AppData\Local\nvim-data\lazy\nvim-treesitter"
+if ($env:XDG_DATA_HOME -ne $null) {
+    $treesitterPath = "$env:XDG_DATA_HOME\nvim-data\lazy\nvim-treesitter"
+}
+git -C "$treesitterPath" stash
 
 # Restore plugins
 nvim --headless "+Lazy! restore" +qa
@@ -134,13 +138,13 @@ nvim --clean -d  $env:XDG_CONFIG_HOME\nvim\lua\myconfig\config.lua $env:XDG_CONF
 
 # If treesitter.nvim fails to install parsers on some machines, I sometimes edit
 # the curl request so I need pop the changes after restoring plugins
-git -C "$env:USERPROFILE\AppData\Local\nvim-data\lazy\nvim-treesitter" stash pop
+git -C "$treesitterPath" stash pop
 
 # update jupytext_venv
-$env:XDG_CONFIG_HOME\cli-tools\jupytext_venv\venv\Scripts\python.exe -m pip install -r "$env:XDG_CONFIG_HOME\cli-tools\jupytext_venv\requirements.txt"
+& $env:XDG_CONFIG_HOME\cli-tools\jupytext_venv\venv\Scripts\python.exe -m pip install -r "$env:XDG_CONFIG_HOME\cli-tools\jupytext_venv\requirements.txt"
 
 # update neovim_remote_plugin_python_venv
-$env:XDG_CONFIG_HOME\cli-tools\neovim_remote_plugin_python_venv\venv\Scripts\python.exe -m pip install -r "$env:XDG_CONFIG_HOME\cli-tools\neovim_remote_plugin_python_venv\requirements.txt"
+& $env:XDG_CONFIG_HOME\cli-tools\neovim_remote_plugin_python_venv\venv\Scripts\python.exe -m pip install -r "$env:XDG_CONFIG_HOME\cli-tools\neovim_remote_plugin_python_venv\requirements.txt"
 
 # update prettier xml packages
 npm --cwd "$env:XDG_CONFIG_HOME\cli-tools\prettier" install
