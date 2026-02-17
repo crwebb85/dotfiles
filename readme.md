@@ -111,6 +111,9 @@ nvim ./ "+DiffviewOpen"
 git add --all
 git commit --message "Backing up changes"
 
+git checkout main
+git pull
+
 # If treesitter.nvim fails to install parsers on some machines, I sometimes edit
 # the curl request so I need to stash it before restoring plugins
 git -C "$env:USERPROFILE\AppData\Local\nvim-data\lazy\nvim-treesitter" stash
