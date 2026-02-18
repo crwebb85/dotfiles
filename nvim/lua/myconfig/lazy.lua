@@ -1141,16 +1141,6 @@ require('lazy').setup({
             -- Note don't forget to update this if I change the mapping namespaces
             wk.add({
                 {
-                    '[gc',
-                    mode = { 'x', 'n' },
-                    group = 'Prev comment mappings',
-                },
-                {
-                    ']gc',
-                    mode = { 'x', 'n' },
-                    group = 'Next comment mappings',
-                },
-                {
                     '[h',
                     mode = { 'x', 'n' },
                     group = 'Prev git hunk mappings',
@@ -1202,6 +1192,36 @@ require('lazy').setup({
                     group = 'Next lsp/comment navigation mappings',
                 },
                 {
+                    '[G',
+                    mode = { 'x', 'n' },
+                    group = 'Prev extreme lsp/comment navigation mappings',
+                },
+                {
+                    ']G',
+                    mode = { 'x', 'n' },
+                    group = 'Next extreme lsp/comment navigation mappings',
+                },
+                {
+                    '[gc',
+                    mode = { 'x', 'n' },
+                    group = 'Prev comment mappings',
+                },
+                {
+                    ']gc',
+                    mode = { 'x', 'n' },
+                    group = 'Next comment mappings',
+                },
+                {
+                    '[Gc',
+                    mode = { 'x', 'n' },
+                    group = 'Prev extreme comment mappings',
+                },
+                {
+                    ']Gc',
+                    mode = { 'x', 'n' },
+                    group = 'Next extreme comment mappings',
+                },
+                {
                     '[gr',
                     mode = { 'x', 'n' },
                     group = 'Prev lsp reference navigation mappings',
@@ -1211,7 +1231,16 @@ require('lazy').setup({
                     mode = { 'x', 'n' },
                     group = 'Next lsp reference navigation mappings',
                 },
-
+                {
+                    '[Gr',
+                    mode = { 'x', 'n' },
+                    group = 'Prev extreme lsp reference navigation mappings',
+                },
+                {
+                    ']Gr',
+                    mode = { 'x', 'n' },
+                    group = 'Next extreme lsp reference navigation mappings',
+                },
                 {
                     '[v',
                     mode = { 'x', 'n' },
@@ -1243,7 +1272,6 @@ require('lazy').setup({
                     mode = { 'x', 'n' },
                     group = 'Next tests mappings',
                 },
-
                 {
                     --TODO clean these up so that they work for all my navigation mappings
                     ']w',
@@ -1257,6 +1285,11 @@ require('lazy').setup({
                     group = 'Multicursor navigation',
                 },
                 {
+                    '<leader>e',
+                    mode = { 'n' },
+                    group = 'Harpoon mappings',
+                },
+                {
                     '<leader>x',
                     mode = { 'n', 'x' },
                     group = 'Debugger mappings',
@@ -1265,6 +1298,26 @@ require('lazy').setup({
                     '<leader>f',
                     mode = { 'n', 'x' },
                     group = 'Telescope mappings',
+                },
+                {
+                    '<leader>fg',
+                    mode = { 'n', 'x' },
+                    group = 'Telescope lsp mappings',
+                },
+                {
+                    '<leader>fgr',
+                    mode = { 'n', 'x' },
+                    group = 'Telescope lsp reference mappings',
+                },
+                {
+                    '<leader>fn',
+                    mode = { 'n', 'x' },
+                    group = 'Telescope notes mappings',
+                },
+                {
+                    '<leader>fz',
+                    mode = { 'n', 'x' },
+                    group = 'Telescope misc mappings (notes, projects, pocs)',
                 },
                 {
                     '<leader>g',
@@ -1278,7 +1331,7 @@ require('lazy').setup({
                 },
                 {
                     '<leader>gl',
-                    mode = { 'n' },
+                    mode = { 'n', 'x' },
                     group = 'Git repo link mappings',
                 },
                 {
@@ -1292,9 +1345,24 @@ require('lazy').setup({
                     group = 'Substitute.nvim',
                 },
                 {
+                    '<leader>o',
+                    mode = { 'n', 'x' },
+                    group = 'Overseer/Oil mappings',
+                },
+                {
+                    '<leader>q',
+                    mode = { 'n', 'x' },
+                    group = 'Quickfix mappings',
+                },
+                {
                     '<leader>t',
                     mode = { 'n' },
                     group = 'Neotest mappings',
+                },
+                {
+                    '<leader>v',
+                    mode = { 'n' },
+                    group = 'Misc mappings (swaps, add lines, treesj) ',
                 },
                 {
                     '<leader>vn',
@@ -1317,11 +1385,6 @@ require('lazy').setup({
                     group = 'Treesj mappings',
                 },
                 {
-                    '<leader>v',
-                    mode = { 'n' },
-                    group = 'Misc mappings',
-                },
-                {
                     '<leader>w',
                     mode = { 'n', 'x' },
                     group = 'Multicursor mappings',
@@ -1330,6 +1393,47 @@ require('lazy').setup({
                     '<leader>i',
                     mode = { 'n', 'x' },
                     group = 'Molten mappings',
+                },
+                {
+                    'a=',
+                    mode = { 'x', 'o' },
+                    group = 'Select assignment parts mappings',
+                },
+                {
+                    'i=',
+                    mode = { 'x', 'o' },
+                    group = 'Select assignment parts mappings',
+                },
+                {
+                    'av',
+                    mode = { 'x', 'o' },
+                    group = 'Select around misc mappings',
+                },
+                {
+                    'iv',
+                    mode = { 'x', 'o' },
+                    group = 'Select around misc mappings',
+                },
+                {
+                    'ag',
+                    mode = { 'x', 'o' },
+                    group = 'Select around misc g mappings (comments, indent)',
+                },
+                {
+                    'ig',
+                    mode = { 'x', 'o' },
+                    group = 'Select around misc mappings (comments, indent)',
+                },
+
+                {
+                    'avg',
+                    mode = { 'x', 'o' },
+                    group = 'Select around misc g mappings (extra comments)',
+                },
+                {
+                    'ivg',
+                    mode = { 'x', 'o' },
+                    group = 'Select around misc mappings (extra comments)',
                 },
             })
         end,

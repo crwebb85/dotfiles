@@ -17,15 +17,6 @@ vim.keymap.set(
     { desc = 'Customized Remap: Remapped to <nop> to disable this keybinging' }
 )
 
-vim.keymap.set(
-    -- { 'n', 'v', 'i' }, --commented because I don't like the delay on insert mode
-    { 'n', 'v' },
-    -- '<C-;>', -- Doesn't work on wezterm
-    '<leader><leader>;',
-    '<ESC><ESC>:',
-    { desc = 'Custom Keymap: Go into command mode' }
-)
-
 ---Finds the start and end index of a substring in another string for a given
 ---known index that is known to be within the matched string.
 ---If a match is not found around the known index then (nil, nil) will be returned
@@ -2591,7 +2582,7 @@ maputils
                     myoperations.repeat_forward_callback()
                 end
             end,
-            desc = 'Custom: Repeat my last {backward|forward} keymap for navigating lists (if extreme was used, will repeat extreme)',
+            desc = 'Custom: Repeat my last normal/extreme {backward|forward} keymap for navigating lists',
             opts = {},
         },
     })
@@ -2619,7 +2610,7 @@ maputils
                     myoperations.repeat_extreme_forward_callback()
                 end
             end,
-            desc = 'Custom: Repeat the extreme of my last "{backward|forward}" command navigating lists (if the last movement was extreme then the none extreme will be repeated)',
+            desc = 'Custom: Repeat the opposite normal/extreme of my last "{backward|forward}"',
             opts = {},
         },
     })
@@ -2629,7 +2620,7 @@ maputils
 
 vim.keymap.set(
     { 'x', 'o' },
-    'a=',
+    'a==',
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@assignment.outer',
@@ -2643,7 +2634,7 @@ vim.keymap.set(
 
 vim.keymap.set(
     { 'x', 'o' },
-    'i=',
+    'i==',
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@assignment.inner',
@@ -2657,7 +2648,7 @@ vim.keymap.set(
 
 vim.keymap.set(
     { 'x', 'o' },
-    'il=',
+    'i=l',
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@assignment.lhs',
@@ -2671,7 +2662,7 @@ vim.keymap.set(
 
 vim.keymap.set(
     { 'x', 'o' },
-    'ir=',
+    'i=r',
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@assignment.rhs',
@@ -2851,29 +2842,9 @@ vim.keymap.set(
     }
 )
 
-vim.keymap.set({ 'x', 'o' }, 'a<leader>c', function()
-    require('nvim-treesitter-textobjects.select').select_textobject(
-        -- I plan to replace this with a smarter version of the keymap
-        '@comment.outer',
-        'textobjects'
-    )
-end, {
-    desc = 'Select outer part of a comment',
-})
-
-vim.keymap.set({ 'x', 'o' }, 'i<leader>c', function()
-    require('nvim-treesitter-textobjects.select').select_textobject(
-        -- I plan to replace this with a smarter version of the keymap
-        '@comment.inner',
-        'textobjects'
-    )
-end, {
-    desc = 'Select inner part of a comment',
-})
-
 vim.keymap.set(
     { 'x', 'o' },
-    'agt',
+    'avc',
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@cast.outer',
@@ -2888,7 +2859,7 @@ vim.keymap.set(
 
 vim.keymap.set(
     { 'x', 'o' },
-    'igt',
+    'ivc',
     function()
         require('nvim-treesitter-textobjects.select').select_textobject(
             '@cast.inner',
@@ -2967,12 +2938,35 @@ vim.keymap.set(
 
 vim.keymap.set(
     { 'o', 'x' },
+    --ugh so I would love all these comment textobjects to have the same
+    --namespaces but I also like being able to do vagcgc to uncomment a group
+    --of comments
     'agc',
     function()
         require('myconfig.utils.mapping').around_comment_lines_textobject()
     end,
     { desc = 'Comment textobject with treesitter fallback' }
 )
+
+vim.keymap.set({ 'x', 'o' }, 'avgc', function()
+    require('nvim-treesitter-textobjects.select').select_textobject(
+        -- I plan to replace this with a smarter version of the keymap
+        '@comment.outer',
+        'textobjects'
+    )
+end, {
+    desc = 'Select outer part of a comment',
+})
+
+vim.keymap.set({ 'x', 'o' }, 'ivgc', function()
+    require('nvim-treesitter-textobjects.select').select_textobject(
+        -- I plan to replace this with a smarter version of the keymap
+        '@comment.inner',
+        'textobjects'
+    )
+end, {
+    desc = 'Select inner part of a comment',
+})
 
 vim.keymap.set(
     { 'o', 'x' },

@@ -225,7 +225,7 @@ function M.setup_lsp_keymaps()
 
     vim.keymap.set(
         'n',
-        '<leader>lr',
+        'grl',
         function() vim.lsp.codelens.run() end,
         { desc = 'LSP: Run Codelens' }
     )
