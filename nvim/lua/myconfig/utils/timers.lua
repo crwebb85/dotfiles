@@ -55,7 +55,7 @@ local M = {}
 
 --- Throttles a function. Automatically `schedule_wrap()`s.
 --- This runs on both edges of a sequence of calls so that you always get
---- immediant feedback on the leading edge but also prevents the last call
+--- immediate feedback on the leading edge but also prevents the last call
 --- in the sequence from getting skipped.
 ---
 ---@param fn function Function to throttle. fn can take any number of arguments

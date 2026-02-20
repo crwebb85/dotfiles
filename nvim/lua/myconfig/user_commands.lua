@@ -1282,28 +1282,14 @@ end, {
 -------------------------------------------------------------------------------
 ---Task runner commands
 
-vim.api.nvim_create_user_command('Make', function(params)
-    -- Insert args at the '$*' in the makeprg
-    local cmd, num_subs = vim.o.makeprg:gsub('%$%*', params.args)
-    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
-    local task = require('overseer').new_task({
-        cmd = vim.fn.expandcmd(cmd),
-        components = {
-            { 'on_output_quickfix', open = not params.bang, open_height = 8 },
-            'default',
-        },
-    })
-    task:start()
-end, {
-    desc = 'Run your makeprg as an Overseer task',
-    nargs = '*',
-    bang = true,
-})
+---@class MakefileTelescopeOptions
+---@field text string
+---@field value string
 
 --- Given a path, open the file, extract all the Makefile keys,
 --  and return them as a list.
 ---@param path string
----@return table options A telescope options list like
+---@return MakefileTelescopeOptions[] options A telescope options list like
 --{ { text: "1 - all", value="all" }, { text: "2 - hello", value="hello" } ...}
 local function get_makefile_options(path)
     local options = {}
@@ -1336,17 +1322,85 @@ local function get_makefile_options(path)
         -- Close the Makefile
         file:close()
     else
-        vim.notify(
-            'Unable to open a Makefile in the current working dir.',
-            vim.log.levels.ERROR,
-            {
-                title = 'Makeit.nvim',
-            }
-        )
+        error('Unable to open a Makefile in the current working dir.')
     end
 
     return options
 end
+
+---@class FetchMakefileThrottledContext
+---@field throttled_update_cache function
+---@field timer uv.uv_timer_t
+---@field cwd string
+---@field telescope_options_cache MakefileTelescopeOptions[]
+---@field makefile_paths string[]
+
+---@type table<string, FetchMakefileThrottledContext>
+local fetch_makefile_throttled_context_lookup = {} --table with key equal to the cwd
+
+---Gets the telescope options for picking runnable makefile commands
+---@param cwd any
+---@return MakefileTelescopeOptions[]
+local function get_makefile_options_throttled(cwd)
+    local ctx = fetch_makefile_throttled_context_lookup[cwd]
+    if ctx == nil then
+        local throttle = require('myconfig.utils.timers').throttle
+        local throttled_function, timer = throttle(function()
+            -- vim.print('updating cache')
+            local inner_ctx = fetch_makefile_throttled_context_lookup[cwd]
+            inner_ctx.makefile_paths =
+                { vim.fs.joinpath(vim.fn.getcwd(), 'Makefile') }
+            local all_command_options = {}
+            for _, makefile_path in ipairs(inner_ctx.makefile_paths) do
+                local command_options = get_makefile_options(makefile_path)
+                -- vim.print(command_options)
+                for _, command_option in ipairs(command_options) do
+                    table.insert(all_command_options, command_option)
+                end
+            end
+            inner_ctx.telescope_options_cache = all_command_options
+        end, 30)
+
+        ctx = {
+            throttled_update_cache = throttled_function,
+            timer = timer,
+            cwd = cwd,
+            telescope_options_cache = {},
+            makefile_paths = {},
+        }
+        fetch_makefile_throttled_context_lookup[cwd] = ctx
+    end
+    ctx.throttled_update_cache()
+    -- vim.print('fetching cache')
+    return ctx.telescope_options_cache
+end
+
+vim.api.nvim_create_user_command('Make', function(params)
+    -- Insert args at the '$*' in the makeprg
+    local cmd, num_subs = vim.o.makeprg:gsub('%$%*', params.args)
+    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    local task = require('overseer').new_task({
+        cmd = vim.fn.expandcmd(cmd),
+        components = {
+            { 'on_output_quickfix', open = not params.bang, open_height = 8 },
+            'default',
+        },
+    })
+    task:start()
+end, {
+    desc = 'Run your makeprg as an Overseer task',
+    nargs = '*',
+    bang = true,
+    complete = make_fuzzy_completion(function()
+        local commands = {}
+        local options = get_makefile_options_throttled(vim.fn.getcwd())
+        -- vim.print(options)
+        for _, option in ipairs(options) do
+            table.insert(commands, option.value)
+        end
+        return commands
+    end),
+})
 
 vim.api.nvim_create_user_command('Makeit', function(_)
     -- dependencies
@@ -1355,8 +1409,23 @@ vim.api.nvim_create_user_command('Makeit', function(_)
     local state = require('telescope.actions.state')
     local pickers = require('telescope.pickers')
     local finders = require('telescope.finders')
-    local options =
-        get_makefile_options(vim.fs.joinpath(vim.fn.getcwd(), 'Makefile'))
+
+    local status, options_or_err = pcall(
+        get_makefile_options,
+        vim.fs.joinpath(vim.fn.getcwd(), 'Makefile')
+    )
+    local options = {}
+    if status then
+        options = options_or_err
+    else
+        vim.notify(
+            'Unable to open a Makefile in the current working dir.',
+            vim.log.levels.ERROR,
+            {
+                title = 'Make',
+            }
+        )
+    end
 
     --- On option selected → Run action depending of the language
     local function on_option_selected(prompt_bufnr)
