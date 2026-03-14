@@ -377,12 +377,8 @@ require('lazy').setup({
             {
                 '<leader>ff',
                 function()
-                    local opts = {}
-                    --
                     local start_pos = vim.fn.getpos('v')
-                    -- vim.print(start_pos)
                     local end_pos = vim.fn.getpos('.')
-                    -- vim.print(end_pos)
                     local text_lines = vim.fn.getregion(start_pos, end_pos)
                     for index, text_line in ipairs(text_lines) do
                         text_lines[index] = vim.fn.trim(text_line)
@@ -427,8 +423,9 @@ require('lazy').setup({
                     -- remove leading slashes and backslashes
                     text = vim.fn.substitute(text, '^[\\/]*', '', '')
 
-                    opts.default_text = text
-                    require('telescope.builtin').find_files(opts)
+                    require('telescope.builtin').find_files({
+                        default_text = text,
+                    })
                 end,
                 desc = 'Telescope: find files (supports line number and col `path:line:col`) ',
                 mode = { 'v' },
