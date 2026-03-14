@@ -923,7 +923,7 @@ end, {
 
 local complete_treesitter_capture = make_fuzzy_completion(function(_, text, _)
     --first argument is the text of the command arg the cursor is on but only includes the text up to the cursor
-    --second argumet is the text up to the cursor
+    --second argument is the text up to the cursor
     --third argument is the index of the cursor
     local words = vim.split(text, '%s+')
     if #words > 2 then
@@ -1261,27 +1261,6 @@ end, {
 -------------------------------------------------------------------------------
 ---Task runner commands
 
-vim.api.nvim_create_user_command('Make', function(params)
-    -- Insert args at the '$*' in the makeprg
-    local cmd, num_subs = vim.o.makeprg:gsub('%$%*', params.args)
-    if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
-    local task = require('overseer').new_task({
-        cmd = vim.fn.expandcmd(cmd),
-        components = {
-            { 'on_output_quickfix', open = not params.bang, open_height = 8 },
-            'default',
-        },
-    })
-    task:start()
-end, {
-    desc = 'Run your makeprg as an Overseer task',
-    nargs = '*',
-    bang = true,
-})
-
--------------------------------------------------------------------------------
----Task runner commands
-
 ---@class MakefileTelescopeOptions
 ---@field text string
 ---@field value string
@@ -1400,6 +1379,7 @@ end, {
         end
         return commands
     end),
+    bar = true,
 })
 
 vim.api.nvim_create_user_command('Makeit', function(_)
