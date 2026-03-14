@@ -22,7 +22,7 @@ vim.api.nvim_create_autocmd('FileType', {
 --- Temporarily highlight text selection that was yanked
 vim.api.nvim_create_autocmd('TextYankPost', {
     group = vim.api.nvim_create_augroup('yank_group', { clear = true }),
-    callback = function() vim.highlight.on_yank() end,
+    callback = function() vim.hl.on_yank() end,
 })
 
 -------------------------------------------------------------------------------
