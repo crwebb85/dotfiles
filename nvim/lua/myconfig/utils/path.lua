@@ -33,6 +33,18 @@ M.ensure_file_exists = function(filepath)
     file:close()
 end
 
+M.is_file_empty = function(filepath)
+    local file, err = io.open(filepath, 'r')
+    if not file then error(err) end
+
+    -- Try reading zero characters, which tests for EOF
+    local content = file:read(0)
+    file:close()
+
+    -- If content is nil, the file is empty or already at EOF
+    return content == nil
+end
+
 ---Creates the given directory if it doesn't exist
 ---from https://github.com/backdround/global-note.nvim/blob/1e0d4bba425d971ed3ce40d182c574a25507115c/lua/global-note/utils.lua#L28C1-L46C4
 ---@param path string
@@ -50,6 +62,13 @@ M.ensure_directory_exists = function(path)
     local status, err = vim.uv.fs_mkdir(path, 493)
 
     if not status then error('Unable to create a directory: ' .. err) end
+end
+
+---Gets the file extension based on the last period in the filename
+---(Does not handle multipart extensions like `.ansible.yaml`)
+function M.get_file_extension(filename)
+    local extension = filename:match('%.([^.]+)$')
+    return extension
 end
 
 ---@param mason_tool_name string

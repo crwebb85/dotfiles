@@ -27,12 +27,51 @@ function M.get_filetype(ipynb_file, format, metadata)
     end
 end
 
--- Absolute path the the default .ipynb file to use as a template "new" files
+-- The template string default .ipynb file to use as a template "new" files
 function M.default_new_template()
-    local script_path = debug.getinfo(1, 'S').source:sub(2)
-    local script_dir = vim.fn.fnamemodify(script_path, ':h')
-    local data_dir = vim.uv.fs_realpath(script_dir .. '/../data')
-    return vim.uv.fs_realpath(vim.fs.joinpath(data_dir, 'template.ipynb'))
+    ---TODO I would like to replace creating the template with something equivalent
+    ---to this bash script from https://gist.github.com/jsta/8da15bcfce967e282bfc891c9289cc8b
+    -- ```bash
+    -- #!/bin/bash
+    -- # Create a new Jupyter notebook from the command line
+    -- #
+    -- # Examples
+    -- # jupyinit env_name py_file.py py_file.ipynb
+    --
+    -- touch $2
+    -- jupytext --set-kernel $1 $2
+    -- jupytext --to notebook --execute $2
+    -- jupytext --set-formats ipynb,py $3
+    -- ```
+
+    local template = [[
+{
+ "cells": [
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+]]
+    return vim.split(template, '\n')
 end
 
 -- Plugin options
@@ -425,12 +464,19 @@ function M.open_notebook(ipynb_file, bufnr)
     if source_file and autosync then M.sync(source_file) end
     local json_lines = {}
     if source_file == nil then
-        json_lines = M.read_file_lines(M.default_new_template())
+        json_lines = M.default_new_template()
     else
         local success, _json_lines = pcall(
             function() return M.read_file_lines(ipynb_file) end
         )
         if success then json_lines = _json_lines end
+        if not success then error(json_lines) end
+        if
+            #json_lines == 0
+            or (json_lines == 1 and json_lines[1]:gsub('%s+', '') == '')
+        then
+            json_lines = M.default_new_template()
+        end
     end
     local metadata = M.get_metadata(json_lines)
     local format = M.opts.format

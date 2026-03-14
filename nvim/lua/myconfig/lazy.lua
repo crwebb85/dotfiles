@@ -1046,7 +1046,83 @@ require('lazy').setup({
                 },
             },
         },
-        config = function(_, opts) require('oil').setup(opts) end,
+        config = function(_, opts)
+            require('oil').setup(opts)
+
+            ---@param actions oil.Action[]
+            ---@return string[]
+            local function get_created_file_paths(actions)
+                ---@type string[]
+                local paths = {}
+                for _, action in ipairs(actions) do
+                    if
+                        action ~= nil
+                        and action.type == 'create'
+                        and action.entry_type == 'file'
+                    then
+                        local scheme, posix_path =
+                            require('oil.util').parse_url(action.url)
+                        if
+                            scheme == 'oil://'
+                            and type(posix_path) == 'string'
+                        then
+                            local path =
+                                require('oil.fs').posix_to_os_path(posix_path)
+
+                            table.insert(paths, path)
+                        end
+                    end
+                end
+                return paths
+            end
+
+            ---Replaces the new file with a skeleton if it matches a known
+            ---filename schema
+            ---@param filepath string
+            local function handle_new_file_skeletons(filepath)
+                if
+                    not require('myconfig.utils.path').is_file_empty(filepath)
+                then
+                    return
+                end
+
+                ---@type string?
+                local template = nil
+
+                --Determine the template to use
+                local extension =
+                    require('myconfig.utils.path').get_file_extension(filepath)
+                if extension == 'ipynb' then
+                    template = vim.fn.join(
+                        require('myconfig.notebook.jupytext').default_new_template(),
+                        '\n'
+                    )
+                end
+
+                --Write the template to the file
+                if template ~= nil then
+                    -- replace file with skeleton
+                    vim.print(filepath)
+                    local file, err = io.open(filepath, 'w')
+                    if not file then error(err) end
+                    file:write(template)
+                    file:close()
+                end
+            end
+
+            vim.api.nvim_create_autocmd('User', {
+                pattern = 'OilActionsPost',
+                callback = function(event)
+                    local paths = get_created_file_paths(event.data.actions)
+                    for _, path in ipairs(paths) do
+                        local ok, err = pcall(handle_new_file_skeletons, path)
+                        if not ok and err ~= nil then
+                            vim.schedule(function() error(err) end)
+                        end
+                    end
+                end,
+            })
+        end,
     },
 
     ---------------------------------------------------------------------------
