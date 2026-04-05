@@ -135,6 +135,7 @@ vim.filetype.add({
     extension = {
         json = 'jsonc', -- This ensures that I can comment lines in json configuration files even if the extension is .json
         cls = 'apex', -- Detect salesforce apex files
+        http = 'http', -- detect http files
     },
 })
 

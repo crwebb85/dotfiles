@@ -15,13 +15,7 @@ local a = require('nvim-treesitter.async')
 local function get_parser_install_info(lang)
     local parser_config = parsers[lang]
 
-    if not parser_config then
-        vim.notify(
-            string.format('Parser not available for language "%s"', lang),
-            vim.log.levels.ERROR
-        )
-        return
-    end
+    if not parser_config then return end
 
     return parser_config.install_info
 end
@@ -56,10 +50,17 @@ local function needs_update(lang)
 
     -- No revision. Check the queries link to the same place
 
-    local queries = vim.fs.joinpath(config.get_install_dir('queries'), lang)
-    local queries_src = install.get_package_path('runtime', 'queries', lang)
+    local queries_path = vim.uv.fs_realpath(
+        vim.fs.joinpath(config.get_install_dir('queries'), lang)
+    )
+    local queries_nvim_treesitter_path =
+        vim.uv.fs_realpath(install.get_package_path('runtime', 'queries', lang))
 
-    return vim.uv.fs_realpath(queries) ~= vim.uv.fs_realpath(queries_src)
+    --I think by checking if queries_nvim_treesitter_path is nil I can avoid the
+    --situation where non-nvimtreesitter parsers like kulala_http prompt me to
+    --update them
+    return queries_nvim_treesitter_path ~= nil
+        and queries_path ~= queries_nvim_treesitter_path
 end
 
 local function get_installed()

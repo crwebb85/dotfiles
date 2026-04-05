@@ -92,6 +92,28 @@ require('lazy').setup({
             vim.cmd.colorscheme(color)
         end,
     },
+    ---------------------------------------------------------------------------
+    ---
+
+    {
+        'mistweaverco/kulala.nvim',
+        keys = {
+            { '<leader>Rs', desc = 'Send request' },
+            { '<leader>Ra', desc = 'Send all requests' },
+            { '<leader>Rb', desc = 'Open scratchpad' },
+        },
+        ft = { 'http', 'rest' },
+        opts = {
+            global_keymaps = true,
+            global_keymaps_prefix = '<leader>R',
+            kulala_keymaps_prefix = '',
+            contenttypes = {
+                --- Adding this content type makes json error responses get formatted correctly
+                --- Note: using `%+` instead of `+` because of issue https://github.com/mistweaverco/kulala.nvim/issues/837
+                ['application/problem%+json'] = 'application/json',
+            },
+        },
+    },
 
     ---------------------------------------------------------------------------
     -- Git integration
