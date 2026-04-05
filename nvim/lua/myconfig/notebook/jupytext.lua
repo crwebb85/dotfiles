@@ -216,6 +216,15 @@ M.setup = function()
                 args = { 'BufReadPost', ipynb_file },
                 mods = { emsg_silent = true },
             })
+
+            vim.notify('Loaded via jupytext', vim.log.levels.INFO)
+
+            vim.notify('Activating quarto...', vim.log.levels.INFO)
+            require('quarto').activate()
+            vim.notify('Activated quarto', vim.log.levels.INFO)
+
+            vim.notify('Init molten', vim.log.levels.INFO)
+            vim.cmd('MoltenInit project_name')
         end,
     })
 

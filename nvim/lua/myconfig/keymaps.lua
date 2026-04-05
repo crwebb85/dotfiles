@@ -2910,6 +2910,18 @@ end, {
     desc = 'TS: swap object property with previous',
 })
 
+vim.keymap.set('n', '<leader>vnb', function()
+    require('nvim-treesitter-textobjects.swap').swap_next('@block.outer') -- swap object property with next
+end, {
+    desc = 'TS: swap block with next (codeblock in markdown)',
+})
+
+vim.keymap.set('n', '<leader>vpb', function()
+    require('nvim-treesitter-textobjects.swap').swap_previous('@block.outer') -- swap object property with next
+end, {
+    desc = 'TS: swap block with previous (codeblock in markdown)',
+})
+
 vim.keymap.set('n', '<leader>vnm', function()
     require('nvim-treesitter-textobjects.swap').swap_next('@function.outer') -- swap function with next
 end, {

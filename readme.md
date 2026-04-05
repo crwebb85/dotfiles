@@ -44,6 +44,7 @@
 - [hurl](https://github.com/Orange-OpenSource/hurl)
 - [make](https://www.gnu.org/software/make/#download) used to run project makefiles
   (can also be installed with `choco install make`
+- [pandoc](https://pandoc.org/installing.html)
 - [chafa](https://github.com/hpjansson/chafa) converts images to ascii. Used by
   my telescope.nvim picker to preview images. (can also be installed with
   `winget install hpjansson.Chafa`
@@ -78,6 +79,7 @@
   - `Path=%USERPROFILE%\Documents\tools\chafa` for [chafa](https://github.com/hpjansson/chafa)
   - `Path=%USERPROFILE%\Documents\tools\clang` for [clang](https://clang.llvm.org/)
   - `Path=%USERPROFILE%\Documents\tools\zig` for [zig version 0.15.2](https://ziglang.org/download/)
+  - `Path=%USERPROFILE%\Documents\tools\pandoc` for [pandoc](https://pandoc.org/installing.html)
 - User Variables that should be added by installers
   - `Path=%USERPROFILE%\.cargo\bin` for tools installed by [rust's cargo](https://rust-lang.org/tools/install/)
   - `Path=%USERPROFILE%\AppData\Local\Programs\Python\Launcher\` for [py python version manager](https://www.python.org/downloads/)
