@@ -1632,13 +1632,25 @@ local myoperations = maputils
             backward = function()
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom: Jump to the {previous|next} diagnostic',
@@ -1651,14 +1663,26 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -math.huge,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = math.huge,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom: Jump to the {first|last} diagnostic',
@@ -1674,14 +1698,26 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.HINT,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.HINT,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic hint',
@@ -1695,7 +1731,13 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.HINT,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
@@ -1703,7 +1745,13 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.HINT,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic hint',
@@ -1719,14 +1767,26 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.ERROR,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.ERROR,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic error',
@@ -1740,7 +1800,13 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.ERROR,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
@@ -1748,7 +1814,13 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.ERROR,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic error',
@@ -1764,14 +1836,26 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.INFO,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.INFO,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic info',
@@ -1785,7 +1869,13 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.INFO,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
@@ -1793,7 +1883,13 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.INFO,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic info',
@@ -1809,14 +1905,26 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.WARN,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.WARN,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom: jump to the {previous|next} diagnostic warn',
@@ -1830,7 +1938,13 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.WARN,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             forward = function()
@@ -1838,7 +1952,13 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.WARN,
                     wrap = false,
-                    float = true,
+                    on_jump = function(diagnostic, bufnr)
+                        vim.diagnostic.open_float({
+                            bufnr = bufnr,
+                            namespace = diagnostic.namespace,
+                            scope = 'cursor',
+                        })
+                    end,
                 })
             end,
             desc = 'Custom Remap: jump to the {first|last} diagnostic warning',
