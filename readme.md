@@ -5,6 +5,8 @@
   powershell 7 on Windows. Download the SDK if developing dotnet applications.
   Download the `Hosting Bundle` runtime as well if developing/running dotnet
   applications in IIS.
+  Also may need to install the latest LTS version as I found that csharp-language-server wouldn't
+  install via nuget until I installed .NET10 SDK which is the current latest LTS version
 - [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.5)
   (Windows only) Install with `dotnet tool install --global PowerShell`
 - [neovim](https://github.com/neovim/neovim) my editor. Use nightly release.

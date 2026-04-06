@@ -102,6 +102,17 @@ function M.get_mason_tool_path(mason_tool_name)
     return executable_path
 end
 
+---@return string basepath of mason data
+function M.get_mason_base_path()
+    local data_path = vim.fn.stdpath('data')
+    if data_path == nil then
+        error('data path was nil but a string was expected')
+    elseif type(data_path) == 'table' then
+        error('data path was an array but a string was expected')
+    end
+    return vim.fs.joinpath(data_path, 'mason')
+end
+
 function M.is_directory(path)
     local stat = vim.uv.fs_stat(path)
     return stat and stat.type == 'directory'

@@ -2922,7 +2922,8 @@ require('lazy').setup({
                 ['typescript-language-server'] = 'ts_ls', -- tsserver LSP (keywords: typescript, javascript)
                 ['eslint-lsp'] = 'eslint', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
                 ['ansible-language-server'] = 'ansiblels',
-                ['omnisharp'] = 'omnisharp', -- C#
+                -- ['omnisharp'] = 'omnisharp', -- C#
+                ['csharp-language-server'] = 'csharp_ls', -- C#
                 ['gopls'] = 'gopls', -- go lang
                 ['rust-analyzer'] = 'rust_analyzer',
                 ['yaml-language-server'] = 'yamlls', -- (yamlls) (keywords: yaml)
