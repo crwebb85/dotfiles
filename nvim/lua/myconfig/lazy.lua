@@ -687,19 +687,40 @@ require('lazy').setup({
             },
             pickers = {
                 find_files = {
-                    find_command = {
-                        'rg',
-                        '--files',
-                        '--hidden',
-                        '--glob',
-                        '!.git',
-                        '--glob',
-                        '!node_modules',
-                        '--glob',
-                        '!venv',
-                        '--glob',
-                        '!.venv',
-                    },
+                    find_command = function(_)
+                        local cwd = vim.fn.getcwd()
+                        if string.find(cwd, '.gitworktrees') then
+                            return {
+                                'rg',
+                                '--files',
+                                '--hidden',
+                                '--glob',
+                                '!.git',
+                                '--glob',
+                                '!node_modules',
+                                '--glob',
+                                '!venv',
+                                '--glob',
+                                '!.venv',
+                            }
+                        end
+
+                        return {
+                            'rg',
+                            '--files',
+                            '--hidden',
+                            '--glob',
+                            '!.git',
+                            '--glob',
+                            '!node_modules',
+                            '--glob',
+                            '!venv',
+                            '--glob',
+                            '!.venv',
+                            '--glob',
+                            '!.gitworktrees',
+                        }
+                    end,
                 },
             },
         },
