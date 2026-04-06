@@ -1635,8 +1635,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1647,8 +1648,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1666,8 +1668,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1679,8 +1682,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1701,8 +1705,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1714,8 +1719,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1734,8 +1740,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1748,8 +1755,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1770,8 +1778,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1783,8 +1792,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1803,8 +1813,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1817,8 +1828,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1839,8 +1851,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1852,8 +1865,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1872,8 +1886,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1886,8 +1901,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1908,8 +1924,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1921,8 +1938,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1941,8 +1959,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })
@@ -1955,8 +1974,9 @@ local myoperations = maputils
                     on_jump = function(diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
-                            namespace = diagnostic.namespace,
+                            -- namespace = diagnostic.namespace,
                             scope = 'cursor',
+                            focus = false, -- Prevent closing the float if already open
                         })
                     end,
                 })

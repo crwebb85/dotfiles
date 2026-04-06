@@ -298,38 +298,6 @@ function M.joinpath(...)
 end
 
 -------------------------------------------------------------------------------
----vim.diagnostic.open_float fix open_float bug that makes it where the second call
----to open float closes the previous float without opening a new one when used in
----vim.diagnostic.jump (weirdly this bug does not seem to happen if you directly call
----open float one after another which is why I have the do the nvim_win_close)
-
-local old_open_float = vim.diagnostic.open_float
---- Show diagnostics in a floating window.
----
----@param opts vim.diagnostic.Opts.Float?
----@return integer? float_bufnr
----@return integer? winid
-function M.open_float(opts, ...)
-    local diagnostic_float_bufnr, diagnotstic_float_winnr =
-        old_open_float(opts, ...)
-
-    if
-        diagnostic_float_bufnr ~= nil
-        and vim.api.nvim_buf_is_valid(diagnostic_float_bufnr)
-        and diagnotstic_float_winnr ~= nil
-        and vim.api.nvim_win_is_valid(diagnotstic_float_winnr)
-    then
-        vim.api.nvim_win_close(diagnotstic_float_winnr, false)
-    end
-    local second_diagnostic_float_bufnr, second_diagnotstic_float_winnr =
-        old_open_float(opts, ...)
-    if diagnotstic_float_winnr == second_diagnotstic_float_winnr then
-        return old_open_float(opts, ...)
-    end
-    return second_diagnostic_float_bufnr, second_diagnotstic_float_winnr
-end
-
--------------------------------------------------------------------------------
 ---Override functions
 vim.ui.select = M.get_select_function()
 
@@ -341,7 +309,6 @@ vim.ui.open = M.open
 
 vim.fs.joinpath = M.joinpath
 vim.fs.root = M.fs_root
-vim.diagnostic.open_float = M.open_float
 
 -------------------------------------------------------------------------------
 ---Override autocmds
