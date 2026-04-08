@@ -725,6 +725,229 @@ require('lazy').setup({
             },
         },
         config = function(_, opts)
+            local action_state = require('telescope.actions.state')
+            local action_set = require('telescope.actions.set')
+            local utils = require('telescope.utils')
+            local log = require('telescope.log')
+
+            local map = {
+                drop = 'drop',
+                ['tab drop'] = 'tab drop',
+                edit = 'buffer',
+                new = 'sbuffer',
+                vnew = 'vert sbuffer',
+                ['leftabove new'] = 'leftabove sbuffer',
+                ['leftabove vnew'] = 'leftabove vert sbuffer',
+                ['rightbelow new'] = 'rightbelow sbuffer',
+                ['rightbelow vnew'] = 'rightbelow vert sbuffer',
+                ['topleft new'] = 'topleft sbuffer',
+                ['topleft vnew'] = 'topleft vert sbuffer',
+                ['botright new'] = 'botright sbuffer',
+                ['botright vnew'] = 'botright vert sbuffer',
+                tabedit = 'tab sb',
+            }
+
+            local edit_buffer = function(command, bufnr)
+                local buf_command = map[command]
+                if buf_command == nil then
+                    local valid_commands = vim.tbl_map(
+                        function(cmd) return string.format('%q', cmd) end,
+                        vim.tbl_keys(map)
+                    )
+                    table.sort(valid_commands)
+                    error(
+                        string.format(
+                            'There was no associated buffer command for %q.\nValid commands are: %s.',
+                            command,
+                            table.concat(valid_commands, ', ')
+                        )
+                    )
+                end
+                if buf_command ~= 'drop' and buf_command ~= 'tab drop' then
+                    vim.cmd(string.format('%s %d', buf_command, bufnr))
+                else
+                    vim.cmd(
+                        string.format(
+                            '%s %s',
+                            buf_command,
+                            vim.fn.fnameescape(vim.api.nvim_buf_get_name(bufnr))
+                        )
+                    )
+                end
+            end
+
+            --- Edit a file based on the current selection.
+            --- From: https://github.com/nvim-telescope/telescope.nvim/blob/7ef4d6dccb78ee71e552bbd866176762ad328afa/lua/telescope/actions/set.lua#L127
+            ---@param prompt_bufnr number: The prompt bufnr
+            ---@param command string: The command to use to open the file.
+            --      Valid commands are:
+            --      - "edit"
+            --      - "new"
+            --      - "vedit"
+            --      - "tabedit"
+            --      - "drop"
+            --      - "tab drop"
+            --      - "leftabove new"
+            --      - "leftabove vnew"
+            --      - "rightbelow new"
+            --      - "rightbelow vnew"
+            --      - "topleft new"
+            --      - "topleft vnew"
+            --      - "botright new"
+            --      - "botright vnew"
+            local my_edit_override = function(prompt_bufnr, command)
+                -- vim.print('my edit')
+                local entry = action_state.get_selected_entry()
+
+                if not entry then
+                    utils.notify('actions.set.edit', {
+                        msg = 'Nothing currently selected',
+                        level = 'WARN',
+                    })
+                    return
+                end
+
+                local filename, row, col
+
+                if entry.path or entry.filename then
+                    filename = entry.path or entry.filename
+
+                    -- TODO: Check for off-by-one
+                    row = entry.row or entry.lnum
+                    col = entry.col
+                elseif not entry.bufnr then
+                    -- TODO: Might want to remove this and force people
+                    -- to put stuff into `filename`
+                    local value = entry.value
+                    if not value then
+                        utils.notify('actions.set.edit', {
+                            msg = 'Could not do anything with blank line...',
+                            level = 'WARN',
+                        })
+                        return
+                    end
+
+                    if type(value) == 'table' then value = entry.display end
+
+                    local sections = vim.split(value, ':')
+
+                    filename = sections[1]
+                    row = tonumber(sections[2])
+                    col = tonumber(sections[3])
+                end
+
+                local entry_bufnr = entry.bufnr
+
+                local picker = action_state.get_current_picker(prompt_bufnr)
+                require('telescope.pickers').on_close_prompt(prompt_bufnr)
+                pcall(vim.api.nvim_set_current_win, picker.original_win_id)
+                local win_id = picker.get_selection_window(picker, entry)
+
+                if picker.push_cursor_on_edit then vim.cmd("normal! m'") end
+
+                if picker.push_tagstack_on_edit then
+                    local from = {
+                        vim.fn.bufnr('%'),
+                        vim.fn.line('.'),
+                        vim.fn.col('.'),
+                        0,
+                    }
+                    local items =
+                        { { tagname = vim.fn.expand('<cword>'), from = from } }
+                    vim.fn.settagstack(
+                        vim.fn.win_getid(),
+                        { items = items },
+                        't'
+                    )
+                end
+
+                if win_id ~= 0 and vim.api.nvim_get_current_win() ~= win_id then
+                    vim.api.nvim_set_current_win(win_id)
+                end
+
+                if entry_bufnr then
+                    if not vim.bo[entry_bufnr].buflisted then
+                        vim.bo[entry_bufnr].buflisted = true
+                    end
+                    edit_buffer(command, entry_bufnr)
+                else
+                    -- check if we didn't pick a different buffer
+                    -- prevents restarting lsp server
+                    if
+                        vim.api.nvim_buf_get_name(0) ~= filename
+                        or command ~= 'edit'
+                    then
+                        -- vim.print(filename)
+                        local current_cwd =
+                            vim.fs.normalize(assert(vim.uv.cwd()))
+                        local root = entry.cwd and vim.fs.normalize(entry.cwd)
+                            or nil
+                        if root == nil then root = current_cwd end
+                        root = vim.fs.normalize(root)
+
+                        -- vim.print(string.format('root: %s', root))
+                        filename = vim.fs.normalize(filename)
+
+                        --Note: This relative path nonsense might not be needed
+                        local relname = vim.fs.relpath(root, filename)
+                        if relname ~= nil then
+                            filename =
+                                vim.fs.normalize(vim.fs.joinpath(root, relname))
+                        end
+
+                        -- vim.print(string.format('filename: %s', filename))
+                        -- vim.print(command)
+
+                        --Note: since the command is normally 'edit' we need to
+                        --use an normalized absolute path so that the file name
+                        --will be a normalized path
+                        pcall(
+                            vim.cmd,
+                            string.format(
+                                '%s %s',
+                                command,
+                                vim.fn.fnameescape(filename)
+                            )
+                        )
+                    end
+                end
+
+                -- HACK: fixes folding: https://github.com/nvim-telescope/telescope.nvim/issues/699
+                if vim.wo[0][0].foldmethod == 'expr' then
+                    vim.schedule(
+                        function() vim.wo[0][0].foldmethod = 'expr' end
+                    )
+                end
+
+                local pos = vim.api.nvim_win_get_cursor(0)
+                if col == nil then
+                    if row == pos[1] then
+                        col = pos[2] + 1
+                    elseif row == nil then
+                        row, col = pos[1], pos[2] + 1
+                    else
+                        col = 1
+                    end
+                end
+
+                if row and col then
+                    if vim.api.nvim_buf_get_name(0) == filename then
+                        vim.cmd([[normal! m']])
+                    end
+                    local ok, err_msg =
+                        pcall(vim.api.nvim_win_set_cursor, 0, { row, col })
+                    if not ok then
+                        log.debug(
+                            'Failed to move to cursor:',
+                            err_msg,
+                            row,
+                            col
+                        )
+                    end
+                end
+            end
+
+            action_set.edit = my_edit_override
             require('telescope').setup(opts)
             require('telescope').load_extension('media_files')
             require('telescope').load_extension('skeleton')
@@ -932,8 +1155,42 @@ require('lazy').setup({
                     buffer = bufnr,
                 })
             end
+
+            ---@param config HarpoonPartialConfigItem
+            ---@param name? any
+            ---@return HarpoonListItem
+            local function my_create_list_item(config, name)
+                name = name
+                    --TODO maybe we should only normalize the file name if it is actually
+                    --a filename
+                    or vim.fs.normalize(
+                        vim.api.nvim_buf_get_name(
+                            vim.api.nvim_get_current_buf()
+                        )
+                    )
+
+                --Make the path relative to the root dir if it is in the root dir
+                name = vim.fs.relpath(
+                    vim.fs.normalize(config.get_root_dir()),
+                    name
+                ) or name
+
+                local bufnr = vim.fn.bufnr(name, false)
+
+                local pos = { 1, 0 }
+                if bufnr ~= -1 then pos = vim.api.nvim_win_get_cursor(0) end
+
+                return {
+                    value = name,
+                    context = {
+                        row = pos[1],
+                        col = pos[2],
+                    },
+                }
+            end
             opts.default = {
                 select = my_select,
+                create_list_item = my_create_list_item,
             }
             harpoon:setup(opts)
         end,

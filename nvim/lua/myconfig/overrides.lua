@@ -297,6 +297,15 @@ function M.joinpath(...)
     return (path:gsub('\\', '/'))
 end
 
+local old_bufadd = vim.fn.bufadd
+
+--- @param name string
+--- @return integer
+function M.bufadd(name)
+    if name == '' or not vim.uv.fs_stat(name) then return old_bufadd(name) end
+    return old_bufadd(vim.fs.normalize(name))
+end
+
 -------------------------------------------------------------------------------
 ---Override functions
 vim.ui.select = M.get_select_function()
@@ -309,6 +318,7 @@ vim.ui.open = M.open
 
 vim.fs.joinpath = M.joinpath
 vim.fs.root = M.fs_root
+vim.fn.bufadd = M.bufadd
 
 -------------------------------------------------------------------------------
 ---Override autocmds

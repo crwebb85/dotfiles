@@ -661,3 +661,49 @@ vim.api.nvim_create_autocmd({ 'WinNew' }, {
         end)
     end,
 })
+
+-------------------------------------------------------------------------------
+---detect unnormalize buffer names
+---
+local detect_unnormalized_buffer_names_group =
+    vim.api.nvim_create_augroup('my_detect_unnormalized_buffer_names_group', {})
+vim.api.nvim_create_autocmd({ 'BufAdd' }, {
+    group = detect_unnormalized_buffer_names_group,
+    callback = function(event)
+        local bufnr = event.buf
+        if vim.bo[bufnr].buftype ~= '' then return end
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        if name == nil or name == '' or not vim.uv.fs_stat(name) then return end
+
+        local firstByte = string.byte(name, 1)
+        -- if byte >= 65 and byte <= 90 then
+        if firstByte >= 97 and firstByte <= 122 then
+            --'First letter is an ASCII lowercase letter'
+            vim.schedule(
+                function()
+                    vim.notify(
+                        string.format(
+                            'Buffer %s has an unnormalized name of %s',
+                            bufnr,
+                            name
+                        ),
+                        vim.log.levels.WARN
+                    )
+                end
+            )
+        elseif string.find(name, '\\', 1, true) then
+            vim.schedule(
+                function()
+                    vim.notify(
+                        string.format(
+                            'Buffer %s has an unnormalized name of %s',
+                            bufnr,
+                            name
+                        ),
+                        vim.log.levels.WARN
+                    )
+                end
+            )
+        end
+    end,
+})

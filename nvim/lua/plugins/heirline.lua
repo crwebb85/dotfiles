@@ -747,15 +747,25 @@ local config = function()
 
     local FileName = {
         provider = function(self)
-            --TODO temporarily going to display the exact filename
-            --to help debug my fixes to oil.nvim
-            -- local filename = vim.fn.fnamemodify(self.filename, ':~:.')
-            -- if filename == '' then return '' end
-            -- if not conditions.width_percent_below(#filename, 1) then
-            --     filename = vim.fn.pathshorten(filename)
-            -- end
-            -- return filename
-            return self.filename
+            ---Display full name if filename is not normalized
+            local name = vim.api.nvim_buf_get_name(0)
+            if name ~= nil and name ~= '' and vim.uv.fs_stat(name) then
+                local firstByte = string.byte(name, 1)
+                if firstByte >= 97 and firstByte <= 122 then
+                    --'First letter is an ASCII lowercase letter'
+                    return name
+                elseif string.find(name, '\\', 1, true) then
+                    return name
+                end
+            end
+
+            --Format name to fit
+            local filename = vim.fn.fnamemodify(self.filename, ':~:.')
+            if filename == '' then return '' end
+            if not conditions.width_percent_below(#filename, 1) then
+                filename = vim.fn.pathshorten(filename)
+            end
+            return filename
         end,
         hl = { fg = filename_foreground_color, bold = true },
     }
