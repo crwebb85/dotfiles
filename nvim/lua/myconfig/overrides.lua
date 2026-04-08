@@ -303,7 +303,7 @@ local old_bufadd = vim.fn.bufadd
 --- @return integer
 function M.bufadd(name)
     if name == '' or not vim.uv.fs_stat(name) then return old_bufadd(name) end
-    return old_bufadd(vim.fs.normalize(name))
+    return old_bufadd(vim.fs.abspath(vim.fs.normalize(name)))
 end
 
 -------------------------------------------------------------------------------

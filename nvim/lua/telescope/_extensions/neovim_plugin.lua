@@ -53,19 +53,15 @@ return require('telescope').register_extension({
                     prompt_title = 'Plugin Directories',
                     finder = require('telescope.finders').new_table({
                         results = plugin_paths,
+                        entry_maker = function(path)
+                            return {
+                                display = path,
+                                ordinal = path,
+                                filename = path,
+                            }
+                        end,
                     }),
                     sorter = conf.generic_sorter({}),
-                    attach_mappings = function(buffer_number)
-                        local actions = require('telescope.actions')
-                        local action_state = require('telescope.actions.state')
-                        actions.select_default:replace(function()
-                            actions.close(buffer_number)
-                            vim.cmd(
-                                'e ' .. action_state.get_selected_entry()[1]
-                            )
-                        end)
-                        return true
-                    end,
                 })
                 :find()
         end,

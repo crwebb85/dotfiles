@@ -877,7 +877,6 @@ require('lazy').setup({
                         vim.api.nvim_buf_get_name(0) ~= filename
                         or command ~= 'edit'
                     then
-                        -- vim.print(filename)
                         local current_cwd =
                             vim.fs.normalize(assert(vim.uv.cwd()))
                         local root = entry.cwd and vim.fs.normalize(entry.cwd)
@@ -895,11 +894,8 @@ require('lazy').setup({
                                 vim.fs.normalize(vim.fs.joinpath(root, relname))
                         end
 
-                        -- vim.print(string.format('filename: %s', filename))
-                        -- vim.print(command)
-
                         --Note: since the command is normally 'edit' we need to
-                        --use an normalized absolute path so that the file name
+                        --use a normalized absolute path so that the file name
                         --will be a normalized path
                         pcall(
                             vim.cmd,

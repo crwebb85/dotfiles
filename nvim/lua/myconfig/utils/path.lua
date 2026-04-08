@@ -123,6 +123,8 @@ function M.is_file(path)
     return stat and stat.type == 'file'
 end
 
+---list of project paths
+---@return string[] project_paths
 function M.get_project_paths()
     ---@type string[]
     local project_search_paths = {} -- The folders called projects not the actual project folders
