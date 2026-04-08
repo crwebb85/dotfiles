@@ -736,20 +736,7 @@ require('lazy').setup({
             require('telescope').load_extension('neovim_config')
             require('telescope').load_extension('projects')
             require('telescope').load_extension('poc')
-
-            -- I believe the hotfix below is no longer needed becauseht the plenary PR was merged
-            -- -- TODO tempory hack based on https://github.com/nvim-telescope/telescope.nvim/issues/3436#issuecomment-2756267300
-            -- -- until plenary PR https://github.com/nvim-lua/plenary.nvim/pull/649 is merged
-            -- vim.api.nvim_create_autocmd('User', {
-            --     pattern = 'TelescopeFindPre',
-            --     callback = function()
-            --         vim.o.winborder = 'none'
-            --         vim.api.nvim_create_autocmd('WinLeave', {
-            --             once = true,
-            --             callback = function() vim.o.winborder = 'rounded' end,
-            --         })
-            --     end,
-            -- })
+            require('telescope').load_extension('yaml_schema')
         end,
     },
 
@@ -2808,23 +2795,6 @@ require('lazy').setup({
     {
         'b0o/schemastore.nvim',
         lazy = true, -- my setup for lspconfig will lazy load this plugin
-    },
-
-    -- A frontend for yaml schemas to use
-    -- Adds a telescope picker via `Telescope yaml_schema`
-    -- Adds a hook to determine which shema is selected (useful for statusline)
-    -- Enhances auto-completion descriptions
-    -- Adds detection mechanism for kubernetes files as they are context dependent rather the file name dependent
-    -- Note: Most of the setup for this is in the lspconfig plugin's setup function
-    {
-        'someone-stole-my-name/yaml-companion.nvim',
-        lazy = true, -- my setup for lspconfig will lazy load this plugin
-        dependencies = {
-            { 'neovim/nvim-lspconfig' },
-            { 'nvim-lua/plenary.nvim' },
-            { 'nvim-telescope/telescope.nvim' },
-        },
-        config = function() require('telescope').load_extension('yaml_schema') end,
     },
 
     {

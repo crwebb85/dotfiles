@@ -4,7 +4,7 @@ local util = require('lspconfig.util')
 return {
     cmd = function(dispatchers, config)
         local csharp_ls_exe = vim.fs.joinpath(
-            require('myconfig.utils.path').get_mason_base_path('csharp-ls'),
+            require('myconfig.utils.path').get_mason_base_path(),
             'packages',
             'csharp-language-server',
             'csharp-ls.exe'

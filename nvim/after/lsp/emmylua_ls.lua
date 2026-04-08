@@ -16,6 +16,7 @@ for name, type in vim.fs.dir(lazy_path, { depth = 1 }) do
     end
 end
 
+---@type vim.lsp.Config
 return {
     settings = {
         Lua = {

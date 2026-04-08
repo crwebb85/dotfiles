@@ -402,6 +402,15 @@ function M.enable()
             if client:supports_method('textDocument/documentColor') then
                 vim.lsp.document_color.enable(true, { bufnr = event.buf }, {})
             end
+
+            if client.name == 'yamlls' then
+                require('myconfig.lsp.off_spec_requests').yamlls_notify_supports_schema_selection(
+                    event.buf
+                )
+                require('myconfig.lsp.off_spec_requests').yamlls_notify_schema_store_initialized(
+                    event.buf
+                )
+            end
         end,
     })
 end

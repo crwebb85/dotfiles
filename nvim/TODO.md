@@ -261,6 +261,14 @@
   - iamcco/markdown-preview.nvim (replace with maybe my own version)
   - nvim-tree/nvim-web-devicons (replace with echasnovski/mini.icons)
   - hrsh7th/nvim-cmp (replace with native completion and https://www.reddit.com/r/neovim/comments/1fwhhp0/new_plugin_cmp2lsp/?utm_medium=android_app&utm_source=share)
+- [ ] improve lsp schema selection support for yaml, json, toml, and xml
+  - [ ] Use off-spec lsp methods to fetch schema names from lsps for heirline
+    - [ ] yamlls require('myconfig.lsp.off_spec_requests').yamlls_get_jsonschema(0)
+    - [ ] jsonls https://github.com/microsoft/vscode-json-languageservice/blob/f5de98bb0d6f9a1ea6745dc24cfa8e0c10def4ff/src/jsonLanguageService.ts#L83
+    - [ ] tablo https://github.com/tamasfe/taplo/blob/b673b44df2773db8673a00df2e7654b769f7fde7/crates/taplo-lsp/src/lsp_ext/request.rs#L103
+    - [ ] add a readme/help page for how each one is configured so I don't have
+          to experiment when I forget
+  - [ ] implement other off-spec lsp features
 
 ### Vim Practice
 

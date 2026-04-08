@@ -1,4 +1,6 @@
+---@type vim.lsp.Config
 return {
+    ---@type lspconfig.settings.pyright
     settings = {
         python = {
             -- Note autoImportCompletions only shows imports that have been used in other files that have already been opened

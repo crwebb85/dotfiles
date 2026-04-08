@@ -1,3 +1,4 @@
+---@type vim.lsp.Config
 return {
     -- on_init = function(client)
     --     local path = client.workspace_folders[1].name
@@ -35,6 +36,8 @@ return {
     --         })
     --     vim.print(client.config.settings)
     -- end,
+
+    ---@type lspconfig.settings.lua_ls
     settings = {
         Lua = {
             runtime = { version = 'LuaJIT' },

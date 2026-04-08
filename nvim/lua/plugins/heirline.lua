@@ -235,12 +235,32 @@ local config = function()
 
     ---@return string
     local function get_yaml_schema_name()
-        local schema = require('yaml-companion').get_buf_schema(0)
-        local result = schema.result
-        if type(result) ~= 'table' then return '' end
-        local name = result[1].name
-        if name ~= 'string' or name == 'none' then return '' end
-        return name
+        --TODO I want to fetch the schema using an lsp request but
+        --this is somehow breaking my telescope picker for the yaml
+        --schemas. I think I need to send the request async and then
+        --update the heirline after it returns but that's a problem for
+        --future me. For now I will just save the selected schema name
+        --to a buffer variable when using the picker. This has the downside
+        --of not displaying the name for auto detected schemas (although I haven't
+        --yet confirmed if autodetection is working)
+        --
+        -- local resp, _ =
+        --     require('myconfig.lsp.off_spec_requests').yamlls_get_jsonschema(0)
+        -- if resp and resp.result and #resp.result >= 1 then
+        --     return resp.result[1].name or ''
+        -- end
+        -- return ''
+        -- {
+        --   result = { {
+        --       name = "OpenAPI Document v3.X",
+        --       uri = "https://www.schemastore.org/openapi-3.X.json"
+        --     } }
+        -- }
+
+        ---@type MyYamlSchema?
+        local yaml_schema = vim.b[0].yaml_schema
+        local schema_name = yaml_schema and yaml_schema.name or ''
+        return schema_name
     end
 
     ---@type StatusLine

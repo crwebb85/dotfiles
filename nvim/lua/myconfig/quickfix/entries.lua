@@ -95,7 +95,7 @@ end
 ---@return vim.quickfix.entry[]
 function M.treesitter_capture_entries(opts)
     local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
-    if bufnr == 0 then vim.api.nvim_get_current_buf() end
+    if bufnr == 0 then bufnr = vim.api.nvim_get_current_buf() end
 
     local capture_names_set = Set:new({})
     for _, capture_name in ipairs(opts.capture_names) do

@@ -1,3 +1,4 @@
+---@type vim.lsp.Config
 return {
     cmd = {
         require('myconfig.utils.path').get_mason_tool_path('omnisharp'),
