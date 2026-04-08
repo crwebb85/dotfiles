@@ -3402,3 +3402,7 @@ require('lazy').setup({
 
 vim.cmd.packadd('cfilter')
 vim.cmd.packadd('nvim.difftool')
+---Added the new native undo tree. I kindof like the old
+---plugin better so Im going keep the old one and try this
+---out on the side
+vim.cmd.packadd('nvim.undotree')
