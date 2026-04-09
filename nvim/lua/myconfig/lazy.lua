@@ -1432,31 +1432,42 @@ require('lazy').setup({
     {
         'max397574/better-escape.nvim',
         opts = {
-            default_mappings = false, -- setting this to false removes all the default mappings
-            -- NOTE:
-            -- `jk` keymap sucks for escaping visual mode because going down with
-            -- `j` and then overshooting so you use `k` is extremely common
-
-            i = {
-                j = {
-                    -- These can all also be functions
-                    k = '<Esc>',
+            -- Note: I was using `default_mappings = false` but there seems to
+            -- be a bug causing the mappings field to no longer work when I do that
+            -- as a result I switched to setting it to `true` and disabling the keys
+            -- I don't want in the mappings field
+            default_mappings = true,
+            mappings = {
+                i = {
+                    j = {
+                        -- These can all also be functions
+                        k = '<Esc>',
+                        j = false,
+                    },
                 },
-            },
-            c = {
-                j = {
-                    k = '<C-c>',
+                c = {
+                    j = {
+                        k = '<C-c>',
+                        j = false,
+                    },
                 },
-            },
-            t = {
-                j = {
-                    k = '<C-\\><C-n>',
+                t = {
+                    j = {
+                        k = '<C-\\><C-n>',
+                    },
                 },
-            },
-
-            s = {
-                j = {
-                    k = '<Esc>',
+                -- -- NOTE:
+                -- -- `jk` keymap sucks for escaping visual mode because going down with
+                -- -- `j` and then overshooting so you use `k` is extremely common
+                v = {
+                    j = {
+                        k = false,
+                    },
+                },
+                s = {
+                    j = {
+                        k = '<Esc>',
+                    },
                 },
             },
         },
