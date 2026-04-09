@@ -66,6 +66,7 @@ local M = {
         'toml',
         'regex',
         'c_sharp',
+        'razor',
         'hurl',
         'powershell',
         'git_config',
