@@ -945,6 +945,8 @@ require('lazy').setup({
 
             action_set.edit = my_edit_override
             require('telescope').setup(opts)
+
+            -- My telescope extensions
             require('telescope').load_extension('media_files')
             require('telescope').load_extension('skeleton')
             require('telescope').load_extension('notes')
@@ -956,6 +958,9 @@ require('lazy').setup({
             require('telescope').load_extension('projects')
             require('telescope').load_extension('poc')
             require('telescope').load_extension('yaml_schema')
+
+            --Plugin telescope extensions
+            require('telescope').load_extension('csharpls_definition') --This one behaves kind of weird in that it just goes to the location instead of opening the picker if there is only one (may remove this)
         end,
     },
 
@@ -2406,7 +2411,6 @@ require('lazy').setup({
             'rouge8/neotest-rust',
             'nvim-neotest/neotest-python',
             'nsidorenco/neotest-vstest',
-            -- 'Issafalcon/neotest-dotnet',
         },
         lazy = true,
         cmd = 'Neotest',
@@ -3328,8 +3332,10 @@ require('lazy').setup({
 
     -- LSP client extensions
     {
-        'Hoffs/omnisharp-extended-lsp.nvim',
-        lazy = true,
+        'Decodetalkers/csharpls-extended-lsp.nvim',
+        config = function(_, _)
+            require('csharpls_extended').buf_read_cmd_bind()
+        end,
     },
 
     {

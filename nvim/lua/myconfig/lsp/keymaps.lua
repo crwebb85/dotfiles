@@ -82,20 +82,9 @@ function M.setup_lsp_keymaps()
 
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_definition()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_definition()
-        elseif
-            #vim.lsp.get_clients({
-                bufnr = 0,
-                method = vim.lsp.protocol.Methods.textDocument_definition,
-            }) > 1
-        then
-            --TODO change on_list to telescope on list for definition
-            vim.lsp.buf.definition({ on_list = on_list_filter_dups })
         else
             --TODO change on_list to telescope on list for definition
-            vim.lsp.buf.definition()
+            vim.lsp.buf.definition({ on_list = on_list_filter_dups })
         end
     end, {
         desc = 'LSP: Jumps to the definition of the symbol under the cursor.',
@@ -103,17 +92,9 @@ function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'gD', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_declaration()
-        elseif
-            #vim.lsp.get_clients({
-                bufnr = 0,
-                method = vim.lsp.protocol.Methods.textDocument_declaration,
-            }) > 1
-        then
-            --TODO change on_list to telescope on list for declaration
-            vim.lsp.buf.declaration({ on_list = on_list_filter_dups })
         else
             --TODO change on_list to telescope on list for declaration
-            vim.lsp.buf.declaration({})
+            vim.lsp.buf.declaration({ on_list = on_list_filter_dups })
         end
     end, {
         desc = 'LSP: Jumps to the declaration of the symbol under the cursor.',
@@ -121,20 +102,9 @@ function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'gi', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_implementation()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_implementation()
-        elseif
-            #vim.lsp.get_clients({
-                bufnr = 0,
-                method = vim.lsp.protocol.Methods.textDocument_implementation,
-            }) > 1
-        then
-            --TODO change on_list to telescope on list for implementation
-            vim.lsp.buf.implementation({ on_list = on_list_filter_dups })
         else
             --TODO change on_list to telescope on list for implementation
-            vim.lsp.buf.implementation({})
+            vim.lsp.buf.implementation({ on_list = on_list_filter_dups })
         end
     end, {
         desc = 'LSP: Lists all the implementations for the symbol under the cursor in the quickfix window.',
@@ -145,17 +115,9 @@ function M.setup_lsp_keymaps()
         -- elseif vim.bo.filetype == 'cs' then
         --     --I should probably be checking for if client is omnisharp but this is good enough
         --     require('omnisharp_extended').lsp_type_definition()
-        elseif
-            #vim.lsp.get_clients({
-                bufnr = 0,
-                method = vim.lsp.protocol.Methods.textDocument_typeDefinition,
-            }) > 1
-        then
-            --TODO change on_list to telescope on list for type_definition
-            vim.lsp.buf.type_definition({ on_list = on_list_filter_dups })
         else
             --TODO change on_list to telescope on list for type_definition
-            vim.lsp.buf.type_definition({})
+            vim.lsp.buf.type_definition({ on_list = on_list_filter_dups })
         end
     end, {
         desc = 'LSP: Jumps to the definition of the type of the symbol under the cursor.',
@@ -164,18 +126,8 @@ function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'grr', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').list_references()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_references()
-        elseif
-            #vim.lsp.get_clients({
-                bufnr = 0,
-                method = vim.lsp.protocol.Methods.textDocument_references,
-            }) > 1
-        then
-            vim.lsp.buf.references(nil, { on_list = on_list_filter_dups })
         else
-            vim.lsp.buf.references(nil, {})
+            vim.lsp.buf.references(nil, { on_list = on_list_filter_dups })
         end
     end, {
         desc = 'Remap LSP: Lists all the references to the symbol under the cursor in the quickfix window.',
