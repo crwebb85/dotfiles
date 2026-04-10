@@ -1880,12 +1880,30 @@ end, {
 
 -------------------------------------------------------------------------------
 --- File search/creation
+local complete_grep = make_fuzzy_completion(function(ArgLead, _, _)
+    local completions = vim.fn.getcompletion(ArgLead, 'file')
+    local argument_completions = {
+        '-u', -- disable gitignore filtering
+        '-uu', --dissable gitignore and hidden files filtering
+        '-uuu', --dissable gitignore, hidden files, and binary file filtering
+        '--file', -- 'Search for patterns from the given file.'
+        '--glob', -- 'Include or exclude files'
+    }
+    return vim.tbl_extend('keep', completions, argument_completions)
+end)
 
 vim.api.nvim_create_user_command('Grep', function(params)
     local overseer = require('overseer')
     -- insert args at the '$*' in the grepprg
     local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
     if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    if config.use_cwd_in_overseer_grep_hack then
+        -- Some reason overseer and ripgrep don't play nice when not using
+        -- terminal output strategy (ripgrep will always search the wrong directory)
+        -- so I need to specify the cwd (this behavior is also different between
+        -- machines I use so I need to be able to toggle on/off this hack in my config)
+        cmd = cmd .. ' ' .. vim.fn.fnameescape(vim.fn.getcwd())
+    end
     local task = overseer.new_task({
         cmd = vim.fn.expandcmd(cmd),
         components = {
@@ -1902,13 +1920,24 @@ vim.api.nvim_create_user_command('Grep', function(params)
         },
     })
     task:start()
-end, { nargs = '*', bang = true, complete = 'file' })
+end, {
+    nargs = '*',
+    bang = true,
+    complete = complete_grep,
+})
 
 vim.api.nvim_create_user_command('GrepAdd', function(params)
     local overseer = require('overseer')
     -- insert args at the '$*' in the grepprg
     local cmd, num_subs = vim.o.grepprg:gsub('%$%*', params.args)
     if num_subs == 0 then cmd = cmd .. ' ' .. params.args end
+    if config.use_cwd_in_overseer_grep_hack then
+        -- Some reason overseer and ripgrep don't play nice when not using
+        -- terminal output strategy (ripgrep will always search the wrong directory)
+        -- so I need to specify the cwd (this behavior is also different between
+        -- machines I use so I need to be able to toggle on/off this hack in my config)
+        cmd = cmd .. ' ' .. vim.fn.fnameescape(vim.fn.getcwd())
+    end
     local task = overseer.new_task({
         cmd = vim.fn.expandcmd(cmd),
         components = {
@@ -1927,7 +1956,11 @@ vim.api.nvim_create_user_command('GrepAdd', function(params)
         },
     })
     task:start()
-end, { nargs = '*', bang = true, complete = 'file' })
+end, {
+    nargs = '*',
+    bang = true,
+    complete = complete_grep,
+})
 
 vim.api.nvim_create_user_command('Find', function(args)
     --This command is a little to simple for me to really need

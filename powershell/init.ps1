@@ -14,6 +14,10 @@ $readlineConfigPath = Get-ChildItem $PSScriptRoot\init\readline.ps1 | Select-Obj
 Write-Output "Sourcing $readlineConfigPath"
 . "$readlineConfigPath"
 
+$ripgrepCompletionConfigPath = Get-ChildItem $PSScriptRoot\init\rg.ps1 | Select-Object -ExpandProperty FullName
+Write-Output "Sourcing $ripgrepCompletionConfigPath"
+. "$ripgrepCompletionConfigPath"
+
 
 Set-Alias -Name zp -Value Invoke-FuzzyProjectLocation
 Set-Alias -Name zc -Value Invoke-FuzzySetProofOfConceptLocation 

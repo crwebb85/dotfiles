@@ -20,6 +20,15 @@ local M = {
     use_overseer_strategy_hack = false,
     -- use_overseer_strategy_hack = true,
 
+    ---This is weird for some reason I sometime need to add the cwd to my overseer
+    ---riggrep usercommand and it is related to the use_overseer_strategy_hack
+    ---however it is not consistent between machines as to when I should use this
+    ---base on the use_overseer_strategy_hack value. As a result I need to toggle this
+    ---base on how my machine behaves
+    ---@type boolean
+    -- use_cwd_in_overseer_grep_hack = true,
+    use_cwd_in_overseer_grep_hack = false,
+
     ---@type boolean
     use_telescope_for_vim_ui_select = false,
     -- use_telescope_for_vim_ui_select = true,
