@@ -1,5 +1,5 @@
 cairocffi==1.7.1
-CairoSVG==2.8.2
+CairoSVG==2.9.0
 cffi==2.0.0
 choreographer==1.2.1
 colorama==0.4.6
@@ -21,7 +21,7 @@ plotly==6.5.2
 pluggy==1.6.0
 pnglatex==1.1
 pycparser==3.0
-Pygments==2.19.2
+Pygments==2.20.0
 pynvim==0.6.0
 pyperclip==1.11.0
 pytest==9.0.2
@@ -31,6 +31,6 @@ pyzmq==27.1.0
 simplejson==3.20.2
 six==1.17.0
 tinycss2==1.5.1
-tornado==6.5.4
+tornado==6.5.5
 traitlets==5.14.3
 webencodings==0.5.1
