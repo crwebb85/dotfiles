@@ -1898,7 +1898,6 @@ require('lazy').setup({
         'kylechui/nvim-surround',
         lazy = true,
         event = 'BufReadPre',
-        config = true,
     },
 
     -- Multicursor support
