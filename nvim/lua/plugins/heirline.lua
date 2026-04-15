@@ -1,4 +1,23 @@
 local get_icon = require('myconfig.icons').get_icon
+
+local function blend_colors(hex1, hex2, ratio)
+    ratio = ratio or 0.5 -- Default to midpoint
+    local function to_rgb(hex)
+        hex = hex:gsub('#', '')
+        return tonumber(hex:sub(1, 2), 16),
+            tonumber(hex:sub(3, 4), 16),
+            tonumber(hex:sub(5, 6), 16)
+    end
+
+    local r1, g1, b1 = to_rgb(hex1)
+    local r2, g2, b2 = to_rgb(hex2)
+
+    local r = math.floor(r1 * (1 - ratio) + r2 * ratio)
+    local g = math.floor(g1 * (1 - ratio) + g2 * ratio)
+    local b = math.floor(b1 * (1 - ratio) + b2 * ratio)
+
+    return string.format('#%02x%02x%02x', r, g, b)
+end
 local config = function()
     local heirline = require('heirline')
     local conditions = require('heirline.conditions')
@@ -8,7 +27,8 @@ local config = function()
     heirline.load_colors(colors)
 
     local background_color = colors.bg_dark
-    local active_background_color = colors.fg_dark
+    local active_background_color =
+        blend_colors(colors.fg_dark, colors.bg_dark1, 0.75)
     local inactive_background_color = background_color
 
     local recording_background_color = colors.bg_highlight
@@ -25,6 +45,10 @@ local config = function()
     local gitsigns_change_foreground_color = colors.git.change
     local macro_recording_forground_color = colors.red1
     local filename_foreground_color = colors.magenta2
+    local filename_foreground_color_in_cd = colors.green2
+    local filename_foreground_color_in_tcd = colors.yellow
+    local filename_foreground_color_in_lcd = colors.orange
+    local filename_foreground_color_fallback = colors.magenta2
     local file_flags_foreground_color = colors.green2
     local filetype_foreground_color = colors.magenta
     local buftype_foreground_color = colors.green2
@@ -767,7 +791,36 @@ local config = function()
             end
             return filename
         end,
-        hl = { fg = filename_foreground_color, bold = true },
+        hl = function(_)
+            local name = vim.api.nvim_buf_get_name(0)
+
+            local source_path
+            if vim.uv.fs_stat(name) ~= nil then
+                source_path = name
+            elseif name:match('^oil:') then
+                source_path = require('oil').get_current_dir(0)
+            end
+
+            local cd = vim.fn.getcwd(-1, -1)
+            local tcd = vim.fn.getcwd(-1, 0)
+            local lcd = vim.fn.getcwd(0, 0)
+            local is_in_cd = source_path
+                and vim.fs.relpath(cd, source_path) ~= nil
+            local is_in_tcd = source_path
+                and vim.fs.relpath(tcd, source_path) ~= nil
+            local is_in_lcd = source_path
+                and vim.fs.relpath(lcd, source_path) ~= nil
+
+            if is_in_cd then
+                return { fg = filename_foreground_color_in_cd, bold = true }
+            elseif is_in_tcd then
+                return { fg = filename_foreground_color_in_tcd, bold = true }
+            elseif is_in_lcd then
+                return { fg = filename_foreground_color_in_lcd, bold = true }
+            else
+                return { fg = filename_foreground_color_fallback, bold = true }
+            end
+        end,
     }
 
     ---@type StatusLine
