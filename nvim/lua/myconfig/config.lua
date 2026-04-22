@@ -17,8 +17,8 @@ local M = {
     dev_plugins_path = 'C:\\Users\\crweb\\Documents\\projects\\',
 
     ---@type boolean
-    use_overseer_strategy_hack = false,
-    -- use_overseer_strategy_hack = true,
+    -- use_overseer_strategy_hack = false,
+    use_overseer_strategy_hack = true,
 
     ---This is weird for some reason I sometime need to add the cwd to my overseer
     ---riggrep usercommand and it is related to the use_overseer_strategy_hack
@@ -26,16 +26,12 @@ local M = {
     ---base on the use_overseer_strategy_hack value. As a result I need to toggle this
     ---base on how my machine behaves
     ---@type boolean
-    -- use_cwd_in_overseer_grep_hack = true,
-    use_cwd_in_overseer_grep_hack = false,
+    use_cwd_in_overseer_grep_hack = true,
+    -- use_cwd_in_overseer_grep_hack = false,
 
     ---@type boolean
-    use_telescope_for_vim_ui_select = false,
-    -- use_telescope_for_vim_ui_select = true,
-
-    ---@type boolean
-    use_extui = true,
-    -- use_extui = false,
+    use_ui2 = true,
+    -- use_ui2 = false,
 
     ---@type boolean
     use_experimental_gf = true,

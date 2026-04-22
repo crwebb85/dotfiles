@@ -1,4 +1,7 @@
 ---Based on telescope builtins
+
+--- TODO not sure if I have a good option for replacing this use of plenary
+--- until telescope removes it
 local async = require('plenary.async')
 local make_entry = require('telescope.make_entry')
 local async_job = require('telescope._')

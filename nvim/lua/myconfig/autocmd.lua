@@ -166,7 +166,6 @@ vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
 vim.api.nvim_create_autocmd('FileType', {
     group = vim.api.nvim_create_augroup('close_with_q', { clear = true }),
     pattern = {
-        'PlenaryTestPopup',
         'help',
         'lspinfo',
         'man',
@@ -280,21 +279,17 @@ vim.api.nvim_create_autocmd('ModeChanged', {
         if new_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = false
             vim.wo.cursorline = true
-            -- we only redraw when using extui or telescope override for vim.ui.select
-            -- because redraws clears the ui select messages without one of those
-            -- features which was it was preventing me seeing which code actions I could pick
-            if config.use_extui or config.use_telescope_for_vim_ui_select then
-                vim.cmd('redraw')
-            end
+            -- we only redraw when using ui2 because redraws clears the ui select
+            -- messages without one of ui2 features which was it was preventing
+            -- me seeing which code actions I could pick
+            if config.use_ui2 then vim.cmd('redraw') end
         elseif prev_mode == 'c' and vim.wo.number == true then
             vim.wo.relativenumber = true
             vim.wo.cursorline = false
-            -- we only redraw when using extui or telescope override for vim.ui.select
-            -- because redraws clears the ui select messages without one of those
-            -- features which was it was preventing me seeing which code actions I could pick
-            if config.use_extui or config.use_telescope_for_vim_ui_select then
-                vim.cmd('redraw')
-            end
+            -- we only redraw when using ui2 because redraws clears the ui select
+            -- messages without one of ui2 features which was it was preventing
+            -- me seeing which code actions I could pick
+            if config.use_ui2 then vim.cmd('redraw') end
         end
     end,
     group = change_relative_line_number_group,

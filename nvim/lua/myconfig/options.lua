@@ -2,7 +2,7 @@ local config = require('myconfig.config')
 -------------------------------------------------------------------------------
 
 --- Look and feel
-if config.use_extui then require('vim._core.ui2').enable({ enable = true }) end
+if config.use_ui2 then require('vim._core.ui2').enable({ enable = true }) end
 vim.o.title = true
 vim.o.titlestring = [[%t – %{fnamemodify(getcwd(), ':t')}]]
 vim.o.colorcolumn = '80'

@@ -1427,13 +1427,6 @@ require('lazy').setup({
             require('mini.icons').setup(opts)
         end,
     },
-
-    -- A util library
-    {
-        'nvim-lua/plenary.nvim',
-        lazy = true,
-    },
-
     {
         'max397574/better-escape.nvim',
         opts = {
@@ -2384,13 +2377,14 @@ require('lazy').setup({
     },
 
     -- Adds refactor commands
+    -- TODO I don't really use this but I would like to. I think I should create
+    -- a custom lsp to supply these as code actions
     {
         'ThePrimeagen/refactoring.nvim',
         lazy = true,
         config = true,
         dependencies = {
-            'nvim-lua/plenary.nvim',
-            'nvim-treesitter/nvim-treesitter',
+            'lewis6991/async.nvim',
         },
         cmd = { 'Refactor' },
     },
@@ -2402,6 +2396,7 @@ require('lazy').setup({
         'nvim-neotest/neotest',
         dependencies = {
             'nvim-neotest/nvim-nio',
+            -- TODO see when we can remove plenary dependency
             'nvim-lua/plenary.nvim',
             'antoinemadec/FixCursorHold.nvim',
             'nvim-treesitter/nvim-treesitter',
@@ -3341,7 +3336,6 @@ require('lazy').setup({
         'rachartier/tiny-code-action.nvim',
         lazy = true,
         dependencies = {
-            { 'nvim-lua/plenary.nvim' },
             { 'nvim-telescope/telescope.nvim' },
         },
         config = function(_, opts) require('tiny-code-action').setup(opts) end,

@@ -47,7 +47,7 @@ local function create_debug_args(runnable_args)
 
     table.insert(cargo_args, '--message-format=json')
 
-    for _, value in ipairs(runnable_args.cargoExtraArgs) do
+    for _, value in ipairs(runnable_args.cargoExtraArgs or {}) do
         table.insert(cargo_args, value)
     end
     local exec_args = {}
@@ -78,7 +78,7 @@ local function run_command(args)
     local command = get_command(args)
 
     -- run the command
-    vim.fn.termopen(command)
+    vim.fn.jobstart(command, { term = true })
 
     -- when the buffer is closed, set the latest buf id to nil else there are
     -- some edge cases with the id being sit but a buffer not being open
@@ -86,59 +86,29 @@ local function run_command(args)
     vim.api.nvim_buf_attach(latest_buf_id, false, { on_detach = onDetach })
 end
 
-local function run_debug(executable, exec_args, rust_debug_adapter, cwd)
-    local launch = {
-        name = 'Rust debug',
-        type = rust_debug_adapter,
-        request = 'launch',
-        program = executable,
-        sourceLanguages = { 'rust' },
-        args = exec_args,
-        cwd = cwd,
-        stopOnEntry = false,
-    }
-    require('dap').run(launch)
-end
-
 local function debug_command(args, rust_debug_adapter)
-    rust_debug_adapter = 'codelldb' -- TODO change if I use a different debug adapter
+    rust_debug_adapter = rust_debug_adapter or 'codelldb'
 
     local cargo_args, exec_args = create_debug_args(args)
-    local Job = require('plenary.job')
-    Job
-        :new({
-            command = 'cargo',
-            args = cargo_args,
-            cwd = args.workspaceRoot,
-            on_exit = function(j, code)
-                if code and code > 0 then
-                    utils.scheduled_notify(
-                        'An error occured while compiling. Please fix all compilation issues and try again.',
-                        vim.log.levels.ERROR
-                    )
-                    return
-                end
-                vim.schedule(function()
-                    for _, value in pairs(j:result()) do
-                        local json = vim.fn.json_decode(value)
-                        if
-                            type(json) == 'table'
-                            and json.executable ~= vim.NIL
-                            and json.executable ~= nil
-                        then
-                            run_debug(
-                                json.executable,
-                                exec_args,
-                                rust_debug_adapter,
-                                args.workspaceRoot
-                            )
-                            break
-                        end
-                    end
-                end)
-            end,
-        })
-        :start()
+
+    local task = require('overseer').new_task({
+        cmd = 'cargo',
+        args = cargo_args,
+        cwd = args.workspaceRoot,
+        components = {
+            --Note since the output is a json object on each line I can't really use
+            --an errorformat to add build errors to the quickfix list. I would need to
+            --add a custom component which I haven't yet done.
+            {
+                'dap.cargo_run_dap_results',
+                exec_args = exec_args,
+                cwd = args.workspaceRoot,
+                rust_debug_adapter = rust_debug_adapter,
+            },
+            'default',
+        },
+    })
+    task:start()
 end
 
 local is_setup = false
