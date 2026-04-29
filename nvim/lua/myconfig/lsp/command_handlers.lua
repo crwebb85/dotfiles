@@ -5,11 +5,17 @@ local M = {}
 -------------------------------------------------------------------------------
 ---jsonls commands
 
-local function sort_json(_) require('ipc_tools.ipc_client').sort_json_file() end
+local function sort_json(_)
+    vim.notify(
+        'I have not implemented sorting json keys. I plan to use treesitter to do this',
+        vim.log.levels.WARN
+    )
+end
 
 -------------------------------------------------------------------------------
 --- rust-analyzer commands
 
+---@type integer?
 local latest_buf_id = nil
 
 local function get_command(args)
@@ -65,15 +71,19 @@ end
 local function run_command(args)
     -- check if a buffer with the latest id is already open, if it is then
     -- delete it and continue
-    utils.delete_buf(latest_buf_id)
+    if latest_buf_id ~= nil then
+        vim.api.nvim_buf_delete(latest_buf_id, { force = true })
+    end
 
     -- create the new buffer
     latest_buf_id = vim.api.nvim_create_buf(false, true)
 
     -- split the window to create a new buffer and set it to our window
-    utils.split(latest_buf_id)
+    vim.cmd.split()
+    local win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_buf(win, latest_buf_id)
 
-    utils.resize('-5')
+    vim.cmd.resize('-5')
 
     local command = get_command(args)
 

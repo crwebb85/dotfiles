@@ -14,6 +14,10 @@ local M = {
     enable_render_markdown = true,
     -- enable_render_markdown = false,
 
+    ---@type boolean
+    load_markdown_preview_plugins = true,
+    -- load_markdown_preview_plugins = false,
+
     dev_plugins_path = 'C:\\Users\\crweb\\Documents\\projects\\',
 
     ---@type boolean

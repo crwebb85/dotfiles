@@ -41,22 +41,28 @@ return {
     settings = {
         Lua = {
             runtime = { version = 'LuaJIT' },
+            path = {
+                '?.lua',
+                '?/init.lua',
+                'lua/?.lua',
+                'lua/?/init.lua',
+            },
             hint = { enable = true },
-            -- workspace = {
-            --     checkThirdParty = false,
-            --     library = {
-            --         vim.env.VIMRUNTIME .. '/lua',
-            --         --     -- Depending on the usage, you might want to add additional paths here.
-            --         --     -- "${3rd}/luv/library"
-            --         --     -- "${3rd}/busted/library",
-            --     },
-            --     -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
-            --     -- library = vim.api.nvim_get_runtime_file('', true),
-            -- },
-            -- diagnostics = {
-            --     -- Get the language server to recognize the `vim` global
-            --     globals = { 'vim' },
-            -- },
+            workspace = {
+                checkThirdParty = false,
+                -- library = {
+                --     vim.env.VIMRUNTIME .. '/lua',
+                --     --     -- Depending on the usage, you might want to add additional paths here.
+                --     --     -- "${3rd}/luv/library"
+                --     --     -- "${3rd}/busted/library",
+                -- },
+                -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
+                library = vim.api.nvim_get_runtime_file('', true),
+            },
+            diagnostics = {
+                -- Get the language server to recognize the `vim` global
+                globals = { 'vim' },
+            },
         },
     },
 }

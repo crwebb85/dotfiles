@@ -42,7 +42,7 @@ function M.open(path, opt)
         --is a directory. However the command works just fine in powershell to open the
         --directory.
     else
-        default_open(path, opt)
+        return default_open(path, opt)
     end
 end
 
@@ -146,11 +146,11 @@ end
 -- opening windows explorer for folders but the merged fix seems to close the open
 -- explorer the second try open it and then prevents you from opening the folder again
 -- TODO create a new ticket
-vim.ui.open = M.open
+if vim.fn.has('win32') == 1 then vim.ui.open = M.open end
 
-vim.fs.joinpath = M.joinpath
-vim.fs.root = M.fs_root
-vim.fn.bufadd = M.bufadd
+-- vim.fs.joinpath = M.joinpath
+-- vim.fs.root = M.fs_root
+-- vim.fn.bufadd = M.bufadd
 
 -------------------------------------------------------------------------------
 ---Override autocmds

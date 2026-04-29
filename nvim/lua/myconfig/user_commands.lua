@@ -18,6 +18,84 @@ vim.api.nvim_create_user_command(
     }
 )
 
+vim.api.nvim_create_user_command('PackSync', function()
+    vim.pack.update(nil, { target = 'lockfile' })
+
+    --TODO update doesn't update if the default branch name changed
+    -- so I need a way to detect this and do (|vim.pack.del()| + |vim.pack.add()|)
+    -- on each plugin that did this
+    --
+    -- TODO write a function to verify that the lock file actually has not change
+    -- after the update
+    --
+    -- TODO write a function to verify that the plugins are set to the correct
+    -- git hash after the update
+end, {
+    nargs = 0,
+    desc = 'Syncs pack plugins to version in lockfile',
+})
+
+vim.api.nvim_create_user_command('PackUpdate', function(args)
+    local names = #args.fargs > 0 and args.fargs or nil
+    vim.pack.update(names, {})
+
+    --TODO update doesn't let you update if the default branch name changed
+    -- so I need a way to detect this warn that I need to do a (|vim.pack.del()| + |vim.pack.add()|)
+    -- on each plugin that did this
+    --
+    -- TODO add a lsp hover for each commit that shows the git diff between the two revisions
+    -- based on C:\nvim-win64\share\nvim\runtime\lua\vim\pack\_lsp.lua
+end, {
+    nargs = '*',
+    desc = 'Update pack plugins',
+
+    complete = make_fuzzy_completion(function()
+        local infos = vim.pack.get(nil, { info = false })
+        local plugins = {}
+        for _, info in ipairs(infos) do
+            table.insert(plugins, info.spec.name)
+        end
+        return plugins
+    end),
+})
+
+vim.api.nvim_create_user_command('PackDelete', function(args)
+    local names = args.fargs
+    vim.pack.del(names, {})
+end, {
+    nargs = '+',
+    desc = 'Delete pack plugins',
+
+    complete = make_fuzzy_completion(function()
+        local infos = vim.pack.get(nil, { info = false })
+        local plugins = {}
+        for _, info in ipairs(infos) do
+            table.insert(plugins, info.spec.name)
+        end
+        return plugins
+    end),
+})
+
+vim.api.nvim_create_user_command('PackClean', function(args)
+    local names = args.fargs
+    vim.pack.del(names, {})
+end, {
+    nargs = '+',
+    desc = 'Clean pack plugins and remove from lock file',
+    complete = make_fuzzy_completion(function()
+        local infos = vim.pack.get(nil, { info = false })
+        local plugins = {}
+        for _, info in ipairs(infos) do
+            --TODO active also includes plugins that are unloaded
+            --not just ones that are are no longer specified by pack.add
+            if info.active == false then
+                table.insert(plugins, info.spec.name)
+            end
+        end
+        return plugins
+    end),
+})
+
 -------------------------------------------------------------------------------
 -- Scratch
 

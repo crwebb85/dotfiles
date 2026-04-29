@@ -4,12 +4,10 @@
 --- when it is added to nightly
 local Job = require('myconfig.test_harness.job')
 
-local log = {
-    debug = function(...)
-        -- TODO replace with vim.log.new when it gets added to nightly
-        -- https://github.com/neovim/neovim/pull/38906
-    end,
-}
+local log = vim.log.new({
+    name = 'myconfig.test_harness',
+})
+
 local test_panel = require('myconfig.test_harness.test_panel')
 
 ---checks if the nvim instance is running headless

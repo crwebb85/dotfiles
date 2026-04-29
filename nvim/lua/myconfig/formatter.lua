@@ -68,7 +68,11 @@ local function setup()
         additional_formatters = { --TODO add getter and setter
             xml = { 'xmlformat' },
         },
-        lsp_format_strategy_for_filetype = {},
+        lsp_format_strategy_for_filetype = {
+            -- disable powershell lsp formatter because it is very inconsistent whether it works
+            -- and I can't stand that it puts the opening curly bracket on a new line
+            ps1 = 'NEVER',
+        },
         is_project_autoformat_disabled = false,
         formatter_timeout_milliseconds = DEFUALT_FORMATTING_TIMEOUT,
         format_after_save_filetypes = {},

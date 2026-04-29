@@ -314,12 +314,16 @@ vim.api.nvim_create_autocmd({ 'WinLeave' }, {
 local READONLY_LIBRARY_DIR_PATTERN =
     vim.glob.to_lpeg('**/{venv,node_modules}/**')
 
-local LAZY_PLUGIN_FILEPATH_PATTERN = (function()
+local PLUGIN_FILEPATH_PATTERN = (function()
     local data_path = vim.fn.stdpath('data')
     if type(data_path) == 'string' then
-        local lazy_plugin_path =
-            string.lower(vim.fs.normalize(vim.fs.joinpath(data_path, 'lazy')))
-        return vim.glob.to_lpeg(lazy_plugin_path .. '/**')
+        local plugin_path = string.lower(
+            vim.fs.normalize(
+                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
+            )
+        )
+
+        return vim.glob.to_lpeg(plugin_path .. '/**')
     end
     return nil
 end)()
@@ -337,7 +341,7 @@ vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
         if
             require('myconfig.utils.misc').string_starts_with(name, 'diffview:') --TODO doesn't work yet for diffview
             or READONLY_LIBRARY_DIR_PATTERN:match(name) ~= nil
-            or (LAZY_PLUGIN_FILEPATH_PATTERN ~= nil and LAZY_PLUGIN_FILEPATH_PATTERN:match(
+            or (PLUGIN_FILEPATH_PATTERN ~= nil and PLUGIN_FILEPATH_PATTERN:match(
                 name
             ) ~= nil)
             or NVIM_RUNTIME_FILEPATH_PATTERN:match(name) ~= nil

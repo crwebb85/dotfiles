@@ -287,6 +287,7 @@ end
 ---@param CmdLine string
 ---@param CursorPos number
 ---@return string[] completiontion_items
+---@diagnostic disable-next-line: unused-local
 function M.complete_make_command_experimental(ArgLead, CmdLine, CursorPos)
     local my_parsed_cmd = parse_command(CmdLine, CursorPos)
     vim.print(my_parsed_cmd)

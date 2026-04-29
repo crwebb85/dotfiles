@@ -105,6 +105,7 @@ local function get_gf_location()
     local cursor = vim.api.nvim_win_get_cursor(0)
 
     local lnum = vim.fn.line('.')
+    ---@diagnostic disable-next-line: unused-local
     local col = vim.fn.col('.')
 
     local trailing_count = 2
@@ -125,6 +126,7 @@ local function get_gf_location()
             -- 2. do gF
             vim.api.nvim_buf_set_lines(scratch_bufnr, 0, 0, false, { lines[1] })
             vim.api.nvim_win_set_cursor(0, { 1, cursor[2] })
+            ---@diagnostic disable-next-line: unused-local
             local cfile_filename, cfile_start_index, cfile_end_index =
                 get_cfile()
 
@@ -140,6 +142,7 @@ local function get_gf_location()
                     { joined_lines }
                 )
                 vim.api.nvim_win_set_cursor(0, { 1, cursor[2] })
+                ---@diagnostic disable-next-line: unused-local
                 cfile_filename, cfile_start_index, cfile_end_index = get_cfile()
 
                 local ok2, err2 = pcall(vim.cmd.normal, { 'gF', bang = true })
@@ -186,12 +189,14 @@ local function get_gf_location()
             local new_lnum_on_second_gf = vim.fn.line('.')
             local new_filename_on_second_gf =
                 vim.api.nvim_buf_get_name(new_bufnr)
+            ---@diagnostic disable-next-line: unused-local
             local new_cursor_on_second_gf = vim.api.nvim_win_get_cursor(0)
 
             -- 9. if filename changed between step 4 and step 8 throw an error
             assert(new_filename_on_first_gf == new_filename_on_second_gf)
 
             -- 10: if line number from step 4 and step 8 are the same then we know gF sets the line number
+            ---@type integer?
             local ret_lnum = new_lnum_on_first_gf
             if new_lnum_on_second_gf ~= new_lnum_on_first_gf then
                 ret_lnum = nil
@@ -1632,7 +1637,8 @@ local myoperations = maputils
             backward = function()
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1645,7 +1651,8 @@ local myoperations = maputils
             forward = function()
                 vim.diagnostic.jump({
                     count = vim.v.count1,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1665,7 +1672,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -math.huge,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1679,7 +1687,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = math.huge,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1702,7 +1711,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.HINT,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1716,7 +1726,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.HINT,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1737,7 +1748,8 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.HINT,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1752,7 +1764,8 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.HINT,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1775,7 +1788,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.ERROR,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1789,7 +1803,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.ERROR,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1810,7 +1825,8 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.ERROR,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1825,7 +1841,8 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.ERROR,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1848,7 +1865,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.INFO,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1862,7 +1880,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.INFO,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1883,7 +1902,8 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.INFO,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1898,7 +1918,8 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.INFO,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1921,7 +1942,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = -vim.v.count1,
                     severity = vim.diagnostic.severity.WARN,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1935,7 +1957,8 @@ local myoperations = maputils
                 vim.diagnostic.jump({
                     count = vim.v.count1,
                     severity = vim.diagnostic.severity.WARN,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1956,7 +1979,8 @@ local myoperations = maputils
                     count = -math.huge,
                     severity = vim.diagnostic.severity.WARN,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,
@@ -1971,7 +1995,8 @@ local myoperations = maputils
                     count = math.huge,
                     severity = vim.diagnostic.severity.WARN,
                     wrap = false,
-                    on_jump = function(diagnostic, bufnr)
+                    ---@diagnostic disable-next-line: unused-local
+                    on_jump = function(_diagnostic, bufnr)
                         vim.diagnostic.open_float({
                             bufnr = bufnr,
                             -- namespace = diagnostic.namespace,

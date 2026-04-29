@@ -71,15 +71,45 @@ function M.get_file_extension(filename)
     return extension
 end
 
----@param mason_tool_name string
----@return string
-function M.get_mason_tool_path(mason_tool_name)
+---@return string datapath
+function M.get_nvim_data_path()
     local data_path = vim.fn.stdpath('data')
     if data_path == nil then
         error('data path was nil but a string was expected')
     elseif type(data_path) == 'table' then
         error('data path was an array but a string was expected')
     end
+    return vim.fs.normalize(data_path)
+end
+
+---@return string path
+function M.get_treesitter_temp_build_path()
+    local data_path = M.get_nvim_data_path()
+    local path = vim.fs.joinpath(data_path, 'mytreesitter', 'cache')
+    M.ensure_directory_exists(path)
+    return path
+end
+
+function M.get_treesitter_parsers_dir()
+    local data_path = M.get_nvim_data_path()
+    local mytreesitter_dir = vim.fs.joinpath(data_path, 'mytreesitter')
+    M.ensure_directory_exists(mytreesitter_dir)
+    local path = vim.fs.joinpath(mytreesitter_dir, 'parsers')
+    M.ensure_directory_exists(path)
+    return path
+end
+
+---@param parser_name string
+---@return string
+function M.get_treesitter_parser_dir(parser_name)
+    local base_path = M.get_treesitter_parsers_dir()
+    return vim.fs.joinpath(base_path, parser_name .. '.so')
+end
+
+---@param mason_tool_name string
+---@return string
+function M.get_mason_tool_path(mason_tool_name)
+    local data_path = M.get_nvim_data_path()
 
     local predicted_executable_path =
         vim.fs.joinpath(data_path, 'mason', 'bin', mason_tool_name)
@@ -104,12 +134,7 @@ end
 
 ---@return string basepath of mason data
 function M.get_mason_base_path()
-    local data_path = vim.fn.stdpath('data')
-    if data_path == nil then
-        error('data path was nil but a string was expected')
-    elseif type(data_path) == 'table' then
-        error('data path was an array but a string was expected')
-    end
+    local data_path = M.get_nvim_data_path()
     return vim.fs.joinpath(data_path, 'mason')
 end
 
@@ -246,6 +271,35 @@ function M.get_poc_paths()
     vim.list_extend(poc_paths, poc_search_paths)
 
     return poc_paths
+end
+
+function M.get_lsp_csharpls_path()
+    local csharp_ls_exe = vim.fs.joinpath(
+        M.get_mason_base_path(),
+        'packages',
+        'csharp-language-server',
+        'csharp-ls.exe'
+    )
+    return csharp_ls_exe
+end
+
+function M.get_lsp_powershell_editor_services_bundle_path()
+    local bundle_path = vim.fs.joinpath(
+        M.get_mason_base_path(),
+        'packages',
+        'powershell-editor-services'
+    )
+    return bundle_path
+end
+
+function M.get_lsp_apex_jar_path()
+    local apex_jar_path = vim.fs.joinpath(
+        M.get_mason_base_path(),
+        'share',
+        'apex-language-server',
+        'apex-jorje-lsp.jar'
+    )
+    return apex_jar_path
 end
 
 return M

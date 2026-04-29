@@ -1,6 +1,13 @@
 ## Requirements:
 
 - [git](https://git-scm.com/)
+  Also create a .gitconfig with user settings
+  C:\Users\<YourUsername>\.gitconfig
+  ```gitconfig
+  [user]
+      email = <your email>
+      name = <your name>
+  ```
 - [.NET](https://dotnet.microsoft.com/en-us/download/dotnet) used to install
   powershell 7 on Windows. Download the SDK if developing dotnet applications.
   Download the `Hosting Bundle` runtime as well if developing/running dotnet
@@ -12,6 +19,7 @@
 - [neovim](https://github.com/neovim/neovim) my editor. Use nightly release.
 - [ripgrep](https://github.com/BurntSushi/ripgrep) file finder used by pickers like telescope.nvim
 - [Treesitter CLI](https://github.com/tree-sitter/tree-sitter) which is now required by nvim-treesitter
+  run `tree-sitter --init-config` on first install
 - [mingw](https://www.mingw-w64.org/downloads/#mingw-w64-builds) used by nvim-treesitter
   to compile the parsers (can also be installed with `choco install mingw`)
 - [fd](https://github.com/sharkdp/fd) file finder used by venv-selector.nvim
@@ -22,6 +30,8 @@
   LSPs, formatters, and debuggers (using mason.nvim). Note: On windows, only `py`
   is added to the path variables so the default python install location will need
   to be added so that mason.nvim can find it. Also used in [Inlined Config Requirements](#inlined-config-requirements)
+- .NET specific tools:
+  - [netcoredbg](https://github.com/samsung/netcoredbg/releases/) .NET debugger
 - Rust specific tools:
   - [rust/cargo](https://rust-lang.org/tools/install/)
   - [carg-bininstall](https://github.com/cargo-bins/cargo-binstall) used for installing nextest
@@ -39,6 +49,8 @@
   remote plugins (required by molten-nvim)
 - `.\cli-tools\prettier\package.json` used to install prettier with the xml plugin.
   This needs to be setup for conform.nvim to format xml
+- `.\.config\powershell\setup.ps1` is used to setup the powershell profile for
+  the first time
 
 ## Optional Requirements:
 
@@ -61,6 +73,7 @@
   - [zig version 0.15.2](https://ziglang.org/download/) used by zig build
   - [windows sdk](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/)
     used by zig build. See [neovim issue #36889](https://github.com/neovim/neovim/issues/36889)
+- Windows PowerToys - Use the keyboard manager to map caps lock to esc for when Im using my laptops keyboard
 
 ## Add Environment Variables:
 
@@ -82,6 +95,7 @@
   - `Path=%USERPROFILE%\Documents\tools\clang` for [clang](https://clang.llvm.org/)
   - `Path=%USERPROFILE%\Documents\tools\zig` for [zig version 0.15.2](https://ziglang.org/download/)
   - `Path=%USERPROFILE%\Documents\tools\pandoc` for [pandoc](https://pandoc.org/installing.html)
+  - `Path=%USERPROFILE%\Documents\tools\netcoredbg` for [netcoredbg](https://github.com/samsung/netcoredbg/releases/)
 - User Variables that should be added by installers
   - `Path=%USERPROFILE%\.cargo\bin` for tools installed by [rust's cargo](https://rust-lang.org/tools/install/)
   - `Path=%USERPROFILE%\AppData\Local\Programs\Python\Launcher\` for [py python version manager](https://www.python.org/downloads/)
@@ -120,14 +134,15 @@ git pull
 
 # If treesitter.nvim fails to install parsers on some machines, I sometimes edit
 # the curl request so I need to stash it before restoring plugins
-$treesitterPath = "$env:USERPROFILE\AppData\Local\nvim-data\lazy\nvim-treesitter"
+$treesitterPath = "$env:USERPROFILE\AppData\Local\nvim-data\site\pack\core\opt\nvim-treesitter"
 if ($env:XDG_DATA_HOME -ne $null) {
-    $treesitterPath = "$env:XDG_DATA_HOME\nvim-data\lazy\nvim-treesitter"
+    $treesitterPath = "$env:XDG_DATA_HOME\nvim-data\site\pack\core\opt\nvim-treesitter"
 }
 git -C "$treesitterPath" stash
 
 # Restore plugins
-nvim --headless "+Lazy! restore" +qa
+nvim --headless "+PackSync" +qa
+
 
 # the first time lazy restore runs it puts the versions
 # at HEAD so we need to stash the lock file and rerun
@@ -135,7 +150,7 @@ nvim --headless "+Lazy! restore" +qa
 git stash
 
 # Restore plugins a second time to checkout the commits in the lock file
-nvim --headless "+Lazy! restore" +qa
+nvim --headless "+PackSync" +qa
 
 # Compare the old config.lua with the new one in use `:diffget` to pull in any changes
 nvim --clean -d  $env:XDG_CONFIG_HOME\nvim\lua\myconfig\config.lua $env:XDG_CONFIG_HOME\nvim\lua\myconfig\config.lua.bak

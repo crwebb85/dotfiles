@@ -18,10 +18,6 @@ $ripgrepCompletionConfigPath = Get-ChildItem $PSScriptRoot\init\rg.ps1 | Select-
 Write-Output "Sourcing $ripgrepCompletionConfigPath"
 . "$ripgrepCompletionConfigPath"
 
-
-Set-Alias -Name zp -Value Invoke-FuzzyProjectLocation
-Set-Alias -Name zc -Value Invoke-FuzzySetProofOfConceptLocation 
-
 function Write-BranchName () {
     try {
         $branch = git rev-parse --abbrev-ref HEAD

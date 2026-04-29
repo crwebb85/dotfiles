@@ -28,18 +28,15 @@ local f = ls.function_node
 -- local ms = ls.multi_snippet
 -- local k = require("luasnip.nodes.key_indexer").new_key
 
-local function uuid()
-    local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-    math.randomseed(os.time())
-    return string.gsub(template, '[xy]', function(c)
-        local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
-        return string.format('%x', v)
-    end)
-end
-
 return {
     require('luasnip').snippet(
         { trig = 'uuid' },
-        { f(function(_, _, _) return uuid() end, {}, {}) }
+        {
+            f(
+                function(_, _, _) return require('myconfig.utils.misc').uuid() end,
+                {},
+                {}
+            ),
+        }
     ),
 }

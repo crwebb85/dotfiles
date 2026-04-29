@@ -9,16 +9,17 @@ return require('telescope').register_extension({
                 error('data path was an array but a string was expected')
             end
 
-            local lazy_path = vim.fs.joinpath(data_path, 'lazy')
-            local stat = vim.uv.fs_stat(lazy_path)
+            local plugins_path =
+                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
+            local stat = vim.uv.fs_stat(plugins_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
-                error(template:format(lazy_path))
+                error(template:format(plugins_path))
             end
 
             require('telescope.builtin').find_files({
-                cwd = lazy_path,
+                cwd = plugins_path,
                 prompt_title = 'Find Files (neovim plugin)',
             })
         end,
@@ -32,18 +33,19 @@ return require('telescope').register_extension({
                 error('data path was an array but a string was expected')
             end
 
-            local lazy_path = vim.fs.joinpath(data_path, 'lazy')
-            local stat = vim.uv.fs_stat(lazy_path)
+            local plugins_path =
+                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
+            local stat = vim.uv.fs_stat(plugins_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
-                error(template:format(lazy_path))
+                error(template:format(plugins_path))
             end
 
             local plugin_paths = {}
-            for name, type in vim.fs.dir(lazy_path, { depth = 1 }) do
+            for name, type in vim.fs.dir(plugins_path, { depth = 1 }) do
                 if type == 'directory' then
-                    local plugin_path = vim.fs.joinpath(lazy_path, name)
+                    local plugin_path = vim.fs.joinpath(plugins_path, name)
                     table.insert(plugin_paths, plugin_path)
                 end
             end
@@ -74,16 +76,17 @@ return require('telescope').register_extension({
                 error('data path was an array but a string was expected')
             end
 
-            local lazy_path = vim.fs.joinpath(data_path, 'lazy')
-            local stat = vim.uv.fs_stat(lazy_path)
+            local plugins_path =
+                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
+            local stat = vim.uv.fs_stat(plugins_path)
             if stat and stat.type ~= 'directory' then
                 local template =
                     "Path %s already exists and it's not a directory!"
-                error(template:format(lazy_path))
+                error(template:format(plugins_path))
             end
 
             require('telescope.builtin').live_grep({
-                cwd = lazy_path,
+                cwd = plugins_path,
                 prompt_title = 'Live Grep (neovim plugin)',
             })
         end,

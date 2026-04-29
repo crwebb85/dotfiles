@@ -5,18 +5,18 @@ local busted = require('myconfig.test_harness.busted')
 
 local describe = busted.describe
 local it = busted.it
-local pending = busted.pending
-local before_each = busted.before_each
-local after_each = busted.after_each
-local clear = busted.clear
+-- local pending = busted.pending
+-- local before_each = busted.before_each
+-- local after_each = busted.after_each
+-- local clear = busted.clear
 local assert = busted.assert
 
 describe('Quickfix', function()
     it('set_list with nil window sets the quickfix list', function()
         require('myconfig.quickfix.api').set_list(nil, ' ', {
             items = {
-                { text = 'helloworld1', valid = 0 },
-                { text = 'helloworld2', valid = 0 },
+                { text = 'helloworld1', valid = false },
+                { text = 'helloworld2', valid = false },
             },
         })
         local list = vim.fn.getqflist()
@@ -59,8 +59,8 @@ describe('Quickfix', function()
         function()
             require('myconfig.quickfix.api').set_list(0, ' ', {
                 items = {
-                    { text = 'helloworld win=0', valid = 0 },
-                    { text = 'helloworld2', valid = 0 },
+                    { text = 'helloworld win=0', valid = false },
+                    { text = 'helloworld2', valid = false },
                 },
             })
             local list = vim.fn.getloclist(0)
@@ -102,8 +102,8 @@ describe('Quickfix', function()
     it('set_list with win=1 sets the location list for window 1', function()
         require('myconfig.quickfix.api').set_list(0, ' ', {
             items = {
-                { text = 'helloworld set win=1', valid = 0 },
-                { text = 'helloworld2', valid = 0 },
+                { text = 'helloworld set win=1', valid = false },
+                { text = 'helloworld2', valid = false },
             },
         })
         local list = vim.fn.getloclist(0)

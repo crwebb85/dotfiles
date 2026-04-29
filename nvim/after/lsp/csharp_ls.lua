@@ -3,12 +3,8 @@ local util = require('lspconfig.util')
 ---@type vim.lsp.Config
 return {
     cmd = function(dispatchers, config)
-        local csharp_ls_exe = vim.fs.joinpath(
-            require('myconfig.utils.path').get_mason_base_path(),
-            'packages',
-            'csharp-language-server',
-            'csharp-ls.exe'
-        )
+        local csharp_ls_exe =
+            require('myconfig.utils.path').get_lsp_csharpls_path()
 
         -- csharp-ls attempt to locate sln, slnx or csproj files from root_dir
         -- If cmd_cwd is provide use it instead

@@ -1,5 +1,13 @@
 local M = {}
 
+function M.uuid()
+    local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    math.randomseed(os.time())
+    return string.gsub(template, '[xy]', function(c)
+        local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
+        return string.format('%x', v)
+    end)
+end
 function M.string_starts_with(s, prefix)
     return string.sub(s, 1, string.len(prefix)) == prefix
 end
@@ -12,33 +20,6 @@ function M.get_default_branch_name()
         { capture_output = true }
     ):wait()
     return res.code == 0 and 'main' or 'master'
-end
-
----Delete the buffer by buffer number
----@param bufnr uinteger
-function M.delete_buf(bufnr)
-    if bufnr ~= nil then vim.api.nvim_buf_delete(bufnr, { force = true }) end
-end
-
----Open buffer in split
----@param bufnr uinteger
----@param vertical_split string?
-function M.split(bufnr, vertical_split)
-    local cmd = vertical_split and 'vsplit' or 'split'
-
-    vim.cmd(cmd)
-    local win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_buf(win, bufnr)
-end
-
----Resize split
----@param amount integer
----@param split_vertical string?
-function M.resize(amount, split_vertical)
-    local cmd = split_vertical and 'vertical resize ' or 'resize'
-    cmd = cmd .. amount
-
-    vim.cmd(cmd)
 end
 
 --- Scheduled wrapper around vim.notify
