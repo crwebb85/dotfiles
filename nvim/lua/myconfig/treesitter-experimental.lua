@@ -300,7 +300,7 @@ end
 ---@param spec MyTreesitterParserSpec
 function M.add_parser(spec)
     local parser_path =
-        require('myconfig.utils.path').get_treesitter_parser_dir(spec.name)
+        require('myconfig.utils.path').get_treesitter_parser_path(spec.name)
     local info = {
         err = '',
     }

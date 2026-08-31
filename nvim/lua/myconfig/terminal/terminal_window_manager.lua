@@ -179,7 +179,7 @@ end
 function TerminalWindowManager:toggle(opts)
     opts = opts or {}
     opts.position = opts.position or self.position
-    local tui_mode = vim.F.if_nil(opts.tui_mode, self.tui_mode)
+    local tui_mode = vim.nonnil(opts.tui_mode, self.tui_mode)
     assert(tui_mode ~= nil)
 
     if opts.position ~= self.position then
@@ -340,7 +340,7 @@ function TerminalWindowManager:show(opts)
 
     local position = opts.position or self.position
     local enter = opts.enter or opts.enter == nil
-    local tui_mode = vim.F.if_nil(opts.tui_mode, self.tui_mode)
+    local tui_mode = vim.nonnil(opts.tui_mode, self.tui_mode)
     assert(tui_mode ~= nil)
 
     if self:set_position(position) then

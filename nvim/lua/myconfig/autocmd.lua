@@ -315,21 +315,15 @@ local READONLY_LIBRARY_DIR_PATTERN =
     vim.glob.to_lpeg('**/{venv,node_modules}/**')
 
 local PLUGIN_FILEPATH_PATTERN = (function()
-    local data_path = vim.fn.stdpath('data')
-    if type(data_path) == 'string' then
-        local plugin_path = string.lower(
-            vim.fs.normalize(
-                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
-            )
-        )
+    local plugin_path =
+        string.lower(require('myconfig.utils.path').get_nvim_plugins_dir())
 
-        return vim.glob.to_lpeg(plugin_path .. '/**')
-    end
-    return nil
+    return vim.glob.to_lpeg(plugin_path .. '/**')
 end)()
 
 local NVIM_RUNTIME_FILEPATH_PATTERN = (function()
-    local nvim_runtime_filepath = string.lower(vim.fs.normalize('$VIMRUNTIME'))
+    local nvim_runtime_filepath =
+        string.lower(require('myconfig.utils.path').get_vimruntime_dir())
     return vim.glob.to_lpeg(nvim_runtime_filepath .. '/**')
 end)()
 

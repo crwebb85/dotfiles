@@ -40,7 +40,9 @@ return {
                 end
 
                 self.report_path =
-                    vim.fs.joinpath(data_path, 'hurl-report', params.report_id)
+                    require('myconfig.utils.path').get_hurl_report_path(
+                        params.report_id
+                    )
                 self.report_json_path =
                     vim.fs.joinpath(self.report_path, 'report.json')
             end,

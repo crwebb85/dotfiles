@@ -140,9 +140,9 @@ vim.api.nvim_create_autocmd('PackChanged', {
 local function load_plugins(plugin_data)
     local data = plugin_data.spec.data or {}
 
-    local load = vim.F.if_nil(data.load, true)
-    local enable_runtimepath = vim.F.if_nil(data.runtimepath, true)
-    local use_dev = vim.F.if_nil(data.dev, false)
+    local load = vim.nonnil(data.load, true)
+    local enable_runtimepath = vim.nonnil(data.runtimepath, true)
+    local use_dev = vim.nonnil(data.dev, false)
     local plugin_path = plugin_data.path
     local plugin_name = plugin_data.spec.name
 
@@ -206,7 +206,7 @@ local function load_plugins(plugin_data)
                 readme_note = parser_info.readme_note,
                 path = parser_source_path,
                 generate = parser_info.generate_from_json,
-                generate_from_json = vim.F.if_nil(
+                generate_from_json = vim.nonnil(
                     parser_info.generate_from_json,
                     true
                 ),

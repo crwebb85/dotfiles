@@ -36,7 +36,7 @@ local function async_oneshot_finder_with_additional_entries(opts)
     local env = opts.env
     local fn_command = assert(opts.fn_command, 'Must pass `fn_command`')
 
-    local results = vim.F.if_nil(opts.results, {})
+    local results = vim.nonnil(opts.results, {})
     local num_results = #results
 
     local job_started = false

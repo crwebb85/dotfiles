@@ -85,40 +85,13 @@ M.opts = {
     async_write = true, -- undocumented (for testing)
 }
 
-local function find_jupytext_executable(venv_dir)
-    local candidates = {
-        vim.fn.has('unix') == 1
-            and vim.fs.joinpath(venv_dir, 'bin', 'jupytext'),
-        -- MSYS2
-        vim.fn.has('win32') == 1
-            and vim.fs.joinpath(venv_dir, 'bin', 'jupytext.exe'),
-        -- Stock Windows
-        vim.fn.has('win32') == 1
-            and vim.fs.joinpath(venv_dir, 'Scripts', 'jupytext.exe'),
-    }
-
-    for _, candidate in ipairs(candidates) do
-        if
-            candidate
-            and vim.fn.executable(vim.fs.normalize(candidate)) == 1
-        then
-            return candidate
-        end
-    end
-    return nil
-end
-
 M.setup = function()
-    local config_env = os.getenv('XDG_CONFIG_HOME')
-    if config_env == nil then
-        error('cannot find XDG_CONFIG_HOME environment variable')
-    end
-    local config_path = vim.fn.expand(config_env)
-
     local jupytext_venv_directory =
-        vim.fs.joinpath(config_path, 'cli-tools', 'jupytext_venv', 'venv')
-
-    local jupytext_path = find_jupytext_executable(jupytext_venv_directory)
+        require('myconfig.utils.path').get_jupytext_venv_dir()
+    local jupytext_path =
+        require('myconfig.utils.path').find_jupytext_executable(
+            jupytext_venv_directory
+        )
     if jupytext_path ~= nil then
         vim.g.jupytext_jupytext = jupytext_path
     else

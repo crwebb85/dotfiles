@@ -93,12 +93,8 @@ function M.hurl_builder_builder(opts)
         local resolved_opts = resolve_hurl_options(opts)
         local report_id = getUUID()
 
-        local data_path = vim.fn.stdpath('data')
-        if type(data_path) ~= 'string' then
-            error('data path is not a string')
-        end
-
-        local report_path = vim.fs.joinpath(data_path, 'hurl-report', report_id)
+        local report_path =
+            require('myconfig.utils.path').get_hurl_report_path(report_id)
 
         local args = {
             resolved_opts.hurl_path,

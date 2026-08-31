@@ -1,19 +1,7 @@
-local library = { vim.fs.normalize('$VIMRUNTIME') }
+local library = { require('myconfig.utils.path').get_vimruntime_dir() }
 
-local data_path = vim.fn.stdpath('data')
-if data_path == nil then
-    error('data path was nil but a string was expected')
-elseif type(data_path) == 'table' then
-    error('data path was an array but a string was expected')
-end
-
-local lazy_path = vim.fs.joinpath(data_path, 'lazy')
-
-for name, type in vim.fs.dir(lazy_path, { depth = 1 }) do
-    if type == 'directory' then
-        local plugin_path = vim.fs.joinpath(lazy_path, name)
-        table.insert(library, plugin_path)
-    end
+for plugin_path in M.list_nvim_plugin_dirs() do
+    if type == 'directory' then table.insert(library, plugin_path) end
 end
 
 ---@type vim.lsp.Config

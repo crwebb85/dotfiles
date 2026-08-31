@@ -127,12 +127,7 @@ vim.api.nvim_create_user_command('Scratch', function()
 end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
 
 vim.api.nvim_create_user_command('GlobalNote', function()
-    local data_dir = vim.fn.stdpath('data')
-    if type(data_dir) ~= 'string' then error('Invalid data directory') end
-    local directory = vim.fs.joinpath(data_dir, 'global-note')
-    local filepath = vim.fs.joinpath(directory, 'global.md')
-    Path.ensure_directory_exists(directory)
-    Path.ensure_file_exists(filepath)
+    local filepath = require('myconfig.utils.path').get_global_note_path()
 
     local buffer_id = vim.fn.bufadd(filepath)
     if buffer_id == nil then
@@ -147,12 +142,7 @@ vim.api.nvim_create_user_command('GlobalNote', function()
 end, { nargs = 0, desc = 'Creates the global note in split to the right' })
 
 vim.api.nvim_create_user_command('GlobalNoteTab', function()
-    local data_dir = vim.fn.stdpath('data')
-    if type(data_dir) ~= 'string' then error('Invalid data directory') end
-    local directory = vim.fs.joinpath(data_dir, 'global-note')
-    local filepath = vim.fs.joinpath(directory, 'global.md')
-    Path.ensure_directory_exists(directory)
-    Path.ensure_file_exists(filepath)
+    local filepath = require('myconfig.utils.path').get_global_note_path()
 
     local buffer_id = vim.fn.bufadd(filepath)
     if buffer_id == nil then

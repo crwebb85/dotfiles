@@ -2,59 +2,19 @@ return require('telescope').register_extension({
     setup = function(_) end,
     exports = {
         find_files = function(_)
-            local data_path = vim.fn.stdpath('data')
-            if data_path == nil then
-                error('data path was nil but a string was expected')
-            elseif type(data_path) == 'table' then
-                error('data path was an array but a string was expected')
-            end
-
-            local plugins_path =
-                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
-            local stat = vim.uv.fs_stat(plugins_path)
-            if stat and stat.type ~= 'directory' then
-                local template =
-                    "Path %s already exists and it's not a directory!"
-                error(template:format(plugins_path))
-            end
-
             require('telescope.builtin').find_files({
-                cwd = plugins_path,
+                cwd = require('myconfig.utils.path').get_nvim_plugins_dir(),
                 prompt_title = 'Find Files (neovim plugin)',
             })
         end,
         find_plugin_dir = function(_)
             local conf = require('telescope.config').values
 
-            local data_path = vim.fn.stdpath('data')
-            if data_path == nil then
-                error('data path was nil but a string was expected')
-            elseif type(data_path) == 'table' then
-                error('data path was an array but a string was expected')
-            end
-
-            local plugins_path =
-                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
-            local stat = vim.uv.fs_stat(plugins_path)
-            if stat and stat.type ~= 'directory' then
-                local template =
-                    "Path %s already exists and it's not a directory!"
-                error(template:format(plugins_path))
-            end
-
-            local plugin_paths = {}
-            for name, type in vim.fs.dir(plugins_path, { depth = 1 }) do
-                if type == 'directory' then
-                    local plugin_path = vim.fs.joinpath(plugins_path, name)
-                    table.insert(plugin_paths, plugin_path)
-                end
-            end
-
             require('telescope.pickers')
                 .new({}, {
                     prompt_title = 'Plugin Directories',
                     finder = require('telescope.finders').new_table({
-                        results = plugin_paths,
+                        results = require('myconfig.utils.path').list_nvim_plugin_dirs(),
                         entry_maker = function(path)
                             return {
                                 display = path,
@@ -69,24 +29,8 @@ return require('telescope').register_extension({
         end,
 
         live_grep = function(_)
-            local data_path = vim.fn.stdpath('data')
-            if data_path == nil then
-                error('data path was nil but a string was expected')
-            elseif type(data_path) == 'table' then
-                error('data path was an array but a string was expected')
-            end
-
-            local plugins_path =
-                vim.fs.joinpath(data_path, 'site', 'pack', 'core', 'opt')
-            local stat = vim.uv.fs_stat(plugins_path)
-            if stat and stat.type ~= 'directory' then
-                local template =
-                    "Path %s already exists and it's not a directory!"
-                error(template:format(plugins_path))
-            end
-
             require('telescope.builtin').live_grep({
-                cwd = plugins_path,
+                cwd = require('myconfig.utils.path').get_nvim_plugins_dir(),
                 prompt_title = 'Live Grep (neovim plugin)',
             })
         end,

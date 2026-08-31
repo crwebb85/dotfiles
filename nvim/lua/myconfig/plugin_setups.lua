@@ -2266,7 +2266,7 @@ function M.setup_nvim_dap()
     -- Then directly use the netcoredbg.exe not the netcoredbg.cmd that mason downloads
     dap.adapters.coreclr = {
         type = 'executable',
-        command = require('myconfig.dap').get_mason_tool_netcoredbg_path(),
+        command = require('myconfig.utils.path').get_mason_tool_netcoredbg_path(),
         args = { '--interpreter=vscode' },
         options = {
             --https://github.com/Wiebesiek/ZeoVim
@@ -2277,7 +2277,7 @@ function M.setup_nvim_dap()
     -- Neotest Test runner looks at this table
     dap.adapters.netcoredbg = {
         type = 'executable',
-        command = require('myconfig.dap').get_mason_tool_netcoredbg_path(),
+        command = require('myconfig.utils.path').get_mason_tool_netcoredbg_path(),
         args = { '--interpreter=vscode' },
         options = {
             --https://github.com/Wiebesiek/ZeoVim

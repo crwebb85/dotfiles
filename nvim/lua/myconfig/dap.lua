@@ -158,29 +158,4 @@ function M.input_executable()
     return vim.fn.input('Path to dll', vim.fn.getcwd() .. '/bin/Debug/', 'file')
 end
 
---- I was having problems with using the cmd file mason creates when installing netcoredbg on windows
---- where using the cmd file for debugging wouldn't work. Instead I had to use the exe file directly
----@return string
-function M.get_mason_tool_netcoredbg_path()
-    local data_path = vim.fn.stdpath('data')
-    if data_path == nil then
-        error('data path was nil but a string was expected')
-    elseif type(data_path) == 'table' then
-        error('data path was an array but a string was expected')
-    end
-
-    if vim.fn.has('win32') == 1 then
-        return vim.fs.joinpath(
-            data_path,
-            'mason',
-            'packages',
-            'netcoredbg',
-            'netcoredbg',
-            'netcoredbg.exe'
-        )
-    else
-        return require('myconfig.utils.path').get_mason_tool_path('netcoredbg')
-    end
-end
-
 return M
