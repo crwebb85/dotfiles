@@ -525,11 +525,68 @@ local function do_open(uri, open_func)
     return err
 end
 
+local function get_pack_plugin_link_at_cursor()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.get_clients({
+        bufnr = bufnr,
+        name = 'vim.pack',
+    })
+    if #clients < 1 then return nil end
+
+    local current_line_text = vim.api.nvim_get_current_line()
+
+    local name, replacements = string.gsub(current_line_text, '## ', '', 1)
+    if replacements ~= 1 then return nil end
+
+    local ok, items_or_error = pcall(vim.pack.get, { name }, { offline = true })
+    if not ok then
+        local err = items_or_error
+        if err then vim.notify(err, vim.log.levels.ERROR) end
+        return nil
+    end
+
+    local items = items_or_error
+    if #items <= 0 then return nil end
+    local plugin = items[1]
+    if
+        plugin.rev_to ~= nil
+        and plugin.rev ~= nil
+        and plugin.spec ~= nil
+        and plugin.spec.src ~= nil
+    then
+        if plugin.rev == plugin.rev_to then
+            return string.format('%s/commit/%s', plugin.spec.src, plugin.rev)
+        else
+            return string.format(
+                '%s/compare/%s...%s',
+                plugin.spec.src,
+                plugin.rev,
+                plugin.rev_to
+            )
+        end
+    end
+
+    if plugin.rev ~= nil and plugin.spec ~= nil and plugin.spec.src ~= nil then
+        return string.format('%s/commit/%s', plugin.spec.src, plugin.rev)
+    end
+
+    if plugin.spec ~= nil and plugin.spec.src ~= nil then
+        return plugin.spec.src
+    end
+    return nil
+end
+
 vim.keymap.set({ 'n' }, 'gx', function()
     local link_uri = require('myconfig.lsp.lsplinks').get_link_at_cursor()
     if link_uri ~= nil then
         local err = do_open(link_uri, require('myconfig.lsp.lsplinks').open)
         if err then vim.notify(err, vim.log.levels.ERROR) end
+    end
+    local plugin_link = get_pack_plugin_link_at_cursor()
+    if plugin_link ~= nil then
+        local err = do_open(plugin_link, vim.ui.open)
+        if err then vim.notify(err, vim.log.levels.ERROR) end
+        return
     end
     for _, url in ipairs(require('vim.ui')._get_urls()) do
         local err = do_open(url, vim.ui.open)
