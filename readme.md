@@ -132,14 +132,6 @@ git commit --message "Backing up changes"
 git checkout main
 git pull
 
-# If treesitter.nvim fails to install parsers on some machines, I sometimes edit
-# the curl request so I need to stash it before restoring plugins
-$treesitterPath = "$env:USERPROFILE\AppData\Local\nvim-data\site\pack\core\opt\nvim-treesitter"
-if ($env:XDG_DATA_HOME -ne $null) {
-    $treesitterPath = "$env:XDG_DATA_HOME\nvim-data\site\pack\core\opt\nvim-treesitter"
-}
-git -C "$treesitterPath" stash
-
 # Restore plugins
 nvim --headless "+PackSync" +qa
 
@@ -171,7 +163,3 @@ npm --cwd "$env:XDG_CONFIG_HOME\cli-tools\prettier" install
 # Open neovim and update treesitter parsers and mason cli's
 nvim ./
 ```
-
-# Debugging
-
-When having issues with treesitter.nvim try manually deleting the files and reinstalling

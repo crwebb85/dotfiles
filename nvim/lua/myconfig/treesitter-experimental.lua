@@ -1,4 +1,4 @@
-local async = require('vim._async')
+async = vim.async
 
 ---@type vim.Log
 local logger = vim.log.new({
