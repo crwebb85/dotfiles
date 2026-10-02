@@ -1877,38 +1877,39 @@ function M.setup_treesj()
         ---@type number If line after join will be longer than max value, node will not be formatted
         max_join_length = 2000,
         langs = {
-            c_sharp = {
-                argument_list = lang_utils.set_preset_for_args(),
-                initializer_expression = lang_utils.set_preset_for_dict(),
-                formal_parameters = lang_utils.set_preset_for_args(),
-                block = lang_utils.set_preset_for_statement(),
-                constructor_body = lang_utils.set_preset_for_statement(),
-                array_initializer = lang_utils.set_preset_for_list(),
-                annotation_argument_list = lang_utils.set_preset_for_args(),
-                enum_body = lang_utils.set_preset_for_dict(),
-                enum_declaration = {
-                    target_nodes = { 'enum_body' },
-                },
-                if_statement = {
-                    target_nodes = { 'block' },
-                },
-                annotation = {
-                    target_nodes = { 'annotation_argument_list' },
-                },
-                method_declaration = {
-                    target_nodes = { 'block' },
-                },
-                object_creation_expression = {
-                    target_nodes = { 'initializer_expression' },
-                },
-                variable_declarator = {
-                    target_nodes = { 'array_initializer' },
-                },
-                constructor_declaration = {
-                    target_nodes = { 'constructor_body' },
-                },
-                element_binding_expression = lang_utils.set_preset_for_list(),
-            },
+            -- TODO Try new default c_sharp config. Remove this comment if it works well
+            -- c_sharp = {
+            --     argument_list = lang_utils.set_preset_for_args(),
+            --     initializer_expression = lang_utils.set_preset_for_dict(),
+            --     formal_parameters = lang_utils.set_preset_for_args(),
+            --     block = lang_utils.set_preset_for_statement(),
+            --     constructor_body = lang_utils.set_preset_for_statement(),
+            --     array_initializer = lang_utils.set_preset_for_list(),
+            --     annotation_argument_list = lang_utils.set_preset_for_args(),
+            --     enum_body = lang_utils.set_preset_for_dict(),
+            --     enum_declaration = {
+            --         target_nodes = { 'enum_body' },
+            --     },
+            --     if_statement = {
+            --         target_nodes = { 'block' },
+            --     },
+            --     annotation = {
+            --         target_nodes = { 'annotation_argument_list' },
+            --     },
+            --     method_declaration = {
+            --         target_nodes = { 'block' },
+            --     },
+            --     object_creation_expression = {
+            --         target_nodes = { 'initializer_expression' },
+            --     },
+            --     variable_declarator = {
+            --         target_nodes = { 'array_initializer' },
+            --     },
+            --     constructor_declaration = {
+            --         target_nodes = { 'constructor_body' },
+            --     },
+            --     element_binding_expression = lang_utils.set_preset_for_list(),
+            -- },
         },
     }
     require('treesj').setup(opts)
