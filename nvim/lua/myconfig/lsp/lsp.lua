@@ -411,6 +411,16 @@ function M.enable()
                     event.buf
                 )
             end
+
+            if
+                client:supports_method(
+                    vim.lsp.protocol.Methods.textDocument_linkedEditingRange
+                )
+            then
+                --enables linked editing for things like html elements so that the
+                --closing tag changes when the opening tag does
+                vim.lsp.linked_editing_range.enable(true, {})
+            end
         end,
     })
 end

@@ -3024,6 +3024,7 @@ function M.setup_mason_nvim()
         ['lemminx'] = 'lemminx', -- xml
         ['sqls'] = 'sqls', -- sql
         ['apex-language-server'] = 'apex_ls', -- salesforce apex
+        ['html-lsp'] = 'html', -- html lsp (vscode-html-language-server)
 
         -- Formatters
         'stylua', -- Formatter for lua files
