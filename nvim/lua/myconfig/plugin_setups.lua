@@ -2966,7 +2966,7 @@ function M.setup_overseer_nvim()
 end
 
 function M.setup_mason_nvim()
-    require('mason').setup(opts)
+    require('mason').setup({})
 
     --Mark down lsp comparison
     --
@@ -3011,6 +3011,7 @@ function M.setup_mason_nvim()
         ['lua-language-server'] = 'lua_ls', -- (lua_ls) LSP for lua files
         ['emmylua_ls'] = 'emmylua_ls', --lua
         ['typescript-language-server'] = 'ts_ls', -- tsserver LSP (keywords: typescript, javascript)
+        -- ['tsc'] = 'tsc', --TODO add tsc which will replace typescript-language-server
         ['eslint-lsp'] = 'eslint', -- eslint Linter (implemented as a standalone lsp to improve speed)(keywords: javascript, typescript)
         ['ansible-language-server'] = 'ansiblels',
         -- ['omnisharp'] = 'omnisharp', -- C#

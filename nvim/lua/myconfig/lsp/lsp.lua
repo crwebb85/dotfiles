@@ -101,7 +101,7 @@ function M.setup_user_commands()
         { desc = 'LSP: Toggle Inlay Hints' }
     )
 
-    --TOOD refactor to sue vim.lsp.codelens.enable(true, { bufnr = event.buf })
+    --TOOD refactor to use vim.lsp.codelens.enable(true, { bufnr = event.buf })
     -- vim.api.nvim_create_user_command(
     --     'LspToggleCodeLens',
     --     require('myconfig.lsp.codelens').toggle_codelens,

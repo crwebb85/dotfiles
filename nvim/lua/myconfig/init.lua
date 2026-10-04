@@ -251,7 +251,6 @@ now(function()
 
         -- plenary is used by:
         --  - nvim-telescope/telescope.nvim
-        --  - nvim-neotest/neotest
         { src = 'https://github.com/nvim-lua/plenary.nvim' },
         -- nvim-tree/nvim-web-devicons is used by:
         --  - sindrets/diffview.nvim
@@ -270,10 +269,6 @@ now(function()
             src = 'https://github.com/nvim-treesitter/nvim-treesitter',
             version = 'main',
         },
-
-        -- lewis6991/async.nvim is used by:
-        -- - ThePrimeagen/refactoring.nvim
-        { src = 'https://github.com/lewis6991/async.nvim' },
 
         -- nvim-neotest/nvim-nio is used by nvim-neotest/neotest
         { src = 'https://github.com/nvim-neotest/nvim-nio' },
@@ -307,8 +302,8 @@ now(function()
         ---------------------------------------------------------------------------
         ---replacement for netrw
         {
-            -- src = 'https://github.com/stevearc/oil.nvim',
-            src = 'https://github.com/crwebb85/oil.nvim',
+            src = 'https://github.com/stevearc/oil.nvim',
+            -- src = 'https://github.com/crwebb85/oil.nvim',
         },
 
         ---------------------------------------------------------------------------
