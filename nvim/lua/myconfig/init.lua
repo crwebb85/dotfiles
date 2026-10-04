@@ -265,10 +265,10 @@ now(function()
         --  - nvim-treesitter/nvim-treesitter-context
         --  - Wansmer/treesj
         --  - nvim-treesitter/nvim-treesitter-textobjects
-        {
-            src = 'https://github.com/nvim-treesitter/nvim-treesitter',
-            version = 'main',
-        },
+        -- {
+        --     src = 'https://github.com/nvim-treesitter/nvim-treesitter',
+        --     version = 'main',
+        -- },
 
         -- nvim-neotest/nvim-nio is used by nvim-neotest/neotest
         { src = 'https://github.com/nvim-neotest/nvim-nio' },

@@ -13,7 +13,7 @@
       "src": "https://github.com/L3MON4D3/LuaSnip"
     },
     "better-escape.nvim": {
-      "rev": "19a38aab94961016430905ebec30d272a01e9742",
+      "rev": "3f4bc0b326606264ff75967f59091b5ddada0554",
       "src": "https://github.com/max397574/better-escape.nvim"
     },
     "conform.nvim": {
@@ -64,10 +64,6 @@
     "mark-code-action.nvim": {
       "rev": "7129ba61349bcb03defb5a482aa5677fecca1462",
       "src": "https://github.com/crwebb85/mark-code-action.nvim"
-    },
-    "markdown-preview.nvim": {
-      "rev": "a923f5fc5ba36a3b17e289dc35dc17f66d0548ee",
-      "src": "https://github.com/iamcco/markdown-preview.nvim"
     },
     "mason.nvim": {
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
@@ -126,11 +122,6 @@
       "rev": "8b47db616ef658b8fc27e61db2896aa2f40134de",
       "src": "https://github.com/kylechui/nvim-surround"
     },
-    "nvim-treesitter": {
-      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
-      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
-      "version": "'main'"
-    },
     "nvim-treesitter-context": {
       "rev": "f3061339b8eaf9fda873600bc425b8d2d8502533",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
@@ -165,7 +156,7 @@
       "src": "https://github.com/stevearc/profile.nvim"
     },
     "quarto-nvim": {
-      "rev": "d923bb7cfc2bde41143e1c531c28190f0fade3a2",
+      "rev": "17f1e5d664bc615478230dc0240666329efacf9b",
       "src": "https://github.com/quarto-dev/quarto-nvim"
     },
     "refactoring.nvim": {
@@ -498,7 +489,7 @@
       "version": "'main'"
     },
     "vim-fugitive": {
-      "rev": "96c1009fcf8ce60161cc938d149dd5a66d570756",
+      "rev": "3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0",
       "src": "https://github.com/tpope/vim-fugitive"
     },
     "which-key.nvim": {
