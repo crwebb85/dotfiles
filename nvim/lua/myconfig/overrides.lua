@@ -88,7 +88,7 @@ function M.override_lspconfig_root_pattern()
             else
                 path = pattern_func(start_path)
             end
-            if path == '.' or path == './' or path == '/.' then
+            if path == '.' or path == './' or path == '/.' or path == nil then
                 path = assert(vim.uv.cwd())
             end
 
