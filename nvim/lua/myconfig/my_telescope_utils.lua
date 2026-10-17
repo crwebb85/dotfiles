@@ -4,8 +4,8 @@
 --- until telescope removes it
 local async = require('plenary.async')
 local make_entry = require('telescope.make_entry')
-local async_job = require('telescope._')
-local LinesPipe = require('telescope._').LinesPipe
+local async_job = require('telescope.async_job')
+local LinesPipe = async_job.LinesPipe
 
 local await_count = 1000
 
