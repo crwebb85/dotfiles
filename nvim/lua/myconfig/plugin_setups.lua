@@ -1419,23 +1419,6 @@ function M.setup_undotree()
     })
 end
 
-function M.setup_comment_nvim()
-    require('Comment').setup({})
-    require('Comment.ft').set('ps1', { '#%s', '<#%s#>' })
-
-    vim.keymap.set(
-        { 'n', 'x' },
-        'gC',
-        require('myconfig.utils.mapping').dot_repeat(
-            function() require('myconfig.utils.mapping').flip_flop_comment() end
-        ),
-        {
-            desc = 'Comment.nvim: Invert comments (dot repeatable)',
-            expr = true,
-        }
-    )
-end
-
 function M.setup_multicursor_nivm()
     local mc = require('multicursor-nvim')
 

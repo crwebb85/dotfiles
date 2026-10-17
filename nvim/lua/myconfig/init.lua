@@ -407,9 +407,6 @@ now(function()
         ---------------------------------------------------------------------------
         --- Buffer operations
 
-        -- Comment toggling
-        { src = 'https://github.com/numToStr/Comment.nvim' },
-
         -- Adds motions to wrap text in quotes/brackets/tags/etc
         -- using the same motions I use to yank text
         { src = 'https://github.com/kylechui/nvim-surround' },
@@ -610,7 +607,12 @@ now(function()
             data = {
                 load = false,
                 runtimepath = false,
-                treesitter = { c_sharp = { versioning_type = 'HEAD' } },
+                treesitter = {
+                    c_sharp = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'cs' },
+                    },
+                },
             },
         },
         {
@@ -705,7 +707,12 @@ now(function()
             data = {
                 load = false,
                 runtimepath = false,
-                treesitter = { git_config = { versioning_type = 'HEAD' } },
+                treesitter = {
+                    git_config = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'gitconfig' },
+                    },
+                },
             },
         },
         {
@@ -714,7 +721,12 @@ now(function()
             data = {
                 load = false,
                 runtimepath = false,
-                treesitter = { git_rebase = { versioning_type = 'HEAD' } },
+                treesitter = {
+                    git_rebase = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'gitrebase' },
+                    },
+                },
             },
         },
         {
@@ -966,7 +978,10 @@ now(function()
                 load = false,
                 runtimepath = false,
                 treesitter = {
-                    powershell = { versioning_type = 'HEAD', filetype = 'ps1' },
+                    powershell = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'ps1' },
+                    },
                 },
             },
         },
@@ -1254,9 +1269,6 @@ later(function()
 
     -- setup mbbill/undotree
     later(plugin_setups.setup_undotree)
-
-    -- setup numToStr/Comment.nvim
-    later(plugin_setups.setup_comment_nvim)
 
     -- setup jake-stewart/multicursor.nvim
     later(plugin_setups.setup_multicursor_nivm)

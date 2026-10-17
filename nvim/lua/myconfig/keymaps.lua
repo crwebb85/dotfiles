@@ -16,6 +16,9 @@ end, {
     desc = 'Customized Remap: Clear native multicursor cursors (use this instead of native <C-L> keymap)',
 })
 
+-------------------------------------------------------------------------------
+---Links
+
 ---Finds the start and end index of a substring in another string for a given
 ---known index that is known to be within the matched string.
 ---If a match is not found around the known index then (nil, nil) will be returned
@@ -507,10 +510,6 @@ if config.use_experimental_gf then
     -- })
 end
 
--------------------------------------------------------------------------------
----LSP keymaps
-require('myconfig.lsp.keymaps').setup_lsp_keymaps()
-
 local function do_open(uri, open_func)
     local cmd, err = open_func(uri)
     local rv = cmd and cmd:wait(1000) or nil
@@ -596,6 +595,15 @@ vim.keymap.set({ 'n' }, 'gx', function()
 end, {
     desc = 'Custom Remap: Open link after prompting confirmation (also open github diff for pack plugins)',
 })
+
+-------------------------------------------------------------------------------
+---LSP keymaps
+require('myconfig.lsp.keymaps').setup_lsp_keymaps()
+
+-------------------------------------------------------------------------------
+---Comment keymaps
+
+require('myconfig.comment.keymaps').setup_comment_keymaps()
 
 -------------------------------------------------------------------------------
 ---Completion
@@ -3158,50 +3166,6 @@ end, {
 })
 
 -------------------------------------------------------------------------------
-vim.keymap.del({ 'o', 'n', 'x' }, 'gc')
-
-vim.keymap.set(
-    { 'o' },
-    'gc',
-    function() require('myconfig.utils.mapping').comment_lines_textobject() end,
-    { desc = 'Comment textobject identical to gc operator' }
-    --note: vgc does not select the commented lines. It really does a block
-    --comment arround the character (which in my opinion pretty useless so I might
-    --try to fix that) this is because it isn't using the textobject gc it is using
-    --the gc visual mapping defined in numToStr/Comment.nvim
-)
-
-vim.keymap.set(
-    { 'o', 'x' },
-    --ugh so I would love all these comment textobjects to have the same
-    --namespaces but I also like being able to do vagcgc to uncomment a group
-    --of comments
-    'agc',
-    function()
-        require('myconfig.utils.mapping').around_comment_lines_textobject()
-    end,
-    { desc = 'Comment textobject with treesitter fallback' }
-)
-
-vim.keymap.set({ 'x', 'o' }, 'avgc', function()
-    require('nvim-treesitter-textobjects.select').select_textobject(
-        -- I plan to replace this with a smarter version of the keymap
-        '@comment.outer',
-        'textobjects'
-    )
-end, {
-    desc = 'Select outer part of a comment',
-})
-
-vim.keymap.set({ 'x', 'o' }, 'ivgc', function()
-    require('nvim-treesitter-textobjects.select').select_textobject(
-        -- I plan to replace this with a smarter version of the keymap
-        '@comment.inner',
-        'textobjects'
-    )
-end, {
-    desc = 'Select inner part of a comment',
-})
 
 vim.keymap.set(
     { 'o', 'x' },

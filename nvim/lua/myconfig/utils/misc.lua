@@ -1,5 +1,22 @@
 local M = {}
 
+---Range of the selection that needs to be commented
+---@class My01IndexedBufferRange
+---@field start_row integer Starting row (1 indexed)
+---@field start_col integer Starting column (0 indexed)
+---@field end_row integer Ending row (1 indexed)
+---@field end_col integer Ending column (0 indexed)
+
+---Vim visual mode enum. Read |visualmode()|
+---@alias VisualMode
+---| '"v"'
+---| '"V"'
+---| '\22' -- The termcode for <CTRL-V>
+---| '' --Default when visual mode has yet been used
+
+local ctrl_v_term_code =
+    vim.api.nvim_replace_termcodes('<C-v>', true, true, true)
+
 function M.uuid()
     local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
     math.randomseed(os.time())
@@ -206,7 +223,7 @@ function M.get_text_selection(opts)
     --This is because visual selections always have two positions a start and end.
     --Note: There is one edgecase where I can't give the correct selection
     --and that is when the last visual selection has the same line numbers
-    --as the as the range used in the command for example if I do
+    --as the range used in the command for example if I do
     -- :'a,'bCompareClipboardSelection where the mark `a` and mark `b` have
     -- the same line number as the last visual selection then this function will
     -- incorrectly return back the last visual selection using the last visual selection
@@ -234,14 +251,14 @@ function M.get_text_selection(opts)
         and line2 == last_visual_selection_end_row
     then
         local start_pos_col = last_visual_selection_start_col
-        if start_pos_col < vim.v.maxcol then --TODO not if im handling maxcol correctly
+        if start_pos_col < vim.v.maxcol then --TODO not sure if I'm handling maxcol correctly
             start_pos_col = start_pos_col + 1 --Convert from 0 index to 1 index
         end
 
         local start_pos = { bufnr, line1, start_pos_col, 0 }
 
         local end_pos_col = last_visual_selection_end_col
-        if end_pos_col < vim.v.maxcol then --TODO not if im handling maxcol correctly
+        if end_pos_col < vim.v.maxcol then --TODO not sure if I'm handling maxcol correctly
             end_pos_col = end_pos_col + 1 --Convert from 0 index to 1 index
         end
         local end_pos = { bufnr, line2, end_pos_col, 0 }
@@ -257,6 +274,88 @@ function M.get_text_selection(opts)
     return vim.fn.getregion(start_pos, end_pos, {
         type = 'V',
     })
+end
+
+---Get region for line movement or visual selection
+---NOTE: Returns the current line region, if `opmode` is not given.
+---@param opmode? OpMotionMode
+---@return My01IndexedBufferRange
+function M.get_region(opmode)
+    local allowed_opmodes = { 'line', 'char', 'block' }
+    if not opmode or not vim.tbl_contains(allowed_opmodes, opmode) then
+        error(string.format('Invalid opmode of `%s`.', opmode))
+    end
+
+    local start_pos, end_pos =
+        require('myconfig.utils.misc').sort_start_end_pos(
+            vim.api.nvim_buf_get_mark(0, '['),
+            vim.api.nvim_buf_get_mark(0, ']')
+        )
+
+    ---@type My01IndexedBufferRange
+    return {
+        start_row = start_pos[1], -- starts at 1
+        start_col = start_pos[2], --starts at 0
+        end_row = end_pos[1], -- starts at 1
+        end_col = end_pos[2], --starts at 0
+    }
+end
+
+---Get region visual selection selection
+---@param visual_mode? VisualMode
+---@return My01IndexedBufferRange
+function M.get_region_from_visual_selection(visual_mode)
+    local allowed_visual_modes = { 'v', 'V', ctrl_v_term_code }
+    if
+        not visual_mode
+        or not vim.tbl_contains(allowed_visual_modes, visual_mode)
+    then
+        error(
+            string.format('Invalid visual modes of `%s`.', allowed_visual_modes)
+        )
+    end
+
+    --TODO eventually support block mode and virtual edit
+    --Ugh: I was forced to use vim.fn.getpos('v') and vim.fn.getpos('.')
+    --because marks 'v' and '.' wouldn't return correct values with
+    --vim.api.nvim_buf_get_mark and marks '<' and '>' don't work outside
+    --of dot repeatable functions
+
+    local start_pos = vim.fn.getpos('v')
+    local end_pos = vim.fn.getpos('.')
+
+    local start_row = start_pos[2]
+    local start_col = start_pos[3]
+    if start_col ~= vim.v.maxcol then
+        start_col = start_col - 1 --convert from 1 indexed to 0 indexed
+    end
+    local end_row = end_pos[2]
+    local end_col = end_pos[3]
+    if end_col ~= vim.v.maxcol then
+        end_col = end_col - 1 --convert from 1 indexed to 0 indexed
+    end
+
+    -- If the user selected backwards, swap the coordinates
+    if
+        start_row > end_row
+        or (start_row == end_row and start_col > end_col)
+    then
+        start_row, end_row = end_row, start_row
+        start_col, end_col = end_col, start_col
+    end
+
+    if visual_mode == 'V' then
+        start_col = 0
+        end_col = vim.v.maxcol
+    end
+
+    ---@type My01IndexedBufferRange
+    return {
+        start_row = start_row,
+        start_col = start_col,
+        end_row = end_row,
+        end_col = end_col,
+    }
 end
 
 ---Like vim.fn.matchfuzzy but will return the inputed list back if results are empty
