@@ -1,6 +1,5 @@
 local Set = require('myconfig.utils.datastructure').Set
 local format_properties = require('myconfig.formatter').properties
-local Path = require('myconfig.utils.path')
 local config = require('myconfig.config')
 local make_fuzzy_completion =
     require('myconfig.utils.misc').make_fuzzy_completion
@@ -110,7 +109,11 @@ vim.api.nvim_create_user_command(
             setlocal noswapfile
 	    ]])
     end,
-    { nargs = 0, desc = 'Creates a scratch buffer in a new tab' }
+    {
+        nargs = 0,
+        bar = true,
+        desc = 'Creates a scratch buffer in a new tab',
+    }
 )
 
 -- Create a new scratch buffer to the right
@@ -124,7 +127,11 @@ vim.api.nvim_create_user_command('Scratch', function()
             setlocal noswapfile
         ]])
     vim.go.splitright = old_splitright_value
-end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
+end, {
+    nargs = 0,
+    bar = true,
+    desc = 'Creates a scratch buffer to the right',
+})
 
 vim.api.nvim_create_user_command('GlobalNote', function()
     local filepath = require('myconfig.utils.path').get_global_note_path()
@@ -139,7 +146,11 @@ vim.api.nvim_create_user_command('GlobalNote', function()
     vim.api.nvim_open_win(buffer_id, true, {
         split = 'right',
     })
-end, { nargs = 0, desc = 'Creates the global note in split to the right' })
+end, {
+    nargs = 0,
+    bar = true,
+    desc = 'Creates the global note in split to the right',
+})
 
 vim.api.nvim_create_user_command('GlobalNoteTab', function()
     local filepath = require('myconfig.utils.path').get_global_note_path()
@@ -155,7 +166,11 @@ vim.api.nvim_create_user_command('GlobalNoteTab', function()
 		execute 'tabnew'
 	]])
     vim.api.nvim_set_current_buf(buffer_id)
-end, { nargs = 0, desc = 'Creates the global note in a new tab' })
+end, {
+    nargs = 0,
+    bar = true,
+    desc = 'Creates the global note in a new tab',
+})
 
 -- Create a new scratch buffer to the left that will push my working window
 -- closer to the center so that I am not hurting my neck
@@ -182,7 +197,11 @@ vim.api.nvim_create_user_command('CenterWindow', function()
     vim.api.nvim_set_current_win(main_win)
 
     vim.go.splitright = old_splitright_value
-end, { nargs = 0, desc = 'Creates a scratch buffer to the right' })
+end, {
+    nargs = 0,
+    bar = true,
+    desc = 'Creates a scratch buffer to the right',
+})
 
 -------------------------------------------------------------------------------
 -- Messages
@@ -209,6 +228,7 @@ vim.api.nvim_create_user_command('MessagesTab', function()
     )
 end, {
     nargs = 0,
+    bar = true,
     desc = 'Open vim messages in a temporary scratch buffer in new tab',
 })
 
@@ -235,7 +255,11 @@ vim.api.nvim_create_user_command('Messages', function()
             desc = [[Messages: Refreshes messages buffer with latest messages]],
         }
     )
-end, { nargs = 0, desc = 'Open vim messages in a temporary scratch buffer' })
+end, {
+    nargs = 0,
+    bar = true,
+    desc = 'Open vim messages in a temporary scratch buffer',
+})
 
 -------------------------------------------------------------------------------
 -- Diff Clipboard https://www.naseraleisa.com/posts/diff#file-1
