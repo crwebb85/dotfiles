@@ -1686,7 +1686,7 @@ function M.setup_multicursor_nivm()
         desc = 'Custom Multicursor: Add cursor to end of each line of visual selection and enter insert mode with "A"',
     })
 
-    vim.keymap.set({ 'n', 'x' }, '<c-q>', function()
+    vim.keymap.set({ 'n', 'x' }, '<leader><c-q>', function()
         if mc.cursorsEnabled() then
             -- Stop other cursors from moving.
             -- This allows you to reposition the main cursor.

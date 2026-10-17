@@ -9,13 +9,12 @@ vim.keymap.del({ 'n' }, ']d')
 vim.keymap.del({ 'n' }, '[D')
 vim.keymap.del({ 'n' }, ']D')
 
--- Disable the "execute last macro" shortcut
-vim.keymap.set(
-    'n',
-    'Q',
-    '<nop>',
-    { desc = 'Customized Remap: Remapped to <nop> to disable this keybinging' }
-)
+vim.keymap.set('n', '<c-q>', function()
+    local mc_ns = vim.api.nvim_create_namespace('nvim.multicursor')
+    vim.api.nvim_buf_clear_namespace(0, mc_ns, 0, -1)
+end, {
+    desc = 'Customized Remap: Clear native multicursor cursors (use this instead of native <C-L> keymap)',
+})
 
 ---Finds the start and end index of a substring in another string for a given
 ---known index that is known to be within the matched string.
