@@ -3156,50 +3156,6 @@ end, {
 })
 
 -------------------------------------------------------------------------------
-vim.keymap.del({ 'o', 'n', 'x' }, 'gc')
-
-vim.keymap.set(
-    { 'o' },
-    'gc',
-    function() require('myconfig.utils.mapping').comment_lines_textobject() end,
-    { desc = 'Comment textobject identical to gc operator' }
-    --note: vgc does not select the commented lines. It really does a block
-    --comment arround the character (which in my opinion pretty useless so I might
-    --try to fix that) this is because it isn't using the textobject gc it is using
-    --the gc visual mapping defined in numToStr/Comment.nvim
-)
-
-vim.keymap.set(
-    { 'o', 'x' },
-    --ugh so I would love all these comment textobjects to have the same
-    --namespaces but I also like being able to do vagcgc to uncomment a group
-    --of comments
-    'agc',
-    function()
-        require('myconfig.utils.mapping').around_comment_lines_textobject()
-    end,
-    { desc = 'Comment textobject with treesitter fallback' }
-)
-
-vim.keymap.set({ 'x', 'o' }, 'avgc', function()
-    require('nvim-treesitter-textobjects.select').select_textobject(
-        -- I plan to replace this with a smarter version of the keymap
-        '@comment.outer',
-        'textobjects'
-    )
-end, {
-    desc = 'Select outer part of a comment',
-})
-
-vim.keymap.set({ 'x', 'o' }, 'ivgc', function()
-    require('nvim-treesitter-textobjects.select').select_textobject(
-        -- I plan to replace this with a smarter version of the keymap
-        '@comment.inner',
-        'textobjects'
-    )
-end, {
-    desc = 'Select inner part of a comment',
-})
 
 vim.keymap.set(
     { 'o', 'x' },

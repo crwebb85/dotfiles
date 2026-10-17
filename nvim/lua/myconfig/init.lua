@@ -572,7 +572,12 @@ now(function()
             data = {
                 load = false,
                 runtimepath = false,
-                treesitter = { c_sharp = { versioning_type = 'HEAD' } },
+                treesitter = {
+                    c_sharp = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'cs' },
+                    },
+                },
             },
         },
         {
@@ -667,7 +672,12 @@ now(function()
             data = {
                 load = false,
                 runtimepath = false,
-                treesitter = { git_config = { versioning_type = 'HEAD' } },
+                treesitter = {
+                    git_config = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'gitconfig' },
+                    },
+                },
             },
         },
         {
@@ -676,7 +686,12 @@ now(function()
             data = {
                 load = false,
                 runtimepath = false,
-                treesitter = { git_rebase = { versioning_type = 'HEAD' } },
+                treesitter = {
+                    git_rebase = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'gitrebase' },
+                    },
+                },
             },
         },
         {
@@ -928,7 +943,10 @@ now(function()
                 load = false,
                 runtimepath = false,
                 treesitter = {
-                    powershell = { versioning_type = 'HEAD', filetype = 'ps1' },
+                    powershell = {
+                        versioning_type = 'HEAD',
+                        filetypes = { 'ps1' },
+                    },
                 },
             },
         },
