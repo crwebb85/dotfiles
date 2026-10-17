@@ -317,6 +317,70 @@ function M.setup_user_commands()
         nargs = 1,
         desc = 'Stops the LSP',
     })
+
+    vim.api.nvim_create_user_command('LspClearOrphanedDiagnostics', function(_)
+        local active_client_ids = {}
+        for _, client in ipairs(vim.lsp.get_clients()) do
+            active_client_ids[client.id] = true
+        end
+
+        for _, ns in pairs(vim.diagnostic.get_namespaces()) do
+            -- Neovim names LSP diagnostic namespaces as 'vim.lsp.<client_name>.<client_id>'
+            -- or 'vim.lsp.<client_name>.<client_id>.<pull_id>' for pull diagnostics
+
+            local client_name_and_client_id_and_pull_id_string =
+                ns.name:match('^nvim%.lsp%.(.*)$')
+            if client_name_and_client_id_and_pull_id_string ~= nil then
+                local parts = vim.split(
+                    client_name_and_client_id_and_pull_id_string,
+                    '.',
+                    { plain = true }
+                )
+                ---@diagnostic disable-next-line: unused-local
+                local client_name = parts[1]
+                local client_id = parts[2] and tonumber(parts[2])
+                local diagnostic_pull_id = parts[3]
+                if #parts > 3 then
+                    vim.notify(
+                        string.format(
+                            'Unexpected diagnostic namespace name format `%s`',
+                            ns.name
+                        ),
+                        vim.log.levels.WARN
+                    )
+                end
+
+                if client_id ~= nil and not active_client_ids[client_id] then
+                    local is_pull = diagnostic_pull_id ~= nil
+                    local diagnostic_ns = vim.lsp.diagnostic.get_namespace(
+                        client_id,
+                        is_pull,
+                        diagnostic_pull_id
+                    )
+
+                    if diagnostic_ns == nil then
+                        vim.notify(
+                            string.format(
+                                'Could not determine diagnostic namespace for namespace name %s.',
+                                ns.name
+                            )
+                        )
+                    else
+                        vim.notify(
+                            string.format(
+                                'Resetting diagnostic namespace %s with name %s.',
+                                diagnostic_ns,
+                                ns.name
+                            )
+                        )
+                        vim.diagnostic.reset(diagnostic_ns, nil)
+                    end
+                end
+            end
+        end
+    end, {
+        desc = 'Clear diagnostics for LSPs that have been stopped',
+    })
 end
 
 ---
