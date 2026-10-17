@@ -241,7 +241,8 @@ local function system(cmd, opts)
     ---@param on_exit fun(result: vim.SystemCompleted)
     ---@return vim.SystemObj?
     local function system_wrap(_cmd, _opts, on_exit)
-        local ok, ret = pcall(vim.system, _cmd, _opts, on_exit)
+        local system_fn = vim.system --[[@as fun(cmd:string[], opts?:vim.SystemOpts, on_exit?:fun(out: vim.SystemCompleted)): vim.SystemObj]]
+        local ok, ret = pcall(system_fn, _cmd, _opts, on_exit)
         if not ok then
             on_exit({
                 code = 125,
@@ -270,7 +271,9 @@ end
 ---@param parser MyTreesitterParser
 ---@return string? err
 local function do_compile(parser)
-    logger.info(string.format('Compiling parser'))
+    --TODO build parser in a different folder than my parsers directory
+    --and then copy it to the correct folder after success
+    logger.info(string.format('Compiling parser %s', parser.spec.name))
     -- local uuid = require('myconfig.utils.misc').uuid()
     local out_path = vim.fs.joinpath(
         require('myconfig.utils.path').get_treesitter_parsers_dir(),
@@ -334,12 +337,25 @@ local function new_progress_report(action)
 end
 
 local copcall = package.loaded.jit and pcall or require('coxpcall').pcall
+local max_timeout = 120000
 
+---@param funs (async fun())[]
 local function async_join_run_wait(funs)
     local n_threads = 2 * (vim.uv.available_parallelism() or 1)
     --- @async
-    local function joined_f() async.join(n_threads, funs) end
-    async.run(joined_f)
+    local function joined_f()
+        ---@diagnostic disable-next-line: no-unknown
+        local semaphore = async.semaphore(n_threads)
+        ---@param f async fun()
+        local function run_one(f)
+            -- Isolate job failures. Task return still observes cancellation.
+            copcall(semaphore.with, semaphore, f)
+        end
+        for _, f in ipairs(funs) do
+            async.run(run_one, f)
+        end
+    end
+    async.run(joined_f):wait(max_timeout)
 end
 
 --- Execute function in parallel for each non-errored plugin in the list
@@ -355,9 +371,15 @@ local function run_list(parsers, f, progress_action)
     for _, p in ipairs(parsers) do
         --- @async
         funs[#funs + 1] = function()
-            local ok, err = copcall(f, p) --[[@as string]]
+            local ok, err = async.pawait(async.run(f, p))
             if not ok then
-                p.info.err = err --- @as string
+                if type(err) == 'string' then
+                    p.info.err = err
+                else
+                    --This should not happen
+                    p.info.err = 'Warning error result was not a string: '
+                        .. vim.inspect(err)
+                end
             end
 
             -- Show progress
