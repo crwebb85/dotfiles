@@ -1353,14 +1353,14 @@ end, {
 -------------------------------------------------------------------------------
 ---Task runner commands
 
----@class MakefileTelescopeOptions
+---@class MyMakefileOptions
 ---@field text string
 ---@field value string
 
 --- Given a path, open the file, extract all the Makefile keys,
 --  and return them as a list.
 ---@param path string
----@return MakefileTelescopeOptions[] options A telescope options list like
+---@return MyMakefileOptions[] options A telescope options list like
 --{ { text: "1 - all", value="all" }, { text: "2 - hello", value="hello" } ...}
 local function get_makefile_options(path)
     local options = {}
@@ -1403,15 +1403,15 @@ end
 ---@field throttled_update_cache function
 ---@field timer uv.uv_timer_t
 ---@field cwd string
----@field telescope_options_cache MakefileTelescopeOptions[]
+---@field makefile_options_cache MyMakefileOptions[]
 ---@field makefile_paths string[]
 
 ---@type table<string, FetchMakefileThrottledContext>
 local fetch_makefile_throttled_context_lookup = {} --table with key equal to the cwd
 
----Gets the telescope options for picking runnable makefile commands
+---Gets the options for picking runnable makefile commands
 ---@param cwd any
----@return MakefileTelescopeOptions[]
+---@return MyMakefileOptions[]
 local function get_makefile_options_throttled(cwd)
     local ctx = fetch_makefile_throttled_context_lookup[cwd]
     if ctx == nil then
@@ -1429,21 +1429,21 @@ local function get_makefile_options_throttled(cwd)
                     table.insert(all_command_options, command_option)
                 end
             end
-            inner_ctx.telescope_options_cache = all_command_options
+            inner_ctx.makefile_options_cache = all_command_options
         end, 30)
 
         ctx = {
             throttled_update_cache = throttled_function,
             timer = timer,
             cwd = cwd,
-            telescope_options_cache = {},
+            makefile_options_cache = {},
             makefile_paths = {},
         }
         fetch_makefile_throttled_context_lookup[cwd] = ctx
     end
     ctx.throttled_update_cache()
     -- vim.print('fetching cache')
-    return ctx.telescope_options_cache
+    return ctx.makefile_options_cache
 end
 
 vim.api.nvim_create_user_command('Make', function(params)
@@ -1472,79 +1472,6 @@ end, {
         return commands
     end),
     bar = true,
-})
-
-vim.api.nvim_create_user_command('Makeit', function(_)
-    -- dependencies
-    local conf = require('telescope.config').values
-    local actions = require('telescope.actions')
-    local state = require('telescope.actions.state')
-    local pickers = require('telescope.pickers')
-    local finders = require('telescope.finders')
-
-    local status, options_or_err = pcall(
-        get_makefile_options,
-        vim.fs.joinpath(vim.fn.getcwd(), 'Makefile')
-    )
-    local options = {}
-    if status then
-        options = options_or_err
-    else
-        vim.notify(
-            'Unable to open a Makefile in the current working dir.',
-            vim.log.levels.ERROR,
-            {
-                title = 'Make',
-            }
-        )
-    end
-
-    --- On option selected → Run action depending of the language
-    local function on_option_selected(prompt_bufnr)
-        actions.close(prompt_bufnr) -- Close Telescope on selection
-        local selection = state.get_selected_entry()
-        _G.makeit_redo = selection.value -- Save redo
-        if selection then
-            vim.cmd([[Make ]] .. selection.value) --TODO replace with a local function
-        end
-    end
-
-    --- Show telescope
-    local function open_telescope()
-        pickers
-            .new({}, {
-                prompt_title = 'Makeit',
-                results_title = 'Options',
-                finder = finders.new_table({
-                    results = options,
-                    entry_maker = function(entry)
-                        return {
-                            display = entry.text,
-                            value = entry.value,
-                            ordinal = entry.text,
-                        }
-                    end,
-                }),
-                sorter = conf.generic_sorter(),
-                attach_mappings = function(_, map)
-                    map(
-                        'i',
-                        '<CR>',
-                        function(prompt_bufnr) on_option_selected(prompt_bufnr) end
-                    )
-                    map(
-                        'n',
-                        '<CR>',
-                        function(prompt_bufnr) on_option_selected(prompt_bufnr) end
-                    )
-                    return true
-                end,
-            })
-            :find()
-    end
-    open_telescope() -- Entry point
-end, {
-    desc = 'Opens telescope picker to pick the Make task to run',
 })
 
 ---@class HurlUserCommandArguments
@@ -1664,195 +1591,55 @@ local function parse_hurl_command_fargs(fargs)
     }
 end
 
----finds the env file and runs the callback with the selection
----@param current_hurl_args HurlUserCommandArguments
----@param callback fun(updated_hurl_args: HurlUserCommandArguments)
-local function telescope_find_env(current_hurl_args, callback)
-    local conf = require('telescope.config').values
-    local actions = require('telescope.actions')
-    local state = require('telescope.actions.state')
-    local pickers = require('telescope.pickers')
-    local make_entry_from_string =
-        require('telescope.make_entry').gen_from_string({})
-    local opts = {}
-    pickers
-        .new(opts, {
-            prompt_title = 'Path to env',
-            finder = require('myconfig.my_telescope_utils').new_oneshot_job_with_extra_entries(
-                {
-                    'rg',
-                    '--files',
-                    '--hidden',
-                    '--ignore-vcs', -- So that ripgrep won't ignore gitignore files
-
-                    '--glob',
-                    '!node_modules',
-                    '--glob',
-                    '!venv',
-                    '--glob',
-                    '!.venv',
-
-                    '--glob',
-                    '*.env',
-                },
-                {
-                    results = {
-                        make_entry_from_string(''), --We use an empty string entry denote not using an env file when running hurl
-                    },
-                }
-            ),
-            sorter = conf.generic_sorter(opts),
-            attach_mappings = function(buffer_number)
-                local canceled = true
-                local updated_hurl_args = vim.deepcopy(current_hurl_args)
-                actions.select_default:replace(function()
-                    local status, err = pcall(function()
-                        local selection = state.get_selected_entry()
-                        if selection == nil then return end
-
-                        canceled = false
-                        if selection[1] == '' then return end
-
-                        updated_hurl_args.env_path =
-                            vim.fs.abspath(selection[1])
-                    end)
-                    actions.close(buffer_number)
-                    if not status then error(err) end
-                end)
-
-                actions.close:enhance({
-                    post = function()
-                        if canceled then
-                            vim.notify(
-                                'Canceling hurl command because env picker was exited without selection',
-                                vim.log.levels.WARN
-                            )
-                            return
-                        end
-                        callback(updated_hurl_args)
-                    end,
-                })
-                return true
-            end,
-        })
-        :find()
-end
-
----finds the hurl file and runs the callback with the selection
----@param current_hurl_args HurlUserCommandArguments
----@param callback fun(updated_hurl_args: HurlUserCommandArguments)
-local function telescope_find_hurl(current_hurl_args, callback)
-    local conf = require('telescope.config').values
-    local actions = require('telescope.actions')
-    local state = require('telescope.actions.state')
-    local pickers = require('telescope.pickers')
-    local finders = require('telescope.finders')
-    local opts = {}
-    pickers
-        .new(opts, {
-            prompt_title = 'Path to hurl file',
-
-            finder = finders.new_oneshot_job({
-                'rg',
-                '--files',
-                '--hidden',
-                '--ignore-vcs', -- So that ripgrep won't ignore gitignore files
-
-                '--glob',
-                '!node_modules',
-                '--glob',
-                '!venv',
-                '--glob',
-                '!.venv',
-
-                '--glob',
-                '*.hurl',
-            }, {}),
-            sorter = conf.generic_sorter(opts),
-            attach_mappings = function(buffer_number)
-                local updated_hurl_args = vim.deepcopy(current_hurl_args)
-                actions.select_default:replace(function()
-                    local status, err = pcall(function()
-                        local selection = state.get_selected_entry()
-                        if selection == nil then return end
-
-                        updated_hurl_args.hurl_path =
-                            vim.fs.abspath(selection[1])
-                    end)
-                    actions.close(buffer_number)
-                    if not status then error(err) end
-                end)
-
-                actions.close:enhance({
-                    post = function()
-                        if updated_hurl_args.hurl_path == nil then
-                            vim.notify(
-                                'Canceling hurl command because no hurl file was selected',
-                                vim.log.levels.WARN
-                            )
-                            return
-                        end
-                        callback(updated_hurl_args)
-                    end,
-                })
-                return true
-            end,
-        })
-        :find()
-end
-
 vim.api.nvim_create_user_command('Hurl', function(params)
     local args = parse_hurl_command_fargs(params.fargs)
 
     if args.hurl_path == nil then
         -- find hurl path (fuzzy picker)
         -- then find env path (fuzzy picker)
-        telescope_find_hurl(args, function(hurl_args_updated_with_hurl_path)
-            -- vim.print('hi from hurl')
-            if args.env_path == nil then
-                telescope_find_env(
-                    hurl_args_updated_with_hurl_path,
-                    function(hurl_args_updated_with_env_path)
-                        -- vim.print('hi from hurl to env')
-                        -- vim.print(hurl_args_updated_with_env_path)
-                        local builder =
-                            require('overseer.template.hurl.hurl').hurl_builder_builder({
-                                hurl_path = hurl_args_updated_with_env_path.hurl_path,
-                                env_path = hurl_args_updated_with_env_path.env_path,
-                            })
+        --
+        local hurl_file = require('myconfig.picker').hurl_files_picker({
+            source = {
+                name = 'Path to hurl file',
+                choose = function(_) end,
+            },
+        })
+        if hurl_file == nil then
+            vim.notify(
+                'Canceling hurl command because no hurl file was selected',
+                vim.log.levels.WARN
+            )
+            return
+        end
 
-                        local task = require('overseer').new_task(builder())
-                        task:start()
-                    end
-                )
-            else
-                -- vim.print('hi')
-                -- vim.print(hurl_args_updated_with_hurl_path)
-                local builder =
-                    require('overseer.template.hurl.hurl').hurl_builder_builder({
-                        hurl_path = hurl_args_updated_with_hurl_path.hurl_path,
-                        env_path = hurl_args_updated_with_hurl_path.env_path,
-                    })
-
-                local task = require('overseer').new_task(builder())
-                task:start()
-            end
-        end)
-    elseif args.env_path == nil then
-        -- find env path (fuzzy picker)
-        telescope_find_env(args, function(updated_hurl_args)
-            -- vim.print('hi from hurl')
-            -- vim.print(updated_hurl_args)
-            local builder =
-                require('overseer.template.hurl.hurl').hurl_builder_builder({
-                    hurl_path = updated_hurl_args.hurl_path,
-                    env_path = updated_hurl_args.env_path,
-                })
-
-            local task = require('overseer').new_task(builder())
-            task:start()
-        end)
+        args.hurl_path = vim.fs.abspath(hurl_file)
     end
+    if args.env_path == nil then
+        local env_file = require('myconfig.picker').env_files_picker({
+            source = {
+                name = 'Path to env file',
+                default_items = { '' },
+                choose = function(_) end,
+            },
+        })
+        if env_file == nil then
+            vim.notify(
+                'Canceling hurl command because env picker was exited without selection',
+                vim.log.levels.WARN
+            )
+            return
+        end
+        if env_file ~= '' then args.env_path = vim.fs.abspath(env_file) end
+    end
+
+    local builder =
+        require('overseer.template.hurl.hurl').hurl_builder_builder({
+            hurl_path = args.hurl_path,
+            env_path = args.env_path,
+        })
+
+    local task = require('overseer').new_task(builder())
+    task:start()
 end, {
     desc = 'Hurl file with env via overseer',
     nargs = '*',

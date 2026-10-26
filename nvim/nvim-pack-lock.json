@@ -44,11 +44,6 @@
       "rev": "070a5d7b985546cc57e1fc61e5bc507fecac6045",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
-    "harpoon": {
-      "rev": "87b1a3506211538f460786c23f98ec63ad9af4e5",
-      "src": "https://github.com/ThePrimeagen/harpoon",
-      "version": "'harpoon2'"
-    },
     "heirline.nvim": {
       "rev": "fae936abb5e0345b85c3a03ecf38525b0828b992",
       "src": "https://github.com/rebelot/heirline.nvim"
@@ -69,9 +64,17 @@
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",
       "src": "https://github.com/williamboman/mason.nvim"
     },
+    "mini.extra": {
+      "rev": "6cbc59d875a9768819091d0a56223205022cbe72",
+      "src": "https://github.com/nvim-mini/mini.extra"
+    },
     "mini.icons": {
       "rev": "f642e3ba8c12afbc8f32f6d77ef6597eac56786f",
       "src": "https://github.com/nvim-mini/mini.icons"
+    },
+    "mini.pick": {
+      "rev": "9368112b7cafb61d837bed55fc6f40e55df53fa0",
+      "src": "https://github.com/nvim-mini/mini.pick"
     },
     "molten-nvim": {
       "rev": "a286aa914d9a154bc359131aab788b5a077a5a99",
@@ -89,10 +92,6 @@
     "neotest-python": {
       "rev": "1b56ca4ba51c6014f986d6548ee629bdc95589d1",
       "src": "https://github.com/nvim-neotest/neotest-python"
-    },
-    "neotest-rust": {
-      "rev": "2c9941d4a358839918fac21d20fc8fef0e1ad05f",
-      "src": "https://github.com/rouge8/neotest-rust"
     },
     "neotest-vstest": {
       "rev": "de30c7978937d07e6d29ab7807a00fad1c61120b",
@@ -147,10 +146,6 @@
       "rev": "a93d9f6d6defdac4bcd6d2c8ba988650e42e0a0e",
       "src": "https://github.com/stevearc/overseer.nvim"
     },
-    "plenary.nvim": {
-      "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
-      "src": "https://github.com/nvim-lua/plenary.nvim"
-    },
     "profile.nvim": {
       "rev": "30433d7513f0d14665c1cfcea501c90f8a63e003",
       "src": "https://github.com/stevearc/profile.nvim"
@@ -174,14 +169,6 @@
     "substitute.nvim": {
       "rev": "0d2077398552f069abccbd964a26dd7cd26882cd",
       "src": "https://github.com/gbprod/substitute.nvim"
-    },
-    "telescope-luasnip.nvim": {
-      "rev": "07a2a2936a7557404c782dba021ac0a03165b343",
-      "src": "https://github.com/benfowler/telescope-luasnip.nvim"
-    },
-    "telescope.nvim": {
-      "rev": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
-      "src": "https://github.com/nvim-telescope/telescope.nvim"
     },
     "tiny-code-action.nvim": {
       "rev": "91a9c32228e9a7761d241023d9ebb9d11d8fb10d",

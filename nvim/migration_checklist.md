@@ -6,7 +6,6 @@
 - add a sort QF/loc list command
 - add a dd QF/loc list keymap
 - setup luarc.json
-- [x] fix bug where the character at the cursor is getting pasted into telescope
 - [x] refactor to first download all plugins and then only load the ones I want to load
 - load profile.nvim when using it's keymap
 - My quickfix commands don't open the quickfix menu so that I can chain them together but

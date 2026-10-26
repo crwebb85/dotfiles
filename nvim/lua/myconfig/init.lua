@@ -249,14 +249,11 @@ now(function()
         ---------------------------------------------------------------------------
         -- Util plugins used by other plugins
 
-        -- plenary is used by:
-        --  - nvim-telescope/telescope.nvim
-        { src = 'https://github.com/nvim-lua/plenary.nvim' },
         -- nvim-tree/nvim-web-devicons is used by:
         --  - sindrets/diffview.nvim
         { src = 'https://github.com/nvim-tree/nvim-web-devicons' },
         -- nvim-mini/mini.icons is used by:
-        --  - nvim-telescope/telescope.nvim
+        --  - nvim-mini/mini.pick
         --  - MeanderingProgrammer/render-markdown.nvim
         { src = 'https://github.com/nvim-mini/mini.icons' },
 
@@ -354,12 +351,8 @@ now(function()
         -- File Navigation
 
         -- Fuzzy finder (for many things not just file finder)
-        { src = 'https://github.com/nvim-telescope/telescope.nvim' },
-        -- Harpoon (fast file navigation between pinned files)
-        {
-            src = 'https://github.com/ThePrimeagen/harpoon',
-            version = 'harpoon2',
-        },
+        { src = 'https://github.com/nvim-mini/mini.pick' },
+        { src = 'https://github.com/nvim-mini/mini.extra' }, -- includes extra pickers
 
         ---------------------------------------------------------------------------
         -- Undotree the solution to screw ups
@@ -405,7 +398,6 @@ now(function()
         { src = 'https://github.com/nvim-neotest/neotest' },
 
         -- Test adapters
-        { src = 'https://github.com/rouge8/neotest-rust' }, -- TODO replace neotest-rust because it is archived
         { src = 'https://github.com/nvim-neotest/neotest-python' },
         { src = 'https://github.com/nsidorenco/neotest-vstest' },
 
@@ -436,7 +428,6 @@ now(function()
         -- Configure snippets
         { src = 'https://github.com/L3MON4D3/LuaSnip' },
         { src = 'https://github.com/rafamadriz/friendly-snippets' },
-        { src = 'https://github.com/benfowler/telescope-luasnip.nvim' },
         { src = 'https://github.com/crwebb85/luasnip-lsp-server.nvim' },
 
         -- Virtual Environments
@@ -452,7 +443,7 @@ now(function()
         { src = 'https://github.com/Decodetalkers/csharpls-extended-lsp.nvim' },
 
         -- A more robust code action menu
-        -- depends on telescope.nvim
+        -- depends on mini.pick
         { src = 'https://github.com/rachartier/tiny-code-action.nvim' },
 
         -- Code Action Macros
@@ -1204,11 +1195,8 @@ later(function()
     -- setup akinsho/git-conflict.nvim
     later(plugin_setups.setup_git_conflict)
 
-    -- setup nvim-telescope/telescope.nvim
-    later(plugin_setups.setup_telescope)
-
-    -- setup ThePrimeagen/harpoon
-    later(plugin_setups.setup_harpoon)
+    -- setup nvim-mini/mini.pick
+    later(plugin_setups.setup_mini_pick)
 
     -- setup mbbill/undotree
     later(plugin_setups.setup_undotree)
@@ -1274,6 +1262,17 @@ later(function()
     later(plugin_setups.setup_render_markdown)
 
     later(plugin_setups.setup_profile_nvim)
+
+    later(
+        function()
+            require('myconfig.harpoon'):setup({
+                settings = {
+                    save_on_toggle = true,
+                    sync_on_ui_close = true,
+                },
+            })
+        end
+    )
 end)
 
 -- TODO

@@ -17,7 +17,7 @@
 - [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.5)
   (Windows only) Install with `dotnet tool install --global PowerShell`
 - [neovim](https://github.com/neovim/neovim) my editor. Use nightly release.
-- [ripgrep](https://github.com/BurntSushi/ripgrep) file finder used by pickers like telescope.nvim
+- [ripgrep](https://github.com/BurntSushi/ripgrep) file finder used by pickers like mini.pick
 - [Treesitter CLI](https://github.com/tree-sitter/tree-sitter) which is now required by nvim-treesitter
   run `tree-sitter --init-config` on first install
 - [mingw](https://www.mingw-w64.org/downloads/#mingw-w64-builds) used by nvim-treesitter
@@ -60,7 +60,7 @@
   (can also be installed with `choco install make`
 - [pandoc](https://pandoc.org/installing.html)
 - [chafa](https://github.com/hpjansson/chafa) converts images to ascii. Used by
-  my telescope.nvim picker to preview images. (can also be installed with
+  my mini.pick picker to preview images. (can also be installed with
   `winget install hpjansson.Chafa`
 - [choco](https://chocolatey.org/install) a package manager for programs on Windows
   (optional way to install programs)

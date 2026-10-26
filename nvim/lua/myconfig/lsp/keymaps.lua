@@ -83,7 +83,7 @@ function M.setup_lsp_keymaps()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_definition()
         else
-            --TODO change on_list to telescope on list for definition
+            --TODO change on_list to mini.pick on list for definition
             vim.lsp.buf.definition({ on_list = on_list_filter_dups })
         end
     end, {
@@ -93,7 +93,7 @@ function M.setup_lsp_keymaps()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_declaration()
         else
-            --TODO change on_list to telescope on list for declaration
+            --TODO change on_list to mini.pick on list for declaration
             vim.lsp.buf.declaration({ on_list = on_list_filter_dups })
         end
     end, {
@@ -103,7 +103,7 @@ function M.setup_lsp_keymaps()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_implementation()
         else
-            --TODO change on_list to telescope on list for implementation
+            --TODO change on_list to mini.pick on list for implementation
             vim.lsp.buf.implementation({ on_list = on_list_filter_dups })
         end
     end, {
@@ -112,11 +112,8 @@ function M.setup_lsp_keymaps()
     vim.keymap.set('n', 'go', function()
         if vim.fn.reg_executing() ~= '' or vim.fn.reg_recording() ~= '' then
             require('mark-code-action.locations').goto_type_definition()
-        -- elseif vim.bo.filetype == 'cs' then
-        --     --I should probably be checking for if client is omnisharp but this is good enough
-        --     require('omnisharp_extended').lsp_type_definition()
         else
-            --TODO change on_list to telescope on list for type_definition
+            --TODO change on_list to mini.pick on list for type_definition
             vim.lsp.buf.type_definition({ on_list = on_list_filter_dups })
         end
     end, {

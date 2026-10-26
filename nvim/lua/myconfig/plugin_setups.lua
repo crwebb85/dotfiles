@@ -381,27 +381,27 @@ function M.which_key()
         {
             '<leader>f',
             mode = { 'n', 'x' },
-            group = 'Telescope mappings',
+            group = 'mini.pick mappings',
         },
         {
             '<leader>fg',
             mode = { 'n', 'x' },
-            group = 'Telescope lsp mappings',
+            group = 'mini.pick lsp mappings',
         },
         {
             '<leader>fgr',
             mode = { 'n', 'x' },
-            group = 'Telescope lsp reference mappings',
+            group = 'mini.pick lsp reference mappings',
         },
         {
             '<leader>fn',
             mode = { 'n', 'x' },
-            group = 'Telescope notes mappings',
+            group = 'mini.pick notes mappings',
         },
         {
             '<leader>fz',
             mode = { 'n', 'x' },
-            group = 'Telescope misc mappings (notes, projects, pocs)',
+            group = 'mini.pick misc mappings (notes, projects, pocs)',
         },
         {
             '<leader>g',
@@ -801,785 +801,527 @@ function M.setup_git_conflict()
     })
 end
 
-function M.setup_telescope()
-    local action_state = require('telescope.actions.state')
-    local action_set = require('telescope.actions.set')
-    local utils = require('telescope.utils')
-    local log = require('telescope.log')
+function M.setup_mini_pick()
+    require('mini.pick').setup({
+        -- Notes
+        -- - Normal mode is not supported for search bar
+        -- - You can use <C-c> to exit the picker (I kindof want to replace all
+        --   my `q to exit` exit keymaps with this)
+        -- - `Tab` lets you toggle the preview
+        --
+        -- - [ ] respect file:line:column searches on file searches
+        -- - [ ] labeled pickers https://github.com/nvim-mini/mini.nvim/discussions/1109
+        -- - [ ] normalize file paths like my telescope picker edit override
+        --       ```lua
+        --          local current_cwd = vim.fs.normalize(assert(vim.uv.cwd()))
+        --          local root = entry.cwd and vim.fs.normalize(entry.cwd) or nil
+        --          if root == nil then root = current_cwd end
+        --          root = vim.fs.normalize(root)
+        --
+        --          -- vim.print(string.format('root: %s', root))
+        --          filename = vim.fs.normalize(filename)
+        --
+        --          --Note: This relative path nonsense might not be needed
+        --          local relname = vim.fs.relpath(root, filename)
+        --          if relname ~= nil then
+        --              filename = vim.fs.normalize(vim.fs.joinpath(root, relname))
+        --          end
+        --
+        --          --Note: since the command is normally 'edit' we need to
+        --          --use a normalized absolute path so that the file name
+        --          --will be a normalized path
+        --          pcall(
+        --              vim.cmd,
+        --              string.format(
+        --                  '%s %s',
+        --                  command,
+        --                  vim.fn.fnameescape(filename)
+        --              )
+        --          )
+        --       ```
+        --
+        -- - [x] pid telescope picker for processes
+        -- - [ ] add numbers to select override for quick selection
+        -- - [x] hurl picker
+        --
+        -- Default telescope pickers converted to mini
+        -- - [x] current_buffer_fuzzy_find
+        -- - [x] current_buffer_tags (I don't use tags so don't need this)
+        -- - [x] git_files
+        -- - [x] git_commits
+        -- - [x] git_branches
+        -- - [x] planets (not useful)
+        -- - [x] vim_options
+        -- - [x] man_pages (never worked on windows)
+        -- - [x] reloader (don't need this)
+        -- - [x] resume
+        -- - [x] grep_string
+        -- - [x] fd (duplicate of find files)
+        -- - [x] pickers (don't need this)
+        -- - [x] find_files
+        -- - [x] diagnostics
+        -- - [x] registers
+        -- - [x] lsp_type_definitions
+        -- - [x] lsp_dynamic_workspace_symbols
+        -- - [x] lsp_document_symbols
+        -- - [x] lsp_implementations
+        -- - [x] buffers
+        -- - [x] lsp_definitions
+        -- - [x] help_tags
+        -- - [x] lsp_references
+        -- - [x] spell_suggest
+        -- - [x] oldfiles
+        -- - [x] marks
+        -- - [x] filetypes (I don't need this
+        -- - [x] keymaps
+        -- - [x] colorscheme
+        -- - [x] live_grep
+        -- - [x] builtin
+        -- - [x] commands
+        -- - [ ] loclist
+        -- - [ ] quickfix
+        -- - [ ] quickfixhistory
+        -- - [ ] command_history
+        -- - [ ] search_history
+        -- - [ ] git_status
+        -- - [ ] jumplist
+        -- - [ ] tagstack
+        -- - [ ] treesitter (mini.nvim doesn't have the node text searchable)
+        -- - [ ] lsp_outgoing_calls
+        -- - [ ] lsp_incoming_calls
+        -- - [ ] lsp_workspace_symbols
+        -- - [ ] tags
+        -- - [ ] symbols
+        -- - [ ] highlights
+        -- - [ ] autocommands
+        -- - [ ] git_bcommits
+        -- - [ ] git_bcommits_range
+        -- - [ ] git_stash
+        --
+        --
+        -- Custom telescope pickers converted to mini
+        -- - [x] neovim_runtime
+        --   - [x] live_grep
+        --   - [x] find_files
+        -- - [x] neovim_data
+        --   - [x] live_grep
+        --   - [x] find_files
+        -- - [x] neovim_plugin
+        --   - [x] live_grep
+        --   - [x] find_files
+        -- - [x] neovim_config
+        --   - [x] live_grep
+        --   - [x] find_files
+        -- - [x] projects
+        --   - [x] projects
+        -- - [x] poc
+        --   - [x] poc
+        -- - [x] yaml_schema
+        --   - [x] yaml_schema
+        -- - [x] luasnip
+        --   - [x] luasnip
+        --   - [x] filter_null - this actually wasn't a picker
+        --   - [x] filter_description - this actually wasn't a picker
+        --   - [x] get_docstring - this actually wasn't a picker
+        -- - [ ] tiny-code-action
+        --   - [ ] code_action
+        -- - [x] csharpls_definition - skipped because this isn't really useful
+        --   - [x] csharpls_definition
+        -- - [x] media_files
+        --   - [x] media_files
+        -- - [x] skeleton
+        --   - [x] live_grep
+        --   - [x] find_files
+        -- - [x] notes
+        --   - [x] live_grep
+        --   - [x] find_files
+        -- - [x] harpoon
+        --   - [x] harpoon
 
-    local map = {
-        drop = 'drop',
-        ['tab drop'] = 'tab drop',
-        edit = 'buffer',
-        new = 'sbuffer',
-        vnew = 'vert sbuffer',
-        ['leftabove new'] = 'leftabove sbuffer',
-        ['leftabove vnew'] = 'leftabove vert sbuffer',
-        ['rightbelow new'] = 'rightbelow sbuffer',
-        ['rightbelow vnew'] = 'rightbelow vert sbuffer',
-        ['topleft new'] = 'topleft sbuffer',
-        ['topleft vnew'] = 'topleft vert sbuffer',
-        ['botright new'] = 'botright sbuffer',
-        ['botright vnew'] = 'botright vert sbuffer',
-        tabedit = 'tab sb',
-    }
+        mappings = {
+            caret_left = '<Left>',
+            caret_right = '<Right>',
 
-    local edit_buffer = function(command, bufnr)
-        local buf_command = map[command]
-        if buf_command == nil then
-            local valid_commands = vim.tbl_map(
-                function(cmd) return string.format('%q', cmd) end,
-                vim.tbl_keys(map)
-            )
-            table.sort(valid_commands)
-            error(
-                string.format(
-                    'There was no associated buffer command for %q.\nValid commands are: %s.',
-                    command,
-                    table.concat(valid_commands, ', ')
-                )
-            )
-        end
-        if buf_command ~= 'drop' and buf_command ~= 'tab drop' then
-            vim.cmd(string.format('%s %d', buf_command, bufnr))
-        else
-            vim.cmd(
-                string.format(
-                    '%s %s',
-                    buf_command,
-                    vim.fn.fnameescape(vim.api.nvim_buf_get_name(bufnr))
-                )
-            )
-        end
-    end
+            choose = '<CR>',
+            choose_in_split = '<C-s>', -- my old telescope mapping was <A-x>
+            choose_in_tabpage = '<C-t>',
+            choose_in_vsplit = '<A-v>', -- remapped from <C-v>
+            choose_marked = '<M-CR>',
 
-    --- Edit a file based on the current selection.
-    --- From: https://github.com/nvim-telescope/telescope.nvim/blob/7ef4d6dccb78ee71e552bbd866176762ad328afa/lua/telescope/actions/set.lua#L127
-    ---@param prompt_bufnr number: The prompt bufnr
-    ---@param command string: The command to use to open the file.
-    --      Valid commands are:
-    --      - "edit"
-    --      - "new"
-    --      - "vedit"
-    --      - "tabedit"
-    --      - "drop"
-    --      - "tab drop"
-    --      - "leftabove new"
-    --      - "leftabove vnew"
-    --      - "rightbelow new"
-    --      - "rightbelow vnew"
-    --      - "topleft new"
-    --      - "topleft vnew"
-    --      - "botright new"
-    --      - "botright vnew"
-    local my_edit_override = function(prompt_bufnr, command)
-        -- vim.print('my edit')
-        local entry = action_state.get_selected_entry()
+            delete_char = '<BS>',
+            delete_char_right = '<Del>',
+            delete_left = '<C-u>',
+            delete_word = '<C-w>',
 
-        if not entry then
-            utils.notify('actions.set.edit', {
-                msg = 'Nothing currently selected',
-                level = 'WARN',
-            })
-            return
-        end
+            mark = '<C-x>',
+            mark_all = '<C-a>',
 
-        local filename, row, col
+            move_down = '<C-n>',
+            move_start = '<C-g>',
+            move_up = '<C-p>',
 
-        if entry.path or entry.filename then
-            filename = entry.path or entry.filename
+            paste = '<C-r>',
 
-            -- TODO: Check for off-by-one
-            row = entry.row or entry.lnum
-            col = entry.col
-        elseif not entry.bufnr then
-            -- TODO: Might want to remove this and force people
-            -- to put stuff into `filename`
-            local value = entry.value
-            if not value then
-                utils.notify('actions.set.edit', {
-                    msg = 'Could not do anything with blank line...',
-                    level = 'WARN',
-                })
-                return
-            end
+            refine = '<C-Space>', -- Doesn't work
+            refine_marked = '<M-Space>', -- Doesn't work
 
-            if type(value) == 'table' then value = entry.display end
+            scroll_down = '<C-f>',
+            scroll_left = '<C-h>',
+            scroll_right = '<C-l>',
+            scroll_up = '<C-b>',
 
-            local sections = vim.split(value, ':')
+            -- Clear <Esc> from stopping the picker so it drops into Normal mode
+            -- use <C-c> instead to exit the picker
+            stop = '<Esc>',
 
-            filename = sections[1]
-            row = tonumber(sections[2])
-            col = tonumber(sections[3])
-        end
+            toggle_info = '<S-Tab>',
+            toggle_preview = '<Tab>',
 
-        local entry_bufnr = entry.bufnr
+            --<C-o> lets you add globs to live_grep
+            --<C-e> lets you switch method on live_grep
 
-        local picker = action_state.get_current_picker(prompt_bufnr)
-        require('telescope.pickers').on_close_prompt(prompt_bufnr)
-        pcall(vim.api.nvim_set_current_win, picker.original_win_id)
-        local win_id = picker.get_selection_window(picker, entry)
+            --Custom mappings
 
-        if picker.push_cursor_on_edit then vim.cmd("normal! m'") end
-
-        if picker.push_tagstack_on_edit then
-            local from = {
-                vim.fn.bufnr('%'),
-                vim.fn.line('.'),
-                vim.fn.col('.'),
-                0,
-            }
-            local items =
-                { { tagname = vim.fn.expand('<cword>'), from = from } }
-            vim.fn.settagstack(vim.fn.win_getid(), { items = items }, 't')
-        end
-
-        if win_id ~= 0 and vim.api.nvim_get_current_win() ~= win_id then
-            vim.api.nvim_set_current_win(win_id)
-        end
-
-        if entry_bufnr then
-            if not vim.bo[entry_bufnr].buflisted then
-                vim.bo[entry_bufnr].buflisted = true
-            end
-            edit_buffer(command, entry_bufnr)
-        else
-            -- check if we didn't pick a different buffer
-            -- prevents restarting lsp server
-            if
-                vim.api.nvim_buf_get_name(0) ~= filename
-                or command ~= 'edit'
-            then
-                local current_cwd = vim.fs.normalize(assert(vim.uv.cwd()))
-                local root = entry.cwd and vim.fs.normalize(entry.cwd) or nil
-                if root == nil then root = current_cwd end
-                root = vim.fs.normalize(root)
-
-                -- vim.print(string.format('root: %s', root))
-                filename = vim.fs.normalize(filename)
-
-                --Note: This relative path nonsense might not be needed
-                local relname = vim.fs.relpath(root, filename)
-                if relname ~= nil then
-                    filename = vim.fs.normalize(vim.fs.joinpath(root, relname))
-                end
-
-                --Note: since the command is normally 'edit' we need to
-                --use a normalized absolute path so that the file name
-                --will be a normalized path
-                pcall(
-                    vim.cmd,
-                    string.format(
-                        '%s %s',
-                        command,
-                        vim.fn.fnameescape(filename)
-                    )
-                )
-            end
-        end
-
-        -- HACK: fixes folding: https://github.com/nvim-telescope/telescope.nvim/issues/699
-        if vim.wo[0][0].foldmethod == 'expr' then
-            vim.schedule(function() vim.wo[0][0].foldmethod = 'expr' end)
-        end
-
-        local pos = vim.api.nvim_win_get_cursor(0)
-        if col == nil then
-            if row == pos[1] then
-                col = pos[2] + 1
-            elseif row == nil then
-                row, col = pos[1], pos[2] + 1
-            else
-                col = 1
-            end
-        end
-
-        if row and col then
-            if vim.api.nvim_buf_get_name(0) == filename then
-                vim.cmd([[normal! m']])
-            end
-            local ok, err_msg =
-                pcall(vim.api.nvim_win_set_cursor, 0, { row, col })
-            if not ok then
-                log.debug('Failed to move to cursor:', err_msg, row, col)
-            end
-        end
-    end
-
-    action_set.edit = my_edit_override
-    require('telescope').setup({
-        defaults = {
-            -- path_display = { 'filename_first' },
-            dynamic_preview_title = true,
-            mappings = {
-                i = {
-
-                    ['<CR>'] = function(...)
-                        require('telescope.actions').select_default(...)
-
-                        local escape_key = vim.api.nvim_replace_termcodes(
-                            '<ESC>',
-                            true,
-                            false,
-                            true
-                        )
-                        vim.api.nvim_feedkeys(escape_key, 'm', false) -- Set mode to normal mode
-                    end,
-                    ['<A-v>'] = function(...)
-                        require('telescope.actions').select_vertical(...)
-                    end,
-                    ['<A-x>'] = function(...)
-                        require('telescope.actions').select_horizontal(...)
-                    end,
-                    ['<C-b>'] = function(prompt_bufnr)
-                        --Using my bufdelete (modified version of famiu/bufdelete.nvim)
-                        --instead of require('telescope.actions').delete_buffer since this
-                        --version will preserve window layout and give me a prompt to save buffers
-                        local current_picker = require(
-                            'telescope.actions.state'
-                        ).get_current_picker(
-                            prompt_bufnr
-                        )
-                        current_picker:delete_selection(function(selection)
-                            local ok, result = pcall(
-                                require('myconfig.bufdelete').bufdelete,
-                                selection.bufnr
-                            )
-                            return ok and result[selection.bufnr] == true
-                        end)
-                    end,
-                },
+            -- Map <C-q> to mark all items and send them to the quickfix list
+            -- equivalent to <C-a><M-CR> which markss all matches and send them
+            -- to the quickfix list
+            send_to_qflist = {
+                char = '<C-q>',
+                func = function()
+                    local pick = require('mini.pick')
+                    -- Mark all matches
+                    pick.default_choose_marked(pick.get_picker_matches().all)
+                end,
             },
-        },
-        pickers = {
-            find_files = {
-                find_command = function(_)
-                    local cwd = vim.fn.getcwd()
-                    if string.find(cwd, '.gitworktrees') then
-                        return {
-                            'rg',
-                            '--files',
-                            '--hidden',
-                            '--glob',
-                            '!.git',
-                            '--glob',
-                            '!node_modules',
-                            '--glob',
-                            '!venv',
-                            '--glob',
-                            '!.venv',
-                        }
-                    end
 
-                    return {
-                        'rg',
-                        '--files',
-                        '--hidden',
-                        '--glob',
-                        '!.git',
-                        '--glob',
-                        '!node_modules',
-                        '--glob',
-                        '!venv',
-                        '--glob',
-                        '!.venv',
-                        '--glob',
-                        '!.gitworktrees',
-                    }
+            delete_match_buffer = {
+                char = '<C-d>', -- my old telescope mapping was <C-b>
+                func = function()
+                    local buffer_items = require('mini.pick').get_picker_items()
+                    local match =
+                        require('mini.pick').get_picker_matches().current
+                    if match and match.bufnr then
+                        --Using my bufdelete (modified version of famiu/bufdelete.nvim)
+                        --will preserve window layout and give me a prompt to save buffers
+                        local bufnrs_deleted_map =
+                            require('myconfig.bufdelete').bufdelete(match.bufnr)
+                        local filtered_items = vim.tbl_filter(
+                            function(item)
+                                return not (
+                                    item.bufnr ~= nil
+                                    and bufnrs_deleted_map[item.bufnr]
+                                        == true
+                                )
+                            end,
+                            buffer_items
+                        )
+                        require('mini.pick').set_picker_items(filtered_items)
+                    end
                 end,
             },
         },
     })
 
-    -- My telescope extensions
-    require('telescope').load_extension('media_files')
-    require('telescope').load_extension('skeleton')
-    require('telescope').load_extension('notes')
-    require('telescope').load_extension('harpoon')
-    require('telescope').load_extension('neovim_runtime')
-    require('telescope').load_extension('neovim_data')
-    require('telescope').load_extension('neovim_plugin')
-    require('telescope').load_extension('neovim_config')
-    require('telescope').load_extension('projects')
-    require('telescope').load_extension('poc')
-    require('telescope').load_extension('yaml_schema')
+    require('mini.extra').setup()
 
-    vim.keymap.set(
-        { 'n' },
-        '<leader>ff',
-        function() require('telescope.builtin').find_files() end,
-        {
-            desc = 'Telescope: find files (supports line number and col `path:line:col`) ',
-        }
-    )
-    vim.keymap.set({ 'v' }, '<leader>ff', function()
-        local start_pos = vim.fn.getpos('v')
-        local end_pos = vim.fn.getpos('.')
-        local text_lines = vim.fn.getregion(start_pos, end_pos)
-        for index, text_line in ipairs(text_lines) do
-            text_lines[index] = vim.fn.trim(text_line)
+    local function schedule_picker_default_text(default_text)
+        -- 1. Schedule setting the query so it runs right after the picker is active
+        vim.schedule(function()
+            if require('mini.pick').is_picker_active() then
+                -- Split the string into a table of characters
+                local chars = vim.split(default_text, '')
+                require('mini.pick').set_picker_query(chars)
+            end
+        end)
+    end
+
+    vim.keymap.set({ 'n', 'v' }, '<leader>ff', function()
+        local mode = vim.api.nvim_get_mode().mode
+        if mode == 'v' then
+            local start_pos = vim.fn.getpos('v')
+            local end_pos = vim.fn.getpos('.')
+            local text_lines = vim.fn.getregion(start_pos, end_pos)
+            for index, text_line in ipairs(text_lines) do
+                text_lines[index] = vim.fn.trim(text_line)
+            end
+
+            local text = vim.fn.join(text_lines, '')
+
+            local root_dir = vim.fn.getcwd()
+            if root_dir ~= nil then
+                --escape special regex characters
+                local root_dir_regex = root_dir
+                root_dir_regex = string.gsub(root_dir_regex, '%(', '%%%(')
+                root_dir_regex = string.gsub(root_dir_regex, '%)', '%%%)')
+                root_dir_regex = string.gsub(root_dir_regex, '%.', '%%%.')
+                root_dir_regex = string.gsub(root_dir_regex, '%%', '%%%%')
+                root_dir_regex = string.gsub(root_dir_regex, '%+', '%%%+')
+                root_dir_regex = string.gsub(root_dir_regex, '%-', '%%%-')
+                root_dir_regex = string.gsub(root_dir_regex, '%*', '%%%*')
+                root_dir_regex = string.gsub(root_dir_regex, '%?', '%%%?')
+                root_dir_regex = string.gsub(root_dir_regex, '%[', '%%%[')
+                root_dir_regex = string.gsub(root_dir_regex, '%^', '%%%^')
+                root_dir_regex = string.gsub(root_dir_regex, '%$', '%%%$')
+
+                --replace path seperators with a char-set
+                root_dir_regex = string.gsub(root_dir_regex, '[\\/]+', '[\\/]+')
+
+                text = string.gsub(text, root_dir_regex, '')
+            end
+
+            -- remove leading slashes and backslashes
+            text = vim.fn.substitute(text, '^[\\/]*', '', '')
+
+            schedule_picker_default_text(text)
         end
-
-        local text = vim.fn.join(text_lines, '')
-
-        local root_dir = vim.fn.getcwd()
-        if root_dir ~= nil then
-            --escape special regex characters
-            local root_dir_regex = root_dir
-            root_dir_regex = string.gsub(root_dir_regex, '%(', '%%%(')
-            root_dir_regex = string.gsub(root_dir_regex, '%)', '%%%)')
-            root_dir_regex = string.gsub(root_dir_regex, '%.', '%%%.')
-            root_dir_regex = string.gsub(root_dir_regex, '%%', '%%%%')
-            root_dir_regex = string.gsub(root_dir_regex, '%+', '%%%+')
-            root_dir_regex = string.gsub(root_dir_regex, '%-', '%%%-')
-            root_dir_regex = string.gsub(root_dir_regex, '%*', '%%%*')
-            root_dir_regex = string.gsub(root_dir_regex, '%?', '%%%?')
-            root_dir_regex = string.gsub(root_dir_regex, '%[', '%%%[')
-            root_dir_regex = string.gsub(root_dir_regex, '%^', '%%%^')
-            root_dir_regex = string.gsub(root_dir_regex, '%$', '%%%$')
-
-            --replace path seperators with a char-set
-            root_dir_regex = string.gsub(root_dir_regex, '[\\/]+', '[\\/]+')
-
-            text = string.gsub(text, root_dir_regex, '')
-        end
-
-        -- remove leading slashes and backslashes
-        text = vim.fn.substitute(text, '^[\\/]*', '', '')
-
-        require('telescope.builtin').find_files({
-            default_text = text,
-        })
+        require('myconfig.picker').files_with_glob()
     end, {
-        desc = 'Telescope: find files (supports line number and col `path:line:col`) ',
+        desc = 'mini.pick: find files',
     })
-    vim.keymap.set(
-        { 'n' },
-        '<leader>fs',
-        function() require('telescope').load_extension('luasnip').luasnip() end,
-        {
-            desc = 'Telescope Luasnip: Select a snippet',
-        }
-    )
+
     vim.keymap.set({ 'n', 'v' }, '<leader>fl', function()
         local mode = vim.api.nvim_get_mode().mode
         if mode == 'v' then
-            -- First greps for the visual selection then lets you grep those results with a new grep
-            --
-            -- Note: while I used to have telescope grep_string as a different keymap so that I could
-            -- also use it in normal mode to search the <cword> (word under cursor) I just never remembered
-            -- to use it that way so I decided to free up that keymap namespace for other uses
-            require('telescope.builtin').grep_string()
-        else
-            require('telescope.builtin').live_grep()
+            local start_pos = vim.fn.getpos('v')
+            local end_pos = vim.fn.getpos('.')
+            local text_lines = vim.fn.getregion(start_pos, end_pos)
+
+            local text = table.concat(text_lines, '\n')
+            text = string.gsub(text, '\n', '')
+            text = vim.trim(text)
+
+            schedule_picker_default_text(text)
         end
+        require('mini.pick').builtin.grep_live()
     end, {
-        desc = 'Telescope: live_grep',
+        desc = 'mini.pick: live_grep',
     })
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fb',
+        function() require('mini.pick').builtin.buffers() end,
+        {
+            desc = 'mini.pick: open buffers',
+        }
+    )
+
+    vim.keymap.set({ 'n', 'v' }, '<leader>fh', function()
+        local mode = vim.api.nvim_get_mode().mode
+        if mode == 'v' then
+            local start_pos = vim.fn.getpos('v')
+            local end_pos = vim.fn.getpos('.')
+            local text_lines = vim.fn.getregion(start_pos, end_pos)
+
+            local text = table.concat(text_lines, '\n')
+            text = string.gsub(text, '\n', '')
+            text = vim.trim(text)
+
+            schedule_picker_default_text(text)
+        end
+        require('mini.pick').builtin.help({})
+    end, {
+        desc = 'mini.pick: help tags',
+    })
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fk',
+        function() require('mini.extra').pickers.keymaps() end,
+        {
+            desc = 'mini.pick: keymaps',
+        }
+    )
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fr',
+        function() require('mini.pick').builtin.resume() end,
+        {
+            desc = 'mini.pick: resume',
+        }
+    )
+
     vim.keymap.set(
         { 'n' },
         '<leader>fgd',
-        function()
-            require('telescope.builtin').lsp_definitions({
-                jump_type = 'never',
-            })
-        end,
+        function() require('mini.extra').pickers.lsp({ scope = 'definition' }) end,
         {
-            desc = 'Telescope: LSP definition',
+            desc = 'mini.pick: LSP definition',
         }
     )
-    -- vim.keymap.set({ 'n' }, '<leader>fgD', function()
-    --     require('telescope.builtin').lsp_declarations({ --This builtin doesn't exist
-    --         jump_type = 'never',
-    --     })
-    -- end, {
-    --     desc = 'Telescope: LSP declaration',
-    -- })
+
     vim.keymap.set(
         { 'n' },
         '<leader>fgi',
         function()
-            require('telescope.builtin').lsp_implementations({
-                jump_type = 'never',
-            })
+            require('mini.extra').pickers.lsp({ scope = 'implementation' })
         end,
         {
-            desc = 'Telescope: LSP implementation',
+            desc = 'mini.pick: LSP implementation',
         }
     )
     vim.keymap.set(
         { 'n' },
         '<leader>fgo',
         function()
-            require('telescope.builtin').lsp_type_definitions({
-                jump_type = 'never',
-            })
+            require('mini.extra').pickers.lsp({ scope = 'type_definition' })
         end,
         {
-            desc = 'Telescope: LSP type definition',
+            desc = 'mini.pick: LSP type definition',
         }
     )
     vim.keymap.set(
         { 'n' },
         '<leader>fgrr',
-        function()
-            require('telescope.builtin').lsp_references({
-                jump_type = 'never',
-            })
-        end,
+        function() require('mini.extra').pickers.lsp({ scope = 'references' }) end,
         {
-            desc = 'Telescope: LSP references',
+            desc = 'mini.pick: LSP references',
         }
     )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>fb',
-        function() require('telescope.builtin').buffers() end,
-        {
-            desc = 'Telescope: open buffers',
-        }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>fh',
-        function() require('telescope.builtin').help_tags() end,
-        {
-            desc = 'Telescope: help tags',
-        }
-    )
-    vim.keymap.set({ 'v' }, '<leader>fh', function()
-        local start_pos = vim.fn.getpos('v')
-        local end_pos = vim.fn.getpos('.')
-        local text_lines = vim.fn.getregion(start_pos, end_pos)
 
-        local text = table.concat(text_lines, '\n')
-        text = string.gsub(text, '\n', '')
-        text = vim.trim(text)
-
-        require('telescope.builtin').help_tags({
-            default_text = text,
-        })
-    end, {
-        desc = 'Telescope: help tags',
-    })
-    vim.keymap.set(
-        { 'n' },
-        '<leader>fk',
-        function() require('telescope.builtin').keymaps() end,
-        {
-            desc = 'Telescope: keymaps',
-        }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>fd',
-        function() require('telescope.builtin').spell_suggest() end,
-        {
-            desc = 'Telescope: suggest spelling (search dictionary)',
-        }
-    )
     vim.keymap.set(
         { 'n' },
         '<leader>fm',
-        function() require('telescope.builtin').marks() end,
+        function() require('mini.extra').pickers.marks() end,
         {
-            desc = 'Telescope: marks',
+            desc = 'mini.pick: marks',
         }
     )
     vim.keymap.set(
         { 'n' },
         '<leader>fo',
-        function() require('telescope.builtin').oldfiles() end,
+        function() require('mini.extra').pickers.oldfiles() end,
         {
-            desc = 'Telescope: old files',
+            desc = 'mini.pick: old files',
         }
     )
+
     vim.keymap.set(
         { 'n' },
         '<leader>fc',
-        function() require('telescope.builtin').git_status() end,
+        function() require('mini.extra').pickers.git_hunks() end,
         {
-            desc = 'Telescope: git status',
+            desc = 'mini.pick:: git hunks',
+        }
+    )
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fe',
+        function() require('myconfig.picker').harpoon_picker() end,
+        {
+            desc = 'mini.pick: harpoon',
+        }
+    )
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fzp',
+        function() require('myconfig.picker').projects_picker() end,
+        {
+            desc = 'mini.pick: find project directory',
+        }
+    )
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fzc',
+        function() require('myconfig.picker').pocs_picker() end,
+        {
+            desc = 'mini.pick: find poc directory',
+        }
+    )
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fnf',
+        function() require('myconfig.picker').notes_files_picker() end,
+        {
+            desc = 'mini.pick: find files in note directory ',
         }
     )
     vim.keymap.set(
         { 'n' },
-        '<leader>fr',
-        function() require('telescope.builtin').resume() end,
+        '<leader>fng',
+        function() require('myconfig.picker').notes_grep_picker() end,
         {
-            desc = 'Telescope: resume',
+            desc = 'mini.pick: grep files in note directory ',
         }
     )
-    vim.keymap.set({ 'n' }, '<leader>fe', function()
-        --My custom picker defined in .config\nvim\lua\telescope\_extensions
-        require('telescope').load_extension('harpoon').harpoon()
-    end, {
-        desc = 'Telescope: harpoon',
-    })
-    vim.keymap.set({ 'n' }, '<leader>fnf', function()
-        --My custom picker defined in .config\nvim\lua\telescope\_extensions
-        require('telescope').load_extension('notes').find_files()
-    end, {
-        desc = 'Telescope: find files in note directory ',
-    })
-    vim.keymap.set({ 'n' }, '<leader>fng', function()
-        --My custom picker defined in .config\nvim\lua\telescope\_extensions
-        require('telescope').load_extension('notes').live_grep()
-    end, {
-        desc = 'Telescope: grep files in note directory ',
-    })
-    vim.keymap.set({ 'n' }, '<leader>fzz', function()
-        --My custom picker defined in .config\nvim\lua\telescope\_extensions
-        require('telescope').load_extension('skeleton').find_files()
-    end, {
-        desc = 'Telescope: find skeletons (file templates) ',
-    })
-    vim.keymap.set({ 'n' }, '<leader>fzp', function()
-        --My custom picker defined in .config\nvim\lua\telescope\_extensions
-        require('telescope').load_extension('projects').projects()
-    end, {
-        desc = 'Telescope: find project directory',
-    })
-    vim.keymap.set({ 'n' }, '<leader>fzc', function()
-        --My custom picker defined in .config\nvim\lua\telescope\_extensions
-        require('telescope').load_extension('poc').poc()
-    end, {
-        desc = 'Telescope: find poc directory',
-    })
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fzz',
+        function() require('myconfig.picker').skeleton_find_files_picker() end,
+        {
+            desc = 'mini.pick: find skeletons (file templates) ',
+        }
+    )
+
+    vim.keymap.set(
+        { 'n' },
+        '<leader>fs',
+        function() require('myconfig.picker').luasnip_picker() end,
+        {
+            desc = 'mini.pick Luasnip: Select a snippet',
+        }
+    )
+
+    require('mini.pick').registry.harpoon =
+        require('myconfig.picker').harpoon_picker
+
+    require('mini.pick').registry.projects =
+        require('myconfig.picker').projects_picker
+
+    require('mini.pick').registry.poc = require('myconfig.picker').pocs_picker
+
+    require('mini.pick').registry.notes_find_files =
+        require('myconfig.picker').notes_files_picker
+    require('mini.pick').registry.notes_live_grep =
+        require('myconfig.picker').notes_grep_picker
+
+    require('mini.pick').registry.neovim_config_find_files =
+        require('myconfig.picker').neovim_config_find_files_picker
+    require('mini.pick').registry.neovim_config_live_grep =
+        require('myconfig.picker').neovim_config_grep_files_picker
+
+    require('mini.pick').registry.skeleton_find_files =
+        require('myconfig.picker').skeleton_find_files_picker
+    require('mini.pick').registry.skeleton_live_grep =
+        require('myconfig.picker').skeleton_grep_files_picker
+
+    require('mini.pick').registry.neovim_data_find_files =
+        require('myconfig.picker').neovim_data_find_files
+    require('mini.pick').registry.neovim_data_live_grep =
+        require('myconfig.picker').neovim_data_live_grep
+
+    require('mini.pick').registry.neovim_plugin_find_files =
+        require('myconfig.picker').neovim_plugin_find_files
+    require('mini.pick').registry.neovim_plugin_find_dir =
+        require('myconfig.picker').neovim_plugin_find_dir
+    require('mini.pick').registry.neovim_plugin_live_grep =
+        require('myconfig.picker').neovim_plugin_live_grep
+
+    require('mini.pick').registry.neovim_runtime_find_files =
+        require('myconfig.picker').neovim_runtime_find_files
+    require('mini.pick').registry.neovim_runtime_live_grep =
+        require('myconfig.picker').neovim_runtime_live_grep
+
+    require('mini.pick').registry.yaml_schema =
+        require('myconfig.picker').yaml_schema
+
+    require('mini.pick').registry.luasnip =
+        require('myconfig.picker').luasnip_picker
+
+    require('mini.pick').registry.media_files =
+        require('myconfig.picker').media_files
+
+    require('mini.pick').registry.hurl_files_picker =
+        require('myconfig.picker').hurl_files_picker
+    require('mini.pick').registry.env_files_picker =
+        require('myconfig.picker').env_files_picker
 end
-
-function M.setup_harpoon()
-    local harpoon = require('harpoon')
-
-    local function to_exact_name(value) return '^' .. value .. '$' end
-
-    --- the select function is called when a user selects an item from
-    --- the corresponding list and can be nil if select_with_nil is true
-    ---
-    --- Also decodes dynamic file names base on the current date
-    --- denoted by ${filname_goes_here}
-    --- When a dynamic name is detected the file name is decoded using
-    --- the os.date function in the lua standard library
-    --- for example "${test%Y-%m-%d.log}" would become "test2024-09-27.log"
-    --- if todays date was 2024-09-27 this allows adding current days log file
-    --- to the harpoon list without having to change it each day.
-    ---
-    --- Based on the default select in harpoon2 but modified to allow dynamic dates
-    --- in the file name
-    ---@param list_item? HarpoonListFileItem
-    ---@param list HarpoonList
-    ---@param options HarpoonListFileOptions
-    local function my_select(list_item, list, options)
-        local Logger = require('harpoon.logger')
-        local Extensions = require('harpoon.extensions')
-        Logger:log('config_defaut#select', list_item, list.name, options)
-        if list_item == nil then return end
-
-        options = options or {}
-
-        --Decode dynamic harpoon items based on current date
-        --for example "${test%Y-%m-%d.log}" would become "test2024-09-27.log"
-        --if todays date was 2024-09-27 this allows adding current days log file
-        --to the harpoon list without having to change it each day.
-        local list_item_value, _ = string.gsub(
-            list_item.value,
-            '^%${(.*)}$',
-            function(n) return os.date(n) end
-        )
-        local bufnr = vim.fn.bufnr(to_exact_name(list_item_value))
-        local set_position = false
-        if bufnr == -1 then -- must create a buffer!
-            set_position = true
-            -- bufnr = vim.fn.bufnr(list_item.value, true)
-            bufnr = vim.fn.bufadd(list_item_value)
-        end
-        if not vim.api.nvim_buf_is_loaded(bufnr) then
-            vim.fn.bufload(bufnr)
-            vim.api.nvim_set_option_value('buflisted', true, {
-                buf = bufnr,
-            })
-        end
-
-        if options.vsplit then
-            vim.cmd('vsplit')
-        elseif options.split then
-            vim.cmd('split')
-        elseif options.tabedit then
-            vim.cmd('tabedit')
-        end
-
-        vim.api.nvim_set_current_buf(bufnr)
-
-        if set_position then
-            local lines = vim.api.nvim_buf_line_count(bufnr)
-
-            local edited = false
-            if list_item.context.row > lines then
-                list_item.context.row = lines
-                edited = true
-            end
-
-            local row = list_item.context.row
-            local row_text =
-                vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)
-            local col = #row_text[1]
-
-            if list_item.context.col > col then
-                list_item.context.col = col
-                edited = true
-            end
-
-            local new_pos = {
-                list_item.context.row or 1,
-                list_item.context.col or 0,
-            }
-            vim.api.nvim_win_set_cursor(0, new_pos)
-
-            if edited then
-                Extensions.extensions:emit(
-                    Extensions.event_names.POSITION_UPDATED,
-                    {
-                        list_item = list_item,
-                    }
-                )
-            end
-        end
-
-        Extensions.extensions:emit(Extensions.event_names.NAVIGATE, {
-            buffer = bufnr,
-        })
-    end
-
-    ---@param config HarpoonPartialConfigItem
-    ---@param name? any
-    ---@return HarpoonListItem
-    local function my_create_list_item(config, name)
-        name = name
-            --TODO maybe we should only normalize the file name if it is actually
-            --a filename
-            or vim.fs.normalize(
-                vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
-            )
-
-        --Make the path relative to the root dir if it is in the root dir
-        name = vim.fs.relpath(vim.fs.normalize(config.get_root_dir()), name)
-            or name
-
-        local bufnr = vim.fn.bufnr(name, false)
-
-        local pos = { 1, 0 }
-        if bufnr ~= -1 then pos = vim.api.nvim_win_get_cursor(0) end
-
-        return {
-            value = name,
-            context = {
-                row = pos[1],
-                col = pos[2],
-            },
-        }
-    end
-    harpoon:setup({
-        settings = {
-            save_on_toggle = true,
-            sync_on_ui_close = true,
-        },
-        default = {
-            select = my_select,
-            create_list_item = my_create_list_item,
-        },
-    })
-
-    vim.keymap.set(
-        { 'n' },
-        '<leader>ea',
-        function() require('harpoon'):list():add() end,
-        {
-            desc = 'Harpoon: Add file',
-        }
-    )
-
-    vim.keymap.set(
-        { 'n' },
-        '<leader>et',
-        function()
-            require('harpoon').ui:toggle_quick_menu(require('harpoon'):list())
-        end,
-        {
-            desc = 'Harpoon: Toggle quick menu',
-        }
-    )
-
-    vim.keymap.set(
-        { 'n' },
-        '<leader>eo',
-        function() require('harpoon'):list():select(vim.v.count1) end,
-        {
-            desc = 'Harpoon: Go to file using count1',
-        }
-    )
-
-    vim.keymap.set(
-        { 'n' },
-        '<leader>1',
-        function() require('harpoon'):list():select(1) end,
-        { desc = 'Harpoon: Go to file 1' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>2',
-        function() require('harpoon'):list():select(2) end,
-        { desc = 'Harpoon: Go to file 2' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>3',
-        function() require('harpoon'):list():select(3) end,
-        { desc = 'Harpoon: Go to file 3' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>4',
-        function() require('harpoon'):list():select(4) end,
-        { desc = 'Harpoon: Go to file 4' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>5',
-        function() require('harpoon'):list():select(5) end,
-        { desc = 'Harpoon: Go to file 5' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>6',
-        function() require('harpoon'):list():select(6) end,
-        { desc = 'Harpoon: Go to file 6' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>7',
-        function() require('harpoon'):list():select(7) end,
-        { desc = 'Harpoon: Go to file 7' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>8',
-        function() require('harpoon'):list():select(8) end,
-        { desc = 'Harpoon: Go to file 8' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>9',
-        function() require('harpoon'):list():select(9) end,
-        { desc = 'Harpoon: Go to file 9' }
-    )
-    vim.keymap.set(
-        { 'n' },
-        '<leader>0',
-        function() require('harpoon'):list():select(10) end,
-        { desc = 'Harpoon: Go to file 10' }
-    )
-end
-
 function M.setup_render_markdown()
     if config.load_markdown_preview_plugins then
         require('render-markdown').setup({
@@ -2104,10 +1846,6 @@ function M.setup_neotest()
             require('neotest-python')({
                 dap = { justMyCode = false },
             }),
-            require('neotest-rust')({
-                -- args = { '--no-capture' },
-                -- dap_adapter = 'lldb',
-            }),
             require('neotest-vstest'),
         },
         icons = {
@@ -2310,7 +2048,12 @@ function M.setup_nvim_dap()
             name = 'netcoredbg: launch (fuzzy pick executable)',
             request = 'launch',
             console = 'integratedTerminal',
-            program = require('myconfig.dap').fuzzy_pick_executable,
+            program = function()
+                require('myconfig.dap').shellslash_hack()
+                local exe = require('myconfig.picker').executable_picker()
+                exe = vim.fn.fnamemodify(exe, ':p')
+                return exe
+            end,
         },
         {
             type = 'coreclr',
@@ -2322,7 +2065,7 @@ function M.setup_nvim_dap()
             type = 'coreclr',
             name = 'netcoredbg: attach (fuzzy pick process)',
             request = 'attach',
-            processId = require('myconfig.dap').fuzzy_pick_process,
+            processId = require('myconfig.picker').process_picker,
         },
         --TODO - possibly useful snippet to automatically find the dll
         --https://www.reddit.com/r/csharp/comments/15ktebq/comment/ks2dvb0/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
@@ -2659,8 +2402,6 @@ function M.setup_luasnip()
     require('luasnip').filetype_extend('ruby', { 'rdoc' })
     require('luasnip').filetype_extend('sh', { 'shelldoc' })
 
-    require('telescope').load_extension('luasnip')
-
     require('luasnip-lsp-server').setup({})
 end
 
@@ -2680,8 +2421,6 @@ function M.setup_venv_selector() require('venv-selector').setup({}) end
 
 function M.setup_csharpls_extended_lsp_nvim()
     require('csharpls_extended').buf_read_cmd_bind()
-
-    require('telescope').load_extension('csharpls_definition')
 end
 
 function M.setup_tiny_code_action_nvim() require('tiny-code-action').setup({}) end

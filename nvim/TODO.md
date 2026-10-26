@@ -8,7 +8,6 @@
   - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
     `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
 - try out basedpyright lsp [example](https://www.reddit.com/r/neovim/comments/1cpkeqd/comment/l3ux37y/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
-- Use counts on telescope pickers to where each count corresponds to a subfolder in the project to narrow the search scope
 - Use counts on harpoon for multiple lists
 - Use counts with gf to open file in the winnr
 - investigate preformance improvements
@@ -62,8 +61,6 @@
       ...b/AppData/Local/nvim-data/lazy/oil.nvim/lua/oil/init.lua:385: in function 'open'
       .config\nvim/lua/config/lazy.lua:942: in function <.config\nvim/lua/config/lazy.lua:932>
   ```
-
-- my telescope pickers don't work for opening selection split, vertical split, new tab
 
 ### Bugs I don't think are happening anymore
 
@@ -128,10 +125,10 @@
   - Add harpoon list for reruning overseer tasks
 - [ ] Settings
   - [ ] match tabs with what my formatters use for various file types
-  - [ ] add a local leader to start replacing keymaps from plugins with UI buffers like telescope, diffview, fugitive
+  - [ ] add a local leader to start replacing keymaps from plugins with UI buffers like mini.pick, diffview, fugitive
   - [ ] try out cspell or harper lsp instead of vim spell check
 - [ ] Snippets and Skeletons
-  - [x] Add keymap to select snippets with telescope (should help with discovering snippets from friendly-snippets)
+  - [x] Add keymap to select snippets with mini.pick (should help with discovering snippets from friendly-snippets)
   - [ ] Add t-sql snippets
     - [ ] update
     - [ ] insert
@@ -156,9 +153,8 @@
   - [x] Commands for interacting with hurl files (may use plugin)
   - [ ] wsdl support with code completion for fields
   - [ ] add a proxy that can log the requests as hurl files
-  - [ ] telescope navigation for hurl files
-  - [ ] add keymap to telescope navigation to create a duplicate of an existing hurl file
-  - [ ] add a keymap to oil.nvim that lets me select a hurl file via telescope to create a duplicate of
+  - [x] mini.pick navigation for hurl files
+  - [ ] add keymap to mini.pick navigation to create a duplicate of an existing hurl file
   - [ ] add hurl completion
 - [ ] Log files
   - [ ] make log files read only
@@ -167,7 +163,7 @@
   - [ ] live-update/pausing
   - [ ] highlights
   - [ ] remote/cloud logs
-  - [ ] (if my new harpoon parameterized dates is not sufficient) make telescope picker for log file folders using a harpoon list to control the log file locations
+  - [ ] (if my new harpoon parameterized dates is not sufficient) make mini.pick picker for log file folders using a harpoon list to control the log file locations
   - [ ] add StackTrace resume and StackTrace restart commands
 - [ ] QuickFix
   - [ ] keep track of commands that generated quickfix/loc lists so that I can reload them with a keybinding or go to a previous list
@@ -201,7 +197,7 @@
   - [ ] jupyter notebooks
 - [ ] Debugging
   - [ ] setup debugger for .net46 projects https://www.reddit.com/r/neovim/comments/1k7egep/using_a_custom_lua_mason_registry/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
-  - [x] pid telescope picker for processes
+  - [x] pid picker for processes
   - [ ] replace my custom build action with overseer actions
 - [ ] Testing
   - [ ] Add a picker for running test files
@@ -221,7 +217,7 @@
 - [ ] Refactor
   - [x] properly use setqflist action parameter for appending to an existing list.
   - [x] refactor my windows check to use `vim.fn.has('win32') == 1`
-  - [ ] refactor telescope keymap `<leader>fh` to no longer use a register in visual mode
+  - [x] refactor mini.pick keymap `<leader>fh` to no longer use a register in visual mode
   - [ ] refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
@@ -294,7 +290,6 @@
 - https://github.com/smjonas/inc-rename.nvim (maybe inline this plugin in my lsp config)
 - https://github.com/nvim-java/nvim-java
 - https://github.com/FabianWirth/search.nvim
-- https://github.com/fdschmidt93/telescope-egrepify.nvim
 - https://github.com/mfussenegger/nvim-jdtls
 - https://github.com/vxpm/ferris.nvim
 - https://github.com/dmitmel/cmp-cmdline-history
@@ -328,7 +323,6 @@
 - [Moving text blocks plugins](https://www.reddit.com/r/neovim/comments/18dk9bp/alternative_to_vimtextmanip_plugin_move_selected/?utm_medium=android_app&utm_source=share)
 - [Autorename a pair of tags](https://www.reddit.com/r/neovim/comments/18dpoq2/for_people_using_a_tag_autorename_plugin_such_as/?utm_medium=android_app&utm_source=share)
 - [Keymap discussion](https://www.reddit.com/r/neovim/comments/18jcj0q/any_advice_on_general_keymapping_methodologies/?utm_medium=android_app&utm_source=share)
-- [Telescope and Trouble QuickFix list](https://www.reddit.com/r/neovim/comments/18iyev5/enhancing_telescope_workflow_sending_marked_files/?utm_medium=android_app&utm_source=share)
 - [Telescope and quick fix list](https://www.reddit.com/r/neovim/comments/17ux1nf/comment/k996vs0/?utm_source=share&utm_medium=web2x&context=3)
 - [Quick fix list and diagnostics discussion](https://www.reddit.com/r/neovim/comments/187pdop/comment/kbgdm0y/?utm_medium=android_app&utm_source=share&context=3)
 - [Spell check](https://www.reddit.com/r/neovim/comments/18id6uu/how_to_get_riddisable_spellcheck_lines_not_from/?utm_medium=android_app&utm_source=share)
@@ -358,7 +352,6 @@
 - [Database UI discussion](https://www.reddit.com/r/neovim/comments/18bjsql/contributors_on_nvimdbee_are_doing_a_great_job/?utm_medium=android_app&utm_source=share)
 - [Building a neovim plugin for extra codelens information (Video)](https://www.youtube.com/watch?v=RtBh8-nSUvw)
 - [Multiple Neovim Configs discussion](https://www.reddit.com/r/neovim/comments/18ahduw/can_you_have_two_neovim_configurations_at_once/?utm_medium=android_app&utm_source=share)
-- [Typescript lsp bug solution](https://www.reddit.com/r/neovim/comments/189wtrz/opening_files_with_telescope_will_not_trigger_lsp/)
 - [Better Typescript error messages discussion](https://www.reddit.com/r/neovim/comments/189rqq7/comment/kbul7oh/?utm_medium=android_app&utm_source=share&context=3)
 - [Keymap discussion](https://www.reddit.com/r/neovim/comments/18a7d8i/comment/kbxcbx1/?utm_source=share&utm_medium=web2x&context=3)
 - [Keymap discussion](https://www.reddit.com/r/neovim/comments/18a7d8i/comment/kbw8kd3/?utm_medium=android_app&utm_source=share&context=3)

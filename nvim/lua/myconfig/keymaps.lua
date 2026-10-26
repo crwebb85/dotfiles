@@ -358,7 +358,7 @@ if config.use_experimental_gf then
             end
         end)
     end, {
-        desc = 'Custom Remap: Go to file or open telescope picker at parent folder',
+        desc = 'Custom Remap: Go to file or open file picker at parent folder',
     })
 
     --
@@ -392,7 +392,7 @@ if config.use_experimental_gf then
     --
     --     -- if terminal_manager == nil then return end
     -- end, {
-    --     desc = 'Custom Remap: Go to file or open telescope picker at parent folder',
+    --     desc = 'Custom Remap: Go to file or open picker at parent folder',
     -- })
     -- local function get_item_at_cursor()
     --     local bufnr = vim.api.nvim_get_current_buf()
@@ -503,7 +503,7 @@ if config.use_experimental_gf then
     --
     --     -- if terminal_manager == nil then return end
     -- end, {
-    --     desc = 'Custom Remap: Go to file or open telescope picker at parent folder',
+    --     desc = 'Custom Remap: Go to file or open picker at parent folder',
     -- })
 end
 
@@ -3213,4 +3213,99 @@ vim.keymap.set(
     'agi',
     ":<c-u>lua require('myconfig.utils.mapping').select_indent(true)<cr>",
     { desc = 'Select around indent textobject', silent = true }
+)
+
+-------------------------------------------------------------------------------
+---Harpoon
+
+vim.keymap.set(
+    { 'n' },
+    '<leader>ea',
+    function() require('myconfig.harpoon'):list():add() end,
+    {
+        desc = 'Harpoon: Add file',
+    }
+)
+
+vim.keymap.set(
+    { 'n' },
+    '<leader>et',
+    function()
+        require('myconfig.harpoon').ui:toggle_quick_menu(
+            require('myconfig.harpoon'):list()
+        )
+    end,
+    {
+        desc = 'Harpoon: Toggle quick menu',
+    }
+)
+
+vim.keymap.set(
+    { 'n' },
+    '<leader>eo',
+    function() require('myconfig.harpoon'):list():select(vim.v.count1) end,
+    {
+        desc = 'Harpoon: Go to file using count1',
+    }
+)
+
+vim.keymap.set(
+    { 'n' },
+    '<leader>1',
+    function() require('myconfig.harpoon'):list():select(1) end,
+    { desc = 'Harpoon: Go to file 1' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>2',
+    function() require('myconfig.harpoon'):list():select(2) end,
+    { desc = 'Harpoon: Go to file 2' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>3',
+    function() require('myconfig.harpoon'):list():select(3) end,
+    { desc = 'Harpoon: Go to file 3' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>4',
+    function() require('myconfig.harpoon'):list():select(4) end,
+    { desc = 'Harpoon: Go to file 4' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>5',
+    function() require('myconfig.harpoon'):list():select(5) end,
+    { desc = 'Harpoon: Go to file 5' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>6',
+    function() require('myconfig.harpoon'):list():select(6) end,
+    { desc = 'Harpoon: Go to file 6' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>7',
+    function() require('myconfig.harpoon'):list():select(7) end,
+    { desc = 'Harpoon: Go to file 7' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>8',
+    function() require('myconfig.harpoon'):list():select(8) end,
+    { desc = 'Harpoon: Go to file 8' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>9',
+    function() require('myconfig.harpoon'):list():select(9) end,
+    { desc = 'Harpoon: Go to file 9' }
+)
+vim.keymap.set(
+    { 'n' },
+    '<leader>0',
+    function() require('myconfig.harpoon'):list():select(10) end,
+    { desc = 'Harpoon: Go to file 10' }
 )

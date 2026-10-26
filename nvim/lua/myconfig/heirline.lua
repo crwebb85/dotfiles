@@ -263,11 +263,11 @@ function M.setup_heirline()
     ---@return string
     local function get_yaml_schema_name()
         --TODO I want to fetch the schema using an lsp request but
-        --this is somehow breaking my telescope picker for the yaml
-        --schemas. I think I need to send the request async and then
-        --update the heirline after it returns but that's a problem for
-        --future me. For now I will just save the selected schema name
-        --to a buffer variable when using the picker. This has the downside
+        --this was somehow breaking my old telescope picker (which I have since
+        --converted to mini.pick) for the yaml schemas. I think I need to send
+        --the request async and then update the heirline after it returns but
+        --that's a problem for future me. For now I will just save the selected
+        --schema name to a buffer variable when using the picker. This has the downside
         --of not displaying the name for auto detected schemas (although I haven't
         --yet confirmed if autodetection is working)
         --
