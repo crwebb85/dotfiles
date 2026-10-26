@@ -1,6 +1,8 @@
 local library = { require('myconfig.utils.path').get_vimruntime_dir() }
 
-for plugin_path in M.list_nvim_plugin_dirs() do
+for _, plugin_path in
+    ipairs(require('myconfig.utils.path').list_nvim_plugin_dirs())
+do
     if type == 'directory' then table.insert(library, plugin_path) end
 end
 
