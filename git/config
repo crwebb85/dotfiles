@@ -26,8 +26,8 @@
 [checkout]
 	defaultRemote = origin
 [rerere]
-	enabled = 1
-	autoupdate = 1
+	enabled = true
+	autoupdate = true
 [diff]
 	algorithm = histogram
 	colorMoved = plain
@@ -39,21 +39,32 @@
     ;Disables prompting if you want to open the diff of the next file after closing the
     ;current files diff
 	prompt = false
-[push]
-    ;automatically determine --set-upstream when no upstream is setup
-    ;TODO see if I like this setting
-	autoSetupRemote = true
-    ; TODO figure out what follow tags does
-	; followTags = true
 [fetch]
-    ;TODO determine if I like these settings
 	prune = true
 	pruneTags = true
 	all = true
-; TODO try out the following rebase settings
-; [rebase]
-; 	autoSquash = true 
-; 	updateRefs = true
 [sequence]
     ;The text editor used by `git rebase -i`
 	editor = nvim
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Trying these out from https://blog.gitbutler.com/how-git-core-devs-configure-git
+[column]
+    ui = auto ; better formatting for CLI table outputs
+[help]
+    autocorrect = prompt
+[commit]
+    ; Skipping because I feel it will make the
+    ; file withe the git commit prompt to be too long
+    ; since it adds the full git diff to the file
+    ; verbose = true 
+[push]
+    ;automatically determine --set-upstream when no upstream is setup
+	autoSetupRemote = true
+	followTags = true
+[rebase]
+	autoSquash = true 
+    autoStash = true
+	updateRefs = true
+[pull]
+    rebase = true ; automatically rebase commits on top when pulling

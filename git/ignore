@@ -3,4 +3,4 @@
 #variable is set to this repo path
 .nvim.lua
 Session.vim
-
+.hurl/
