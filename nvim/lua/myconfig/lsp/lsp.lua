@@ -463,7 +463,11 @@ function M.enable()
                 )
             end
 
-            if client:supports_method('textDocument/documentColor') then
+            if
+                client:supports_method(
+                    vim.lsp.protocol.Methods.textDocument_documentColor
+                )
+            then
                 vim.lsp.document_color.enable(true, { bufnr = event.buf }, {})
             end
 
@@ -484,6 +488,14 @@ function M.enable()
                 --enables linked editing for things like html elements so that the
                 --closing tag changes when the opening tag does
                 vim.lsp.linked_editing_range.enable(true, {})
+            end
+
+            if
+                client:supports_method(
+                    vim.lsp.protocol.Methods.textDocument_inlineCompletion
+                )
+            then
+                vim.lsp.inline_completion.enable(true, {})
             end
         end,
     })

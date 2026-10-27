@@ -178,6 +178,19 @@ function M.setup_lsp_keymaps()
         function() vim.lsp.codelens.run() end,
         { desc = 'LSP: Run Codelens' }
     )
+
+    vim.keymap.set(
+        'i',
+        '<C-F>',
+        vim.lsp.inline_completion.get,
+        { desc = 'LSP: accept inline completion' }
+    )
+    vim.keymap.set(
+        'i',
+        '<C-;>',
+        vim.lsp.inline_completion.select,
+        { desc = 'LSP: switch inline completion' }
+    )
 end
 
 return M
