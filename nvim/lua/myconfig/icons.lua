@@ -13,6 +13,7 @@ local nerd_font_icons_and_fallback = {
     file_readonly = { '', 'L' },
     terminal_icon = { '', 'term' },
     mode_icon = { ' ', '' }, --including spaces here so I don't need to refactor heirline component
+    treesitter_icon = { '', 'T' },
 
     ---------------------------------------------------------------------------
     ---Snippets

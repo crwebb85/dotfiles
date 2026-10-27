@@ -907,7 +907,16 @@ function M.setup_heirline()
 
     ---@type StatusLine
     local FileType = {
-        provider = function() return vim.bo.filetype end,
+        provider = function()
+            local ft = vim.bo.filetype
+            local lang = vim.treesitter.language.get_lang(ft) or ft
+            local has_parser = vim.treesitter.language.add(lang) --Not sure if this is the best way to determine if the parser is active
+            if has_parser then
+                return get_icon('treesitter_icon') .. ' ' .. ft -- Parser exists for filetype
+            else
+                return ft -- No parser exists for filetype
+            end
+        end,
         hl = { fg = filetype_foreground_color, bold = true },
     }
 
