@@ -1101,7 +1101,7 @@ function M.hurl_files_picker(opts)
         rg_tool_opts = {
             globs = globs,
             show_hidden = true,
-            show_ignore_vcs = true,
+            ignore_vcs = true,
         },
     }, opts)
 end
@@ -1119,7 +1119,7 @@ function M.env_files_picker(opts)
         rg_tool_opts = {
             globs = globs,
             show_hidden = true,
-            show_ignore_vcs = true,
+            ignore_vcs = true,
         },
     }, opts)
 end
