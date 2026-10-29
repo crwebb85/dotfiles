@@ -39,6 +39,9 @@
     requires
 - Go specific tools:
   - [go](https://go.dev/dl/)
+- Python specific tools:
+  - [pipx](https://pipx.pypa.io/stable/how-to/install-pipx.html) `py -m pip install --user pipx` and `py -m pipx ensurepath`
+  - [pip-audit](https://github.com/pypa/pip-audit) `pipx install pip-audit`
 
 ## Inlined Config Requirements:
 
@@ -51,6 +54,16 @@
   This needs to be setup for conform.nvim to format xml
 - `.\.config\powershell\setup.ps1` is used to setup the powershell profile for
   the first time
+
+### Updating vulnerable python packages:
+
+```ps1
+./venv/Script/activate
+pip-audit -r ./requirements.txt
+pip install --upgrade <package-name>==<version>
+pip freeze > requirements.txt
+
+```
 
 ## Optional Requirements:
 
@@ -126,36 +139,26 @@ git checkout -b <YYYY-MM-DD>
 # review the changes to my repo
 nvim ./ "+DiffviewOpen"
 
+# Compare the old config.lua with the new one in use `:diffget` to pull in any changes
+nvim --clean -d  $env:XDG_CONFIG_HOME\nvim\lua\myconfig\config.lua $env:XDG_CONFIG_HOME\nvim\lua\myconfig\config.lua.bak
+
 git add --all
 git commit --message "Backing up changes"
 
 git checkout main
 git pull
 
-# Restore plugins
-nvim --headless "+PackSync" +qa
-
-
-# the first time lazy restore runs it puts the versions
-# at HEAD so we need to stash the lock file and rerun
-# so it properly sets versions to the lazy lock file
-git stash
-
 # Restore plugins a second time to checkout the commits in the lock file
 nvim --headless "+PackSync" +qa
-
-# Compare the old config.lua with the new one in use `:diffget` to pull in any changes
-nvim --clean -d  $env:XDG_CONFIG_HOME\nvim\lua\myconfig\config.lua $env:XDG_CONFIG_HOME\nvim\lua\myconfig\config.lua.bak
-
-# If treesitter.nvim fails to install parsers on some machines, I sometimes edit
-# the curl request so I need pop the changes after restoring plugins
-git -C "$treesitterPath" stash pop
 
 # update jupytext_venv
 & $env:XDG_CONFIG_HOME\cli-tools\jupytext_venv\venv\Scripts\python.exe -m pip install -r "$env:XDG_CONFIG_HOME\cli-tools\jupytext_venv\requirements.txt"
 
 # update neovim_remote_plugin_python_venv
 & $env:XDG_CONFIG_HOME\cli-tools\neovim_remote_plugin_python_venv\venv\Scripts\python.exe -m pip install -r "$env:XDG_CONFIG_HOME\cli-tools\neovim_remote_plugin_python_venv\requirements.txt"
+
+# update ninja2
+& $env:XDG_CONFIG_HOME\cli-tools\ninja2\venv\Scripts\python.exe -m pip install -r "$env:XDG_CONFIG_HOME\cli-tools\ninja2\requirements.txt"
 
 # update prettier xml packages
 npm --cwd "$env:XDG_CONFIG_HOME\cli-tools\prettier" install
