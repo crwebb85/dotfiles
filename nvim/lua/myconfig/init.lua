@@ -1,5 +1,12 @@
 vim.g.mapleader = ' '
 
+-- Disable autoread plugin because of a bug in the filewatcher
+-- When a file was deleted (specifically my hurl files) I would get ENOENT
+-- that will keep getting repeated until the nvim_watch.log file filled up
+-- my drive and I ran out of disk space (TODO determine if that is repeatable
+-- on other computers and create a github issue for it)
+vim.g.loaded_autoread = 0
+
 local config = require('myconfig.config')
 local plugin_setups = require('myconfig.plugin_setups')
 
