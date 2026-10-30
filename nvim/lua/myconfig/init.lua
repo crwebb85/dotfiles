@@ -274,6 +274,12 @@ now(function()
         -- nvim-neotest/nvim-nio is used by nvim-neotest/neotest
         { src = 'https://github.com/nvim-neotest/nvim-nio' },
 
+        -- another async library
+        -- used by gregorias/coop.nvim
+        {
+            src = 'https://github.com/gregorias/coop.nvim',
+        },
+
         -- antoinemadec/FixCursorHold.nvim is used by:
         --  - nvim-neotest/neotest
         { src = 'https://github.com/antoinemadec/FixCursorHold.nvim' },
@@ -392,9 +398,13 @@ now(function()
             src = 'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
             version = 'main',
         },
+
         -- adds substitution keymaps that act like paste keymaps but don't
         -- replace the * register
         { src = 'https://github.com/gbprod/substitute.nvim' },
+
+        -- change variable/words naming convention
+        { src = 'https://github.com/gregorias/coerce.nvim' },
 
         -- Adds refactor commands
         -- TODO I don't really use this but I would like to. I think I should create
@@ -1224,6 +1234,9 @@ later(function()
 
     -- setup gbprod/substitute.nvim
     later(plugin_setups.setup_substitute_nvim)
+
+    -- setup gregorias/coerce.nvim
+    later(plugin_setups.setup_coerce)
 
     --setup nvim-neotest/neotest
     later(plugin_setups.setup_neotest)

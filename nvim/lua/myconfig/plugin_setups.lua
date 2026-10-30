@@ -222,6 +222,7 @@ function M.which_key()
     })
 
     local wk = require('which-key')
+    local wke = require('coerce.keymaps').which_key_expand
     -- Note don't forget to update this if I change the mapping namespaces
     wk.add({
         {
@@ -518,6 +519,35 @@ function M.which_key()
             'ivg',
             mode = { 'x', 'o' },
             group = 'Select around misc mappings (extra comments)',
+        },
+        {
+            '<leader>gc',
+            group = 'Coerce keymaps',
+            mode = { 'n', 'x' },
+        },
+        {
+            '<leader>gcr',
+            group = '+Coerce word',
+            expand = wke.normal_mode,
+            mode = 'n',
+        },
+        {
+            '<leader>gcl',
+            group = '+Coerce word (no LSP)',
+            expand = wke.normal_no_lsp_mode,
+            mode = 'n',
+        },
+        {
+            '<leader>gcm',
+            group = '+Coerce motion',
+            expand = wke.motion_mode,
+            mode = 'n',
+        },
+        {
+            '<leader>gcr',
+            group = '+Coerce visual',
+            expand = wke.visual_mode,
+            mode = 'x',
         },
     })
 end
@@ -1774,6 +1804,36 @@ function M.setup_substitute_nvim()
         {
             desc = 'Substitute: visual',
         }
+    )
+end
+
+function M.setup_coerce()
+    require('coerce').setup({
+        cases = require('coerce').default_cases,
+    })
+    vim.keymap.set(
+        'n',
+        '<leader>gcr',
+        '<Plug>(coerce-normal)',
+        { desc = 'Coerce: word' }
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>gcl',
+        '<Plug>(coerce-normal-no-lsp)',
+        { desc = 'Coerce: word (no LSP)' }
+    )
+    vim.keymap.set(
+        'n',
+        '<leader>gcm',
+        '<Plug>(coerce-motion)',
+        { desc = 'Coerce: motion' }
+    )
+    vim.keymap.set(
+        'x',
+        '<leader>gcr',
+        '<Plug>(coerce-visual)',
+        { desc = 'Coerce: visual' }
     )
 end
 function M.setup_neotest()

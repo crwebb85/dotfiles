@@ -16,9 +16,17 @@
       "rev": "3f4bc0b326606264ff75967f59091b5ddada0554",
       "src": "https://github.com/max397574/better-escape.nvim"
     },
+    "coerce.nvim": {
+      "rev": "1d0b987b02280ec03dc82f7a94acad4361eb8163",
+      "src": "https://github.com/gregorias/coerce.nvim"
+    },
     "conform.nvim": {
       "rev": "016802de402556da54c36bd7359b441266b01cdd",
       "src": "https://github.com/stevearc/conform.nvim"
+    },
+    "coop.nvim": {
+      "rev": "26df3be54846ed44b5a9d7749f7780049931b8a8",
+      "src": "https://github.com/gregorias/coop.nvim"
     },
     "csharpls-extended-lsp.nvim": {
       "rev": "ed20a88af5774319c7eafc7faa45c9fde7314b4e",
