@@ -256,9 +256,6 @@ now(function()
         ---------------------------------------------------------------------------
         -- Util plugins used by other plugins
 
-        -- nvim-tree/nvim-web-devicons is used by:
-        --  - sindrets/diffview.nvim
-        { src = 'https://github.com/nvim-tree/nvim-web-devicons' },
         -- nvim-mini/mini.icons is used by:
         --  - nvim-mini/mini.pick
         --  - MeanderingProgrammer/render-markdown.nvim
@@ -344,7 +341,11 @@ now(function()
         -- Adds Git commands
         { src = 'https://github.com/tpope/vim-fugitive' },
         -- Adds git diffview
-        { src = 'https://github.com/sindrets/diffview.nvim' },
+        {
+            -- an active developed fork of https://github.com/sindrets/diffview.nvim
+            -- diff at the time of switching https://github.com/dlyongemallo/diffview-plus.nvim/compare/4516612fe98ff56ae0415a259ff6361a89419b0a...3aba39f4d1704cc7aa26af487ab5579b5c614437
+            src = 'https://github.com/dlyongemallo/diffview-plus.nvim',
+        },
         -- Adds an API wrapper around git which I use in my heirline setup
         -- Adds Git blame
         -- Adds sidebar showing lines changed
