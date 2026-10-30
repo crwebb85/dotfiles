@@ -325,6 +325,7 @@ now(function()
         --- HTTP testing
         {
             src = 'https://github.com/mistweaverco/kulala.nvim',
+            version = '6656c9d332735ca6a27725e0fb45a1715c4372d9', --lock to version that doesn't require kulala core
             data = {
                 --This plugin ships with it's own treesitter parser that needs to be
                 --built
