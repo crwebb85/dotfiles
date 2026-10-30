@@ -521,30 +521,30 @@ function M.which_key()
             group = 'Select around misc mappings (extra comments)',
         },
         {
-            '<leader>gc',
+            '<leader>vr',
             group = 'Coerce keymaps',
             mode = { 'n', 'x' },
         },
         {
-            '<leader>gcr',
+            '<leader>vrr',
             group = '+Coerce word',
             expand = wke.normal_mode,
             mode = 'n',
         },
         {
-            '<leader>gcl',
+            '<leader>vrl',
             group = '+Coerce word (no LSP)',
             expand = wke.normal_no_lsp_mode,
             mode = 'n',
         },
         {
-            '<leader>gcm',
+            '<leader>vrm',
             group = '+Coerce motion',
             expand = wke.motion_mode,
             mode = 'n',
         },
         {
-            '<leader>gcr',
+            '<leader>vrr',
             group = '+Coerce visual',
             expand = wke.visual_mode,
             mode = 'x',
@@ -1813,25 +1813,25 @@ function M.setup_coerce()
     })
     vim.keymap.set(
         'n',
-        '<leader>gcr',
+        '<leader>vrr',
         '<Plug>(coerce-normal)',
         { desc = 'Coerce: word' }
     )
     vim.keymap.set(
         'n',
-        '<leader>gcl',
+        '<leader>vrl',
         '<Plug>(coerce-normal-no-lsp)',
         { desc = 'Coerce: word (no LSP)' }
     )
     vim.keymap.set(
         'n',
-        '<leader>gcm',
+        '<leader>vrm',
         '<Plug>(coerce-motion)',
         { desc = 'Coerce: motion' }
     )
     vim.keymap.set(
         'x',
-        '<leader>gcr',
+        '<leader>vrr',
         '<Plug>(coerce-visual)',
         { desc = 'Coerce: visual' }
     )
