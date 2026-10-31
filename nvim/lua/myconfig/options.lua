@@ -2,7 +2,19 @@ local config = require('myconfig.config')
 -------------------------------------------------------------------------------
 
 --- Look and feel
-if config.use_ui2 then require('vim._core.ui2').enable({ enable = true }) end
+if config.use_ui2 then
+    require('vim._core.ui2').enable({
+        enable = true,
+        msg = {
+            targets = {
+                -- progress option came from https://www.reddit.com/r/neovim/s/fRrAs9PBX2
+                -- for my lsp progress message but I don't understand what this option does
+                -- TODO update this comment with an explanation of the option
+                progress = 'msg',
+            },
+        },
+    })
+end
 vim.o.title = true
 vim.o.titlestring = [[%t – %{fnamemodify(getcwd(), ':t')}]]
 vim.o.colorcolumn = '80'
