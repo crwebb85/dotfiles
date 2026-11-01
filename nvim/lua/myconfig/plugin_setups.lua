@@ -222,7 +222,6 @@ function M.which_key()
     })
 
     local wk = require('which-key')
-    local wke = require('coerce.keymaps').which_key_expand
     -- Note don't forget to update this if I change the mapping namespaces
     wk.add({
         {
@@ -520,35 +519,7 @@ function M.which_key()
             mode = { 'x', 'o' },
             group = 'Select around misc mappings (extra comments)',
         },
-        {
-            '<leader>vr',
-            group = 'Coerce keymaps',
-            mode = { 'n', 'x' },
-        },
-        {
-            '<leader>vrr',
-            group = '+Coerce word',
-            expand = wke.normal_mode,
-            mode = 'n',
-        },
-        {
-            '<leader>vrl',
-            group = '+Coerce word (no LSP)',
-            expand = wke.normal_no_lsp_mode,
-            mode = 'n',
-        },
-        {
-            '<leader>vrm',
-            group = '+Coerce motion',
-            expand = wke.motion_mode,
-            mode = 'n',
-        },
-        {
-            '<leader>vrr',
-            group = '+Coerce visual',
-            expand = wke.visual_mode,
-            mode = 'x',
-        },
+        --Note: coerce namespaces added in setup_coerce()
     })
 end
 
@@ -1835,6 +1806,41 @@ function M.setup_coerce()
         '<Plug>(coerce-visual)',
         { desc = 'Coerce: visual' }
     )
+
+    local wk = require('which-key')
+    local wke = require('coerce.keymaps').which_key_expand
+    -- Note don't forget to update this if I change the mapping namespaces
+    wk.add({
+        {
+            '<leader>vr',
+            group = 'Coerce keymaps',
+            mode = { 'n', 'x' },
+        },
+        {
+            '<leader>vrr',
+            group = '+Coerce word',
+            expand = wke.normal_mode,
+            mode = 'n',
+        },
+        {
+            '<leader>vrl',
+            group = '+Coerce word (no LSP)',
+            expand = wke.normal_no_lsp_mode,
+            mode = 'n',
+        },
+        {
+            '<leader>vrm',
+            group = '+Coerce motion',
+            expand = wke.motion_mode,
+            mode = 'n',
+        },
+        {
+            '<leader>vrr',
+            group = '+Coerce visual',
+            expand = wke.visual_mode,
+            mode = 'x',
+        },
+    })
 end
 function M.setup_neotest()
     --- @type neotest_vstest.Config

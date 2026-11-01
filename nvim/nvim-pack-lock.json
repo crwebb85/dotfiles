@@ -17,8 +17,8 @@
       "src": "https://github.com/max397574/better-escape.nvim"
     },
     "coerce.nvim": {
-      "rev": "1d0b987b02280ec03dc82f7a94acad4361eb8163",
-      "src": "https://github.com/gregorias/coerce.nvim"
+      "rev": "f014ff90dc31d7634f1489297fade617435dcfbc",
+      "src": "https://github.com/crwebb85/coerce.nvim"
     },
     "conform.nvim": {
       "rev": "016802de402556da54c36bd7359b441266b01cdd",

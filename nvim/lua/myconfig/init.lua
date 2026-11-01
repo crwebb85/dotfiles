@@ -404,7 +404,14 @@ now(function()
         { src = 'https://github.com/gbprod/substitute.nvim' },
 
         -- change variable/words naming convention
-        { src = 'https://github.com/gregorias/coerce.nvim' },
+        {
+            -- original repository before I forked: 'https://github.com/gregorias/coerce.nvim',
+            -- my fork fixes it so that lua_ls knows where vim.lsp and friends are defined
+            src = 'https://github.com/crwebb85/coerce.nvim',
+            data = {
+                -- dev = true,
+            },
+        },
 
         -- Adds refactor commands
         -- TODO I don't really use this but I would like to. I think I should create
@@ -1184,9 +1191,6 @@ now(function()
 
     -- setup max397574/better-escape.nvim
     now(plugin_setups.better_escape)
-
-    -- setup nvim-treesitter/nvim-treesitter
-    -- now(plugin_setups.setup_nvim_treesitter)
 
     -- setup treesitter without nvim-treesitter
     now(require('myconfig.treesitter').setup_treesitter)
