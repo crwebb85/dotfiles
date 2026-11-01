@@ -12,6 +12,10 @@ function M.string_starts_with(s, prefix)
     return string.sub(s, 1, string.len(prefix)) == prefix
 end
 
+function M.string_ends_with(s, suffix)
+    return suffix == '' or string.sub(s, -#suffix) == suffix
+end
+
 ---Get the get default git branch name
 ---@return string
 function M.get_default_branch_name()
