@@ -169,7 +169,40 @@ local function load_plugins(plugin_data)
                 )
             )
         end
-        vim.opt.runtimepath:append(dev_path)
+
+        --Insert the dev path into runtimepath just before the vimruntime directory
+        --so that it behaves like vim.cmd.packadd does for non-dev plugins
+
+        local vimruntime_dir =
+            require('myconfig.utils.path').get_vimruntime_dir()
+        local rtp = vim.split(vim.o.runtimepath, ',')
+
+        -- Find the index of VIMRUNTIME
+        local vimruntime_idx = nil
+        for i, path in ipairs(rtp) do
+            if path == vimruntime_dir then
+                vimruntime_idx = i
+                break
+            end
+        end
+
+        -- If found, insert before it; otherwise, default to append
+        if vimruntime_idx then
+            table.insert(rtp, vimruntime_idx, dev_path)
+        else
+            vim.notify(
+                string.format(
+                    'Could not find the path VIMRUNTIME path of %s in vim.o.runtimepath of %s',
+                    vimruntime_dir,
+                    vim.inspect(vim.o.runtimepath)
+                ),
+                vim.log.levels.WARN
+            )
+            table.insert(rtp, dev_path)
+        end
+
+        -- Update Neovim's runtimepath
+        vim.o.runtimepath = table.concat(rtp, ',')
     end
 
     -- NOTE: The `:packadd` specifically seems to not handle spaces in dir name
@@ -192,11 +225,9 @@ local function load_plugins(plugin_data)
             false,
             true
         )
-        vim.tbl_map(
-            --- @param path string
-            function(path) vim.cmd.source({ path, magic = { file = false } }) end,
-            after_paths
-        )
+        for _, path in ipairs(after_paths) do
+            vim.cmd.source({ path, magic = { file = false } })
+        end
     end
 
     local treesitter = data.treesitter
