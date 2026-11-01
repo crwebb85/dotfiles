@@ -307,6 +307,25 @@ M.files_with_glob = function(local_opts, opts)
 end
 
 -------------------------------------------------------------------------------
+--- Pick files
+
+function M.files_picker()
+    M.files_with_glob(
+        {
+            rg_tool_opts = {
+                globs = get_default_rg_ignore_globs(),
+                show_hidden = true,
+            },
+        }, -- tool options
+        {
+            source = {
+                name = 'Find Files',
+            },
+        }
+    )
+end
+
+-------------------------------------------------------------------------------
 --- Pick harpoon items
 
 function M.harpoon_picker()
@@ -413,6 +432,7 @@ function M.neovim_config_find_files_picker()
     M.files_with_glob({
         rg_tool_opts = {
             globs = get_default_rg_ignore_globs(cwd),
+            show_hidden = true,
         },
     }, {
         source = {
@@ -442,6 +462,7 @@ function M.skeleton_find_files_picker()
     M.files_with_glob({
         rg_tool_opts = {
             globs = get_default_rg_ignore_globs(cwd),
+            show_hidden = true,
         },
     }, {
         source = {
@@ -471,6 +492,7 @@ function M.neovim_data_find_files()
     M.files_with_glob({
         rg_tool_opts = {
             globs = get_default_rg_ignore_globs(cwd),
+            show_hidden = true,
         },
     }, {
         source = {
@@ -500,6 +522,7 @@ function M.neovim_plugin_find_files()
     M.files_with_glob({
         rg_tool_opts = {
             globs = get_default_rg_ignore_globs(cwd),
+            show_hidden = true,
         },
     }, {
         source = {
@@ -543,6 +566,7 @@ function M.neovim_runtime_find_files()
     M.files_with_glob({
         rg_tool_opts = {
             globs = get_default_rg_ignore_globs(cwd),
+            show_hidden = true,
         },
     }, {
         source = {

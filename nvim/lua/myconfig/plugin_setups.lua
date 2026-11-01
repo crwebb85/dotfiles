@@ -1075,7 +1075,7 @@ function M.setup_mini_pick()
 
             schedule_picker_default_text(text)
         end
-        require('myconfig.picker').files_with_glob()
+        require('myconfig.picker').files_picker()
     end, {
         desc = 'mini.pick: find files',
     })
