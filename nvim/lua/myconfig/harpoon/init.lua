@@ -1,5 +1,4 @@
 --vendored plugin from https://github.com/ThePrimeagen/harpoon/blob/87b1a3506211538f460786c23f98ec63ad9af4e5/lua/harpoon/init.lua
-local Log = require('myconfig.harpoon.logger')
 local Ui = require('myconfig.harpoon.ui')
 local Data = require('myconfig.harpoon.data')
 local Config = require('myconfig.harpoon.config')
@@ -12,7 +11,6 @@ local HarpoonGroup = require('myconfig.harpoon.autocmd')
 ---@field ui MyHarpoonUI
 ---@field _extensions MyHarpoonExtensions
 ---@field data MyHarpoonData
----@field logger MyHarpoonLog
 ---@field lists {[string]: {[string]: MyHarpoonList}}
 ---@field hooks_setup boolean
 local MyHarpoon = {}
@@ -41,7 +39,6 @@ function MyHarpoon:new()
     local harpoon = setmetatable({
         config = config,
         data = Data.Data:new(config),
-        logger = Log,
         ui = Ui:new(config.settings),
         _extensions = Extensions.extensions,
         lists = {},
@@ -82,7 +79,7 @@ function MyHarpoon:list(name)
     return list
 end
 
----@param cb fun(list: HarpoonList, config: HarpoonPartialConfigItem, name: string)
+---@param cb fun(list: MyHarpoonList, config: MyHarpoonPartialConfigItem, name: string)
 function MyHarpoon:_for_each_list(cb)
     local key = self.config.settings.key()
     local lists = self.lists[key]
@@ -122,7 +119,7 @@ function MyHarpoon:extend(extension) self._extensions:add_listener(extension) en
 local the_harpoon = MyHarpoon:new()
 
 ---@param self MyHarpoon
----@param partial_config HarpoonPartialConfig?
+---@param partial_config MyHarpoonPartialConfig?
 ---@return MyHarpoon
 function MyHarpoon.setup(self, partial_config)
     if self ~= the_harpoon then

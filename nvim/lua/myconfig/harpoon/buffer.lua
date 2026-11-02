@@ -5,6 +5,11 @@ local M = {}
 
 local HARPOON_MENU = '__harpoon-menu__'
 
+---@type vim.Log
+local logger = vim.log.new({
+    name = 'myconfig.harpoon',
+})
+
 -- simple reason here is that if we are deving harpoon, we will create several
 -- ui objects, each with their own buffer, which will cause the name to be
 -- duplicated and then we will get a vim error on nvim_buf_set_name
@@ -18,13 +23,13 @@ end
 function M.run_select_command()
     ---@type MyHarpoon
     local harpoon = require('myconfig.harpoon')
-    harpoon.logger:log("select by keymap '<CR>'")
+    logger.info("select by keymap '<CR>'")
     harpoon.ui:select_menu_item()
 end
 
 function M.run_toggle_command(key)
     local harpoon = require('myconfig.harpoon')
-    harpoon.logger:log("toggle by keymap '" .. key .. "'")
+    logger.info("toggle by keymap '" .. key .. "'")
     harpoon.ui:toggle_quick_menu()
 end
 
@@ -77,7 +82,7 @@ function M.setup_autocmds_and_keymaps(bufnr)
         callback = function()
             require('myconfig.harpoon').ui:save()
             vim.schedule(function()
-                require('myconfig.harpoon').logger:log('toggle by BufWriteCmd')
+                logger.info('toggle by BufWriteCmd')
                 require('myconfig.harpoon').ui:toggle_quick_menu()
             end)
         end,
@@ -87,7 +92,7 @@ function M.setup_autocmds_and_keymaps(bufnr)
         group = MyHarpoonGroup,
         buffer = bufnr,
         callback = function()
-            require('myconfig.harpoon').logger:log('toggle by BufLeave')
+            logger.info('toggle by BufLeave')
             require('myconfig.harpoon').ui:toggle_quick_menu()
         end,
     })

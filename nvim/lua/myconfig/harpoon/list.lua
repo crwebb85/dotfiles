@@ -1,7 +1,11 @@
 --vendored plugin from https://github.com/ThePrimeagen/harpoon/blob/87b1a3506211538f460786c23f98ec63ad9af4e5/lua/harpoon/list.lua
-local Logger = require('myconfig.harpoon.logger')
 local utils = require('myconfig.harpoon.utils')
 local Extensions = require('myconfig.harpoon.extensions')
+
+---@type vim.Log
+local logger = vim.log.new({
+    name = 'myconfig.harpoon',
+})
 
 local function guess_length(arr)
     local last_known = #arr
@@ -125,7 +129,7 @@ function MyHarpoonList:add(item)
     item = item or self.config.create_list_item(self.config)
 
     local index = index_of(self.items, self._length, item, self.config)
-    Logger:log('MyHarpoonList:add', { item = item, index = index })
+    logger.info('MyHarpoonList:add', { item = item, index = index })
 
     if index == -1 then
         local idx = self._length + 1
@@ -152,7 +156,7 @@ end
 function MyHarpoonList:prepend(item)
     item = item or self.config.create_list_item(self.config)
     local index = index_of(self.items, self._length, item, self.config)
-    Logger:log('MyHarpoonList:prepend', { item = item, index = index })
+    logger.info('MyHarpoonList:prepend', { item = item, index = index })
     if index == -1 then
         local stop_idx = prepend_to_array(self.items, item)
         if stop_idx > self._length then self._length = stop_idx end
@@ -172,7 +176,7 @@ function MyHarpoonList:remove(item)
     for i = 1, self._length do
         local v = self.items[i]
         if self.config.equals(v, item) then
-            Logger:log('MyHarpoonList:remove', { item = item, index = i })
+            logger.info('MyHarpoonList:remove', { item = item, index = i })
             self.items[i] = nil
             if i == self._length then
                 self._length = determine_length(self.items, self._length)
@@ -190,7 +194,7 @@ end
 ---@return MyHarpoonList
 function MyHarpoonList:remove_at(index)
     if self.items[index] then
-        Logger:log(
+        logger.info(
             'MyHarpoonList:removeAt',
             { item = self.items[index], index = index }
         )

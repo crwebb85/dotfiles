@@ -63,28 +63,6 @@ function Builtins.navigate_with_number()
     }
 end
 
-function Builtins.highlight_current_file()
-    return {
-        UI_CREATE = function(cx)
-            for line_number, file in pairs(cx.contents) do
-                if string.find(cx.current_file, file, 1, true) then
-                    -- highlight the harpoon menu line that corresponds to the current buffer
-                    vim.api.nvim_buf_add_highlight(
-                        cx.bufnr,
-                        -1,
-                        'CursorLineNr',
-                        line_number - 1,
-                        0,
-                        -1
-                    )
-                    -- set the position of the cursor in the harpoon menu to the start of the current buffer line
-                    vim.api.nvim_win_set_cursor(cx.win_id, { line_number, 0 })
-                end
-            end
-        end,
-    }
-end
-
 return {
     builtins = Builtins,
     extensions = extensions,

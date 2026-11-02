@@ -1,6 +1,9 @@
 --vendored plugin from https://github.com/ThePrimeagen/harpoon/blob/87b1a3506211538f460786c23f98ec63ad9af4e5/lua/harpoon/config.lua
-local Extensions = require('myconfig.harpoon.extensions')
-local Logger = require('myconfig.harpoon.logger')
+
+---@type vim.Log
+local logger = vim.log.new({
+    name = 'myconfig.harpoon',
+})
 local function normalize_path(buf_name, root)
     --AI conversion of
     -- return require('plenary.path'):new(buf_name):make_relative(root)
@@ -100,9 +103,8 @@ function M.get_default_config()
             ---@param list MyHarpoonList
             ---@param options MyHarpoonListFileOptions
             select = function(list_item, list, options)
-                local Logger = require('myconfig.harpoon.logger')
                 local Extensions = require('myconfig.harpoon.extensions')
-                Logger:log(
+                logger.info(
                     'config_defaut#select',
                     list_item,
                     list.name,
@@ -237,6 +239,7 @@ function M.get_default_config()
             ---@param arg {buf: number}
             ---@param list MyHarpoonList
             BufLeave = function(arg, list)
+                local Extensions = require('myconfig.harpoon.extensions')
                 local bufnr = arg.buf
                 local bufname = normalize_path(
                     vim.api.nvim_buf_get_name(bufnr),
@@ -247,7 +250,7 @@ function M.get_default_config()
                 if item then
                     local pos = vim.api.nvim_win_get_cursor(0)
 
-                    Logger:log(
+                    logger.info(
                         'config_default#BufLeave updating position',
                         bufnr,
                         bufname,

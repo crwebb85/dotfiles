@@ -1,7 +1,11 @@
 --vendored plugin from https://github.com/ThePrimeagen/harpoon/blob/87b1a3506211538f460786c23f98ec63ad9af4e5/lua/harpoon/ui.lua
 local Buffer = require('myconfig.harpoon.buffer')
-local Logger = require('myconfig.harpoon.logger')
 local Extensions = require('myconfig.harpoon.extensions')
+
+---@type vim.Log
+local logger = vim.log.new({
+    name = 'myconfig.harpoon',
+})
 
 ---@class MyHarpoonToggleOptions
 ---@field border? any this value is directly passed to nvim_open_win
@@ -48,7 +52,7 @@ function MyHarpoonUI:close_menu()
     if self.closing then return end
 
     self.closing = true
-    Logger:log(
+    logger.info(
         'ui#close_menu name: ',
         list_name(self.active_list),
         'win and bufnr',
@@ -107,7 +111,7 @@ function MyHarpoonUI:_create_window(toggle_opts)
     })
 
     if win_id == 0 then
-        Logger:log(
+        logger.info(
             'ui#_create_window failed to create window, win_id returned 0'
         )
         self.bufnr = bufnr
@@ -130,7 +134,7 @@ end
 function MyHarpoonUI:toggle_quick_menu(list, opts)
     opts = toggle_config(opts)
     if list == nil or self.win_id ~= nil then
-        Logger:log('ui#toggle_quick_menu#closing', list and list.name)
+        logger.info('ui#toggle_quick_menu#closing', list and list.name)
         if self.settings.save_on_toggle then self:save() end
         self:close_menu()
         return
@@ -139,7 +143,7 @@ function MyHarpoonUI:toggle_quick_menu(list, opts)
     -- grab the current file before opening the quick menu
     local current_file = vim.api.nvim_buf_get_name(0)
 
-    Logger:log('ui#toggle_quick_menu#opening', list and list.name)
+    logger.info('ui#toggle_quick_menu#opening', list and list.name)
     local win_id, bufnr = self:_create_window(opts)
 
     self.win_id = win_id
@@ -173,7 +177,7 @@ function MyHarpoonUI:select_menu_item(options)
     local list, length = self:_get_processed_ui_contents()
     self.active_list:resolve_displayed(list, length)
 
-    Logger:log(
+    logger.info(
         'ui#select_menu_item selecting item',
         idx,
         'from',
@@ -190,7 +194,7 @@ end
 function MyHarpoonUI:save()
     local list, length = self:_get_processed_ui_contents()
 
-    Logger:log('ui#save', list)
+    logger.info('ui#save', list)
     self.active_list:resolve_displayed(list, length)
     if self.settings.sync_on_ui_close then
         require('myconfig.harpoon'):sync()
