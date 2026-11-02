@@ -884,7 +884,8 @@ function M.comment_toggle_motion_linewise(motion)
     -- If we are doing char or visual motion on the same line
     -- then we would probably want block comment instead of line comment
     local is_partial = motion == 'char'
-    local is_ending_line_comment = range.start_row == range.end_row
+    local is_ending_line_comment = is_partial
+        and range.start_row == range.end_row
         and M.is_only_whitespace_after(lines[1], range.end_col)
     local is_blockx = is_partial
         and range.start_row == range.end_row
