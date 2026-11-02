@@ -583,11 +583,18 @@ vim.keymap.set({ 'n' }, 'gx', function()
         return
     end
     for _, url in ipairs(require('vim.ui')._get_urls()) do
-        local err = do_open(url, vim.ui.open)
-        if err then vim.notify(err, vim.log.levels.ERROR) end
+        local choice = vim.fn.confirm(
+            string.format('Do you want to open url?\n%s', url),
+            '&Yes\n&No',
+            2
+        )
+        if choice == 1 then
+            local err = do_open(url, vim.ui.open)
+            if err then vim.notify(err, vim.log.levels.ERROR) end
+        end
     end
 end, {
-    desc = 'Custom Remap: Open lsp links if exists. Otherwise, fallback to default neovim functionality for open link',
+    desc = 'Custom Remap: Open link after prompting confirmation (also open github diff for pack plugins)',
 })
 
 -------------------------------------------------------------------------------
