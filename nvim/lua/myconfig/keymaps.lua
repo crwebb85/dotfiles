@@ -576,11 +576,6 @@ local function get_pack_plugin_link_at_cursor()
 end
 
 vim.keymap.set({ 'n' }, 'gx', function()
-    local link_uri = require('myconfig.lsp.lsplinks').get_link_at_cursor()
-    if link_uri ~= nil then
-        local err = do_open(link_uri, require('myconfig.lsp.lsplinks').open)
-        if err then vim.notify(err, vim.log.levels.ERROR) end
-    end
     local plugin_link = get_pack_plugin_link_at_cursor()
     if plugin_link ~= nil then
         local err = do_open(plugin_link, vim.ui.open)

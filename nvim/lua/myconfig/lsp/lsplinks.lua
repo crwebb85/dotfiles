@@ -1,4 +1,6 @@
 --Based on https://github.com/icholy/lsplinks.nvim/blob/master/lua/lsplinks.lua
+--Neovim now has native lsp link support so I only kept the code that underlines
+--the link (TODO there may be a more native way to do this remaining function)
 
 local M = {}
 
@@ -7,84 +9,6 @@ local links_by_buf = {} --TODO handle memory leaks
 
 ---@type integer
 local ns = vim.api.nvim_create_namespace('lsplinks')
-
----@return lsp.Position
-local function get_cursor_pos()
-    local cursor = vim.api.nvim_win_get_cursor(0)
-    local line = cursor[1] - 1 -- adjust line number for 0-indexing
-    local character = vim.lsp.util.character_offset(0, line, cursor[2], 'utf-8')
-    return { line = line, character = character }
-end
-
----@param pos lsp.Position
----@param range lsp.Range
----@return boolean
-local function in_range(pos, range)
-    if pos.line > range.start.line and pos.line < range['end'].line then
-        return true
-    elseif pos.line == range.start.line and pos.line == range['end'].line then
-        return pos.character >= range.start.character
-            and pos.character <= range['end'].character
-    elseif pos.line == range.start.line then
-        return pos.character >= range.start.character
-    elseif pos.line == range['end'].line then
-        return pos.character <= range['end'].character
-    else
-        return false
-    end
-end
-
---- Return the link under the cursor.
----
----@return string | nil
-function M.get_link_at_cursor()
-    local cursor = get_cursor_pos()
-    for _, link in ipairs(M.get_lsp_links_by_bufnr()) do
-        if in_range(cursor, link.range) then return link.target end
-    end
-    return nil
-end
-
---- Return the uri without the fragment
----
----@param uri string
----@return string
-local function remove_uri_fragment(uri)
-    local fragment_index = uri:find('#')
-    if fragment_index ~= nil then uri = uri:sub(1, fragment_index - 1) end
-    return uri
-end
-
---- Open the link under the cursor if one exists.
---- The return value indicates if a link was found.
----
----@param uri string | nil
----@return vim.SystemObj?
----@return string?
-function M.open(uri)
-    uri = uri or M.get_link_at_cursor()
-    if not uri then return false end
-    if uri:find('^file:/') then
-        vim.lsp.util.show_document(
-            { uri = remove_uri_fragment(uri) },
-            'utf-8',
-            {
-                reuse_win = true,
-                focus = true,
-            }
-        )
-        local line_no, col_no = uri:match('.-#(%d+),(%d+)')
-        if line_no then
-            vim.api.nvim_win_set_cursor(
-                0,
-                { tonumber(line_no), tonumber(col_no) - 1 }
-            )
-        end
-        return nil, nil
-    else
-        return vim.ui.open(uri)
-    end
-end
 
 -- Refresh the links for the current buffer
 function M.refresh()
