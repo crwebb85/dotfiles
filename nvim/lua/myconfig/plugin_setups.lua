@@ -1023,6 +1023,58 @@ function M.setup_mini_pick()
         },
     })
 
+    local function expandcmd(x)
+        local ok, res = pcall(vim.fn.expandcmd, x)
+        return ok and res or x
+    end
+    local function pick_command_parse_fargs(fargs)
+        local name = fargs[1]
+        local opts_parts =
+            vim.tbl_map(expandcmd, vim.list_slice(fargs, 2, #fargs))
+        local tbl_string =
+            string.format('{ %s }', table.concat(opts_parts, ', '))
+        local lua_load = loadstring('return ' .. tbl_string)
+        if lua_load == nil then
+            vim.notify(
+                'Could not convert extra command arguments to table: '
+                    .. tbl_string,
+                vim.log.levels.ERROR
+            )
+            return name, nil
+        end
+        return name, lua_load()
+    end
+
+    --Override the Pick command so that I can have fuzzy completion
+    vim.api.nvim_create_user_command('Pick', function(input)
+        local name, local_opts = pick_command_parse_fargs(input.fargs)
+        local f = require('mini.pick').registry[name]
+        if f == nil then
+            vim.notify(
+                string.format(
+                    'There is no picker named "%s" in registry.',
+                    name
+                ),
+                vim.log.levels.ERROR
+            )
+        else
+            f(local_opts)
+        end
+    end, {
+        nargs = '+',
+        complete = require('myconfig.utils.misc').make_fuzzy_completion(
+            function(_, line, col)
+                local prefix_from, prefix_to, _ =
+                    string.find(line, '^%S+%s+(%S*)')
+                if col < prefix_from or prefix_to < col then return {} end
+                local candidates = vim.tbl_keys(require('mini.pick').registry)
+                table.sort(candidates)
+                return candidates
+            end
+        ),
+        desc = "Pick from 'mini.pick' registry",
+    })
+
     require('mini.extra').setup()
 
     local function schedule_picker_default_text(default_text)
@@ -1614,7 +1666,7 @@ function M.setup_nvim_treesitter_context()
 end
 
 function M.setup_treesj()
-    local lang_utils = require('treesj.langs.utils')
+    -- local lang_utils = require('treesj.langs.utils')
     local opts = {
         use_default_keymaps = false,
         ---@type number If line after join will be longer than max value, node will not be formatted
