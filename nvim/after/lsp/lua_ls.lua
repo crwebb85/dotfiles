@@ -155,8 +155,15 @@ vim.api.nvim_create_autocmd('LspAttach', {
                 },
             }
         elseif
+                --Detect plugins
+            vim.fs.relpath(
+                    require('myconfig.utils.path').get_nvim_plugins_dir(),
+                    client.root_dir
+                )
+                ~= nil
             --Most plugins end in .nvim so this hopefully will be a decent way to detect it
-            require('myconfig.utils.misc').string_ends_with(
+            --for plugins I'm developing/creating bug fixes for
+            or require('myconfig.utils.misc').string_ends_with(
                 client.root_dir,
                 '.nvim'
             )
