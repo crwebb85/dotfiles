@@ -52,7 +52,7 @@ vim.o.guicursor =
 --- Note: I have an autocommand to temporarily disable timeout during macro
 --- recording since I try to slowly and carefully type my macros
 vim.o.timeout = true
-vim.o.timeoutlen = 300
+vim.o.timeoutlen = 400
 
 -------------------------------------------------------------------------------
 --- Clipboard

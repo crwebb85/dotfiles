@@ -218,7 +218,7 @@ function M.which_key()
         -- doesn't behave exactly like it used to
 
         -- delay = vim.o.timeoutlen,
-        delay = 1000,
+        delay = 1500,
     })
 
     local wk = require('which-key')
