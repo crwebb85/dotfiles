@@ -1,12 +1,6 @@
 ### Unorganized TODO:
 
 - look into skeleton (file template) plugins/configuration
-- try out new features:
-  - winfixbuf
-  - vim.ringbuf
-  - getregion()
-  - |gx| now uses |vim.ui.open()| and not netrw. To customize, you can redefine
-    `vim.ui.open` or remap `gx`. To continue using netrw (deprecated): >vim
 - try out basedpyright lsp [example](https://www.reddit.com/r/neovim/comments/1cpkeqd/comment/l3ux37y/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 - Use counts on harpoon for multiple lists
 - Use counts with gf to open file in the winnr
@@ -15,7 +9,6 @@
   - https://www.reddit.com/r/neovim/comments/1cjnf0m/fully_eliminate_gds_delay/
   - https://www.reddit.com/r/neovim/comments/1ch6yfz/smart_indent_with_treesitter_indent_fallback/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
 - [registers improvements](https://gist.github.com/MyyPo/569de2bff5644d2c351d54a0d42ad09f)
-- make file buffers not in current directory slightly redder
 - look into overseer docker templates https://github.com/LoricAndre/dotfiles/blob/main/dot_config/nvim/lua/overseer/template/docker/build.lua
 - have seperate keymaps for surround that adds spaces instead of adding them by default to `([{`
 - add smart operator to select in quotes that works with any quote and markdown code blocks
@@ -33,7 +26,6 @@
   `require('nvim-treesitter-textobjects.move').goto_previous_end( '@cast.outer', 'textobjects')` and
   `require('nvim-treesitter-textobjects.move').goto_next_end( '@cast.outer', 'textobjects')`
 - when in wezterm and I open my `nvim ./` from my .config directory then new wezterm tab the cwd will be .config/nvim instead of .config
-- 'gC' keymap doesn't invert correctly when comments have nested comments
 - fix my_on_output_quickfix.lua file as invalid characters added are added to
   the begining of items when using tail = true and append = true at the same time
   (this has been confirmed to happen with my GrepAdd command my temporary fix is to set tail to false)
@@ -64,40 +56,21 @@
 
 ### Bugs I don't think are happening anymore
 
-- something is causing my cmdheight to increase in size (vim.go.cmdheight or vim.o.cmdheight) it is rare but does happen
-
 ### Neovim bugs
 
-- redraw cmd and lazyredraw option now clear the selection messages so it was preventing me seeing which code actions I could pick
 - regression: LspStop no longer clears diagnostics
-- bug sometimes happens during completion (was using extui and native completion)
-  After the bug happens the `-- Insert --` text that displays over the Ex command line
-  will stay stuck above it preventing you from seeing the Ex commands you are typing.
-  I found no way to clear that text and when it happens i have to create a new tab and
-  close the old tab. Seems to be caused by vim.api.nvim\_\_redraw({ buf = ev.buf, statusline = true })
-  which is somehow commonly triggered by a neovim autocmd for DiagnosticChanged.
-  Somehow selecting a completion item triggers the autocmd.
 
   ```
-  Lua: ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: E565: Not allowed to change text or change window
-  stack traceback:
-      [C]: in function 'nvim_buf_set_text'
-      ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:162: in function 'set_virttext'
-      ...vim-win64\share\nvim\runtime/lua/vim/_extui/messages.lua:424: in function 'handler'
-      C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:44: in function 'ui_callback'
-      C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:89: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/_extui.lua:82>
-      [C]: in function 'nvim__redraw'
-      C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2916: in function <C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2914>
-      [C]: in function 'nvim_exec_autocmds'
-      C:\nvim-win64\share\nvim\runtime/lua/vim/diagnostic.lua:2610: in function 'reset'
-      C:/nvim-win64/share/nvim/runtime/lua/vim/lsp/client.lua:1262: in function '_on_detach'
-      C:\nvim-win64\sha
-  Error in "msg_showmode" UI event handler (ns=nvim._ext_ui):
 
   ```
 
 ### TODO and Workflows that need improvements
 
+- [ ] picker improvements
+  - [ ] smart case file search
+  - [ ] smart case rg search
+  - [ ] toggle smart case search, fuzzy search, exact search, regex with a keymap
+  - [ ] <C-?> should open a list of keymaps for the picker
 - [ ] project specific configuration
   - [ ] improve exrc
     1. Move this to the beginning of config
@@ -107,7 +80,7 @@
     3. Create a .nvim.lua skeleton file with the autocommands templates prepopulated
 - [ ] lsp
   - [ ] keymaps like grr should notify when no results were found
-  - [ ] try a newer dotnet lsp
+  - [x] try a newer dotnet lsp
   - [ ] create a way to disable/enable lsp's and formatters on a project level using .nvim.lua file
   - [ ] add debugger for older dotnet projects
 - [ ] terminal
@@ -186,7 +159,6 @@
   - [ ] special treesitter keymaps/text objexts
     - [ ] add `` i` and a` `` text objexts for inner and arround backticks (if in a markdown file use exclude the filetype when doing inner selection by using treesitter)
   - [x] try out https://github.com/MeanderingProgrammer/render-markdown.nvim
-  - [ ] possibly replace the markdown viewer I am using
 - [ ] Notetaking
   - [x] add some lsp/plugin for notetaking compatible with obsidian/dendron or other some other note taking app
   - [x] https://github.com/Feel-ix-343/markdown-oxide
@@ -207,6 +179,7 @@
   - [ ] show workspace diagnostic counts in heirline
   - [ ] add a symbol when I have any unsaved buffers
   - [ ] if an lsp diagnostics are hidden the lsp should appear orange in heirline
+  - [ ] show git information in oil buffer
 - [ ] CLI
   - [ ] add ripgrep completion to my powershell profile https://github.com/BurntSushi/ripgrep/blob/master/FAQ.md#complete
   - [ ] Create a bash completion script for attaching zellij session (https://opensource.com/article/18/3/creating-bash-completion-script)
@@ -218,7 +191,7 @@
   - [x] properly use setqflist action parameter for appending to an existing list.
   - [x] refactor my windows check to use `vim.fn.has('win32') == 1`
   - [x] refactor mini.pick keymap `<leader>fh` to no longer use a register in visual mode
-  - [ ] refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
+  - [x] refactor uses of vim.lsp.util.make_range_params() to use the character encoding parameter
 - [ ] Formatting
   - [ ] Formatting mode to only format git changes
   - [ ] add html formatter
@@ -253,10 +226,6 @@
   - [ ] try out [matze/vim-move](https://github.com/matze/vim-move)
   - [ ] try out [custom surrounds](https://github.com/kylechui/nvim-surround/discussions/53)
   - [ ] try out https://www.reddit.com/r/neovim/comments/1ckd1rs/helpful_treesitter_node_motion/?utm_medium=android_app&utm_source=share
-- [ ] Prune Plugins (plugins I might want to create my own version of or see if I still need it)
-  - iamcco/markdown-preview.nvim (replace with maybe my own version)
-  - nvim-tree/nvim-web-devicons (replace with echasnovski/mini.icons)
-  - hrsh7th/nvim-cmp (replace with native completion and https://www.reddit.com/r/neovim/comments/1fwhhp0/new_plugin_cmp2lsp/?utm_medium=android_app&utm_source=share)
 - [ ] improve lsp schema selection support for yaml, json, toml, and xml
   - [ ] Use off-spec lsp methods to fetch schema names from lsps for heirline
     - [ ] yamlls require('myconfig.lsp.off_spec_requests').yamlls_get_jsonschema(0)
@@ -313,7 +282,6 @@
 - [lua async tutorial](https://github.com/ms-jpq/lua-async-await)
 - [git message guide](https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/)
 - `:h skeleton` - for info about file templates
-- `:h win_gettype()`
 
 ### Interesting Articles/Posts:
 
