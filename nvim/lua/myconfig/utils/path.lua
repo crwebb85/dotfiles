@@ -181,6 +181,27 @@ function M.get_nvim_config_dir()
 end
 
 ---@return string plugins_path
+function M.get_nvim_site_dir()
+    local data_path = M.get_nvim_data_dir()
+    local site_dir = vim.fs.joinpath(data_path, 'site')
+
+    site_dir = vim.fs.normalize(site_dir)
+
+    local stat, err, error_name = vim.uv.fs_stat(site_dir)
+    if not stat or err or error_name then
+        local template = 'Error checking path stat for `%s`:\n %s: %s'
+        error(template:format(site_dir, error_name or '', err or ''))
+    end
+
+    if stat and stat.type ~= 'directory' then
+        local template = "Path %s already exists and it's not a directory!"
+        error(template:format(site_dir))
+    end
+
+    return site_dir
+end
+
+---@return string plugins_path
 function M.get_nvim_plugins_dir()
     local data_path = M.get_nvim_data_dir()
     local plugins_dir =

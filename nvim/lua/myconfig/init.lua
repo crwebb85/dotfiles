@@ -211,30 +211,30 @@ local function load_plugins(plugin_data)
             )
         end
 
-        --Insert the dev path into runtimepath just before the vimruntime directory
-        --so that it behaves like vim.cmd.packadd does for non-dev plugins
+        --Insert the dev path into runtimepath just after the the nvim-data/site
+        --directory so that it behaves like vim.cmd.packadd does for non-dev plugins
 
-        local vimruntime_dir =
-            require('myconfig.utils.path').get_vimruntime_dir()
+        local neovim_site_dir =
+            require('myconfig.utils.path').get_nvim_site_dir()
         local rtp = vim.split(vim.o.runtimepath, ',')
 
         -- Find the index of VIMRUNTIME
-        local vimruntime_idx = nil
+        local neovim_site_dir_idx = nil
         for i, path in ipairs(rtp) do
-            if path == vimruntime_dir then
-                vimruntime_idx = i
+            if path == neovim_site_dir then
+                neovim_site_dir_idx = i
                 break
             end
         end
 
         -- If found, insert before it; otherwise, default to append
-        if vimruntime_idx then
-            table.insert(rtp, vimruntime_idx, dev_path)
+        if neovim_site_dir_idx then
+            table.insert(rtp, neovim_site_dir_idx + 1, dev_path)
         else
             vim.notify(
                 string.format(
-                    'Could not find the path VIMRUNTIME path of %s in vim.o.runtimepath of %s',
-                    vimruntime_dir,
+                    'Could not find the path site path of %s in vim.o.runtimepath of %s',
+                    neovim_site_dir,
                     vim.inspect(vim.o.runtimepath)
                 ),
                 vim.log.levels.WARN
