@@ -10,6 +10,12 @@ vim.g.loaded_autoread = 0
 local config = require('myconfig.config')
 local plugin_setups = require('myconfig.plugin_setups')
 
+---@type vim.Log
+local perf_logger = vim.log.new({
+    name = 'myconfig.perf',
+    level = vim.log.levels.INFO,
+})
+
 local later_cache = {}
 local execute_now = function(f, init_trace)
     local ok, err = xpcall(
@@ -41,6 +47,33 @@ local execute_later = function()
     end)
     -- Space out "later" executions to be sure that they don't block anything
     timer:start(1, 0, f)
+end
+
+---@type table<string, uinteger>
+local packadd_time_delta_lookup = {}
+---@type [string, uinteger][]
+local now_callback_time_deltas = {}
+
+---@param plugin_name string
+local function packadd_with_timedelta(plugin_name)
+    local start_ms = vim.uv.now()
+    vim.cmd.packadd({
+        vim.fn.escape(plugin_name, ' '),
+        bang = not load,
+        magic = { file = false },
+    })
+    local end_ms = vim.uv.now()
+    if packadd_time_delta_lookup[plugin_name] ~= nil then
+        vim.notify(
+            string.format(
+                'already packadded plugin %s which previously had a timedelta of %s',
+                plugin_name,
+                packadd_time_delta_lookup[plugin_name]
+            ),
+            vim.log.levels.WARN
+        )
+    end
+    packadd_time_delta_lookup[plugin_name] = end_ms - start_ms
 end
 
 --- Execute a function on a condition and warn on error
@@ -84,11 +117,15 @@ end
 ---   now(function()
 ---     vim.notify('This will print now')
 ---   end)
-local now = function(f)
+---@param f fun() the function to run now
+---@param namespace? string to identify this function call in timing information
+local function now(f, namespace)
     -- TODO detect when the input is not a function and print a warning that I probably
     -- called the function directly not passed it in
     -- for example it should detect if I did `now(plugin_setups.setup_mark_code_action())`
     -- instead of `now(plugin_setups.setup_mark_code_action)`
+
+    local start_ms = vim.uv.now()
 
     -- Compute traceback before delaying execution to provide more info
     local init_trace = debug.traceback('', 2)
@@ -97,6 +134,10 @@ local now = function(f)
         f,
         function(e) return debug.traceback(e .. '\n', 2) end
     )
+    local end_ms = vim.uv.now()
+    local delta = end_ms - start_ms
+    table.insert(now_callback_time_deltas, { namespace or 'anonymous', delta })
+
     if ok then return true end
     init_trace = init_trace == nil and ''
         or ('\n\nTraceback of `now()` call:\n' .. init_trace)
@@ -114,7 +155,7 @@ vim.api.nvim_create_autocmd('PackChanged', {
         if
             name == 'molten-nvim' and (kind == 'update' or kind == 'install')
         then
-            if not ev.data.active then vim.cmd.packadd('molten-nvim') end
+            if not ev.data.active then packadd_with_timedelta('molten-nvim') end
             later(
                 function()
                     require('myconfig.notebook.notebook').my_update_remote_plugins()
@@ -207,11 +248,7 @@ local function load_plugins(plugin_data)
 
     -- NOTE: The `:packadd` specifically seems to not handle spaces in dir name
     if enable_runtimepath and not use_dev then
-        vim.cmd.packadd({
-            vim.fn.escape(plugin_name, ' '),
-            bang = not load,
-            magic = { file = false },
-        })
+        packadd_with_timedelta(plugin_name)
     end
 
     -- The `:packadd` only sources plain 'plugin/' files. Execute 'after/' scripts
@@ -259,24 +296,33 @@ end
 -------------------------------------------------------------------------------
 ---setup config
 now(function()
-    now(function() require('myconfig.options') end)
-    now(function() require('myconfig.autocmd') end)
-    now(function() require('myconfig.folding') end)
-    now(function() require('myconfig.lsp') end)
-    now(function() require('myconfig.mouse') end)
-    now(function() require('myconfig.user_commands') end)
-    now(function() require('myconfig.keymaps') end)
-    now(function() require('myconfig.overrides') end)
-    now(function() require('myconfig.test_harness') end)
+    now(function() require('myconfig.options') end, 'require myconfig.options')
+    now(function() require('myconfig.autocmd') end, 'require myconfig.autocmd')
+    now(function() require('myconfig.folding') end, 'require myconfig.folding')
+    now(function() require('myconfig.lsp') end, 'require myconfig.lsp')
+    now(function() require('myconfig.mouse') end, 'require myconfig.mouse')
+    now(
+        function() require('myconfig.user_commands') end,
+        'require myconfig.user_commands'
+    )
+    now(function() require('myconfig.keymaps') end, 'require myconfig.keymaps')
+    now(
+        function() require('myconfig.overrides') end,
+        'require myconfig.overrides'
+    )
+    now(
+        function() require('myconfig.test_harness') end,
+        'require myconfig.test_harness'
+    )
 
     now(function()
-        vim.cmd.packadd('cfilter')
-        vim.cmd.packadd('nvim.difftool')
+        packadd_with_timedelta('cfilter')
+        packadd_with_timedelta('nvim.difftool')
         ---Added the new native undo tree. I kindof like the old
         ---plugin better so Im going keep the old one and try this
         ---out on the side
-        vim.cmd.packadd('nvim.undotree')
-    end)
+        packadd_with_timedelta('nvim.undotree')
+    end, 'packadd native plugins')
 
     ---@type (string|MyPackSpec)[] List of plugin specifications. String item
     local specs = {
@@ -1221,32 +1267,35 @@ now(function()
         },
     }
 
-    now(function() vim.pack.add(specs, { load = load_plugins }) end)
+    now(
+        function() vim.pack.add(specs, { load = load_plugins }) end,
+        'vim.pack.add spec'
+    )
 
     -- setup tokyonight.nvim
-    now(plugin_setups.setup_tokyonight)
+    now(plugin_setups.setup_tokyonight, 'setup_tokyonight')
 
     -- setup echasnovski/mini.icons
-    now(plugin_setups.setup_mini_icons)
+    now(plugin_setups.setup_mini_icons, 'setup_mini_icons')
 
     -- setup stevearc/oil.nvim
-    now(plugin_setups.setup_oil)
+    now(plugin_setups.setup_oil, 'setup_oil')
 
     -- setup folke/which-key.nvim
-    now(plugin_setups.which_key)
+    now(plugin_setups.which_key, 'setup_which_key')
 
     -- setup max397574/better-escape.nvim
-    now(plugin_setups.better_escape)
+    now(plugin_setups.better_escape, 'setup_better_escape')
 
     -- setup treesitter without nvim-treesitter
-    now(require('myconfig.treesitter').setup_treesitter)
+    now(require('myconfig.treesitter').setup_treesitter, 'setup_treesitter')
 
     -- setup neovim/nvim-lspconfig
-    now(plugin_setups.setup_nvim_lspconfig)
+    now(plugin_setups.setup_nvim_lspconfig, 'setup_nvim_lspconfig')
 
     -- setup williamboman/mason.nvim
-    now(plugin_setups.setup_mason_nvim)
-end)
+    now(plugin_setups.setup_mason_nvim, 'setup_mason_nvim')
+end, 'initial setup now')
 
 later(function()
     -- setup mistweaverco/kulala.nvim
@@ -1343,6 +1392,14 @@ later(function()
         end
     )
 end)
+
+local packadd_total_time = 0
+for _, time_delta in pairs(packadd_time_delta_lookup) do
+    packadd_total_time = packadd_total_time + time_delta
+end
+perf_logger.info('packadd_total_time:', packadd_total_time)
+perf_logger.info('packadd_time_delta_lookup:', packadd_time_delta_lookup)
+perf_logger.info('now_callback_time_deltas:', now_callback_time_deltas)
 
 -- TODO
 -- {
